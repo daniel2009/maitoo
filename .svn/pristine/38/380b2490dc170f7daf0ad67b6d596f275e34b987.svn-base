@@ -1,0 +1,167 @@
+function loadNav61Data() {
+	$("a[name='a_rmb_recharge_link']").click(function(){
+		var amount = $(":text[name='amount_rmb']").val();
+		if (/^\d+(.\d{0,2})?$/.test(amount)) {
+			alert("请选择及时到账服务");
+			 window.open(alipay_recharge_url+ "?amount=" + amount);  
+			//window.location.href = alipay_recharge_url+ "?amount=" + amount;				
+		} else {
+			alert("请输入要充值的人民币数量，值必须是数字，而且大于0！");
+		}
+		return false;
+	});
+	
+};
+
+
+function xykcz() {
+	var name = $(":text[name='name']").val();
+	//var type = $(":text[name='type']").val();
+	var creditNo = $(":text[name='creditNo']").val();
+	var creditSecurityCode = $(":text[name='creditSecurityCode']").val();
+	var expireYear = $(":text[name='expireYear']").val();
+	var expireMonth = $(":text[name='expireMonth']").val();
+	
+	var amount = $(":text[name='amount']").val();
+	
+	if (confirm("您是否确认要进行信用卡预充值?")) {
+		$.ajax({
+			type:"post",
+			url:stripe_recharge_url,
+			data:{
+				"name":name,
+				//"type":type,
+				"creditNo":creditNo,
+				"currency":"usd",
+				"securityCode":creditSecurityCode,
+				"expireYear":expireYear,
+				"expireMonth":expireMonth,
+				"amount":amount
+			},
+			success:function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("充值成功");
+						nav61Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						// 失败
+						alert("充值失败，原因是:" + response.message);
+					}
+				}
+		});
+	}
+}
+///////////////////////////////////////
+function loadNav62Data() {
+	loadcwjlinfo("1");
+	
+	//设置跳转链接
+	$("#datatable tfoot a").click(function() {
+		// 跳页
+			var pn = $(this).attr("href");
+			loadcwjlinfo(pn);
+			return false;
+		});
+
+	$("#datatable tfoot input").keydown(function(event) {
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				loadcwjlinfo(pn);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});
+}
+
+
+
+function loadcwjlinfo(pn) {
+	$.ajax({
+		type : "get",
+		url : account_detail_search_url,
+		data : {
+			"pageIndex" : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+				if (response.data != null) {
+					showcwjllist(response.data.datas);
+					showpagesplit(response.data);
+				} else {
+					showcwjllist(null);
+					showpagesplit(null);
+				}
+				aftershow();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取财务记录信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+function showcwjllist(list) {
+	$("#datatable tbody").html("");
+	if (list != null && list.length > 0) {
+		$.each(list, function() {
+			var str = "<tr>";
+			str += "<td>" + this.id + "</td>";
+			str += "<td>" + this.name + "</td>";
+			if (this.type == "2") {
+				str += "<td>消费</td>";
+			} else {
+				str += "<td>充值</td>";
+			}
+			str += "<td>" + this.currency + "</td>";
+			str += "<td>" + this.amount + "</td>";
+			str += "<td>" + this.createDate + "</td>";
+			var remark = this.remark;
+			if (remark == null) {
+				remark = "";
+			}
+			if (this.state == "0") {
+				remark = "未处理:" + remark;
+			}else if (this.state == '1')
+			{
+				remark = "" + remark;
+			}
+			else if (this.state == '2') {
+				remark = "充值失败:" + remark;
+			}
+			str += "<td>" + remark + "</td></tr>";
+			$("#datatable tbody").append(str);
+		});
+	}
+}
+
+function showpagesplit(pageSplit) {
+	var rowCount = 0;
+	var pageSize = 0;
+	var pageNow = 0;
+	var pageCount = 0;
+	if (pageSplit != null) {
+		rowCount = pageSplit.rowCount;
+		pageSize = pageSplit.pageSize;
+		pageNow = pageSplit.pageNow;
+		pageCount = pageSplit.pageCount;
+	}
+	$("#trsize").html(rowCount);
+	$("#tpsize").html(pageCount);
+	$("#first_page").attr("href", "1");
+	$("#pre_page").attr("href", pageNow - 1);
+	$("#next_page").attr("href", pageNow + 1);
+	$("#last_page").attr("href", pageCount);
+}
+
+function aftershow() {
+}

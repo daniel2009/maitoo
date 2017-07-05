@@ -1,0 +1,12 @@
+package com.weiye.common.util;
+
+import java.io.PrintStream;
+
+public class UserCodeUtilTest
+{
+  public static void main(String[] args)
+  {
+    UserCodeUtil u = new UserCodeUtil();
+    System.out.println(UserCodeUtil.getUserCode());
+  }
+}

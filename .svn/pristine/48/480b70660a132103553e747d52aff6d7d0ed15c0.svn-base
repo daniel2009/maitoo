@@ -1,0 +1,25 @@
+package com.weiye.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.FlyInfo;
+import com.weiye.model.Order;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.Warehouse;
+import com.weiye.model.temp.ImportFlyInfo;
+
+
+public interface SendUserService {
+	/**
+	 * 添加航班信息
+	 * 
+	 * @param warehouse
+	 * @return
+	 * @throws ServiceException
+	 */
+	public ResponseObject<Object> getallbyid(String userid) throws ServiceException;
+
+}

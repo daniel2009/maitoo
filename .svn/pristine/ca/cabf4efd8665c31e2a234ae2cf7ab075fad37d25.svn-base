@@ -1,0 +1,435 @@
+<!doctype html>
+<html><!-- InstanceBegin template="/Templates/Template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta charset="utf-8">
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>91闪淘</title>
+<!-- InstanceEndEditable -->
+<link rel="stylesheet" type="text/css" href="css/libs/CSSRESET.css">
+<link rel="stylesheet" type="text/css" href="css/common.css">
+<script src="js/libs/jquery-1.11.1.min.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<link rel="stylesheet" type="text/css" href="css/discount.css">
+<script src="js/discount.js"></script>
+<!-- InstanceEndEditable -->
+</head>
+<body>
+	<input type="hidden" id="activeProductType" value="0">
+	<section class="menu">
+       	<div class="_container">
+        	<p>91闪淘为您服务</p>
+            <p><a href="../r/login.jsp">登陆</a><a href="../r/register.html">注册</a></p>
+        </div>
+    </section>
+    
+	<header class="header">
+    	<div class="_container">
+        	<h1><a href="javascript:;">91闪购</a></h1>
+            
+            <div class="search">
+				<input type="text" id="spiderOrderUrl" placeholder="请输入宝贝关键词或商品链接" onkeyup="javascript: if(event.keyCode==13){searchSpiderOrder();};"><input type="submit" value="搜索" onclick="searchSpiderOrder();"/>
+			</div>
+        </div>
+    </header>
+    <!-- header End -->
+    
+    <nav class="nav">
+    	<div class="_container">
+    		<ul class="ul_nav">
+				<li><a href="../91gou/index.html">首页</a></li>
+				<li class="active"><a href="javascript:;">优惠</a></li>
+				<li><a href="javascript:;">晒单</a></li>
+				<li><a href="../91gou/gou.html">一键购</a></li>
+				<li><a href="javascript:;">联系我们</a></li>
+			</ul>  
+            <div class="cart">
+            	<a href="../91gou/cart.html"><span></span>购物车中<em id="cartCount">0</em>件</a>
+            </div>
+        </div>
+    </nav>
+    <!-- nav -->
+    
+    <!-- InstanceBeginEditable name="EditRegion1" -->
+    <section class="list">
+    	<div class="_container">
+        	<h3>闪购清单</h3>
+            <div class="div_list clear">
+            	<ul class="ul_list">
+                	<li><img src="img/discount_pic_1.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_2.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_3.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_4.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    
+                    <li><img src="img/discount_pic_1.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_2.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_3.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_4.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    
+                    <li><img src="img/discount_pic_1.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_2.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_3.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_4.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    
+                    <li><img src="img/discount_pic_1.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                    <li><img src="img/discount_pic_2.png" /><p>金盒特价：BSN运动营养补充专场 低至4折</p></li>
+                </ul>
+                <p class="p_more"><a href="javascript:;">查看更多</a></p>
+            </div>
+            <a href="javascript:;" class="a_prev"></a>
+            <a href="javascript:;" class="a_next"></a>
+        </div>
+    </section>
+    
+    <section class="strategy">
+    	<div class="_container">
+        	<h3>闪购攻略</h3>
+            <div class="strategy_detail clear">
+                <p>1.史上最全海淘攻略 ：英国直邮Strawberry Children童装品牌特卖网站购物指南</p>
+                <p>2.史上最全海淘攻略：Victoria's Secret维多利亚的秘密美国官网注册购物指南</p>
+                <p>3.黑五哪买最便宜：Kohl's 科尔士百货 海淘注册下单攻略！</p>
+                <p>4.选择支付宝付款 3步搞定Saks Fifth Avenue直邮中国攻略</p>
+                <p>5.史上最全海淘攻略：10秒钟教你学会在Macy’s梅西百货上使用支付宝付款直邮中国扫大牌！</p>
+                <p>6.三步教你搞定Bloomingdale’s布鲁明戴尔百货官网下单 支付宝付款 直邮中国</p>
+                <p><a href="javascript:;">查看更多>></a></p>
+            </div>
+        </div>
+    </section>
+    
+    <section class="info">
+    	<div class="_container">
+        	<h3>闪购信息</h3>
+        	<div class="tabs">
+        		
+            	<ul class="ul_tabs" id="productTypeUl">
+                    <li class="active"><a href="javascript:;">全部</a></li>
+                    <li><a href="javascript: ;">美容护肤</a></li>
+                    <li><a href="javascript:;">服装鞋帽</a></li>
+                    <li><a href="javascript:;">妈咪宝贝</a></li>
+                    <li><a href="javascript:;">保健品sdfsdfsdfsdfd</a></li>
+                    <li><a href="javascript:;">好吃食品</a></li>
+                    <li><a href="javascript:;">品质家居</a></li>
+                    <li><a href="javascript:;">数码装备fssdfsdfdsfdsfdsfdf</a></li>
+                    <li><a href="javascript:;">钟表首饰</a></li>
+                </ul>
+            </div>
+            
+            <ul class="ul_info clear" id="productUl">
+            	<li>
+                	<img src="img/dicount_pd_1.png" alt=""/ >
+                    <h5>Seagate 希捷 Backup Plus 新睿品 USB3.0 便携移动硬盘 </h5>
+                    <p>$199.99(￥1315.00)</p>
+                    <div class="info_func">
+                        <p>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                        </p>
+              
+                        <a href="javascript:;">购物直达></a>
+                    </div>
+                </li>
+                
+                <li>
+                	<img src="img/dicount_pd_1.png" alt=""/ >
+                    <h5>Seagate 希捷 Backup Plus 新睿品 USB3.0 便携移动硬盘 </h5>
+                    <p>$199.99(￥1315.00)</p>
+                    <div class="info_func">
+                        <p>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                        </p>
+              
+                        <a href="javascript:;">购物直达></a>
+                    </div>
+                </li>
+                
+                <li>
+                	<img src="img/dicount_pd_1.png" alt=""/ >
+                    <h5>Seagate 希捷 Backup Plus 新睿品 USB3.0 便携移动硬盘 </h5>
+                    <p>$199.99(￥1315.00)</p>
+                    <div class="info_func">
+                        <p>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                        </p>
+              
+                        <a href="javascript:;">购物直达></a>
+                    </div>
+                </li>
+                
+                <li>
+                	<img src="img/dicount_pd_1.png" alt=""/ >
+                    <h5>Seagate 希捷 Backup Plus 新睿品 USB3.0 便携移动硬盘 </h5>
+                    <p>$199.99(￥1315.00)</p>
+                    <div class="info_func">
+                        <p>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                        </p>
+              
+                        <a href="javascript:;">购物直达></a>
+                    </div>
+                </li>
+                
+                <li>
+                	<img src="img/dicount_pd_1.png" alt=""/ >
+                    <h5>Seagate 希捷 Backup Plus 新睿品 USB3.0 便携移动硬盘 </h5>
+                    <p>$199.99(￥1315.00)</p>
+                    <div class="info_func">
+                        <p>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                        </p>
+              
+                        <a href="javascript:;">购物直达></a>
+                    </div>
+                </li>
+                <!-- group -->
+                
+                <li>
+                	<img src="img/dicount_pd_1.png" alt=""/ >
+                    <h5>Seagate 希捷 Backup Plus 新睿品 USB3.0 便携移动硬盘 </h5>
+                    <p>$199.99(￥1315.00)</p>
+                    <div class="info_func">
+                        <p>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                        </p>
+              
+                        <a href="javascript:;">购物直达></a>
+                    </div>
+                </li>
+                
+                <li>
+                	<img src="img/dicount_pd_1.png" alt=""/ >
+                    <h5>Seagate 希捷 Backup Plus 新睿品 USB3.0 便携移动硬盘 </h5>
+                    <p>$199.99(￥1315.00)</p>
+                    <div class="info_func">
+                        <p>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                        </p>
+              
+                        <a href="javascript:;">购物直达></a>
+                    </div>
+                </li>
+                
+                <li>
+                	<img src="img/dicount_pd_1.png" alt=""/ >
+                    <h5>Seagate 希捷 Backup Plus 新睿品 USB3.0 便携移动硬盘 </h5>
+                    <p>$199.99(￥1315.00)</p>
+                    <div class="info_func">
+                        <p>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                        </p>
+              
+                        <a href="javascript:;">购物直达></a>
+                    </div>
+                </li>
+                
+                <li>
+                	<img src="img/dicount_pd_1.png" alt=""/ >
+                    <h5>Seagate 希捷 Backup Plus 新睿品 USB3.0 便携移动硬盘 </h5>
+                    <p>$199.99(￥1315.00)</p>
+                    <div class="info_func">
+                        <p>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                            <a href="javascript:;">0</a>
+                        </p>
+              
+                        <a href="javascript:;">购物直达></a>
+                    </div>
+                </li>
+                <!-- group -->
+            </ul>
+            
+            <div class="paging" id="pagination"><a class="active">1</a><a>2</a><a>3</a><a>...</a><a>下一页</a></div>
+        	
+        </div>
+    </section>
+    <!-- InstanceEndEditable -->
+    
+    <footer class="footer">
+    	<div class="_container">
+        	<div class="link">
+            	<p>
+                	<a href="javascript:;">首页</a>&nbsp;|&nbsp;
+                    <a href="javascript:;">最新优惠</a>&nbsp;|&nbsp;
+                    <a href="javascript:;">闪淘晒单</a>&nbsp;|&nbsp;
+                    <a href="javascript:;">海淘经验</a>
+                </p>
+                
+                <p>
+                	<a href="javascript:;">关于我们</a>&nbsp;|&nbsp;
+                    <a href="javascript:;">联系我们</a>&nbsp;|&nbsp;
+                    <a href="javascript:;">加入我们</a>&nbsp;|&nbsp;
+                    <a href="javascript:;">建议反馈</a>
+                </p>
+            </div>
+        
+        	<div class="flink">
+            	<a href="javascript:;">360导航</a>&nbsp;|&nbsp;
+                <a href="javascript:;">中环转运</a>&nbsp;|&nbsp;
+                <a href="javascript:;">乐一番</a>&nbsp;|&nbsp;
+                <a href="javascript:;">飞碟快递</a>&nbsp;|&nbsp;
+                <a href="javascript:;">易海淘</a>&nbsp;|&nbsp;
+                <a href="javascript:;">转运中国</a>&nbsp;|&nbsp;
+                <a href="javascript:;">先锋快递</a>&nbsp;|&nbsp;
+                <a href="javascript:;">瓦拉淘</a>&nbsp;|&nbsp;
+                <a href="javascript:;">海带宝</a>&nbsp;|&nbsp;
+                <a href="javascript:;">八达网</a>&nbsp;|&nbsp;
+                <a href="javascript:;">今日头条</a><br/>
+                <a href="javascript:;">网易新闻</a>&nbsp;|&nbsp;
+                <a href="javascript:;">搜狐新闻</a>&nbsp;|&nbsp;
+                <a href="javascript:;">转运四方</a>
+          </div>
+             
+          <p class="copyright">© copyright 2012-2014 极客海淘. All rights reserved. 京ICP备14036389号-1 京公网安备11010602100083</p>
+      </div>
+</footer>
+<script src="../resources/scripts/htmlTagUtil.js"></script>
+<script src="../resources/scripts/imgUtil.js"></script>
+<script>
+setFooter(".footer");
+serachProductType();
+searchProduct(0);
+getCartCount();
+function serachProductType(){
+	$.ajax({
+		type: "post",
+		url: "../productType/findAll",
+		success: function(response) {
+			if(200==response.code){
+				$("#productTypeUl").html("");
+				string = "<li id='productTypeLi0'><a href='javascript: searchProduct(0);'>全部</a></li>";
+				for(var i=0; i<response.data.datas.length; i++){
+					string += "<li id='productTypeLi"+ response.data.datas[i].id + "'><a href='javascript: searchProduct(" + response.data.datas[i].id + ");'>" + response.data.datas[i].name + "</a></li>";
+				}
+				$("#productTypeUl").html(string);
+			}
+		}
+	});
+}
+function searchProduct(typeId){
+	var orignalTypeId = $("#activeProductType").val();
+	$("#productTypeLi" + orignalTypeId).removeClass("active");
+	var formData = new FormData();
+	if(0 < typeId){
+		formData.append("typeId", typeId);
+	}
+	$("#productTypeLi" + typeId).addClass("active");
+	$("#activeProductType").val(typeId);
+	loadProductList(formData);
+}
+function loadProductList(formData){
+	$.ajax({
+		type: "post",
+		url: "../product/findAllByUser",
+		data : formData,
+		processData : false,
+		contentType : false,
+		success: function(response) {
+			if(200==response.code ){
+				showProductList(response.data.datas);
+				showProductPage(response.data);
+				clearWrongImgNoBaseUrl();
+			}else if(36011 == response.code){
+				showProductList(0);
+				$("#pagination").html("");
+			}
+		}
+	});
+}
+function showProductList(list){
+	$("#productUl").html("");
+	string = "";
+	for(var i=0; i<list.length; i++){
+		var product = list[i];
+		string += "<li style='height: 500px;'>";
+		string += "<img src='../" + product.pic1 + "' style='width: 250px; height: 250px;' alt=''/>";
+		string += "<h5 style='max-height: 200px; overflow: hidden; '>" + product.name + "</h5>";
+		var price = product.price;
+		if(price == "" || price == -999999){
+			price = "<span style='color: #f00;'>待定</span>";
+		}
+		string += " <p>" + product.currency + price + "</p>";
+		string += "<div class='info_func'>";
+		string += "<p>";
+		string += "<a href='javascript:;'>0</a>";
+		string += "<a href='javascript:;'>0</a>";
+		string += "<a href='javascript:;'>" + product.commentNum + "</a>";
+		string += "</p>";
+		string += "<a href='javascript: getProductInfo(" + product.id + ");'>购物直达></a>";
+		string += "</div>";
+		string += "</li>";
+	}
+	$("#productUl").html(string);
+}
+function showProductPage(pageSplit){
+	$("#pagination").html("");
+	var string = "";
+	if(pageSplit.pageNow-1 > 0){
+		var pageNow = pageSplit.pageNow-1;
+		string += "<a onclick='javascript: changePage(" + pageNow + ");'>上一页</a>";
+	}
+	var active = " class='active' ";
+	for(var i=-2; i<3; i++){
+		var pageNow = pageSplit.pageNow+i;
+		if(pageNow > 0 && (pageNow < pageSplit.pageCount || pageNow == pageSplit.pageCount)){
+			string += "<a " + (i==0 ? active : "") + (i==0 ? "" : " onclick='javascript: changePage(" + pageNow + ");' ") + ">" + pageNow + "</a>";
+		}
+	}
+	if(pageSplit.pageNow+1 == pageSplit.pageCount || pageSplit.pageNow+1 < pageSplit.pageCount){
+		var pageNow = pageSplit.pageNow+1;
+		string += "<a onclick='javascript: changePage(" + pageNow + ");'>下一页</a>";
+	}
+	$("#pagination").html(string);
+}
+function changePage(pageIndex){
+	var formData = new FormData();
+	var typeId = $("#activeProductType").val();
+	formData.append("pageIndex", pageIndex);
+	if(0 < typeId){
+		formData.append("typeId", typeId);
+	}
+	loadProductList(formData);
+	return false;
+}
+function getCartCount(){
+	$.ajax({
+		type: "get",
+		url: "../cart/countCart",
+		success: function(response) {
+			if(200==response.code || 36019==response.code){
+				$("#cartCount").html(response.data);
+			}else if(607 == response.code){
+				var cartArray = localStorage.getItem("cartArray");
+				if(cartArray != null){
+					cartArray = JSON.parse(cartArray);
+					$("#cartCount").html(cartArray.length);
+				}
+			}
+		}
+	});
+}
+function getProductInfo(productId){
+	window.sessionStorage.setItem("productIdKeep", productId);
+	location.href = "../91gou/product_detail.html";
+}
+function searchSpiderOrder(){
+	sessionStorage.setItem("spiderOrderUrlKeep", $("#spiderOrderUrl").val());
+	sessionStorage.removeItem("productIdKeep");
+	location.href="../91gou/product_detail.html";
+}
+</script>
+</body>
+<!-- InstanceEnd --></html>

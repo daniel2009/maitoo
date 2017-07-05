@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <title>美淘快递</title>
+    <meta charset="utf-8" />
+    <!-- Page Loader - Needs to be placed in header for loading at top of all content -->
+    <script type="text/javascript" src="js/pace.min.js"></script>
+    <link href="css/pace-loading-bar.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/animate.shipping.css">
+    <link rel="stylesheet" type="text/css" href="css/ShippingIcon.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" id="main-style" type="text/css" href="css/style.css">
+    
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+          <script type="text/javascript">
+   
+
+        function checkCode() {
+            $("#spanError").css("display", "none");
+
+            var code = $("#searchinput").val();
+            if (code == null) {
+                $("#spanError").css("display", "block");
+                alert("面单号不存在");
+            } else {
+               // this.document.location = "newwaybill.jsp?oid=" + escape(code);
+               if((code!="")||(code!="undefined")||(code!=null))
+            	{
+            	   code=code.trim();
+            	}
+               
+               this.document.location = "route-kd100.jsp?oid=" + escape(code);
+            }
+        }
+
+        function BillCodeOnKeyDown(obj, event) {
+            // 输入回车时，焦点转移同一行的重量输入框
+            if (event.keyCode == '13') {
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
+
+                checkCode();
+            }
+        }
+        function BillCodeOnKeyDown_click() {
+        	checkCode();
+        }
+    </script>
+</head>
+
+<body class="blue page-loading">
+<!--悬浮窗口-->
+<style type="text/css">
+#msg_win{border:1px solid #A67901; border-radius:10px; background:#EAEAEA;width:240px;position:absolute;right:10px;font-size:12px;font-family:Arial;margin:0px;display:none;overflow:hidden;z-index:99;}
+#msg_win .icos{position:absolute;top:2px;*top:0px;right:2px;z-index:9;}
+.icos a{float:left;color:#833B02;margin:1px;text-align:center;font-weight:bold;width:14px;height:22px;line-height:22px;padding:1px;text-decoration:none;font-family:webdings;}
+.icos a:hover{color:#fff;}
+#msg_title{background:#FECD00;border-bottom:1px solid #A67901;border-top:1px solid #FFF;border-left:1px solid #FFF;color:#000;height:40px;line-height:40px;text-indent:5px;}
+#msg_content{margin:5px;margin-right:0;width: ;height:300px;overflow:hidden;}
+</style>
+<div id="msg_win" style="display:block;top:490px;visibility:visible;opacity:1;">
+	<div class="icos"><a id="msg_min" title="最小化" href="javascript:void 0">_</a><a id="msg_close" title="关闭" href="javascript:void 0">×</a></div>
+	<div id="msg_title">包裹价格自助查询</div>
+	<div id="msg_content"><form>
+    						<label style="margin-bottom: 0px;">门店</label>
+                            <select>
+                            	<option>
+                                洛杉矶店
+                                </option>
+                                <option>
+                                拉斯维加斯店
+                                </option>
+                                <option>
+                                俄勒冈店
+                                </option>
+                                <option>
+                                洛杉矶店
+                                </option>
+                                <option>
+                                洛杉矶店
+                                </option>
+                                <option>
+                                洛杉矶店
+                                </option></select><br/>
+                            <label style="margin-bottom: 0px;">渠道</label>
+                            <select>
+                            	<option>
+                                洛杉矶店
+                                </option>
+                                <option>
+                                拉斯维加斯店
+                                </option>
+                                <option>
+                                俄勒冈店
+                                </option>
+                                <option>
+                                洛杉矶店
+                                </option>
+                                <option>
+                                洛杉矶店
+                                </option>
+                                <option>
+                                洛杉矶店
+                                </option></select>
+                             <label style="margin-bottom: 0px;">商品类型</label>
+                           <select>
+                            	<option>
+                                洛杉矶店
+                                </option>
+                                <option>
+                                拉斯维加斯店
+                                </option>
+                                <option>
+                                俄勒冈店
+                                </option>
+                                <option>
+                                洛杉矶店
+                                </option>
+                                <option>
+                                洛杉矶店
+                                </option>
+                                <option>
+                                洛杉矶店
+                                </option></select>
+                             <label style="margin-bottom: 0px;">重量</label>
+                            <input type="text" style="margin-bottom: 0px;padding-bottom: 0px;padding-top: 0px;padding-left: 0px; padding-right: 0px; height:25px;">
+                            <button>查看价格</button>
+                            </form></div>
+</div>
+<script language="javascript">
+var Message={
+	set: function() {//最小化与恢复状态切换
+		var set=this.minbtn.status == 1?[0,1,'block',this.char[0],'最小化']:[1,0,'none',this.char[1],'恢复'];
+		this.minbtn.status=set[0];
+		this.win.style.borderBottomWidth=set[1];
+		this.content.style.display =set[2];
+		this.minbtn.innerHTML =set[3]
+		this.minbtn.title = set[4];
+		this.win.style.top = this.getY().top;
+	},
+	close: function() {//关闭
+		this.win.style.display = 'none';
+		window.onscroll = null;
+	},
+	setOpacity: function(x) {//设置透明度
+		var v = x >= 100 ? '': 'Alpha(opacity=' + x + ')';
+		this.win.style.visibility = x<=0?'hidden':'visible';//IE有绝对或相对定位内容不随父透明度变化的bug
+		this.win.style.filter = v;
+		this.win.style.opacity = x / 100;
+	},
+	show: function() {//渐显
+		clearInterval(this.timer2);
+		var me = this,fx = this.fx(0, 100, 0.1),t = 0;
+		this.timer2 = setInterval(function() {
+			t = fx();
+			me.setOpacity(t[0]);
+			if (t[1] == 0) {clearInterval(me.timer2)}
+		},10);
+	},
+	fx: function(a, b, c) {//缓冲计算
+		var cMath = Math[(a - b) > 0 ? "floor": "ceil"],c = c || 0.1;
+		return function() {return [a += cMath((b - a) * c), a - b]}
+	},
+	getY: function() {//计算移动坐标
+		var d = document,b = document.body,	e = document.documentElement;
+		var s = Math.max(b.scrollTop, e.scrollTop);
+		var h = /BackCompat/i.test(document.compatMode)?b.clientHeight:e.clientHeight;
+		var h2 = this.win.offsetHeight;
+		return {foot: s + h + h2 + 2+'px',top: s + h - h2 - 2+'px'}
+	},
+	moveTo: function(y) {//移动动画
+		clearInterval(this.timer);
+		var me = this,a = parseInt(this.win.style.top)||0;
+		var fx = this.fx(a, parseInt(y));
+		var t = 0 ;
+		this.timer = setInterval(function() {
+			t = fx();
+			me.win.style.top = t[0]+'px';
+			if (t[1] == 0) {
+				clearInterval(me.timer);
+				me.bind();
+			}
+		},10);
+	},
+	bind:function (){//绑定窗口滚动条与大小变化事件
+		var me=this,st,rt;
+		window.onscroll = function() {
+			clearTimeout(st);
+			clearTimeout(me.timer2);
+			me.setOpacity(0);
+			st = setTimeout(function() {
+				me.win.style.top = me.getY().top;
+				me.show();
+			},600);
+		};
+		window.onresize = function (){
+			clearTimeout(rt);
+			rt = setTimeout(function() {me.win.style.top = me.getY().top},100);
+		}
+	},
+	init: function() {//创建HTML
+		function $(id) {return document.getElementById(id)};
+		this.win=$('msg_win');
+		var set={minbtn: 'msg_min',closebtn: 'msg_close',title: 'msg_title',content: 'msg_content'};
+		for (var Id in set) {this[Id] = $(set[Id])};
+		var me = this;
+		this.minbtn.onclick = function() {me.set();this.blur()};
+		this.closebtn.onclick = function() {me.close()};
+		this.char=navigator.userAgent.toLowerCase().indexOf('firefox')+1?['_','::','×']:['0','2','r'];//FF不支持webdings字体
+		this.minbtn.innerHTML=this.char[0];
+		this.closebtn.innerHTML=this.char[2];
+		setTimeout(function() {//初始化最先位置
+			me.win.style.display = 'block'; 
+			me.win.style.top = me.getY().foot;
+			me.moveTo(me.getY().top);
+		},0);
+		return this;
+	}
+};
+Message.init();
+</script>
+<!--/悬浮窗口-->
+    <!-- Section Start - Header -->
+    <section class='header' id='header'>
+        <!-- Header Top Bar - Start -->
+         <div class="topbar-wrap">
+            <div class="container">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 logo-area">
+                    <div class="logo">
+                        <div>
+                        <a href="index.html">
+                            <img src="img/logo.jpg" alt="Header Image" class="img-responsive"><!--<i class="icon icon-logo white"></i>-->
+                            </a>
+                        </div>
+                        <!--<span class="name">SHIPPING</span>
+                        <span class="small">Logistics & Transport</span>-->
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-9 col-sm-8 col-xs-5 menu-area pull-right">
+                    <!-- Menu Top Bar - Start -->
+                    <div class="topbar">
+                        <div class="menu">
+                            <div class="primary inviewport animated delay2" data-effect="">
+                                <div class='cssmenu'>
+                                    <!-- Menu - Start -->
+                                    <ul class='menu-ul'>
+                                        <li class='has-sub'>
+                                            <a href='index.html'><b>首页</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='price.html'><b>收费标准</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='about-us-2.html'><b>关于我们</b></a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='contact.html'><b>联系我们</b></a>
+                                        </li>
+                                        <!--<li class='has-sub'>
+                                            <a href='location.html'><b>公司地点</b></a>
+                                        </li>-->
+                                         <li class='has-sub'>
+                                            <a href='News.html'><b>新闻公告</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='login.jsp'><b>登陆</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='registe.html'><b>注册</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='upload.html'><b>上传ID</b></a>
+                                        </li>
+                                          
+                                    </ul>
+                                    <!-- Menu - End -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Menu Top Bar - End -->
+                    <!-- Mobile Menu - Start -->
+                    <div class="menu-mobile col-xs-10 pull-right cssmenu">
+                        <i class="icon icon-menu menu-toggle"></i>
+                        <ul class="menu" id='parallax-mobile-menu'>
+                        </ul>
+                    </div>
+                    <!-- Mobile Menu - End -->
+                </div>
+            </div>
+        </div>
+        <!-- Header Top Bar - End -->
+        <div class="header-bg header-small">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 slantbar hidden-xs"></div>
+            <!-- Header Tracking Box - Start--> 
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 white-wrap hidden-xs">
+                <div class="white-box">
+                    <div class="track-order">
+                        <div class="track-logo transition col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <i class="icon icon-logo"></i>
+                        </div>
+                        <div class=" col-lg-9 col-md-9 col-sm-9 col-xs-9 track-form-wrap">
+                               <form method='post' action="#" class="track-form">
+                                <input type="text" id="searchinput" placeholder="单号" onkeydown=" BillCodeOnKeyDown(this, event); ">
+                               <!--  <i class="icon icon-magnify" onclick="checkCode();"></i> -->
+                                 <a href="javascript: BillCodeOnKeyDown_click()"><i class="icon icon-magnify" ></i></a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Tracking Box - End -->
+            
+            <!-- Header Content Slide - Start -->
+            <div style="position:relative;display:inline-block;width:100%;height:auto;">
+                <img src="img/banner-5s.jpg" alt="Header Image" class="img-responsive">
+                <div class="bg-overlay"></div>
+                <div class="main-wrap">
+                    <div class="container">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 main-content">
+                            <h1>收费标准</h1>
+                            <div class="headul"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Content Slide - End -->
+        </div>
+    </section>
+    <!-- Section End - Header -->
+    
+    <!-- Section Start - Grid Columns -->
+    <section>
+        <div class="container">
+        
+    <div class=" pull-right"><form><label style="text-align:right;">门店快速选择:</label><select>
+    	<option>洛杉矶蒙特利公园店</option>
+        <option>1</option>
+        <option>1</option>
+        <option>1</option>
+        <option>1</option>
+        <option>1</option>
+    </select></form></div><br/><br/><br/>
+        <!--tab-->
+        <center><ul class="nav nav-tabs">
+ 
+  <li class="dropdown active" style=" font-size:30px;">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+    洛杉矶
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="#">蒙特利公园</a></li>
+      <li><a href="#">Submenu 1-2</a></li>
+      <li><a href="#">Submenu 1-3</a></li> 
+    </ul>
+  </li>
+  <li class="dropdown" style=" font-size:30px;">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">拉斯维加斯
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="#">Submenu 1-1</a></li>
+      <li><a href="#">Submenu 1-2</a></li>
+      <li><a href="#">Submenu 1-3</a></li> 
+    </ul>
+  </li>
+  <li class="dropdown" style=" font-size:30px;">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">俄勒冈
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="#">Submenu 1-1</a></li>
+      <li><a href="#">Submenu 1-2</a></li>
+      <li><a href="#">Submenu 1-3</a></li> 
+    </ul>
+  </li>
+  <li class="dropdown" style=" font-size:30px;">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">洛杉矶
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="#">Submenu 1-1</a></li>
+      <li><a href="#">Submenu 1-2</a></li>
+      <li><a href="#">Submenu 1-3</a></li> 
+    </ul>
+  </li>
+  <li class="dropdown" style=" font-size:30px;">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">洛杉矶
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="#">Submenu 1-1</a></li>
+      <li><a href="#">Submenu 1-2</a></li>
+      <li><a href="#">Submenu 1-3</a></li> 
+    </ul>
+  </li>
+  <li class="dropdown" style=" font-size:30px;">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">洛杉矶
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="#">Submenu 1-1</a></li>
+      <li><a href="#">Submenu 1-2</a></li>
+      <li><a href="#">Submenu 1-3</a></li> 
+    </ul>
+  </li>
+  <li class="dropdown" style=" font-size:30px;">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#">洛杉矶
+    <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      <li><a href="#">Submenu 1-1</a></li>
+      <li><a href="#">Submenu 1-2</a></li>
+      <li><a href="#">Submenu 1-3</a></li> 
+    </ul>
+  </li>
+</ul></center><!--/tab-->
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12 ui-columns">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="panel-body">渠道一（包税包清关）</div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">时效</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">可否混装</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	价格/磅</div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="panel-body">食品、保健品、婴儿用品、及衣服鞋子、玩具、 安全座椅</div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">6-10天</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	可</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	$4.5</div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="panel-body">品牌保健品、奶粉米粉、蛋白粉等粉类、等一般物品</div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">6-10天</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	可</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	$5</div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="panel-body">护肤品、化妆品、小电器</div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">6-10天</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	可</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	$6.5</div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="panel-body">海参、花旗参 、海味 、 液体</div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">20天</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	可</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	$15</div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="panel-body">COACH/ MK/KS 等品牌包包</div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">6-10天</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	可</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	$7</div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="panel-body">不在上述范围内均属一般物品</div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">6-10天</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	可</div>
+                        </div>
+                         <div class="col-lg-2 col-md-2 col-sm-2">
+                            <div class="panel-body">	$6.5</div>
+                        </div>
+                    </div>
+                    
+                     <div class="headul"></div>
+                    
+                     <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">渠道二</div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">渠道三</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">渠道四</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">渠道五</div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">美国邮政小包价格</div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">美国邮政优先件价格</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">美国邮政特快件价格</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">中国邮政身份证渠道</div>
+                        </div>
+                    </div>
+                      <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">只能发中国</div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">可以发全球218个国家地区</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">可以发全球218个国家地区</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">提供身份证，如有关税自理</div>
+                        </div>
+                    </div>
+                      <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">时效6-10天</div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">时效6-10天</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">时效3-5天</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">时效6-10天</div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">首磅12</div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">首磅32</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">首磅42</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">首磅7</div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">续磅5</div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">续磅3.8</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">续磅5</div>
+                        </div>
+                          <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="panel-body">续磅3.2</div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Section End - Grid Columns -->
+    
+    <!-- Section Start - Footer -->
+     <section class='footer bg-black parallax ' id='footer'>
+        <div class="bg-overlay"></div>
+        <div class="container">
+            <div class="row">
+                <!-- Text Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 text-widget inviewport animated delay1" data-effect="fadeInUp">
+                    <div class="logo">
+                        <div>
+                        <a href="index.html">
+                            <img src="img/logo.jpg" alt="Header Image" class="img-responsive" style="width:50%; height:50%;">
+                            </a>
+                        </div>
+                    </div>
+                    <p>公司简介</p>
+                    
+                </div>
+                <!-- Text Widget - End -->
+               <!-- News Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 news-widget inviewport animated delay2" data-effect="fadeInUp">
+                    <h4>微信公众号</h4>
+                    <div class="headul left-align"></div>
+                    <div class="news-wrap row">
+                        <div class="pic col-md-3 col-xs-3 col-sm-3 col-lg-3">
+                            <img alt="news-image" class="img-responsive" src="img/news-1.jpg">
+                        </div>
+                        <div class="info col-md-9 col-xs-9 col-sm-9 col-lg-9">
+                            <h5 class="title"><a href='#'>公众号名称(或微信号)</a></h5>
+                            <div class="date">william18559</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- News Widget - End -->
+                <!-- Contact Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 contact-widget inviewport animated delay3" data-effect="fadeInUp">
+                    <h4>公司地址</h4>
+                    <div class="headul left-align"></div>
+                    <p>地址: 2428 w valley blvd, alhambra  
+                        
+                        <br>CA 91803</p>
+                    <p>电子邮箱: williamliang111@yahoo.com
+                        <br> 联系电话:  (626)620-1616&nbsp;(626)382-3025&nbsp;(626)410-8845</p>
+                </div>
+                <!-- Contact Widget - End -->
+            </div>
+        </div>
+        <!-- Copyright Bar - Start -->
+        <div class="copyright">
+            <div class="col-md-12">
+                <div class="container">
+                    <div class="">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 message inviewport animated delay1" data-effect="fadeInUp">
+                            <span class="">&copy; Copyright WebXury Inc. 2016. ® All Rights Reserved </span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 social">
+                            <a href="#" class="inviewport animated delay1" data-effect="fadeInUp"><i class="icon icon-facebook text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay2" data-effect="fadeInUp"><i class="icon icon-twitter text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay3" data-effect="fadeInUp"><i class="icon icon-dribbble text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay4" data-effect="fadeInUp"><i class="icon icon-google-plus text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay5" data-effect="fadeInUp"><i class="icon icon-youtube-play text-on-primary"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Copyright Bar - End -->
+    </section>
+    <!-- Section End - Footer -->
+    <!-- Javascript & CSS Files moved to bottom of page for faster loading -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/inviewport-1.3.2.js"></script>
+    <!-- Main JS -->
+    <script type="text/javascript" src="js/main.js"></script>
+</body>
+
+</html>

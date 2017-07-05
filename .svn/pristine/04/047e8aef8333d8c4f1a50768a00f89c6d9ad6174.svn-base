@@ -1,0 +1,144 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+		<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">报表统计</p>
+
+		<div class="box_content">
+			<div class="content_title">报表统计</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<form action="${pageContext.request.contextPath }/admin/order/export_internal"  method="get">
+			            &nbsp; 选择门店：<select class="text-input" name="wid" style="width:200px;">
+							<option value="-1">所有门店</option>
+						</select>
+						<br/><br/>
+			            &nbsp; 
+								创建日期：
+								<input type="text" class="text-input Wdate" size="15" name="sd" onClick="WdatePicker()" style="width:100px;"/>
+								~
+								<input type="text" class="text-input Wdate" size="15" name="ed" onClick="WdatePicker()" style="width:100px;"/>
+								&nbsp;
+								关键字：
+								<input class="text-input" size="10" type="text" name="key" style="width:100px;" />
+								<select class="text-input" name="type" style="width:100px;">
+									<option value="-1">
+										请选择搜索方式
+									</option>
+									<option value="0">
+										运单号
+									</option>
+									<option value="1">
+										转运单号
+									</option>
+									<option value="2">
+										所属用户
+									</option>
+									<option value="3">
+										收件人姓名
+									</option>
+								</select>
+								<select class="text-input" name="state" style="width:100px;">
+									<option value="-1">
+										请选择状态
+									</option>
+									<option value="0">等待审核</option>
+									<option value="1">未付款</option>
+									<option value="2">已入库</option>
+									<option value="3">送往集散中心</option>
+									<option value="4">集散中心已入库</option>
+									<option value="5">送往机场</option>
+									<option value="6">空运中</option>
+									<option value="7">海关清关</option>
+									<option value="8">目的地第三方快递</option>
+									<option value="9">收件人已接收</option>
+								</select>
+				         
+				         <input class="button" type="submit" value="导出清单表格数据" />
+				         <div class="clear"></div>
+			         </form>
+					<div class="notification information png_bg" style="margin-top:10px">
+	      				<div>
+	      				导出的时间格式必须是yyyy-MM-dd这种形式。比如：2014-02-05。如果输入格式错误，那么会获取默认时间。如果开始时间晚于结束时间，那么不会导出任何数据。
+	      				如果时间为空，那么默认为当前时间。即如果什么都不输入，就只会导出今天的数据！
+	      				</div>
+	    			</div>
+				</div>
+			</div>
+			
+			
+			<div class="content-box-content">
+				<div class="tab-content default-tab" id="tab1">
+					<form action="${pageContext.request.contextPath }/admin/order/export_gather"  method="get">
+						&nbsp; 选择门店：<select class="text-input" name="wid" style="width:200px;">
+							<option value="-1">所有门店</option>
+						</select>
+						<br/><br/>
+			            &nbsp; 
+								创建日期：
+								<input type="text" class="text-input Wdate" size="15" name="sd" onClick="WdatePicker()" style="width:100px;"/>
+								~
+								<input type="text" class="text-input Wdate" size="15" name="ed" onClick="WdatePicker()" style="width:100px;"/>
+								&nbsp;
+								关键字：
+								<input class="text-input" size="10" type="text" name="key" style="width:100px;" />
+								<select class="text-input" name="type" style="width:100px;">
+									<option value="-1">
+										请选择搜索方式
+									</option>
+									<option value="0">
+										运单号
+									</option>
+									<option value="1">
+										转运单号
+									</option>
+									<option value="2">
+										所属用户
+									</option>
+									<option value="3">
+										收件人姓名
+									</option>
+								</select>
+								<select class="text-input" name="state" style="width:100px;">
+									<option value="-1">
+										请选择状态
+									</option>
+									<option value="0">等待审核</option>
+									<option value="1">未付款</option>
+									<option value="2">已入库</option>
+									<option value="3">送往集散中心</option>
+									<option value="4">集散中心已入库</option>
+									<option value="5">送往机场</option>
+									<option value="6">空运中</option>
+									<option value="7">海关清关</option>
+									<option value="8">目的地第三方快递</option>
+									<option value="9">收件人已接收</option>
+								</select>
+				         
+				         <input class="button" type="submit" value="导出出货汇总" />
+				         <div class="clear"></div>
+			         </form>
+					<div class="notification information png_bg" style="margin-top:10px">
+	      				<div>
+	      				导出的时间格式必须是yyyy-MM-dd这种形式。比如：2014-02-05。如果输入格式错误，那么会获取默认时间。如果开始时间晚于结束时间，那么不会导出任何数据。
+	      				如果时间为空，那么默认为当前时间。即如果什么都不输入，就只会导出今天的数据！
+	      				</div>
+	    			</div>
+				</div>
+			</div>
+			
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		$("#main-content").ready(function() {
+			loadNav81Data();
+		});
+	</script>
+</html>

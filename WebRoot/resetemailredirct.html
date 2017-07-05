@@ -1,0 +1,27 @@
+<html>
+ <script type="text/javascript">
+	 function request(strParame) {
+		    var args = new Object();
+		    var query = location.search.substring(1);
+		
+		    var pairs = query.split("&"); // Break at ampersand 
+		    for (var i = 0; i < pairs.length; i++) {
+		        var pos = pairs[i].indexOf('=');
+		        if (pos == -1) continue;
+		        var argname = pairs[i].substring(0, pos);
+		        var value = pairs[i].substring(pos + 1);
+		        value = decodeURIComponent(value);
+		        args[argname] = value;
+		    }
+		    return args[strParame];
+	}
+    </script>
+    
+    
+    
+<script language="javascript" type="text/javascript"> 
+
+window.location.href='./258/frontpage/restpasswordbyemail.html'+'?email='+request("email")+'&token='+request("token");
+
+</script>
+</html>

@@ -1,0 +1,614 @@
+function loadNav21Data() {
+	loadEmpListFirst();
+
+	$("#a_add_emp_link").click(function() {
+		$("#main-content").load(admin_add_emp_page_url);
+		return false;
+	});
+	
+	if("admin"!=$("#admin_id_flag").val())
+	{
+		
+		$("#a_add_emp_link").hide();
+	}
+	else
+	{
+		$("#a_add_emp_link").show();
+	}
+}
+
+
+
+
+function afterLoadEmpList() {
+	$("a[name='a_emp_detail_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = admin_detail_emp_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+
+	$("a[name='a_emp_modify_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = admin_modify_emp_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+
+	$("a[name='a_emp_delete_link']").click(function() {
+		if (confirm("您是否确认要删除此职工对象?")) {
+			var id = $(this).parent().parent().attr("id");
+			$.ajax( {
+				type : "post",
+				url : admin_delete_emp_url,
+				data : {
+					"id" : id
+				},
+				success : function(response) {
+					var code = response.code;
+					if ("200" == code) {
+						alert("删除成功");
+						loadEmpListFirst();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("删除失败，失败原因是:" + response.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+}
+
+function loadEmpListFirst() {
+	loadEmpList(1);
+}
+
+function loadEmpList(pageNow) {
+	$.ajax( {
+		post : "get",
+		url : admin_emp_list_url,
+		data : {
+			"pageIndex" : pageNow
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				showEmpListAuthority(response.data.datas);
+				showEmpLink(response.data);
+				afterLoadEmpList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+function showEmpList(list) {
+
+	var str = "";
+	$.each(list, function() {
+		str += "<tr id='" + this.id
+				+ "'><td><a href='#' name='a_emp_detail_link'>" + this.account
+				+ "</a></td>";
+		str += "<td>" + this.storeId + "</td>";
+		str += "<td>" + this.storeName + "</td>";
+		var qxstr = ''; // 这个是权限
+		$.each(this.authority,function(){
+			qxstr += this.name + ",";
+		});
+		str += "<td>"+qxstr+"</td>";//这里存放权限信息
+		str += "<td><a href='#' name='a_emp_delete_link'>删除</a></td>";
+		str += "<td><a href='#' name='a_emp_modify_link'>修改</a></td>"+"</tr>";
+	});
+	$("#tab1 table tbody").html(str);
+
+}
+function showEmpLink(pageSplit) {
+	var rowCount = pageSplit.rowCount;
+	var pageSize = pageSplit.pageSize;
+	var pageNow = pageSplit.pageNow;
+	var pageCount = pageSplit.pageCount;
+	$("tfoot .pagination").html(
+			createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount));
+
+	$("tfoot .pagination a").click(function() {
+		// 跳页
+			var pn = $(this).attr("href");
+			loadEmpList(pn);
+			return false;
+		});
+
+	$("tfoot .pagination input").keydown(function(event) {
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				loadEmpList(pn);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});
+}
+
+function loadNav22Data() {
+	$("#a_back_emp_list_link").click(function() {
+		//$("#nav21").click();
+		nav21Click();
+		return false;
+	});
+	
+	$.ajax({
+		type:"get",
+		async:true,
+		url:admin_warehosue_all,
+		success:function(response){
+			var code = response.code;
+			if (code == '200') {
+				if(response.data != null) {
+					var str = "";
+					$.each(response.data,function(){
+						str += "<option value='" + this.id + "'>" + this.name + "</option>";
+					});
+					$("select[name='wid']").html(str);
+					$(":text[name='sid']").val($("select[name='wid']").val());
+					$(":text[name='sname']").val($("select[name='wid']").find("option:selected").text());
+					$("select[name='wid']").change(function(){
+						$(":text[name='sid']").val($("select[name='wid']").val());
+						$(":text[name='sname']").val($("select[name='wid']").find("option:selected").text());
+					});
+				}
+			}
+		}
+	});
+
+	$(".close").click(function() {
+		$(this).parent().fadeTo(400, 0, function() {
+			$(this).slideUp(400);
+		});
+		return false;
+	});
+
+	$("#bt_add_emp").click(function() {
+		var picValue = $(":file[name='pic']").val();
+		var account = $(":text[name='account']").val();
+		var pwd = $(":password[name='password']").val();
+		var sid = $(":text[name='sid']").val();
+		var sname = $(":text[name='sname']").val();
+		var phone = $(":text[name='phone']").val();
+		var authorityids=[];
+		$('input[name="auth"]:checked').each(function() {
+			authorityids.push($(this).val());
+		});
+	
+		if (!checkEmpAccount(account)) {
+			alert("用户名格式不对，用户名不能为空，而且长度最小为2，最大为20");
+		} else if (!checkEmpPassword(pwd)) {
+			alert("密码格式不对，密码必须为6到20位的可见字符，不能包含空格！");
+		} else if (!checkStoreId(sid)) {
+			alert("门市编号格式不正确，门市编号必须为数字");
+		} else if (!checkStoreName(sname)){
+			alert("门市名称格式不正确，门市名称长度最长为20个字符");
+		} else if(!checkPhone(phone)) {
+			alert("手机号码格式不正确，手机号码长度最长为20个字符");
+		} else {
+			if (picValue == null || "" == picValue) {
+				addEmpWithNoPic();
+			} else {
+				addEmpWithPic();
+			}
+		}
+		$("#nav21").click();
+		return false;
+	});
+	
+}
+
+function addEmpWithNoPic() {
+	
+	var authorityids=[];
+	$('input[name="auth"]:checked').each(function() {
+		authorityids.push($(this).val());
+	});
+
+	$("#bt_add_emp").attr("disabled", true);
+	$.ajax( {
+		type : "post",
+		url : admin_add_emp_url_with_no_pic,
+		data : $.param({
+			"account" : $(":text[name='account']").val(),
+			"password" : $(":password[name='password']").val(),
+			"sid" : $(":text[name='sid']").val(),
+			"sname" : $(":text[name='sname']").val(),
+			"phone" : $(":text[name='phone']").val(),
+			"auth":authorityids 
+		}, true),
+		
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				alert("添加成功");
+				$("#main-content").load(admin_add_emp_page_url);
+			} else if ("607" == code) {
+				alert("您尚未登录，或登录已失效！");
+				logout();
+			} else {
+				alert("添加失败，原因是:" + response.message);
+			}
+			$("#bt_add_emp").attr("disabled", false);
+			return false;
+		}
+	});
+}
+
+function addEmpWithPic() {
+
+	$("#bt_add_emp").attr("disabled", true);
+	$("#add_form").ajaxSubmit( {
+		type : 'post',
+		url : admin_add_emp_url_with_pic,
+		success : function(data) {
+			$("#tmpmsgdiv").html(data);
+			var str = $("#tmpmsgdiv pre").html();
+			var obj = $.parseJSON(str);
+			var code = obj.code;
+			if (code == "200") {
+			
+			    $("#bt_add_emp").attr("disabled", false);
+				alert("添加成功");
+				$("#main-content").load(admin_add_emp_page_url);
+			} else if ("607" == code) {
+				alert("您尚未登录，或登录已失效！");
+				logout();
+			} else {
+				alert("添加失败，原因是:" + obj.message);
+				$("#main-content").load(admin_add_emp_page_url);
+			}
+			
+			return false;
+		},
+		error : function(XmlHttpRequest, textStatus, errorThrown) {
+			$("#bt_add_emp").attr("disabled", false);
+			alert("操作失败");
+			return false;
+		}
+	});
+}
+
+function loadNav23Data() {
+	$("#a_back_emp_list_link").click(function() {
+		//$("#nav21").click();
+		nav21Click();
+		return false;
+	});
+	$.ajax( {
+		type : "get",
+		url : admin_detail_emp_url,
+		data : {
+			"id" : $("#e_d_id").val()
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				$("#e_d_account").html(response.data.account);
+				$("#e_d_store_id").html(response.data.storeId);
+				$("#e_d_store_name").html(response.data.storeName);
+				$("#e_d_phone").html(response.data.phone);
+				var imgUrl = response.data.picUrl;
+				if (imgUrl == null || imgUrl == '') {
+					$("#e_d_pic").html("");
+				} else {
+					$("#e_d_pic").html(
+							"<img alt='" + response.data.account + "' src='"
+									+ baseUrl + imgUrl + "'/>");
+				}
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// alert("添加失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+function loadNav24Data() {
+	$("#a_back_emp_list_link").click(function() {
+		nav21Click();
+		return false;
+	});
+
+	$.ajax({
+		type:"get",
+		async:true,
+		url:admin_warehosue_all,
+		success:function(response){
+			var code = response.code;
+			if (code == '200') {
+				if(response.data != null) {
+					var str = "";
+					$.each(response.data,function(){
+						str += "<option value='" + this.id + "'>" + this.name + "</option>";
+					});
+					$("select[name='wid']").html(str);
+					$("select[name='wid']").change(function(){
+						$(":text[name='sid']").val($("select[name='wid']").val());
+						$(":text[name='sname']").val($("select[name='wid']").find("option:selected").text());
+					});
+				}
+			}
+		}
+	});
+	
+	$.ajax( {
+		type : "get",
+		url : admin_detail_emp_url,
+		data : {
+			"id" : $(":hidden[name='id']").val()
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				$("#e_d_account").html(response.data.account);
+				
+				$(":text[name='sid']").val(response.data.storeId);
+				$(":text[name='sname']").val(response.data.storeName);
+				$(":text[name='phone']").val(response.data.phone);
+
+				$.each(response.data.authority,function(){
+					//alert(this.authoriy_id);
+					
+					if(response.data.superadmin == "1")
+					{
+						$("#power input[type='checkbox']").attr("checked",'true');
+						$("#power input[type='checkbox']").attr("disabled",'true');
+					}
+					else
+					{
+						$("#power input[value='"+this.authoriy_id+"']").attr("checked",'true');//全选//qxstr += this.name + ",";
+						/*if(response.data.superadmin == "1"){
+							$("#power input[value='"+this.authoriy_id+"']").attr("disabled",'true');
+						};*/
+					}
+				});
+				
+				var imgUrl = response.data.picUrl;
+				if (imgUrl == null || imgUrl == '') {
+					$("#e_d_pic").html("");
+				} else {
+					$("#e_d_pic").html(
+							"<br/><img alt='" + response.data.account
+									+ "' src='" + baseUrl + imgUrl + "'/>");
+				}
+				$("select[name='wid'] option[value='" + response.data.storeId + "']").attr("selected",true);
+			} else if ("607" == code) {
+				alert("您尚未登录，或登录已失效！");
+				logout();
+			} else {
+				alert("获取职工信息失败，原因是：" + response.message);
+				//$("#nav21").click();
+				nav21Click();
+			}
+			return false;
+		}
+	});
+
+	$("#bt_modify_emp").click(function() {
+		var picValue = $(":file[name='pic']").val();
+		var sid = $(":text[name='sid']").val();
+		var sname = $(":text[name='sname']").val();
+		var phone = $(":text[name='phone']").val();
+		var password = $(":text[name='password']").val();
+		var authorityids=[];
+		$('input[name="auth"]:checked').each(function() {
+			authorityids.push($(this).val());
+		});
+		if (!checkStoreId(sid)) {
+			alert("门市编号格式不正确，门市编号必须为数字");
+		} else if (!checkStoreName(sname)){
+			alert("门市名称格式不正确，门市名称长度最长为20个字符");
+		} else if(!checkPhone(phone)) {
+			alert("手机号码格式不正确，手机号码长度最长为20个字符");  
+		} else if((password!="")&&(!checkEmpPassword(password))) {
+			alert("密码格式不正确，密码长度最长为20个字符");  
+		} else {
+			if (picValue == null || "" == picValue) {
+				modifyEmpWithNoPic();
+			} else {
+				modifyEmpWithPic();
+			}
+		}
+		return false;
+	});
+}
+
+function modifyEmpWithNoPic() {
+	var authorityids=[];
+	$('input[name="auth"]:checked').each(function() {
+		authorityids.push($(this).val());
+	});
+
+	$("#bt_modify_emp").attr("disabled", true);
+	$.ajax( {
+		type : "post",
+		url : admin_modify_emp_url_with_no_pic,
+		data :  $.param({
+			"id" : $(":hidden[name='id']").val(),
+			"sid" : $(":text[name='sid']").val(),
+			"sname" : $(":text[name='sname']").val(),
+			"phone" : $(":text[name='phone']").val(),
+			"password" : $(":text[name='password']").val(),
+			"auth":authorityids 
+		}, true),
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				alert("修改职工信息成功");
+				//$("#nav21").click();
+				nav21Click();
+			} else if ("607" == code) {
+				alert("您尚未登录，或登录已失效！");
+				logout();
+			} else {
+				alert("修改职工信息失败，原因是:" + response.message);
+				$("#bt_modify_emp").attr("disabled", false);
+			}
+			return false;
+		}
+	});
+}
+
+function modifyEmpWithPic() {
+	
+	$("#bt_modify_emp").attr("disabled", true);
+	$("#modify_form").ajaxSubmit( {
+		type : 'post',
+		url : admin_modify_emp_url_with_pic,
+		success : function(data) {
+			
+			
+			$("#tmpmsgdiv").html(data);
+			var str = $("#tmpmsgdiv pre").html();
+			var obj = $.parseJSON(str);
+			var code = obj.code;
+			if (code == "200") {
+			
+				alert("修改操作完成");
+				//$("#nav21").click();
+				nav21Click();
+			} else if ("607" == code) {
+				alert("您尚未登录，或登录已失效！");
+				logout();
+			} else {
+				alert("添加失败，原因是:" + obj.message);
+				
+			}
+			
+			
+			
+			
+			
+			return false;
+		},
+		error : function(XmlHttpRequest, textStatus, errorThrown) {
+			alert("修改操作失败");
+			$("#bt_modify_emp").attr("disabled", false);
+			return false;
+		}
+	});
+}
+
+/**
+ *chenkanghua
+ *2015-1-26
+ *员工权限管理调用函数
+*/
+function loadNav25Data() {
+//	$(".a_modify_authority_link").facebox();
+	loadEmpListAutorityFirst();	
+}
+
+function loadEmpListAutorityFirst() {
+	loadEmpListAuthority(1);
+}
+function showEmpListAuthority(list) {
+	var str = "";
+//	$.each(list, function() {
+//		str += "<tr id='" + this.id
+//				+ "'><td><a href='#' name='a_emp_detail_link'>" + this.account
+//				+ "</a></td>";
+//		str += "<td>" + this.storeId + "</td>";
+//		str += "<td>" + this.storeName + "</td>";
+//		var qxstr = ''; // 这个是权限
+//		$.each(this.authority,function(){
+//			qxstr += this.name + ",";
+//		});
+//		str += "<td>"+qxstr+"</td>";//这里存放权限信息
+//		str += "<td><a href='#modifyauthority' name='a_modify_authority_link'>修改</a></td>" +
+//				"</tr>";
+//	});
+	$.each(list, function() {
+		str += "<tr id='" + this.id
+				+ "'><td><a href='#' name='a_emp_detail_link'>" + this.account
+				+ "</a></td>";
+		str += "<td>" + this.storeId + "</td>";
+		str += "<td>" + this.storeName + "</td>";
+		var qxstr = ''; // 这个是权限
+		$.each(this.authority,function(){
+			qxstr += this.name + ",";
+		});
+		str += "<td>"+qxstr+"</td>";//这里存放权限信息
+		str += "<td><a href='#' name='a_emp_delete_link'>删除</a></td>";
+		str += "<td><a href='#' name='a_emp_modify_link'>修改</a></td>"+"</tr>";
+	});
+	$("#tab1 table tbody").html(str);
+}
+
+
+function loadEmpListAuthority(pageNow) {
+	$.ajax( {
+		post : "get",
+		url : admin_emp_list_url,
+		data : {
+			"pageIndex" : pageNow
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				showEmpListAuthority(response.data.datas);
+				showEmpLink(response.data);
+				afterLoadEmpListAuthority();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+function afterLoadEmpListAuthority() {
+	$("a[name='a_emp_detail_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = admin_detail_emp_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+
+	$("a[name='a_emp_modify_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = admin_modify_emp_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+	$("a[name='a_emp_delete_link']").click(function() {
+		if (confirm("您是否确认要删除此职工对象?")) {
+			var id = $(this).parent().parent().attr("id");
+			$.ajax( {
+				type : "post",
+				url : admin_delete_emp_url,
+				data : {
+					"id" : id
+				},
+				success : function(response) {
+					var code = response.code;
+					if ("200" == code) {
+						alert("删除成功");
+						loadEmpListFirst();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("删除失败，失败原因是:" + response.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+}

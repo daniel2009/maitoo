@@ -1,0 +1,230 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">查看退货信息
+			<a href="#" onclick="javascript:nav14Click();" class="button">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">查看退货信息</div>
+			<div class="content_text">
+		
+				<div class="tab-content" id="tab2" style="display: flex; flex-wrap: wrap;">
+			         <form style="flex: 1; flex-basis: 450px;" id="form" enctype="multipart/form-data" method="post">
+			         	<input type="text" style="display:none;" id="id" name="id" readonly>
+			         	<input type="text" style="display:none;" id="state" name="state" readonly>
+						<table class="userTable">
+							<tr>
+								<th>手续费：</th>
+								<td>$<label id="returnFee"></label></td>
+							</tr>
+							<tr>
+								<th>转运过来的费用：</th>
+								<td>$<label id=""></label></td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>包裹码：</th>
+								<td><input type="text" size="30" id="packageNo" name="packageNo" readonly/></td>
+							</tr>
+							<tr>
+								<th>状态：</th>
+								<td id="state_read"></td>
+							</tr>
+							<tr>
+								<th>创建日期：</th>
+								<td id="createDate"></td>
+							</tr>
+							<tr>
+								<th><input type="checkbox" id="checkbox" onchange="changeReceipt();"><input type="text" id="receipt" name="receipt" style="display: none;" value="0" readonly></th>
+								<td>是否有免邮费凭证<label id="receiptLabel"></label></td>
+							</tr>
+							<tr>
+								<th>电话：</th>
+								<td><input type="text" size="100" id="phone" name="phone" /></td>
+							</tr>
+							<tr>
+								<th><span class="red" id="required1">*</span>地址：</th>
+								<td><input type="text" size="100" id="address" name="address" /></td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>备注：</th>
+								<td><textarea rows="3" cols="20" class="text-input" id="remark" name="remark" maxlength="200" style="width:300px" required></textarea>
+								</td>
+							</tr>
+							<tr>
+								<th>证据图：</th>
+								<td id="required2" hidden>
+									<span class="red" >*</span><input type="text" style="display:none" id="pic1None" name="pic1"><img id="pic1"><br/><input type="file" id="picture1" name="picture1"><br/>
+									<input type="text" style="display:none" id="pic2None" name="pic2"><img id="pic2"><br/><input type="file" id="picture2" name="picture2"><br/>
+									<input type="text" style="display:none" id="pic3None" name="pic3"><img id="pic3"><br/><input type="file" id="picture3" name="picture3"><br/>
+									<input type="text" style="display:none" id="pic4None" name="pic4"><img id="pic4"><br/><input type="file" id="picture4" name="picture4"><br/>
+									<input type="text" style="display:none" id="pic5None" name="pic5"><img id="pic5"><br/><input type="file" id="picture5" name="picture5"><br/>
+								</td>
+							</tr>
+						</table>
+						<div class="center">
+							<input type="button" id="modify_returnPacakge_btn" value="提交申请" class="combtn"/>
+						</div>
+					</form>
+					<section style="flex: 1; flex-basis: 250px;" id="empMessageSection" hidden>
+						处理员工：<label id="empId"></label><br/><br/>
+						处理回应：<label id="empRemark"></label><br/><br/>
+						<section id="empMessagePart" hidden>
+							快递单号：<label id="empExpressNo"></label><br/><br/>
+							快递公司：<label id="empExpressCompany"></label><br/><br/>
+							邮递费用：<label id="shippingFee"></label><br/><br/>
+							员工回应图:	<img id="empPicture">
+						</section>
+					</section>
+		        </div>
+			</div>
+		</div>
+		</div>
+
+		<div id="tmpmsgdiv1" style="display:none;"></div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		var sessionStorage = window.sessionStorage;
+		var id = sessionStorage.getItem("returnPackageId");
+		sessionStorage.removeItem("returnPackageId");
+		$.ajax({
+			type: "get",
+			url: "../user/returnPackage/getById",
+			data: {
+				id : id
+			},
+			success: function(response){
+				var code = response.code;
+				if (code == "200") {
+					var data = response.data;
+					if(data != null){
+						
+						var state = "未处理";
+						if(data.state == "1"){
+							document.getElementById("empMessageSection").hidden = false;
+							document.getElementById("empMessagePart").hidden = false;
+							state = "已处理";
+							document.getElementById("packageNo").readOnly = true;
+							document.getElementById("phone").readOnly = true;
+							document.getElementById("address").readOnly = true;
+							document.getElementById("remark").readOnly = true;
+							document.getElementById("picture1").hidden = true;
+							document.getElementById("picture2").hidden = true;
+							document.getElementById("picture3").hidden = true;
+							document.getElementById("picture4").hidden = true;
+							document.getElementById("picture5").hidden = true;
+							document.getElementById("modify_returnPacakge_btn").style.display = "none";
+							document.getElementById("checkbox").hidden = true;
+							if(data.receipt == "1"){
+								document.getElementById("receiptLabel").innerHTML = ":是";
+							}else{
+								document.getElementById("receiptLabel").innerHTML = ":否";
+							}
+						}else{
+							if(data.state == "2"){
+								document.getElementById("empMessageSection").hidden = false;
+								state = "有问题";
+							}
+							if(data.receipt == "1"){
+								document.getElementById("checkbox").checked = true;
+								changeReceipt();
+							}
+							document.getElementsByName("receipt")[0].value = data.receipt;
+						}
+						document.getElementById("id").value = id;
+						document.getElementById("state").value = data.state;
+						document.getElementById("state_read").innerHTML = state;
+						document.getElementById("createDate").innerHTML = data.createDate;
+						document.getElementById("packageNo").value = data.packageNo;
+						document.getElementById("phone").value = data.phone;
+						document.getElementById("address").value = data.address;
+						document.getElementById("remark").innerHTML = data.remark;
+						document.getElementById("pic1None").value = data.pic1;
+						document.getElementById("pic2None").value = data.pic2;
+						document.getElementById("pic3None").value = data.pic3;
+						document.getElementById("pic4None").value = data.pic4;
+						document.getElementById("pic5None").value = data.pic5;
+						document.getElementById("pic1").src = baseUrl + data.pic1;
+						document.getElementById("pic2").src = baseUrl + data.pic2;
+						document.getElementById("pic3").src = baseUrl + data.pic3;
+						document.getElementById("pic4").src = baseUrl + data.pic4;
+						document.getElementById("pic5").src = baseUrl + data.pic5;
+						document.getElementById("empId").innerHTML = data.empId;
+						document.getElementById("empRemark").innerHTML = data.empRemark;
+						document.getElementById("empExpressNo").innerHTML = data.empExpressNo;
+						document.getElementById("empExpressCompany").innerHTML = data.empExpressCompany;
+						document.getElementById("shippingFee").innerHTML = data.shippingFee;
+						document.getElementById("empPicture").src = baseUrl + data.empPic;
+						clearWrongImg();
+					}
+				} else if (code == "607") {
+					alert("登录过期，请重新登录");
+					window.location.href = "login.jsp";
+				} else {
+					alert("添加失败，原因是:" + obj.message);
+				}
+				return false;
+			}
+		});
+		$("#modify_returnPacakge_btn").click(function() {
+			var httpRequest = new XMLHttpRequest();
+			var url = "../user/returnPackage/modify";
+			httpRequest.onreadystatechange = function(){
+				if(4 == httpRequest.readyState){
+					if(200 == httpRequest.status){
+						var response = eval("(" + httpRequest.responseText + ")");
+						var code = response.code;
+						if("200" == code){
+							alert("修改成功");
+							nav14Click();
+						}else if("607" == code){
+							alert("您尚未登录或登录已失效");
+							window.location.href = "login.jsp";
+						}else{
+							alert("修改失败，失败原因:" + response.message);
+						}
+						return false;
+					}
+				}
+			};
+			httpRequest.open("post", url, true);
+			httpRequest.send(new FormData(document.getElementById("form")));
+			return false;
+		});
+		$.ajax({
+			type: "get",
+			url: "../globalArgs/getReturnPackageReturnFee",
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var data = response.data;
+					if(data != null){
+						document.getElementById("returnFee").innerHTML = data;
+					}
+				}else{
+					alert("审核失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function changeReceipt(){
+		if(document.getElementById("checkbox").checked){
+			document.getElementById("required1").hidden = true;
+			document.getElementById("required2").hidden = false;
+			document.getElementsByName("receipt")[0].value="1";
+		}else{
+			document.getElementById("required1").hidden = false;
+			document.getElementById("required2").hidden = true;
+			document.getElementsByName("receipt")[0].value="0";
+		}
+	}
+</script>
+</html>

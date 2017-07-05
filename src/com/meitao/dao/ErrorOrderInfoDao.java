@@ -1,0 +1,27 @@
+package com.meitao.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.meitao.model.ErrorOrderInfo;
+
+
+public interface ErrorOrderInfoDao {
+	public int insertErrorOrderInfo(ErrorOrderInfo info) throws Exception;
+
+	public int deleteErrorOrderInfoByIds(List<String> list) throws Exception;
+	
+	public int deleteErrorOrderInfoByParentIds(List<String> list) throws Exception;
+	
+	public int updateState(ErrorOrderInfo info) throws Exception;
+
+	public int updateErrorOrderModifyDate(@Param("id") String id, @Param("date") String date) throws Exception;
+
+	public List<ErrorOrderInfo> getInfosByParentId(@Param("id") String id) throws Exception;
+
+	public List<ErrorOrderInfo> searchByOrderId(@Param("orderId") String orderId, @Param("index") int index,
+	        @Param("size") int size) throws Exception;
+
+	public int countSearchOfOrderId(@Param("orderId") String orderId) throws Exception;
+}

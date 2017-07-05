@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel="stylesheet" href="css/vendor/owl.carousel.css">
+	<link rel="stylesheet" href="css/vendor/magnific-popup.css">
+	<link rel="stylesheet" href="css/style.css">
+	<!-- favicon -->
+	<link rel="icon" href="favicon.ico">
+	<title>Go Box Global | Register Login</title>
+	<style type="text/css"> 
+input[type="password"] {
+		height: 38px;
+		padding-top: 0;
+		padding-bottom: 0;
+		color: #808080;
+		font-family: $paragraph-font;
+		font-size: 12px / 16px * 1em;
+		width: 100%;
+		border: 1px solid #d5d5d5;
+		border-radius: 2px;
+		padding: 8px 12px 5px 12px;
+		margin-bottom:22px;
+	}
+
+</style> 
+	
+ <script type="text/javascript">
+     
+
+        function checkCode() {
+            $("#spanError").css("display", "none");
+
+            var code = $("#searchinput").val();
+            if (code == null) {
+                $("#spanError").css("display", "block");
+                alert("面单号不存在");
+            } else {
+               // this.document.location = "newwaybill.jsp?oid=" + escape(code);
+               if((code!="")||(code!="undefined")||(code!=null))
+            	{
+            	   code=code.trim();
+            	}
+               
+               this.document.location = "route-kd100.jsp?oid=" + escape(code);
+            }
+        }
+
+        function BillCodeOnKeyDown(obj, event) {
+            // 输入回车时，焦点转移同一行的重量输入框
+            if (event.keyCode == '13') {
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
+
+                checkCode();
+            }
+        }
+        function BillCodeOnKeyDown_click() {
+        	checkCode();
+        }
+    </script>	
+</head>
+	<!-- HEADER -->
+<body>	
+		<header>
+		<div id="header-top-wrap">
+			<!-- HEADER TOP 头文件-->
+			<section id="header-top" class="clearfix">
+				<p class="contact">
+					有问题吗? 如果需要帮助的话? 请发送邮件到: 
+					<a href="" id="suport_email2"></a>
+				</p>
+				<p class="login">
+					欢迎光临, 如果你有账户请 
+					<a href="register-login.html">登录</a>, or 
+					<a href="register-login.html">注册</a>
+				</p>
+			</section>
+			<!-- /HEADER TOP -->
+		</div>
+		<div id="header-bottom-wrap">
+			<!-- HEADER BOTTOM -->
+			<section id="header-bottom">
+				<!-- LOGO -->
+				<div class="logo-container">
+					<a href="index.html">
+						<figure class="logo" >
+							<img src="" alt="logo" id="logo_big">
+							<figcaption>Fleet</figcaption>
+						</figure>
+					</a>
+				</div>
+				<!-- /LOGO -->
+				<form class="westeros-form" onsubmit="return false">
+					
+					<input type="text" name="searchinput" id="searchinput" placeholder="请输入您的运单号..."><i class='fa fa-search'></i>
+					<input type="image" src="images/icons/search-icon.png" alt="search-icon" onclick="javascript: BillCodeOnKeyDown_click()">
+				</form>
+			</section>
+			<!-- /HEADER BOTTOM -->
+		</div>
+		<!-- WESTEROS SEPARATOR -->
+		<ul class="westeros-separator small">
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+		<!-- /WESTEROS SEPARATOR -->
+	</header>
+	<!-- /HEADER -->
+	<!-- MOBILE MENU COVER -->
+	<div class="mobile-menu-cover"></div>
+	<!-- /MOBILE MENU COVER -->
+	
+		<!-- MOBILE MENU -->
+	<nav class="mobile-menu">
+		<img src="images/logo-footer.png" alt="logo">
+		<!-- SVG PLUS -->
+		<svg class="svg-plus pull-nav">
+			<use xlink:href="#svg-plus"></use>
+		</svg>
+		<!-- /SVG PLUS -->
+
+		<!-- MENU LIST -->
+		<ul>
+			<li>
+				<a href="index.html">首页</a>
+			</li>
+			<li>
+				<a href="price.html">渠道说明</a>
+			</li>
+			<li><a href="about-us.html">关于我们</a></li>
+			<li>
+				<a href="blog.html">新闻公告</a>
+			</li>
+			<li>
+				<a href="contact.html">找到我们</a>
+			</li>
+			<li>
+				<a href="register-login.html">登录</a></li>
+			<li><a href="register-login.html">登录|注册</a></li>
+			
+		</ul>
+		<!-- /MENU LIST -->
+	</nav>
+	<!-- /MOBILE MENU -->
+	
+	<!-- MAIN MENU -->
+	<nav id="main-menu">
+		<img class="pull-nav" src="images/icons/pull-icon.png" alt="pull-icon">
+		<ul>
+			<li><a href="index.html">首页</a></li>
+			<li><a href="price.html">渠道说明</a></li>
+			<li><a href="about-us.html">关于我们</a></li>
+			<li><a href="blog.html">新闻公告</a></li>
+			<li><a href="contact.html">找到我们</a></li>
+			<li><a href="../../user/index.jsp">我的账户</a></li>
+			<li><a href="register-login.html">登录 | 注册</a></li>
+			<li><a href="uploadID.html">上传身份证</a></li>
+		
+			
+		</ul>
+	</nav>
+	<!-- /MAIN MENU -->
+	
+	<!-- SECTION-NAV -->
+	<div id="section-nav-wrap">
+		<section id="section-nav">
+			<p>Home / <a href="#">Login and Register</a></p>
+		</section>
+	</div>
+	<!-- /SECTION-NAV -->
+	<!-- REGISTER-LOGIN -->
+	<div id="register-login-wrap">
+		<section id="register-login">
+			<div class="featured-form">
+				<h3>快速登录</h3>
+				<form class="westeros-form">
+					<label class="rl-label">邮箱或是手机号码</label>
+					<input type="text" placeholder="输入你的手机或者是邮箱..." id="login_account">
+					<label class="rl-label">密码</label>
+					<input type="password" placeholder="这里输入你的密码..." id="login_password">
+					
+					<label class="rl-label">验证码</label>
+					<input type='text' placeholder='请输入验证码' class='transition' id="verifycode" style="width:50%;">
+                          <img src="" id="code" alt="看不清，换一张" />
+					
+					<!--  <input type="checkbox" id="remember" name="remember">
+					<label for="remember"><span class="checkbox"><span></span></span>记住你的帐号</label>-->
+					<div>
+					<a href="../../resetPwd.html" class="fp-msg">忘记密码? 请点击这里!</a><br/>
+					<!-- <button class="button login" onclick="loginus258()">登陆</button> -->
+					<input type="button" class="button login" onclick="loginus258()" value="登陆" style="width:252px;float:right;cursor:pointer"/> 
+					</div>
+				</form>
+			</div>
+			<div class="featured-form">
+				<h3>新用户欢迎注册</h3>
+				<div style="border-bottom:1px solid #d5d5d5">
+							<label class="radio-inline">
+											<input type="radio" name="inlineRadioOptions" id="telphone_radio" value="New_Car" checked="checked" onclick="moble_form()"> 手机注册
+										</label>
+                            <label class="radio-inline">
+											<input type="radio" name="inlineRadioOptions" id="email_radio" value="Used_Car"  onclick="email_form()"> 邮箱注册
+										</label>
+										
+				</div>
+				<br/>
+				<form class="westeros-form" id="registertable" onsubmit="return false">
+				
+					
+				</form>
+			</div>
+		</section>
+	</div>
+	<!-- /REGISTER-LOGIN -->
+	<!-- FOOTER -->
+	<footer>
+		<div id="footer-top-wrap">
+			<section id="footer-top" class="clearfix">
+				<article>
+					<h6 id="company_name_show_about"></h6>
+					<p id="foot_about_content"></p>
+					<!-- LOGO -->
+					<a href="index.html">
+						<figure class="logo">
+							<img src="" alt="logo" id="foot_small_logo2">
+							<figcaption>Fleet</figcaption>
+						</figure>
+					</a>
+					<!-- /LOGO -->
+
+					<!-- CONTACT INFO -->
+					<ul class="contact-info">
+						<li class="address">
+							<!-- SVG PIN -->
+							<svg class="svg-pin">
+								<use xlink:href="#svg-pin"></use>	
+							</svg>
+							<!-- /SVG PIN -->
+							<p id="sales_address"></p>
+						</li>
+						<li class="phone">
+							<!-- SVG PHONE -->
+							<svg class="svg-phone">
+								<use xlink:href="#svg-phone"></use>	
+							</svg>
+							<!-- /SVG PHONE -->
+							<p id="sales_phone"></p>
+						</li>
+						<li class="email">
+							<!-- SVG ENVELOPE -->
+							<svg class="svg-envelope">
+								<use xlink:href="#svg-envelope"></use>	
+							</svg>
+							<!-- /SVG ENVELOPE -->
+							<p><a href="" id="sales_email"></a></p>
+						</li>
+					</ul>
+					<!-- /CONTACT INFO -->
+
+					<!-- PAYMENT METHODS -->
+					<ul class="payment-methods">
+						<!-- METHOD -->
+						<li>
+							<img src="images/payment/alipay.png" alt="method3">
+						</li>
+						<!-- /METHOD -->
+
+						<!-- METHOD -->
+						<li>
+							<img src="images/payment/wechatpay.jpg" alt="method4">
+						</li>
+						<!-- /METHOD -->
+					</ul>
+					<!-- /PAYMENT METHODS -->
+				</article>
+
+				<article>
+					<h6>网站信息</h6>
+					<nav id="footer-menu">
+						<ul>
+							<li>
+								<a href="index.html">首页</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+							<li>
+								<a href="register-login.html">我的账户</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+							<li>
+								<a href="price.html">渠道说明</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+							<li>
+								<a href="about-us.html">关于我们</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+							<li>
+								<a href="register-login.html">成为我们的会员</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+							<li>
+								<a href="#">网站条例</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+						</ul>
+					</nav>
+				</article>
+
+				<article>
+					<h6>联系客服</h6>
+					<!-- 联系客服 -->
+					<!-- 微信二维码 -->
+					<a href="index.html">
+						<figure class="logo">
+							<img src="" alt="logo" id="support_2code2">
+							<figcaption>Fleet</figcaption>
+						</figure>
+					</a>
+					<!-- /微信二维码 -->
+
+					<!-- CONTACT INFO -->
+					<ul class="contact-info" style="margin-top: 150px;">
+						<li class="address">
+							<!-- SVG PIN -->
+							<svg class="svg-pin">
+								<use xlink:href="#svg-pin"></use>	
+							</svg>
+							<!-- /SVG PIN -->
+							<p id="support_address"> </p>
+						</li>
+						<li class="phone">
+							<!-- SVG PHONE -->
+							<svg class="svg-phone">
+								<use xlink:href="#svg-phone"></use>	
+							</svg>
+							<!-- /SVG PHONE -->
+							<p id="support_phone2"></p>
+						</li>
+						<li class="email">
+							<!-- SVG ENVELOPE -->
+							<svg class="svg-envelope">
+								<use xlink:href="#svg-envelope"></use>	
+							</svg>
+							<!-- /SVG ENVELOPE -->
+							<p><a href="" id="suport_email3"></a></p>
+						</li>
+					</ul>
+					<!-- /CONTACT INFO -->
+					<!-- /PRODUCT PREVIEW -->
+				</article>
+
+				<article>
+					<h6>常见问题</h6>
+					<!-- 常见问题 -->
+					<nav id="footer-menu">
+						<ul>
+							<li>
+								<a href="FAQ.html">新手引导</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+							<li>
+								<a href="FAQ.html">理赔细则</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+							<li>
+								<a href="FAQ.html">清关说明</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+							<li>
+								<a href="FAQ.html">禁运物品</a>
+								<!-- SVG ARROW -->
+								<svg class="svg-arrow">
+									<use xlink:href="#svg-arrow"></use>
+								</svg>
+								<!-- /SVG ARROW -->
+							</li>
+						</ul>
+					</nav>
+					<!-- /常见问题 -->
+				</article>
+			</section>
+		</div>
+		<div id="footer-bottom-wrap">
+			<section id="footer-bottom">
+				<p>GoBox Global 2016 ALL RIGHTS RESERVED. Copyright & Powered by WebXury Inc.</p>
+				<!-- SOCIAL LINKS -->
+				<ul class="social-links">
+					<li class="fb"><a href="#"></a></li>
+					
+				</ul>
+				<!-- /SOCIAL LINKS -->
+			</section>
+		</div>
+	</footer>
+	<!-- /FOOTER -->
+	<!-- SVG ARROW -->
+<svg style="display: none;">	
+	<symbol id="svg-arrow" viewBox="0 0 3.923 6.64014" preserveAspectRatio="xMinYMin meet">
+		<path d="M3.711,2.92L0.994,0.202c-0.215-0.213-0.562-0.213-0.776,0c-0.215,0.215-0.215,0.562,0,0.777l2.329,2.329
+			L0.217,5.638c-0.215,0.215-0.214,0.562,0,0.776c0.214,0.214,0.562,0.215,0.776,0l2.717-2.718C3.925,3.482,3.925,3.135,3.711,2.92z"/>
+	</symbol>
+</svg>
+<!-- /SVG ARROW -->
+
+<!-- SVG LOGGED -->
+<svg style="display: none;">
+	<symbol id="svg-logged" viewBox="0 0 12 13" preserveAspectRatio="xMinYMin meet">
+		<path d="M0,7.027c0-1.826,0.924-3.415,2.31-4.45c0.327-0.244,0.983-0.353,1.246-0.041
+			c0.164,0.193,0.222,0.426,0.229,0.646c0.012,0.408-0.41,0.904-0.701,1.191c-0.695,0.684-1.133,1.611-1.133,2.66
+			c0,2.194,1.778,3.856,3.971,3.856c2.195,0,3.973-1.662,3.973-3.856c0-1.117-0.426-2.099-1.136-2.794
+			c-0.292-0.286-0.687-0.79-0.623-1.193c0.036-0.233,0.137-0.464,0.357-0.63c0.325-0.246,0.979-0.07,1.3,0.181
+			c1.33,1.035,2.196,2.617,2.196,4.431c0,3.216-2.851,5.706-6.067,5.706C2.707,12.733,0,10.243,0,7.027z"/>
+		<path d="M6.037,7.629c-0.401,0-0.958-0.469-0.958-0.871v-5.59c0-0.056,0.009-0.901,0.929-0.901
+			c0.401,0,0.93,0.21,0.93,0.901v5.59C6.939,7.16,6.44,7.629,6.037,7.629z"/>
+	</symbol>
+</svg>
+<!-- /SVG LOGGED -->
+
+<!-- SVG PLUS -->
+<svg style="display: none;">
+	<symbol id="svg-plus" viewBox="0 0 13 13" preserveAspectRatio="xMinYMin meet">
+		<rect x="5" width="3" height="13"/>
+		<rect y="5" width="13" height="3"/>
+	</symbol>
+</svg>
+<!-- /SVG PLUS -->
+
+<!-- SVG STAR -->
+<svg style="display: none;">
+	<symbol id="svg-star" viewBox="0 0 10 10" preserveAspectRatio="xMinYMin meet">	
+		<polygon points="4.994,0.249 6.538,3.376 9.99,3.878 7.492,6.313 8.082,9.751 4.994,8.129 1.907,9.751 
+	2.495,6.313 -0.002,3.878 3.45,3.376 "/>
+	</symbol>
+</svg>
+<!-- /SVG STAR -->
+
+<!-- SVG WISHLIST -->
+<svg style="display: none;">
+	<symbol id="svg-wishlist" viewBox="0 0 16 13" preserveAspectRatio="xMinYMin meet">
+		<path d="M13.655,0.53C13.009,0.193,12.267,0,11.475,0c-1.396,0-2.647,0.601-3.474,1.542
+			C7.172,0.601,5.922,0,4.523,0C3.733,0,2.993,0.193,2.344,0.53C0.953,1.257,0.011,2.654,0.011,4.261
+			c0,0.46,0.079,0.901,0.223,1.313c0.774,3.285,7.768,7.43,7.768,7.43s6.988-4.145,7.765-7.43c0.143-0.412,0.224-0.854,0.224-1.313
+			C15.989,2.655,15.047,1.257,13.655,0.53z"/>
+	</symbol>
+</svg>
+<!-- /SVG WISHLIST -->
+
+<!-- SVG QUICKVIEW -->
+<svg style="display: none;">
+	<symbol id="svg-quickview" viewBox="0 0 20 12" preserveAspectRatio="xMinYMin meet">
+		<path id="svg-path-eye" d="M10.033,0C5.607,0,1.792,2.388,0.04,5.833c-0.054,0.105-0.054,0.227,0,0.333
+			C1.792,9.612,5.607,12,10.033,12c4.426,0,8.241-2.388,9.994-5.834c0.053-0.104,0.053-0.226,0-0.333C18.274,2.388,14.459,0,10.033,0
+			z M10.033,10.141c-2.5,0-4.523-1.854-4.523-4.14c0-2.288,2.026-4.14,4.523-4.14c2.499,0,4.522,1.854,4.522,4.14
+			C14.556,8.287,12.53,10.141,10.033,10.141z"/>
+		<ellipse id="svg-path-center" cx="10.033" cy="5.999" rx="2.896" ry="2.65"/>
+	</symbol>
+</svg>
+<!-- /SVG QUICKVIEW -->
+
+<!-- SVG FULLVIEW -->
+<svg style="display: none;">
+	<symbol id="svg-fullview" viewBox="0 0 20 20" preserveAspectRatio="xMinYMin meet">
+		<path d="M13.149,8.701c0.228,0.228,0.597,0.228,0.824,0l2.8-2.799l0.896,0.896
+			c0.185,0.184,0.456,0.25,0.705,0.173c0.248-0.078,0.434-0.287,0.479-0.543l1.03-5.689c0.037-0.203-0.028-0.411-0.175-0.556
+			c-0.146-0.146-0.354-0.21-0.557-0.172l-5.659,1.061c-0.257,0.048-0.465,0.233-0.541,0.481c-0.076,0.248-0.01,0.519,0.174,0.703
+			l0.896,0.896l-2.801,2.8c-0.229,0.228-0.229,0.597,0,0.825L13.149,8.701z"/>
+		<path d="M6.851,11.299c-0.228-0.227-0.597-0.227-0.825,0L3.227,14.1L2.33,13.202
+			c-0.184-0.185-0.456-0.251-0.705-0.173c-0.249,0.078-0.434,0.287-0.479,0.543l-1.031,5.689c-0.036,0.203,0.029,0.41,0.175,0.556
+			c0.146,0.146,0.354,0.21,0.557,0.172l5.66-1.061c0.256-0.048,0.463-0.233,0.54-0.481c0.077-0.248,0.01-0.52-0.174-0.703
+			l-0.896-0.896l2.804-2.795c0.229-0.228,0.229-0.598,0-0.826L6.851,11.299z"/>
+		<path d="M1.146,6.427c0.046,0.256,0.231,0.465,0.479,0.543C1.874,7.048,2.146,6.982,2.33,6.798
+			l0.897-0.896l2.8,2.799c0.228,0.228,0.597,0.228,0.824,0l1.927-1.924c0.228-0.228,0.228-0.597,0-0.825l-2.801-2.8l0.896-0.896
+			c0.184-0.184,0.25-0.455,0.174-0.703C6.97,1.304,6.763,1.119,6.507,1.071l-5.66-1.061C0.644-0.027,0.436,0.037,0.29,0.183
+			C0.144,0.328,0.078,0.535,0.115,0.738L1.146,6.427z"/>
+		<path d="M18.854,13.572c-0.046-0.256-0.231-0.465-0.479-0.543c-0.249-0.078-0.521-0.012-0.705,0.173
+			l-0.896,0.896l-2.8-2.8c-0.228-0.227-0.597-0.227-0.824,0l-1.931,1.928c-0.229,0.229-0.228,0.599,0.001,0.826l2.804,2.795
+			l-0.896,0.896c-0.184,0.184-0.251,0.455-0.174,0.703c0.076,0.248,0.284,0.434,0.54,0.481l5.66,1.061
+			c0.202,0.038,0.411-0.026,0.557-0.172c0.146-0.146,0.212-0.353,0.175-0.556L18.854,13.572z"/>
+	</symbol>
+</svg>
+<!-- /SVG FULLVIEW -->
+
+<!-- SVG COMPARE -->
+<svg style="display: none;">
+	<symbol id="svg-compare" viewBox="0 0 18 18" preserveAspectRatio="xMinYMin meet">
+		<path d="M17.47,8.621L9.369,0.523C9.047,0.199,8.595,0,8.101,0H1.798C0.81,0,0,0.811,0,1.799v6.302
+			c0,0.494,0.198,0.946,0.53,1.279l8.101,8.097C8.954,17.803,9.404,18,9.899,18c0.494,0,0.945-0.197,1.269-0.529l6.301-6.303
+			C17.802,10.846,18,10.395,18,9.9S17.792,8.946,17.47,8.621z M3.149,4.5c-0.746,0-1.351-0.602-1.351-1.351
+			c0-0.746,0.605-1.351,1.351-1.351C3.898,1.799,4.5,2.404,4.5,3.15C4.5,3.898,3.898,4.5,3.149,4.5z"/>
+	</symbol>
+</svg>
+<!-- /SVG COMPARE -->
+
+<!-- SVG GEAR -->
+<svg style="display: none;">
+	<symbol id="svg-gear" viewBox="0 0 10 10" preserveAspectRatio="xMinYMin meet">
+		<path d="M9.969,4.445c-0.016-0.141-0.18-0.246-0.322-0.246c-0.457,0-0.864-0.269-1.035-0.685
+			C8.438,3.087,8.55,2.59,8.892,2.277c0.107-0.098,0.12-0.263,0.03-0.377C8.688,1.602,8.421,1.333,8.13,1.1
+			C8.016,1.009,7.849,1.021,7.75,1.131c-0.299,0.33-0.834,0.453-1.248,0.28C6.072,1.23,5.801,0.793,5.827,0.325
+			C5.836,0.178,5.729,0.05,5.582,0.033C5.209-0.01,4.832-0.011,4.457,0.03C4.312,0.046,4.205,0.171,4.209,0.316
+			C4.226,0.78,3.951,1.208,3.525,1.383C3.116,1.55,2.584,1.429,2.287,1.102C2.189,0.994,2.024,0.98,1.91,1.07
+			C1.61,1.305,1.337,1.574,1.101,1.869C1.009,1.984,1.022,2.15,1.131,2.25c0.348,0.315,0.46,0.816,0.279,1.248
+			C1.238,3.908,0.811,4.173,0.322,4.173C0.164,4.168,0.051,4.274,0.034,4.418C-0.01,4.794-0.011,5.177,0.031,5.555
+			c0.016,0.142,0.185,0.246,0.328,0.246C0.795,5.79,1.213,6.06,1.388,6.486c0.175,0.426,0.063,0.923-0.28,1.236
+			C1.001,7.821,0.988,7.985,1.078,8.1C1.311,8.396,1.577,8.664,1.869,8.9C1.983,8.992,2.15,8.979,2.25,8.869
+			c0.299-0.33,0.834-0.453,1.247-0.279c0.432,0.18,0.703,0.616,0.676,1.084c-0.008,0.148,0.1,0.275,0.246,0.293
+			C4.609,9.988,4.801,10,4.994,10c0.183,0,0.365-0.01,0.549-0.03c0.145-0.017,0.252-0.142,0.248-0.286
+			C5.773,9.22,6.049,8.791,6.475,8.617c0.411-0.168,0.94-0.045,1.238,0.281C7.812,9.006,7.975,9.02,8.09,8.93
+			c0.299-0.234,0.571-0.503,0.809-0.799C8.991,8.016,8.979,7.85,8.869,7.75c-0.348-0.314-0.461-0.816-0.28-1.246
+			c0.17-0.406,0.581-0.679,1.022-0.679l0.063,0.002c0.143,0.012,0.275-0.099,0.293-0.245C10.01,5.206,10.011,4.824,9.969,4.445z
+			 M5.008,6.678c-0.919,0-1.667-0.748-1.667-1.667c0-0.92,0.748-1.668,1.667-1.668c0.92,0,1.668,0.748,1.668,1.668
+			C6.676,5.93,5.928,6.678,5.008,6.678z"/>
+	</symbol>
+</svg>
+<!-- /SVG GEAR -->
+
+<!-- SVG CART -->
+<svg style="display: none;">
+	<symbol id="svg-cart" viewBox="0 0 11 11" preserveAspectRatio="xMinYMin meet">
+		<path d="M10.885,3.302c-0.091-0.129-0.219-0.206-0.388-0.229L2.922,2.225L2.826,1.306
+			C2.81,1.192,2.767,1.092,2.698,1.003C2.63,0.914,2.543,0.854,2.438,0.821l-1.67-0.532C0.624,0.249,0.48,0.263,0.339,0.332
+			C0.198,0.4,0.103,0.511,0.055,0.664C0.014,0.818,0.028,0.963,0.097,1.1C0.166,1.237,0.276,1.33,0.43,1.378L1.736,1.79l0.46,4.622
+			L1.894,8.057C1.87,8.234,1.914,8.392,2.027,8.528c0.12,0.138,0.266,0.206,0.435,0.206h7.066c0.154,0,0.287-0.055,0.399-0.164
+			c0.112-0.108,0.169-0.243,0.169-0.404S10.04,7.87,9.928,7.761S9.683,7.597,9.528,7.597H3.14l0.133-0.749h6.702
+			c0.138,0,0.261-0.044,0.37-0.135c0.108-0.087,0.171-0.201,0.188-0.338l0.459-2.638C11.018,3.568,10.98,3.423,10.885,3.302z"/>
+		<path d="M3.322,9.049c-0.242,0-0.448,0.085-0.617,0.254C2.535,9.473,2.45,9.678,2.45,9.92
+			s0.085,0.45,0.254,0.623c0.169,0.174,0.375,0.261,0.617,0.261c0.242,0,0.447-0.087,0.617-0.261c0.17-0.173,0.254-0.381,0.254-0.623
+			S4.108,9.473,3.938,9.303C3.769,9.134,3.563,9.049,3.322,9.049z"/>
+		<path d="M8.488,9.049c-0.242,0-0.447,0.085-0.618,0.254C7.701,9.473,7.617,9.678,7.617,9.92
+			s0.084,0.45,0.253,0.623c0.171,0.174,0.376,0.261,0.618,0.261c0.241,0,0.448-0.087,0.617-0.261
+			c0.169-0.173,0.254-0.381,0.254-0.623S9.274,9.473,9.105,9.303C8.937,9.134,8.729,9.049,8.488,9.049z"/>
+	</symbol>
+</svg>
+<!-- /SVG CART -->
+
+<!-- SVG CHECK -->
+<svg style="display: none;">
+	<symbol id="svg-check" viewBox="0 0 15 12" preserveAspectRatio="xMinYMin meet">
+		<polygon points="12.45,0.344 5.39,7.404 2.562,4.575 0.429,6.708 3.257,9.536 3.257,9.536 
+			5.379,11.657 14.571,2.465 "/>
+	</symbol>
+</svg>
+<!-- /SVG CHECK -->
+
+<!-- SVG LIMITED -->
+<svg style="display: none;">
+	<symbol id="svg-limited" viewBox="0 0 17 12" preserveAspectRatio="xMinYMin meet">
+		<polygon points="9.914,5.292 9.207,4.585 7.086,2.464 4.964,4.585 0.015,9.534 2.136,11.657 
+			7.086,6.707 7.793,7.414 9.914,9.534 12.035,7.414 16.985,2.464 14.864,0.343 "/>
+	</symbol>
+</svg>
+<!-- /SVG LIMITED -->
+
+<!-- SVG ORDER BOX -->
+<svg style="display: none;">
+	<symbol id="svg-order-box" viewBox="0 0 34 31" preserveAspectRatio="xMinYMin meet">
+		<polygon id="Base" fill="#00B0FF" points="0,24 17,31 34,24 34,7 17,0 0,7 "/>
+		<polygon id="Top" fill="#56CBFF" points="0,7 17,0 34,7 34,17 0,17 "/>
+		<polygon id="Right" fill="#0C7BBF" points="17,31 34,24 34,7 17,14 "/>
+		<polygon id="Left" fill="#00B0FF" points="17,31 0,24 0,7 17,14 "/>
+		<polygon id="Tag" fill="#FFFFFF" points="11,18 5,15.51 5,13.51 11,16 "/>
+		<path id="Ink" fill="#2B2B2B" d="M17,14.844c0,0,3.252-0.061,2.594,2.344c-0.719,2.625-1.313,5.469,1.25,5.438
+			s2.375-3.5,1.094-5.438s-0.193-3.594,0.981-4.063c0,0,1.644-0.469,1.55,1.125s1.031,1.791,1.813,1.505s1.5-1.255,0.844-2.536
+			s0.469-2.125,1.75-2.125s3.688,1.625,5.125-0.781V7l-17,7V14.844z"/>
+	</symbol>
+</svg>
+<!-- /SVG ORDER BOX -->
+
+<!-- SVG PIN -->
+<svg style="display: none;">
+	<symbol id="svg-pin" viewBox="0 0 10 15" preserveAspectRatio="xMinYMin meet">	
+		<path d="M4.996,0.036c-2.735,0-4.959,2.224-4.959,4.959c0,1.102,0.703,2.897,2.15,5.489
+			c1.023,1.834,2.03,3.362,2.072,3.427l0.737,1.118l0.737-1.118c0.042-0.064,1.048-1.593,2.072-3.427
+			c1.446-2.592,2.149-4.388,2.149-5.489C9.954,2.26,7.73,0.036,4.996,0.036z M4.996,7.532c-1.42,0-2.571-1.15-2.571-2.57
+			c0-1.419,1.151-2.571,2.571-2.571c1.42,0,2.571,1.152,2.571,2.571C7.566,6.382,6.416,7.532,4.996,7.532z"/>
+	</symbol>
+</svg>
+<!-- /SVG PIN -->
+
+<!-- SVG PHONE -->
+<svg style="display: none;">
+	<symbol id="svg-phone" viewBox="0 0 11 15" preserveAspectRatio="xMinYMin meet">
+		<path d="M4.969,10.199C4.623,9.639,4.304,9.057,4.001,8.473C3.7,7.886,3.411,7.293,3.151,6.684
+			c-0.212-0.496-0.1-1.079,0.227-1.497L1.339,1.249c-0.923,0.494-1.397,2.295-1.13,4.095c0.114,0.777,0.345,1.521,0.6,2.239
+			C1.064,8.295,1.373,8.991,1.716,9.66c0.346,0.669,0.732,1.323,1.168,1.944c0.438,0.623,0.914,1.238,1.48,1.777
+			c1.318,1.257,3.065,1.903,4,1.435l-2.04-3.938C5.796,10.902,5.253,10.659,4.969,10.199z"/>
+		<path d="M4.292,4.557l0.609-0.315l0.654-0.338C5.787,3.785,5.877,3.5,5.76,3.271L4.212,0.28
+			C4.092,0.053,3.81-0.034,3.581,0.085C3.084,0.343,2.59,0.6,2.095,0.856l1.986,3.837C4.146,4.642,4.217,4.597,4.292,4.557z"/>
+		<path d="M10.813,13.026l-1.549-2.99C9.145,9.81,8.859,9.719,8.63,9.838L8.629,9.837l-0.656,0.34
+			l-0.606,0.316c-0.075,0.037-0.153,0.068-0.232,0.094l1.985,3.837c0.496-0.258,0.992-0.514,1.488-0.77
+			C10.839,13.536,10.932,13.256,10.813,13.026z"/>
+	</symbol>
+</svg>
+<!-- /SVG PHONE -->
+
+<!-- SVG ENVELOPE -->
+<svg style="display: none;">
+	<symbol id="svg-envelope" viewBox="0 0 13 9" preserveAspectRatio="xMinYMin meet">
+		<path d="M6.5,6.304L4.94,4.939L0.48,8.762c0.162,0.151,0.381,0.245,0.623,0.245h10.795
+			c0.241,0,0.458-0.094,0.62-0.245L8.06,4.939L6.5,6.304z"/>
+		<path d="M12.521,0.244C12.358,0.093,12.14,0,11.897,0H1.103C0.862,0,0.644,0.093,0.482,0.246
+			L6.5,5.403L12.521,0.244z"/>
+		<polygon points="0.195,0.791 0.195,8.273 4.548,4.574"/>
+		<polygon points="8.451,4.574 12.805,8.273 12.805,0.788"/>
+	</symbol>
+</svg>
+<!-- SVG ENVELOPE -->
+
+<!-- jQuery -->
+<script src="js/vendor/jquery-1.11.1.min.js"></script>
+<!-- Owl Carrousel -->
+<script src="js/vendor/owl.carousel.min.js"></script>
+<!-- imgLiquid -->
+<script src="js/vendor/imgLiquid-min.js"></script>
+<!-- Header -->
+<script src="js/header.js"></script>
+<!-- Menu -->
+<script src="js/menu.js"></script>
+<!-- Register-Login -->
+<script src="js/register-login.js"></script>
+</body>
+<script type="text/javascript" src="../../js/user.validate.js"></script>
+ <script type="text/javascript" src="../../javascripts/user.register.js"></script>
+<script src="../../frontpage/frontpage_globalargs.js"></script>
+<script type="text/javascript">
+
+
+function indexpageloadargs()
+{
+	/* var s_logo_big="";
+	 var s_small_logo="";
+	 var s_support_email="";
+	 var s_support_address="";
+	 var s_support_phone="";
+	 var s_support_2code="";
+	 var s_support_qq="";
+	 var s_support_weixin="";
+	 var s_foot_about_content="";
+	 var s_company_name_show="";
+	 var s_sales_address="";
+	 var s_sales_phone="";
+	 var s_sales_email="";*/
+	// s_banner_float_font_code=data[13];
+	//	s_banner_background_pic1=data[14];
+	
+		//s_middle_contect_sub_content1
+		//s_middle_contect_sub_title1
+	$("#suport_email1").html(s_support_email);
+	$("#suport_email2").html(s_support_email);
+	$("#suport_email3").html(s_support_email);
+	
+	
+	$("#suport_email1").attr("href","mailto:"+s_support_email);
+	$("#suport_email2").attr("href","mailto:"+s_support_email);
+	$("#suport_email3").attr("href","mailto:"+s_support_email);
+	$("#logo_big").attr("src","../.."+s_logo_big);
+	$("#banner-wrap").attr("style","background:url('../.."+s_banner_background_pic1+"')");
+	$("#banner_float_font_code").html(s_banner_float_font_code);
+	
+	$("#banner_background_pic2").attr("src","../.."+s_banner_background_pic2);
+	$("#banner_background_pic3").attr("src","../.."+s_banner_background_pic3);
+	$("#banner_background_pic4").attr("src","../.."+s_banner_background_pic4);
+	
+	$("#middle_contect_sub_title1").html(s_middle_contect_sub_title1);
+	$("#middle_contect_sub_title2").html(s_middle_contect_sub_title2);
+	$("#middle_contect_sub_title3").html(s_middle_contect_sub_title3);
+	$("#middle_contect_sub_content1").html(s_middle_contect_sub_content1);
+	$("#middle_contect_sub_content2").html(s_middle_contect_sub_content2);
+	$("#middle_contect_sub_content3").html(s_middle_contect_sub_content3);
+	$("#middle_contect_title").html(s_middle_contect_title);
+	$("#company_name_show_about").html("关于"+s_company_name_show);
+	$("#foot_about_content").html(s_foot_about_content);
+	$("#foot_small_logo").attr("src","../.."+s_small_logo);
+	$("#foot_small_logo2").attr("src","../.."+s_small_logo);
+	
+	$("#sales_address").html(s_sales_address);
+	$("#sales_phone").html(s_sales_phone);
+
+	$("#sales_email").attr("href","mailto:"+s_sales_email);
+	$("#sales_email").html(s_sales_email);
+	
+	$("#support_2code").attr("src","../.."+s_support_2code);
+	$("#support_2code2").attr("src","../.."+s_support_2code);
+	$("#support_address").html(s_support_address);
+	$("#support_phone1").html(s_support_phone);
+	$("#support_phone2").html(s_support_phone);
+	
+	$("#support_qq").html(s_support_qq);
+	$("#support_weixin").html(s_support_weixin);
+	
+	
+	
+	
+	
+	//images/logo.png
+	
+}
+	
+ $(document).ready(function(){
+	
+	 loadGlobalfrontpageArgs(indexpageloadargs);//传的参数是一个函数，表示当装完成参数后，将执行传入的函数
+	//loadNewsList();
+	// loadOceanStoreList();
+	 $("#code").click(function(){
+			resetValidateCode(this);
+		});
+		resetValidateCode($("#code"));
+		moble_form();
+ });
+ 
+	function resetValidateCode(event) {
+		$(event).attr('src','../../code/generate?timestamp=' + new Date().getTime());
+	}
+	
+	
+	function loginus258() {
+		
+		var account = $("#login_account").val();
+		var password = $("#login_password").val();
+		var code = $("#verifycode").val();
+		
+		if(!validateAccount(account)||!validatePwd()){
+				return false;
+		}
+		
+		$.ajax({
+			type:"post",
+			url:"../../user/login",
+			data:{
+				"account":account,
+				"password":password,
+				"vcode":code
+			},
+			success:function(response) {
+				var code = response.code;
+				//alert(code);
+				if (code == "200") {
+					//alert("54545");
+					window.location.href = "../../user/index.jsp";
+					//window.location.href = "login.jsp";
+				} else {
+					alert("登录失败，失败原因是:" + response.message);
+					resetValidateCode($("#code"));
+				}
+			}
+		});
+		return false;
+	
+	}
+	function validateAccount(account){
+		if(!checkUserPhone(account)&&!checkUserEmailRegex(account)){
+			alert("手机号或者邮箱是无效的,请输入正确的手机或者邮箱.");
+			return false;
+		}
+		return true;
+	}
+	function validatePwd(password){
+		if(!checkUserPassword(password)){
+			alert("密码长度不对.");
+			return false;
+		}
+		return true;
+	}
+	
+	function moble_form()
+	{
+		
+		
+		var str0="";
+		str0+='<label class="rl-label">电话：</label>';
+		str0+='<input type="text" placeholder="输入你的电话号码..." id="phone_r1" >';
+		str0+='<label class="rl-label required">密码：</label>';
+		str0+='<input type="password" placeholder="输入你的密码..." id="password_r1">';
+		str0+='<button class="button register" onclick="phone_register(0)">注册</button>';
+		//选择装载不使用验证码的方式 
+		 $("#registertable").html(str0);
+		
+		var flags="phone_register_codeornot";
+		 $.ajax({
+				type: "post",
+				url: "../../globalargs/getcontents",
+				data : {
+					"flags" : flags
+				},
+				success: function(response){
+					var code = response.code;
+					if("200" == code){
+						var data = response.data;
+						if(data=="yes")
+						{
+							var str="";
+							str+='<label class="rl-label">电话：</label>';
+							str+='<input type="text" placeholder="输入你的电话号码..." style="width:60%" id="phone_r2"><button class="button login" style="margin-top:0px;width:35%" onclick="getValidateCode1()">获取验证码</button>';
+						    str+='<label class="rl-label required">验证码：</label>';
+						    str+='<input type="text" placeholder="输入你的手机验证码..." id="code_r2">';
+						    str+='<label class="rl-label required">密码：</label>';
+						    str+='<input type="password" placeholder="输入你的密码..." id="password_r2">';
+						    str+='<button class="button register" onclick="phone_register(1)">注册</button>';
+						    $("#registertable").html(str);
+						}
+					}
+					else
+					{}
+				}});
+		
+		
+		
+	
+	}
+	
+	function getValidateCode1() {
+		var telphone = $("#phone_r2").val();
+		//alert(telphone);
+		if(!validaTelphone(telphone)){
+			//alert("请输入手机号");
+			return ;
+		}
+		//alert(telphone);
+		$.ajax({
+			type:"post",
+			url:"../../code/phone_reg",
+			data:{
+			"phone":telphone
+			},
+			success:function(response) {
+				var code = response.code;
+				//alert(code);
+				if (code == "200") {
+					alert("发送成功，请查看手机收到的验证码");
+				} 
+				else
+				{
+					alert("发送失败！"+response.message);
+				}
+			}
+		});
+	}
+	function phone_register(type)
+	{
+		//要验证码的注册
+		if(type==1)
+		{
+
+			var vcode = $("#code_r2").val();
+			var telphone = $("#phone_r2").val();
+			var password = $("#password_r2").val();
+			var recommender = $(":hidden[name='recommender']").val();
+			if (recommender == null || recommender == "") {
+				recommender = "-1";
+			}
+
+			if(!validaTelphone(telphone)||!validatePwd(password)||!validaVerifycode(vcode)){
+				return false;
+			}
+
+		
+				$.ajax({
+					type:"post",
+					url:"../../user/register",
+					data:{
+						"password":password,
+						"phone":telphone,
+						"vcode":vcode,
+						"recommender":recommender,
+						"isloging":"1"
+					},
+					success:function(response) {
+						var code = response.code;
+						if (code == "200") {
+							alert("注册成功");
+							window.location.href = "../../user/index.jsp";
+						} else {
+							alert("注册失败，失败原因是:" + response.message);
+						}
+					}
+				});
+			
+		
+		}
+		else
+		{
+			var vcode = "";
+			var telphone = $("#phone_r1").val();
+			var password = $("#password_r1").val();
+			var recommender = $(":hidden[name='recommender']").val();
+			if (recommender == null || recommender == "") {
+				recommender = "-1";
+			}
+
+			if(!validaTelphone(telphone)||!validatePwd(password)){
+				return false;
+			}
+
+		
+				$.ajax({
+					type:"post",
+					url:"../../user/register",
+					data:{
+						"password":password,
+						"phone":telphone,
+						"vcode":vcode,
+						"recommender":recommender,
+						"isloging":"1"
+					},
+					success:function(response) {
+						var code = response.code;
+						if (code == "200") {
+							alert("注册成功");
+							window.location.href = "../../user/index.jsp";
+						} else {
+							alert("注册失败，失败原因是:" + response.message);
+						}
+					}
+				});
+			
+		}
+	}
+	
+	
+	function email_form()
+	{
+		var str0="";
+		str0+='<label class="rl-label">邮箱：</label>';
+		str0+='<input type="text" placeholder="输入你的邮箱..." id="email_r1" >';
+		str0+='<label class="rl-label required">密码：</label>';
+		str0+='<input type="password" placeholder="输入你的密码..." id="email_password_r1">';
+		str0+='<button class="button register" onclick="register_email()">注册</button>';
+		//选择装载不使用验证码的方式 
+		 $("#registertable").html(str0);
+		
+		
+		
+	}
+	
+	function register_email()
+	{
+
+		var email = $("#email_r1").val();
+		var password = $("#email_password_r1").val();
+		var recommender = $(":hidden[name='recommender']").val();
+		if (recommender == null || recommender == "") {
+			recommender = "-1";
+		}
+		if(!validaEmail(email)||!validatePwd(password)){
+			return false;
+		}
+		//alert(email);
+
+		
+			$.ajax({
+				type:"post",
+				url:"../../user/email_register",
+				data:{
+					"password":password,
+					"email":email,
+					"recommender":recommender,
+					"isloging":"1"
+				},
+				success:function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("注册成功");
+						window.location.href = "../../user/index.jsp";
+					} else {
+						alert("注册失败，失败原因是:" + response.message);
+					}
+				}
+			});
+	
+	
+	}
+	//phone_register_codeornot
+	
+ </script>
+</html>

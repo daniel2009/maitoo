@@ -1,0 +1,87 @@
+package com.weiye.model;
+
+import java.util.List;
+
+public class StoragePosition implements java.io.Serializable{
+	private static final long serialVersionUID = 1589768115925544290L;
+	
+	private String id;
+	private String storageId;
+	private String colNumber;
+	private String rowNumber;
+	private String available;
+	private String userId;
+	private String modifyDate;
+	
+	private String position;
+	private String storageName;
+	private String userName;
+	private List<StoragePositionRecord> recordList;
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getColNumber() {
+		return colNumber;
+	}
+	public void setColNumber(String colNumber) {
+		this.colNumber = colNumber;
+	}
+	public String getRowNumber() {
+		return rowNumber;
+	}
+	public void setRowNumber(String rowNumber) {
+		this.rowNumber = rowNumber;
+	}
+	public String getAvailable() {
+		return available;
+	}
+	public void setAvailable(String available) {
+		this.available = available;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public String getModifyDate() {
+		return modifyDate;
+	}
+	public void setModifyDate(String modifyDate) {
+		this.modifyDate = modifyDate;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getPosition() {
+		return position;
+	}
+	public void setPosition(String position) {
+		this.position = position;
+	}
+	public String getStorageId() {
+		return storageId;
+	}
+	public void setStorageId(String storageId) {
+		this.storageId = storageId;
+	}
+	public String getStorageName() {
+		return storageName;
+	}
+	public void setStorageName(String storageName) {
+		this.storageName = storageName;
+	}
+	public List<StoragePositionRecord> getRecordList() {
+		return recordList;
+	}
+	public void setRecordList(List<StoragePositionRecord> recordList) {
+		this.recordList = recordList;
+	}
+}

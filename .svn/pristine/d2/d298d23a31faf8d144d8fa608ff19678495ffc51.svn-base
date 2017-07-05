@@ -1,0 +1,276 @@
+package com.weiye.controller;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.UploadUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Cart;
+import com.weiye.model.PageSplit;
+import com.weiye.model.Product;
+import com.weiye.model.ProductRecord;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.User;
+import com.weiye.service.GlobalArgsService;
+import com.weiye.service.ProductService;
+
+@Controller
+public class ProductController extends BasicController {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4544907817740050996L;
+	private static final Logger log = Logger.getLogger(ProductController.class);
+	@Resource(name = "productService")
+	private ProductService productService;
+	@Resource(name = "globalargsService")
+	private GlobalArgsService globalArgsService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+	private static final String IMG_PACKAGE = "/img/product";
+	@Value(value = "${default_img_type}")
+	private String defaultImgType;
+	@Value(value = "${default_img_size}")
+	private int defaultImgSize;
+	
+	private boolean needIdCard(){
+		boolean needIdCard = false;
+		try {
+			ResponseObject<String> responseObject = globalArgsService.getByFlag("use_idcard");
+			if(ResponseCode.SUCCESS_CODE.equals(responseObject.getCode()) && "1".equals(responseObject.getData())){
+				needIdCard = true;
+			}
+		} catch (ServiceException e) {
+			e.printStackTrace();
+		}
+		return needIdCard;
+	}
+	private <T> ResponseObject<T> catchException(Exception e, String message){
+		log.error(message, e);
+		return generateResponseObject(ResponseCode.SHOW_EXCEPTION, message);
+	}
+	@RequestMapping(value = "/admin/product/findAll", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<PageSplit<Product>> findAll(HttpServletRequest request, Product product,
+			@RequestParam(value = "key", required = false) String key,
+			@RequestParam(value = "userId", required = false) String userId,
+			@RequestParam(value = "priceStart", required = false) String priceStart,
+			@RequestParam(value = "priceEnd", required = false) String priceEnd,
+			@RequestParam(value = "pageIndex", required = false, defaultValue="1")int pageIndex){
+		product.setName(key);
+		try{
+			return productService.findByKey(product, priceStart, priceEnd, userId, pageIndex, defaultPageSize);
+		}catch(Exception e){
+			return this.catchException(e, "获取商品列表异常");
+		}
+	}
+	@RequestMapping(value = {"/product/findAllByUser" , "/user/product/findAllByUser"}, method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<PageSplit<Product>> findAllByAdminCreate(HttpServletRequest request, Product product,
+			@RequestParam(value = "key", required = false) String key,
+			@RequestParam(value = "priceStart", required = false) String priceStart,
+			@RequestParam(value = "priceEnd", required = false) String priceEnd,
+			@RequestParam(value = "pageIndex", required = false, defaultValue="1")int pageIndex){
+		product.setName(key);
+		product.setUserId(StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY)));
+		try{
+			return productService.findByKeyAndUser(product, priceStart, priceEnd, pageIndex, defaultPageSize);
+		}catch(Exception e){
+			return this.catchException(e, "获取商品列表异常");
+		}
+	}
+	@RequestMapping(value = "/product/findByIds", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<PageSplit<Product>> findByIds(HttpServletRequest request, 
+			@RequestParam(value = "ids", required = false)String[] ids,
+			@RequestParam(value = "pageIndex", required = false, defaultValue="1")int pageIndex){
+		try{
+			return productService.findByIds(ids, pageIndex, defaultPageSize);
+		}catch(Exception e){
+			return this.catchException(e, "获取商品列表异常");
+		}
+	}
+	@RequestMapping(value = {"/product/findByUserCart", "/user/product/findByUserCart"}, method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<PageSplit<Cart>> findByUserCart(HttpServletRequest request, 
+			@RequestParam(value = "ids", required = false)String[] ids,
+			@RequestParam(value = "pageIndex", required = false, defaultValue="1")int pageIndex){
+		User user = new User();
+		user.setId(StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY)));
+		try{
+			return productService.findByUserCart(user, ids, pageIndex, defaultPageSize);
+		}catch(Exception e){
+			return this.catchException(e, "获取商品列表异常");
+		}
+	}
+	@RequestMapping(value = "/admin/product/add", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> add(HttpServletRequest request, Product product,
+			@RequestParam(value = "picture1", required = false) MultipartFile picture1,
+			@RequestParam(value = "picture2", required = false) MultipartFile picture2,
+			@RequestParam(value = "picture3", required = false) MultipartFile picture3){
+		String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+		product.setEmpId(empId);
+		String realPath = request.getSession().getServletContext().getRealPath("/");
+		String[] fileNames = UploadUtil.uploadFile(IMG_PACKAGE, realPath, defaultImgSize, defaultImgType, true, 300, picture1, picture2, picture3);
+		if(fileNames[0].indexOf(".") < 0){
+			return generateResponseObject(ResponseCode.UPLOAD_IMG_ERROR, fileNames[0]);
+		}else{
+			if(fileNames[0].indexOf(".") > 0){
+				product.setPic1(fileNames[0]);
+			}
+			if(fileNames[1].indexOf(".") > 0){
+				product.setPic2(fileNames[1]);
+			}
+			if(fileNames[2].indexOf(".") > 0){
+				product.setPic3(fileNames[2]);
+			}
+		}
+		try{
+			return productService.add(product);
+		}catch(Exception e){
+			return this.catchException(e, "添加商品异常");
+		}
+	}
+	@RequestMapping(value = "/user/product/addProductAndRecordByUser", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> addProductAndRecordByUser(HttpServletRequest request, Product product, ProductRecord productRecord,
+			@RequestParam(value = "idCardPicture", required = false) MultipartFile idCardPicture,
+			@RequestParam(value = "idCardOtherPicture", required = false) MultipartFile idCardOtherPicture){
+		boolean hasPic = UploadUtil.isFileUrl(productRecord.getcIdCardPic()) || UploadUtil.hasFile(idCardPicture);
+		if(this.needIdCard() && !hasPic){
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "需要上传身份证");
+		}
+		String realPath = request.getSession().getServletContext().getRealPath("/");
+		String[] fileNames = UploadUtil.uploadFile(IMG_PACKAGE, realPath, defaultImgSize, defaultImgType, false, 0, idCardPicture, idCardOtherPicture);
+		if(fileNames[0].indexOf(".") < 0){
+			return generateResponseObject(ResponseCode.UPLOAD_IMG_ERROR, fileNames[0]);
+		}else{
+			if(fileNames[0].indexOf(".") > 0){
+				productRecord.setcIdCardPic(fileNames[0]);
+			}
+			if(fileNames[1].indexOf(".") > 0){
+				productRecord.setcIdCardOtherPic(fileNames[1]);
+			}
+		}
+		String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+		product.setUserId(userId);
+		productRecord.setUserId(userId);
+		try{
+			return productService.addProductAndRecordByUser(product, productRecord);
+		}catch(Exception e){
+			return this.catchException(e, "添加商品自行购买异常");
+		}
+	}
+	@RequestMapping(value = "/admin/product/update", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> update(HttpServletRequest request, Product product,
+			@RequestParam(value = "picture1", required = false) MultipartFile picture1,
+			@RequestParam(value = "picture2", required = false) MultipartFile picture2,
+			@RequestParam(value = "picture3", required = false) MultipartFile picture3){
+		String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+		product.setEmpId(empId);
+		String realPath = request.getSession().getServletContext().getRealPath("/");
+		String[] fileNames = UploadUtil.uploadFileWithoutSort(IMG_PACKAGE, realPath, defaultImgSize, defaultImgType, true, 300, picture1, picture2, picture3);
+		if(fileNames[0].indexOf(".") < 0){
+			return generateResponseObject(ResponseCode.UPLOAD_IMG_ERROR, fileNames[0]);
+		}else{
+			if(fileNames[0].indexOf(".") > 0){
+				product.setPic1(fileNames[0]);
+			}
+			if(fileNames[1].indexOf(".") > 0){
+				product.setPic2(fileNames[1]);
+			}
+			if(fileNames[2].indexOf(".") > 0){
+				product.setPic3(fileNames[2]);
+			}
+		}
+		try{
+			return productService.update(product);
+		}catch(Exception e){
+			return this.catchException(e, "修改商品异常");
+		}
+	}
+	@RequestMapping(value = "/admin/product/delete", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> delete(HttpServletRequest request, Product product){
+		try{
+			return productService.delete(product);
+		}catch(Exception e){
+			return this.catchException(e, "删除商品异常");
+		}
+	}
+	@RequestMapping(value = {"/admin/product/findById", "/product/findById", "/user/product/findById"}, method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Product> findById(HttpServletRequest request, Product product){
+		try{
+			return productService.findById(product);
+		}catch(Exception e){
+			return this.catchException(e, "获取商品详情异常");
+		}
+	}
+	@RequestMapping(value = {"/cart/countCart", "user/cart/countCart"}, method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<Integer> countCart(HttpServletRequest request){
+		User user = new User();
+		user.setId(StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY)));
+		try{
+			return productService.countByUser(user);
+		}catch(Exception e){
+			return this.catchException(e, "计算购物车数量异常");
+		}
+	}
+	@RequestMapping(value = {"/cart/add2Cart", "/user/cart/add2Cart"}, method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> add2Cart(HttpServletRequest request, Cart cart){
+		cart.setUserId(StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY)));
+		try{
+			return productService.add2Cart(cart);
+		}catch(Exception e){
+			return this.catchException(e, "加入购物车异常");
+		}
+	}
+	@RequestMapping(value = {"/cart/delete", "user/cart/delete"}, method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> deleteCart(HttpServletRequest request, Cart cart){
+		cart.setUserId(StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY)));
+		try{
+			return productService.delete(cart);
+		}catch(Exception e){
+			return this.catchException(e, "删除购物车异常");
+		}
+	}
+	@RequestMapping(value = {"/cart/deleteAll", "user/cart/deleteAll"}, method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> deleteAllCart(HttpServletRequest request){
+		User user = new User();
+		user.setId(StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY)));
+		try{
+			return productService.deleteAllCartByUser(user);
+		}catch(Exception e){
+			return this.catchException(e, "删除购物车异常");
+		}
+	}
+	@RequestMapping(value = "/user/cart/findById", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Cart> findCartById(HttpServletRequest request, Cart cart){
+		try{
+			return productService.findCartById(cart);
+		}catch(Exception e){
+			return this.catchException(e, "获取购物车异常");
+		}
+	}
+}

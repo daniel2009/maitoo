@@ -1,0 +1,91 @@
+﻿<%@page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">用户中心首页</p>
+
+		<div class="box_content">
+			<div class="content_title">用户中心首页</div>
+			<div class="content_text">
+				<div>
+					<div class="ax_text"><span style="font-size:18px;color:blue;"><strong>我的个人信息：</strong></span></div>
+					<table class="userTable" style="width:80%">
+						<tr>
+							<td><span>您好，<span id="u_username" style="color:red;"></span></span></span></td>
+							<td>收件标识：<span class="red" id="useralias">&nbsp;</span><br />
+								收件代码：<span class="red" id="usercode">&nbsp;</span></td>
+							<td>我的余额：<span class="red" id="usd">&nbsp;</span>,<span class="red" id="rmb">&nbsp;</span>
+								<a href="javascript:nav61Click()">【在线充值】</a></td>
+
+						</tr>
+
+					</table>
+				</div>
+				<hr />
+				<section>
+					<div class="ax_text"><span style="font-size:18px;color:blue;"><strong>待处理事件：</strong></span></div>
+					<div style="display: flex; flex-wrap: wrap;">
+						<article style="margin: 3px; flex-basis: 200px; border: 1px solid #aaa; ">
+							转运单：
+							<a href="#" onclick="javascript: forwardPage('transhipment', 1);">已入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentState1">0</label>)</span></a>
+							<a href="#" onclick="javascript: forwardPage('transhipment', 3);">待支付<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentState3">0</label>)</span></a>
+						</article>
+						<article style="margin: 3px; flex-basis: 200px; border: 1px solid #aaa; ">
+							退货：
+							<a href="#" onclick="javascript: forwardPage('returnPackage', 2);">有问题<span style="margin: 0 3px; color: #f00;">(<label id="countReturnPackageState2">0</label>)</span></a>
+						</article>
+						<article style="margin: 3px; flex-basis: 200px; border: 1px solid #aaa; ">
+							认领：
+							<a href="#" onclick="javascript: forwardPage('claimPackage', 4);">有问题<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState4">0</label>)</span></a>
+						</article>
+						<article style="margin: 3px; flex-basis: 200px; border: 1px solid #aaa; ">
+							运单：
+							<a href="#" onclick="javascript: forwardPage('order', 1);">未付款<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState1">0</label>)</span></a>
+						</article>
+						<article style="margin: 3px; flex-basis: 200px; border: 1px solid #aaa; ">
+							商品购买：
+							<a href="#" onclick="javascript: forwardPage('productRecord', 1);">有问题<span style="margin: 0 3px; color: #f00;">(<label id="countProductRecordState1">0</label>)</span></a>
+						</article>
+					</div>
+				</section>
+				<hr />
+				<div class="ax_text" id="showzytitle"><span style="font-size:18px;color:blue;"><strong>我的美国收货地址：</strong></span></div>
+				<div class="ax_text" id="showzyremark"><span style="font-size:12px;color:red;"><strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注意:美国收货地址是指你通过网上购物，先寄到我们的仓库地址，然后我们代你转寄到国内的使用地址。每一个仓库地址如下格式所示，收件人的姓名填写方式为"姓名"+收件标识，收件地址填写方式为"地址"+#收件代码,进行转运的客户必须在个人资料中填写个人姓名。 </strong> </span></div>
+				<div id="show_warehouse_div">
+				
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+function forwardPage(type, state){
+	window.sessionStorage.setItem("searchState", state);
+	switch(type){
+		case "transhipment":
+			nav13Click();
+			break;
+		case "returnPackage":
+			nav14Click();
+			break;
+		case "claimPackage":
+			nav15Click();
+			break;
+		case "order":
+			nav44Click();
+			break;
+		case "productRecord":
+			navProductRecordClick();
+			break;
+	}
+}
+</script>
+</html>

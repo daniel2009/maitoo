@@ -1,0 +1,348 @@
+function main() {
+	(function () {
+   	'use strict';
+
+   	$(window).load(function(){
+		$('.rst_main_wraper').isotope();
+		$('.rst_main_2_page').isotope();
+		$('.rst_portfolio_page .rst_content').isotope({itemSelector: '.rst_portfolio_content'});
+	});
+	
+	jQuery(document).ready(function($){
+		// Custom map Google
+		if ( $('#cd-google-map').length != 0 )
+		{
+			// set google maps parameters
+			var latitude = 33.8977605,
+				longitude = -118.4065804,
+				map_zoom = 16;	
+			//var marker_url = 'images/icon/mappoint.png' ;
+
+			//we define here the style of the map
+			//var style= [{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#d3d3d3"}]},{"featureType":"transit","stylers":[{"color":"#808080"},{"visibility":"off"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"visibility":"on"},{"color":"#b3b3b3"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#ffffff"},{"weight":1.8}]},{"featureType":"road.local","elementType":"geometry.stroke","stylers":[{"color":"#d7d7d7"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#ebebeb"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#a7a7a7"}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#efefef"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#696969"}]},{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"visibility":"on"},{"color":"#737373"}]},{"featureType":"poi","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.arterial","elementType":"geometry.stroke","stylers":[{"color":"#d6d6d6"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"color":"#dadada"}]}];
+				
+			//set google map options
+			var map_options = {
+				center: new google.maps.LatLng(latitude, longitude),
+				zoom: map_zoom,
+				panControl: false,
+				zoomControl: false,
+				mapTypeControl: false,
+				streetViewControl: false,
+				mapTypeId: google.maps.MapTypeId.ROADMAP,
+				scrollwheel: false,
+				//styles: style,
+			}
+			
+			//inizialize the map
+			var map = new google.maps.Map(document.getElementById('google-container'), map_options);
+			
+			//add a custom marker to the map				
+			var marker = new MarkerWithLabel({
+				position: new google.maps.LatLng(latitude, longitude),
+				map: map,
+				visible: true,
+				//icon: marker_url,
+				labelContent: "Street 15, Manhattan, New York",
+				labelAnchor: new google.maps.Point(-50, 55),
+				labelClass: "rst-labels", // the CSS class for the label
+			});
+			
+		};
+
+		$('.bxslider').bxSlider({
+			auto: true,
+			controls: false,
+		});
+		$('.bxslider_2').bxSlider({
+			auto: true,
+		});
+		$('.bxslider_testimonial').bxSlider({
+			auto: true,
+		});
+		$('.rst_search_button').on("click",function(event){
+			$('.rst_search_bar').css('width', '100%');
+			return false;
+		});
+		$('.rst_search_close').on("click", function(event){
+			$('.rst_search_bar').css('width', '0');
+			return false;
+		});
+		$('.rst_more_menu').on("click", function(event){
+			$('.rst_drop_menu_wrapper').css('height', '100vh');
+			return false;
+		});
+		$('.rst_close_drop_menu a').on("click",function(event){
+			$('.rst_drop_menu_wrapper').css('height', '0');
+			return false;
+		});
+		$('.rst_talk_shadow .rst_select_services a').on("click",function(event){
+			return false;
+		});
+		$('.rst_back').on("click",function(event){
+			window.history.back();
+			return false;
+		});
+
+
+		$('.rst_gallery_page .rst_gallery_content a').fancybox({
+			helpers : {
+				overlay: {
+				  locked: false
+				}
+			}
+		});
+
+		$('.fancybox-media').fancybox({
+			openEffect  : 'none',
+			closeEffect : 'none',
+			helpers : {
+				media : {},
+				overlay: {
+				  locked: false
+				}
+			}
+		});
+
+		// Images Loaded
+		$.fn.imagesLoaded = function () {
+
+			$imgs = this.find('img[src!=""]');
+			// if there's no images, just return an already resolved promise
+			if (!$imgs.length) {return $.Deferred.resolve().promise();}
+
+			// for each image, add a deferred object to the array which resolves when the image is loaded
+			var dfds = [];  
+			$imgs.each(function(){
+
+				var dfd = $.Deferred();
+				dfds.push(dfd);
+				var img = new Image();
+				img.onload = function(){dfd.resolve();}
+				img.src = this.src;
+
+			});
+
+			// return a master promise object which will resolve when all the deferred objects have resolved
+			// IE - when all the images are loaded
+			return $.when.apply($,dfds);
+
+		};
+
+		// Load more Main Page
+		$('.rst_main_page .rst_loadmore').on("click",function(event){
+			var data = $('.rst_main_wraper').html();
+			$(data).filter('.rst_main_content').each(function(index, el) {
+				$('.rst_main_wraper').append($(this)).isotope( 'appended', $(this) );
+			});
+			$('.rst_main_page').imagesLoaded().then(function(){
+				$('.rst_main_wraper').isotope('layout');
+			});
+			
+		});
+
+		// Load more Main page V2
+		$('.rst_main_2_page + .rst_load_more .rst_loadmore').on("click",function(event){
+			var data = $('.rst_main_2_page').html();
+			$(data).filter('.rst_main_2_element').each(function(index, el) {
+				$('.rst_main_2_page').append($(this)).isotope( 'appended', $(this) );
+			});
+			$('.rst_main_2_page').imagesLoaded().then(function(){
+				$('.rst_main_2_page').isotope('layout');
+			});
+			
+		});
+
+		// Load More Portfolio page
+		$('.rst_portfolio_page .rst_loadmore').on("click",function(event){
+			var data = $('.rst_content').html();
+			$(data).filter('.rst_portfolio_content').each(function(index, el) {
+				$('.rst_content').append($(this)).isotope( 'appended', $(this) );
+			});
+			$('.rst_content').imagesLoaded().then(function(){
+				$('.rst_content').isotope('layout');
+			});
+		});
+
+		// Load More Landing page
+		$('.rst_landing_page .rst_more .btn').on("click",function(event){
+			var data = $('.rst_our_blog').html();
+			$(data).filter('.col-xs-12').each(function(index, el) {
+				$('.rst_our_blog').append($(this)).isotope( 'appended', $(this) );
+			});
+			$('.rst_our_blog').imagesLoaded().then(function(){
+				$('.rst_our_blog').isotope('layout');
+			});
+			return false;
+		});
+
+		// Load more About page
+		$('.rst_about_page .rst_loadmore').on("click",function(event){
+			var data = $('.rst_our_blog').html();
+			$(data).filter('.col-xs-12').each(function(index, el) {
+				$('.rst_our_blog').append($(this)).isotope( 'appended', $(this) );
+			});
+			$('.rst_our_blog').imagesLoaded().then(function(){
+				$('.rst_our_blog').isotope('layout');
+			});
+			return false;
+		});
+
+		$('.rst_main_wraper').masonry({
+		  itemSelector: '.rst_main_content',
+		});
+
+		$('.rst_close_talk_shadow').on("click",function(event){
+			$('.rst_talk_shadow').css('z-index', '-1');
+			$('.rst_talk_shadow').css('opacity', '0');
+			return false;
+		});
+
+		$('.rst_how_much .rst_talk .btn').on("click",function(event){
+			$('.rst_talk_shadow').css('z-index', '1');
+			$('.rst_talk_shadow').css('opacity', '1');
+			return false;
+		});
+
+		$('.rst_portfolio_list_show').on("click",function(event){
+			$('.rst_main_page .rst_portfolio_list').slideToggle();
+			return false;
+		});
+
+		$('.rst_go_to_top').on("click",function(e){
+			$('html,body').animate({
+				scrollTop: $('header').offset().top
+			},'slow');
+			return false;
+		});
+
+		$('.rst_go_to_bottom').on("click",function(e){
+			$('html,body').animate({
+				scrollTop: $('.scroll_to').offset().top
+			},'slow');
+			return false;
+		});
+
+		$('.rst_video').on("click",function(e){
+			$(this).css('display', 'none');
+			//$('.rst_video_wrapper iframe').attr('src', $('.rst_video_wrapper iframe').attr('src') + '?autoplay=1');
+			var videoURL = $('.rst_video_wrapper iframe').prop('src');
+			videoURL += "?autoplay=1";
+			$('.rst_video_wrapper iframe').prop('src',videoURL);
+			return false;
+		});
+
+		$('.rst_drop_menu ul li').on({
+			mouseenter: function () {
+				$('.rst_drop_menu_social').css('bottom', '-100px');
+			}, 
+			mouseleave: function () {
+				$('.rst_drop_menu_social').css('bottom', '70px');
+			}
+		});
+
+		// RESIZE VIDEO
+		$(function() {
+		    var $allVideos = $("iframe[src^='//player.vimeo.com'], iframe[src^='//www.youtube.com'], object, embed"),
+		    $fluidEl = $("figure");
+			$allVideos.each(function() {
+
+			  $(this)
+			    // jQuery .data does not work on object/embed elements
+			    .attr('data-aspectRatio', this.height / this.width)
+			    .removeAttr('height')
+			    .removeAttr('width');
+
+			});
+
+			$(window).resize(function() {
+			  var newWidth = $fluidEl.width();
+			  $allVideos.each(function() {
+
+			    var $el = $(this);
+			    $el
+			        .width(newWidth)
+			        .height(newWidth * $el.attr('data-aspectRatio'));
+			  });
+			}).resize();
+		});
+
+		//Check validate send mail
+		if( $("#contactForm").length ) {
+			$("#contactForm input,#contactForm textarea").jqBootstrapValidation({
+				preventSubmit: true,
+				submitError: function($form, event, errors) {
+					// additional error messages or events
+				},
+				submitSuccess: function($form, event) {
+					event.preventDefault(); // prevent default submit behaviour
+					// get values from FORM
+					var name = $("input#name").val();
+					var email = $("input#email").val();
+					var phone = $("input#phone").val();
+					var message = $("textarea#message").val();
+					var firstName = name; // For Success/Failure Message
+					// Check for white space in name for Success/Fail message
+					if (firstName.indexOf(' ') >= 0) {
+						firstName = name.split(' ').slice(0, -1).join(' ');
+					}
+					$.ajax({
+						url: "././submit.php",
+						type: "POST",
+						data: {
+							name: name,
+							phone: phone,
+							email: email,
+							message: message
+						},
+						cache: false,
+						success: function() {
+							// Success message
+							$('#success').html('<div class="alert alert-info" role="alert">');
+							$('#success > .alert-info').html('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i>');
+							$('#success > .alert-info').append("Your message has been sent.");
+							$('#success > .alert-info').append('</div>');
+
+							//clear all fields
+							$('#contactForm').trigger("reset");
+						},
+						error: function() {
+							// Fail message
+							$('#success').html('<div class="alert alert-black" role="alert">');
+							$('#success > .alert-black').html('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><i class="fa fa-close"></i>');
+							$('#success > .alert-black').append("Sorry " + firstName + ", it seems that my mail server is not responding. Please try again later!");
+							$('#success > .alert-black').append('</div>');
+							//clear all fields
+							$('#contactForm').trigger("reset");
+						},
+					})
+				},
+				filter: function() {
+					return $(this).is(":visible");
+				}
+			});
+		};
+	});
+
+
+}());
+
+}
+main();
+
+	$('.filter').on("click",function(event){	
+		$data = $(this).attr('data-filter');
+		$('.rst_main_wraper').isotope({
+			itemSelector: '.rst_main_content',
+		  	filter: $data,
+		});
+		$('.rst_main_2_page').isotope({
+			itemSelector: '.rst_main_2_element',
+			filter: $data,
+		});
+		$('.rst_portfolio_page .rst_content').isotope({
+			itemSelector: '.rst_portfolio_content',
+			filter: $data,
+		});
+		return false;
+	});

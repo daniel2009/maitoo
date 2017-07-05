@@ -1,0 +1,50 @@
+var usa_title	= ['countries' , 'state' ];
+function showusaLocation(province , city , town) {
+	$('#usa_province').empty();
+	$('#usa_city').empty();
+	//$('#usa_town').empty();
+	var loc	= new usaLocation();
+	var title = ['countries' , 'state' ];
+	$.each(title , function(k , v) {
+		title[k]	= '<option value="">'+v+'</option>';
+	});
+	$('#usa_province').append(title[0]);
+	$('#usa_city').append(title[1]);
+	//$('#usa_town').append(title[2]);
+	
+	$('#usa_province').change(function() {
+		$('#usa_city').empty();
+		$('#usa_city').append(title[1]);
+		loc.fillOption('usa_city' , '0,'+$('#usa_province').val());
+//		$('#usa_town').empty();
+//		$('#usa_town').append(title[2]);
+		//$('input[@name=location_id]').val($(this).val());
+	});
+	
+//	$('#usa_city').change(function() {
+//		$('#usa_town').empty();
+//		$('#usa_town').append(title[2]);
+//		loc.fillOption('usa_town' , '0,' + $('#usa_province').val() + ',' + $('#usa_city').val());
+//		//$('input[@name=location_id]').val($(this).val());
+//	})
+//	
+//	$('#usa_town').change(function() {
+//		//$('input[@name=location_id]').val($(this).val());
+//	})
+
+	if (province) {
+		loc.fillOption('usa_province' , '0' , province);
+		
+		if (city) {
+			loc.fillOption('usa_city' , '0,'+province , city);
+			
+//			if (town) {
+//				loc.fillOption('usa_town' , '0,'+province+','+city , town);
+//			}
+		}
+		
+	} else {
+		loc.fillOption('usa_province' , '0');
+	}
+
+}

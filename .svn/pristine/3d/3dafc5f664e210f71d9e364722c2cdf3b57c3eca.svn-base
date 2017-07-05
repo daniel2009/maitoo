@@ -1,0 +1,511 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+<style>
+.sequareBox{
+	width: 40px;
+	height: 40px;
+}
+.littleSequare1, .littleSequare0{
+	display: block;
+	margin: 0 auto;
+	padding: 0;
+	border: 1px solid #555;
+	width: 93%;
+	height: 93%;
+}
+.littleSequare1:HOVER, .littleSequare0:HOVER {
+	box-shadow: 0 0 2px 2px #6ff;
+}
+.littleSequare1{
+	background-color: #0f0;
+}
+.littleSequare0{
+	background-color: #f55;
+}
+.radio:checked ~ .littleSequare1, .radio:checked ~ .littleSequare0{
+	background-color: #909;
+	box-shadow: 0 0 2px 2px #707;
+}
+.contentBox{
+	width: 100%; display: flex; transition: all 1s;
+}
+.radio0:checked ~ .contentBox{
+	width: 200%;
+}
+.storagePositionArticle{
+	margin-left: 30px;
+	padding: 3px;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	display: none;
+}
+.storagePositionArticle-context{
+	width: 200px;
+	background-color: #ccc;
+	border: 1px solid #666;
+}
+.viewBox{
+	width: 100%;
+	overflow: hidden;
+	text-overflow: clip;
+}
+.titleBox{
+	margin: 20px auto;
+	width: 75%;
+	display: flex;
+}
+.hoveraaa:HOVER {
+	background-color: #aaa;
+	border-radius: 3px;
+}
+</style>
+<body>
+<div class="block">
+	<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">储藏间信息列表</p>
+	<div class="box_content">
+		<div class="content_title">储藏间信息列表</div>
+		<div class="content_text">
+			<div class="tab-content default-tab center" id="tab1">
+				<div id="u51" style="padding-top: 5px;">
+					<div id="u510">
+						用户编号：<input type="text" class="text-input" size="15" id="userIdText"/>
+						<input class="button" type="button" value="搜索" onclick="javascript: searchUserId();" />
+						用户关键字： <input class="text-input" size="10" type="text" id="userRealNameText" maxlength="16"/>
+						<input class="button" type="button" value="高级搜索" onclick="javascript: searchUser();"/>
+					</div>
+					<div style="clear: both;"></div>
+				</div>
+				<span >选择门店：</span> <select class="text-input" style="width: 150px;" id="warehouseSelect"></select> <span>选择类型</span><select class="text-input" style="width: 150px;" name="type1" id="type1"><option value="0">转运州仓位</option><option value="1">本地转运仓位</option><option value="2">运单归类仓位</option></select>
+				<br/>
+				<a href="javascript: addStorageDlg();" style="margin-left: 90%; margin-top: 20px; font-size:14px;">添加储藏间</a>
+			</div>
+			<section id="listContainer">
+				
+				<div style="margin: 20px;">
+					<div class="viewBox">
+						<div class="titleBox">
+							<div style="flex: 1;">储藏间名称:<label id="name"></label></div>
+							<div style="flex: 1;">所在门店:<label id="warehouseName"></label></div>
+							<div style="flex: 1;">空位数量:<label id="totalAvailable"></label></div>
+						</div>
+						<form id="form1">
+							<input type="radio" class="radio0" id="radio01" name="id" value="0" checked hidden>
+							<div class="contentBox">
+								<article style="flex: 1;">
+									<section id="storageSection" style="margin: 0 auto; display: flex; width: 280px; flex-wrap: wrap; ">
+										<!-- 
+										<div class="sequareBox"><input type="radio" class="radio" id="radio11" name="id" value="1" onclick="javascript: clickStorage(1,1);" hidden><label class="littleSequare1" for="radio11"></label></div>
+										<div class="sequareBox"><input type="radio" class="radio" id="radio21" name="id" value="2" onclick="javascript: clickStorage(1,0);" hidden><label class="littleSequare0" for="radio21"></label></div>
+										<div class="sequareBox"><input type="radio" class="radio" id="radio31" name="id" value="3" onclick="javascript: clickStorage(1,1);" hidden><label class="littleSequare1" for="radio31"></label></div>
+										<div class="sequareBox"><div class="littleSequare0"></div></div>
+										<div class="sequareBox"><div class="littleSequare1"></div></div>
+										<div class="sequareBox"><div class="littleSequare1"></div></div>
+										<div class="sequareBox"><div class="littleSequare0"></div></div>
+										<div class="sequareBox"><div class="littleSequare0"></div></div>
+										<div class="sequareBox"><div class="littleSequare0"></div></div>
+										<div class="sequareBox"><div class="littleSequare1"></div></div>
+										<div class="sequareBox"><div class="littleSequare1"></div></div>
+										 -->
+									</section>
+								</article>
+								<article style="flex: 1;">
+									<div id="infoDiv1" class="storagePositionArticle">
+										位置：<label id="storagePosition1">AA99</label><br/>
+										用户：<label id="userNameLabel1" >aaa</label><br/>
+										未发包裹：<p id="relateIdsP1"></p>
+									</div>
+									<div id="useDiv1" class="storagePositionArticl">
+										<div style="width: 200px; border: 1px solid #666; background-color: #ccc; ">
+											用户ID：<input type="text" id="userNameInput1"><br/>
+											<input type="button" class="button" value="使用该仓位" onclick="javascript:useStorage(1);">
+										</div>
+										<div id="noPositionDiv1" style="width: 250px; border: 1px solid #666; background-color: #ccc;">
+											本门店有包裹在库，但未分配储藏位的用户<br/>
+											<a href="#" onclick="javascript: clickNoPositionUser(userId);">1122:wwww 数量：5</a><br/>
+											1133:ccc<br/>
+											1144:ddd<br/>
+										</div>
+									</div>
+								</article>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!-- End .pagination -->
+				<div class="clear"></div>
+			</section>
+			<div id="pagination" class="pagination" style="font-size: 15px;">
+					共0条/共0页&nbsp;&nbsp;
+					<a href="">首页</a>|
+					<a href="#">上一页</a>
+					<input style="width: 20px;" type="text" name="pageNow" />
+					<a href="#">下一页</a>|
+					<a href="#">尾页</a>
+				</div>
+		</div>
+	</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var clickedStorageId = 0;
+	var clickedFormId = 0;
+	function clickStorage(i, available){//form 的id
+		$("#relateIdsP"+clickedFormId).html("");
+		var id = $("#form"+i+" input:radio[name=id]:checked").val();
+		if(id == clickedStorageId){
+			clickedStorageId = 0;
+			document.getElementById("radioZero"+i).click();
+		}else{
+			if(clickedFormId != i && clickedFormId != 0){
+				document.getElementById("radioZero"+clickedFormId).click();
+			}
+			clickedStorageId = id;
+			clickedFormId = i;
+			if(available == "1"){
+				//add user to storage
+				document.getElementById("infoDiv"+i).style.display = "none";
+				document.getElementById("useDiv"+i).style.display = "flex";
+				$.ajax({
+					type: "get",
+					url: "../admin/storagePosition/findNoPositionUserByStorageId",
+					data:{ "id" : i },
+					success:function (response){
+						var code = response.code;
+						if("200" == code){
+							var list = response.data;
+							var string = "本门店有包裹在库，但未分配储藏位的用户<br/>";
+							for(var i=0; i<list.length; i++){
+								string +="<br/><a onclick='javascript: clickNoPositionUser("+clickedFormId+", "+list[i].userId+");'>"+list[i].userId+":"+list[i].userName+"</a>";
+								var recordString = "";
+								for(var j=0,length = list[i].recordList.length; j<length; j++){
+									recordString += list[i].recordList[j].relateId + ",";
+								}
+								string += recordString;
+							}
+							$("#noPositionDiv"+clickedFormId).html(string);
+						}else if("607" == code){
+							alert("您尚未登录或登录已失效！");
+							logout();
+						}else{
+							alert("获取未分配用户列表数据失败，原因是:" + response.message);
+						}
+					}
+				});
+			}else{
+				document.getElementById("infoDiv"+i).style.display = "block";
+				document.getElementById("useDiv"+i).style.display = "none";
+				$.ajax({
+					type: "get",
+					url: "../admin/storagePosition/findById",
+					data:{id:id},
+					success:function (response){
+						var code = response.code;
+						if("200" == code){
+							var storagePosition = response.data;
+							$("#storagePosition"+clickedFormId).html(storagePosition.position);
+							$("#userNameLabel"+clickedFormId).html(storagePosition.userName=="" ? storagePosition.userId : storagePosition.userName);
+							var recordString = "";
+							for(var i=0; i<storagePosition.recordList.length; i++){
+								recordString += "<span class='hoveraaa' style='margin-right: 10px;'>" + storagePosition.recordList[i].relateId + "<a href='#' onclick='javascript: takeoutPackage("+storagePosition.id+","+storagePosition.recordList[i].relateId+")'>拿走</a></span>";
+							}
+							$("#relateIdsP"+clickedFormId).html(recordString);
+							$("#relateOutIdsP"+clickedFormId).html("");
+							$.ajax({
+								type: "get",
+								url: "../admin/storagePosition/findOutPositionRecordByStoragePositionId",
+								data:{id:id},
+								success:function (response){
+									var code = response.code;
+									if("200" == code){
+										var storagePosition = response.data;
+										if(storagePosition!=null && storagePosition.recordList!=null){
+											var recordOutString = "";
+											for(var i=0; i<storagePosition.recordList.length; i++){
+												recordOutString += "<span class='hoveraaa' style='margin-right: 10px;'>" + storagePosition.recordList[i].relateId + "<a href='#' onclick='javascript: bringInPackage("+storagePosition.id+","+storagePosition.recordList[i].relateId+")'>拿入</a></span>";
+											}
+											$("#relateOutIdsP"+clickedFormId).html(recordOutString);
+										}
+									}
+								}
+							});
+						}else if("607" == code){
+							alert("您尚未登录或登录已失效！");
+							logout();
+						}else{
+							alert("获取指定储藏间信息数据失败，原因是:" + response.message);
+						}
+					}
+				});
+				
+			}
+			
+		}
+	}
+	function clickNoPositionUser(i, userId){
+	 	document.getElementById("userIdText"+i).value=userId;
+	 	return false;
+	}
+	function useStorage(i){
+		$.ajax({
+			type : "post",
+			url : "../admin/storagePosition/useStorage",
+			data : new FormData(document.getElementById("form"+i)),
+			contentType : false,
+			processData : false,
+			success : function (response){
+				var code = response.code;
+				if("200" == code){
+					alert("使用成功");
+					navStorageClick();
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("使用储藏间数据失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function clearStorage(i){
+		$.ajax({
+			type : "post",
+			url : "../admin/storagePosition/clearStorage",
+			data : new FormData(document.getElementById("form"+i)),
+			contentType : false,
+			processData : false,
+			success : function (response){
+				var code = response.code;
+				if("200" == code){
+					alert("清空成功");
+					navStorageClick();
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("使用储藏间数据失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	
+	$("#main-content").ready(function() {
+		$.ajax({
+			type : "get",
+			async : true,
+			url : "../warehouse/all",
+			success : function(response) {
+				var code = response.code;
+				if (code == '200') {
+					if (response.data != null) {
+						var str = "<option value=''>请选择</option>";
+						$.each(response.data, function() {
+							str += "<option value='" + this.id + "'>" + this.name + "</option>";
+						});
+						$("#warehouseSelect").html(str);
+						$("#warehouseSelect").change(function(){loadStorageList(1);});
+						$("#type1").change(function(){loadStorageList(1);});
+					}
+				}
+			}
+		});
+		//li zhang
+		var warehose1 = $("#warehouseSelect").val();
+		console.log("warehose1:"+warehose1);
+		if(null != warehose1 && "null" != warehose1)
+			loadStorageList(1);
+	});
+	function loadStorageList(pageIndex){
+		$.ajax({
+			type : "get",
+			url : "../admin/storage/findByWarehouse",
+			data : {
+				warehouseId : document.getElementById("warehouseSelect").value,
+				type : $("#type1").val(),
+				pageIndex : pageIndex
+			},
+			success : function (response){
+				var code = response.code;
+				if("200" == code){
+					var listContainer = document.getElementById("listContainer");
+					var string = "";
+					if(response.data == null || response.data.datas == null){
+						string += "<tr><td style='text-align: left;' colspan='9'><span>&nbsp;&nbsp;对不起，没有找到对应的退货信息!</span></td></tr>";
+					}else{
+
+						var list = response.data.datas;
+						for(var i=0; i<list.length; i++){
+							var id = list[i].id;
+							string += "<div style='margin: 20px;'>";
+							string +="<div class='viewBox' >";
+							string +="<div class='titleBox'>";
+							string +="<div style='flex: 1;'>储藏间名称:<label>"+list[i].name+"</label></div>";
+							string +="<div style='flex: 1;'>所在门店:<label>"+list[i].warehouseName+"</label></div>";
+							var type = "转运州仓位";
+							if(list[i].type==1){
+								type = "本地转运仓位";
+							}else if(list[i].type==2){
+								type = "运单归类仓位";
+							}
+							string +="<div style='flex: 1;'>储藏间类型:<label>"+type+"</label></div>";
+							string +="<div style='flex: 1;'>关联对象:<label>"+list[i].typeRelateName+"</label></div>";
+							string +="<div style='flex: 1;'>空位数量:<label>"+list[i].totalAvailable+"</label></div>";
+							string +="<div style='flex: 1;'><a href='javascript: deleteStorage("+id+")'>删除储藏间</a></div>";
+							string +="</div>";
+							string +="<form id='form"+id+"'>";
+							string +="<input type='radio' class='radio0' id='radioZero"+id+"' name='id' value='0' checked hidden>";
+							string +="<div class='contentBox'>";
+							string +="<article style='flex: 1;'>";
+							string +="<section id='storageSection' style='margin: 0 auto; display: flex; width: "+40*list[i].maxColumn+"px; flex-wrap: wrap; '>";
+							for(var j=0; j<list[i].positionList.length; j++){
+								var position = list[i].positionList[j];
+								var radioj = j + 1;
+								//console.log();
+								string +="<div class='sequareBox'><input type='radio' class='radio' id='radio"+radioj+id+"' name='id' value='"+position.id+"' onclick='javascript: clickStorage("+id+","+position.available+");' hidden><label class='littleSequare"+position.available+"' for='radio"+radioj+id+"'></label></div>";
+							}
+							
+							string +="</section>";
+							string +="</article>";
+							string +="<article style='flex: 1;'>";
+							string +="<div id='infoDiv"+id+"' class='storagePositionArticle storagePositionArticle-context'>";
+							string +="位置：<label id='storagePosition"+id+"'>------</label>";
+							string +="用户：<label id='userNameLabel"+id+"' >------</label>";
+							string +="未发包裹：<p id='relateIdsP"+id+"' style='width: 100%; display: flex; flex-wrap: wrap;'></p>";
+							string +="未放入仓位：<p id='relateOutIdsP"+id+"' style='width: 100%; display: flex; flex-wrap: wrap;'></p>";
+							string +="<input type='button' class='button' value='清空该仓位' onclick='javascript:clearStorage("+id+");'>";
+							string +="</div>";
+							string +="<div id='useDiv"+id+"' class='storagePositionArticle'>";
+							string +="<div class='storagePositionArticle-context'>";
+							string +="用户ID：<input type='text' id='userIdText"+id+"' name='userId'><br/>";
+							string +="<input type='button' class='button' value='使用该仓位' onclick='javascript:useStorage("+id+");'>";
+							string +="</div>";
+							string +="<div id='noPositionDiv"+id+"' class='storagePositionArticle-context' style='width: 250px;'>";
+							string +="本门店有包裹在库，但未分配储藏位的用户<br/>";
+							string +="<a onclick='javascript: clickNoPositionUser("+id+", 9999);'>9999:aaa 数量：99</a><br/>";
+							string +="</div>";
+							string +="</div>";
+							string +="</article>";
+							string +="</div>";
+							string +="</form>";
+							string +="</div>";
+							string +="</div>";
+						}
+						listContainer.innerHTML = string;
+					}
+
+					var rowCount = response.data.rowCount;
+					var pageSize = response.data.pageSize;
+					var pageNow = response.data.pageNow;
+					var pageCount = response.data.pageCount;
+					$("#pagination").html(createPaginationHtmlStr(rowCount, pageSize, pageNow,pageCount));
+					$("#pagination a").click(function() {
+						var page = $(this).attr("href");
+						loadStorageList(page);
+						return false;
+					});
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("获取储藏间列表数据失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount) {
+		var prePage = pageNow - 1;
+		prePage = prePage < 1 ? 1 : prePage;
+		var nextPage = pageNow + 1;
+		nextPage = nextPage > pageCount ? pageCount : nextPage;
+		var info = "共" + rowCount + "条/共" + pageCount + "页&nbsp;";
+		info += "当前第" + pageNow + "页&nbsp;&nbsp;";
+		info += "<a href='1' id='a_first_page'>首页</a>|";
+		info += "<a href='" + prePage + "' id='a_pre_page'>上一页</a>";
+		info += "<input style='width: 30px;' type='text' name='pageNow' />";
+		info += "<a href='" + nextPage + "' id='a_next_page'>下一页</a>|";
+		info += "<a href='" + pageCount + "' id='a_last_page'>尾页</a>";
+		return info;
+	}
+	function addStorageDlg(){
+		$("#main-content").load("../admin/storageAdd.jsp");
+		return false;
+	}
+	function deleteStorage(id){
+		if(confirm("确认删除吗?")){
+			$.ajax({
+				type : "post",
+				url : "../admin/storage/deleteStorage",
+				data : {id : id},
+				success : function (response){
+					var code = response.code;
+					if("200" == code){
+						alert("删除成功");
+						navStorageClick();
+					}else if("607" == code){
+						alert("您尚未登录或登录已失效！");
+						logout();
+					}else{
+						alert("删除储藏间失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+	}
+	function searchUserId(){
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("userId", $("#userIdText").val());
+		$("#main-content").load("../admin/storageListTable.jsp");
+		return false;
+	}
+	function searchUser(){
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("userRealName", $("#userRealNameText").val());
+		$("#main-content").load("../admin/storageListTable.jsp");
+		return false;
+	}
+	function takeoutPackage(id, relateId){
+		if(confirm("确认拿走这个包裹?" + relateId)){
+			$.ajax({
+				type : "post",
+				url : "../admin/storagePosition/takeoutPackageInStoragePosition",
+				data : {storagePositionId : id, relateId : relateId},
+				success : function (response){
+					var code = response.code;
+					if("200" == code){
+						alert("删除成功");
+						navStorageClick();
+					}else if("607" == code){
+						alert("您尚未登录或登录已失效！");
+						logout();
+					}else{
+						alert("删除储藏包裹失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	}
+	function bringInPackage(id, relateId){
+		$.ajax({
+			type : "post",
+			url : "../admin/storagePosition/bringInPackageInStoragePosition",
+			data : {storagePositionId : id, relateId : relateId},
+			success : function (response){
+				var code = response.code;
+				if("200" == code){
+					alert("拿入成功");
+					navStorageClick();
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("拿入藏包裹失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+</script>
+</html>

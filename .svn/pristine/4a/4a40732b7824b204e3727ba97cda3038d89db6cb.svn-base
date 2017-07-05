@@ -1,0 +1,47 @@
+/* CSS Document */
+.main{ background:#fff5f5; padding-top:20px;}
+.main  h4{ font-size:38px; color:#f80a00; margin:10px 0; font-weight:normal;}
+
+.div_zd{ height:50px; line-height:50px; background:#FEC6C4; font-size:23px; color:#000; margin-bottom:20px;}
+.div_zd strong{ margin:0 14px 0 8px; font-weight:normal; display:inline-block; line-height:23px; padding:3px 5px; color:#fff; background:#F93027;}
+.div_zd a{ color:#000;}
+
+.ul_product li:after{content:""; display:block; clear:both;}
+.ul_product h5{ height:50px; line-height:50px; text-indent:14px; font-size:23px; font-weight:normal; color:#000; background:#fedddc;}
+.ul_product h5 span{ float:right; font-size:23px; color:#f80a00; margin-right:14px;}
+.ul_product li>img{ width:190px; float:left;}
+.ul_product .detail{ width:906px; float:right;}
+.ul_product .intro{ height:100px; overflow:hidden;}
+.ul_product p{ line-height:30px; font-size:16px; color:#222;}
+.ul_product p a{ float:right; margin-right:3px; color:#f80a00;}
+.ul_product p a:hover{ text-decoration:underline;}
+
+.func{ margin-top:10px;}
+.func .func_left{ float:left;}
+.func .func_left a{ width:20px; height:30px; padding-left:40px; display:inline-block; color:#000; margin-right:20px; font-size:20px;}
+.func .func_left a:nth-of-type(1){ background:url(../img/icon_shared.png) no-repeat left center/28px 24px;}
+.func .func_left a:nth-of-type(1):hover{ -webkit-animation:scale 1s 1; -moz-animation:scale 1s 1; animation:scale 1s 1;}
+.func .func_left a:nth-of-type(2){ background:url(../img/icon_store.png) no-repeat left center/31px 31px;}
+.func .func_left a:nth-of-type(2):hover{ -webkit-animation:scale 1s 1; -moz-animation:scale 1s 1; animation:scale 1s 1;}
+.func .func_left a:nth-of-type(3){ background:url(../img/icon_msg.png) no-repeat left center/31px 26px;}
+.func .func_left a:nth-of-type(3):hover{ -webkit-animation:scale 1s 1; -moz-animation:scale 1s 1; animation:scale 1s 1;}
+.func .func_right{ float:right;}
+.func .func_right a:nth-of-type(1){ height:36px; line-height:32px; padding:0 20px; border-radius:4px; display:inline-block; background:#f80a00; color:#fff; font-size:20px;}
+.func .func_right a:nth-of-type(1):hover{ -webkit-animation:scale 1s 1; -moz-animation:scale 1s 1; animation:scale 1s 1; }
+.func .func_right a:nth-of-type(2){ height:36px; line-height:32px; padding:0 20px 0 50px; border-radius:4px; display:inline-block; background:#000 url(../img/icon_cart.png) no-repeat 10% center; color:#fff; font-size:20px;}
+.func .func_right a:nth-of-type(2):hover{ -webkit-animation:scale 1s 1; -moz-animation:scale 1s 1; animation:scale 1s 1; }
+
+/* flexslider */
+.flexslider{position:relative;height:345px;overflow:hidden;background:url(../img/loading.gif) 50% no-repeat; width:100%; margin:0 auto;}
+.slides{position:relative;z-index:1; }
+.slides li{height:345px;}
+.flex-control-nav{position:absolute;bottom:10px;z-index:2;width:100%;text-align:center;}
+.flex-control-nav li{display:inline-block;width:14px;height:14px;margin:0 5px;*display:inline;zoom:1;}
+.flex-control-nav a{display:inline-block;width:14px;height:14px;line-height:40px;overflow:hidden;background:url(../img/dot.png) right 0 no-repeat;cursor:pointer;}
+.flex-control-nav .flex-active{background-position:0 0;}
+
+.flex-direction-nav{position:absolute;z-index:3;width:100%;top:45%;}
+.flex-direction-nav li a{display:block;width:50px;height:50px;overflow:hidden;cursor:pointer;position:absolute;}
+.flex-direction-nav li a.flex-prev{left:40px;background:url(../img/prev.png) center center no-repeat;}
+.flex-direction-nav li a.flex-next{right:40px;background:url(../img/next.png) center center no-repeat;}
+

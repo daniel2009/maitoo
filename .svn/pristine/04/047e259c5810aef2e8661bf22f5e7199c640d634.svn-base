@@ -1,0 +1,630 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>用户中心. 阳光快递系统</title>
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+
+<link rel="stylesheet" type="text/css"
+	href="${pageContext.request.contextPath }/lib/bootstrap/css/bootstrap.css">
+<link rel="stylesheet" type="text/css"
+	href="${pageContext.request.contextPath }/stylesheets/theme.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath }/lib/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" type="text/css"
+	href="${pageContext.request.contextPath }/stylesheets/common.css">
+<link rel="stylesheet" type="text/css"
+	href="${pageContext.request.contextPath }/stylesheets/user.css">
+<!--    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/stylesheets/dialog.css">-->
+<link rel="stylesheet" type="text/css"
+	href="${pageContext.request.contextPath }/stylesheets/jqmodal.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath }/stylesheets/style.css" />
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/css/styleprint.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/css/print.css" type="text/css" media="print" />
+
+<script type="text/javascript" src="${pageContext.request.contextPath }/resources/My97DatePicker/WdatePicker.js"></script>
+<!-- Demo page code -->
+
+<style type="text/css">
+#line-chart {
+	height: 300px;
+	width: 800px;
+	margin: 0px auto;
+	margin-top: 1em;
+}
+.brand {
+	font-family: georgia, serif;
+}
+.brand .first {
+	color: #ccc;
+	font-style: italic;
+}
+.brand .second {
+	color: #fff;
+	font-weight: bold;
+}
+.countInNav{
+	color: #aaa;
+}
+</style>
+
+<link rel="shortcut icon" href="../img/favicon.ico" />
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+<link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+</head>
+
+
+
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+     <script src="${pageContext.request.contextPath }/javascripts/html5.js"></script>
+<![endif]-->
+
+<!--[if lt IE 7 ]> <body class="ie ie6"> <![endif]-->
+<!--[if IE 7 ]> <body class="ie ie7"> <![endif]-->
+<!--[if IE 8 ]> <body class="ie ie8"> <![endif]-->
+<!--[if IE 9 ]> <body class="ie ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<body>
+
+
+
+
+	<!--<![endif]-->
+	<input type="hidden" id="project_name" value="${pageContext.request.contextPath }"/>
+	<input type="hidden" name="userType" value="0" />
+	<div id="my_print_div" class="print"></div>
+	<input type="hidden" name="selfvalue" id="selfvalue" value="${param.self}" />
+	
+	
+	
+	<div id="body-wrapper" class="noprint" >
+		<!-- Header Top Bar - Start -->
+	<div class="navbar">
+		<div class="navbar-inner">
+			<div class="container-fluid" >
+				<ul class="nav pull-right">
+
+					<li id="fat-menu" class="dropdown"><a href="#" id="drop3"
+						role="button" class="dropdown-toggle" data-toggle="dropdown">
+							<i class="icon-user"></i> 用户中心 <i class="icon-caret-down"></i> </a>
+
+						<ul class="dropdown-menu">
+							<li><a tabindex="-1" href="javascript: nav73Click();">设置</a></li>
+							<li class="divider"></li>
+							<li><a tabindex="-1" href="javascript:logout()">安全登出</a></li>
+						</ul>
+					</li>
+
+				</ul>
+				<a class="brand" href="#"><span class="first"></span> <span
+					class="second"></span> </a>
+			</div>
+		</div>
+	</div>
+	<div class="container-fluid">
+
+		<div class="row-fluid" style="min-height:1000px;">
+			<div class="span3">
+				<div class="sidebar-nav">
+					<div class="nav-header" data-toggle="collapse"
+						data-target="#index-menu">
+						<i class="icon-user"></i>用户中心
+					</div>
+					<ul id="index-menu" class="nav nav-list collapse in">
+						<li><a href="javascript:nav01Click();">用户中心首页</a></li>
+						<!-- <li><a href="javascript: ;">使用手册(无)</a></li> -->
+						<!--<li><a href="javascript: ;">运费价格(无)</a></li>-->
+						<li><a href="javascript: nav73Click();">修改资料</a></li>
+						<li><a href="javascript: nav74Click();">收件地址</a></li>
+						<li><a href="javascript: nav75Click();">修改密码</a></li>
+						<li><a href="javascript: nav24Click();">上门取件<span class="countInNav">(<label id="countCallOrderInNav">0</label>)</span></a></li>
+					</ul>
+				  
+					<div class="nav-header" data-toggle="collapse"
+						data-target="#dashboard-menu">
+						<i class="icon-plane"></i>转运中心
+					</div>
+					<ul id="dashboard-menu" class="nav nav-list collapse in">
+						<li><a href="javascript: nav21Click();">转运预报</a></li>
+						<li><a href="javascript: nav13Click();">预报记录<span class="countInNav">(<label id="countTranshipmentBillInNav">0</label>)</span></a></li>
+						<li><a href="javascript: navTranshipmentBillState1Click();">已入库转运单<span class="countInNav">(<label id="countTranshipmentBillState1InNav">0</label>)</span></a></li>
+						<li><a href="javascript: navTranshipmentBillState3Click();">待付款转运单<span class="countInNav">(<label id="countTranshipmentBillState3InNav">0</label>)</span></a></li>
+												<li><a href="javascript: navTranshipmentBillStateN10Click();">问题包裹<span class="countInNav">(<label id="countTranshipmentBillStateN10InNav">0</label>)</span></a></li>
+						<li><a href="javascript: nav15Click();">包裹认领<span class="countInNav">(<label id="countClaimPackageInNav">0</label>)</span></a></li>
+						<li><a href="javascript: nav14Click();">转运退货<span class="countInNav">(<label id="countReturnPackageInNav">0</label>)</span></a></li>
+
+						<!-- <li><a href="javascript:nav23Click()">库存列表</a></li> -->
+					</ul>
+
+					<div class="nav-header" data-toggle="collapse"
+						data-target="#accounts-menu">
+						<i class="icon-list-ul"></i>运单管理
+					</div>
+					<ul id="accounts-menu" class="nav nav-list collapse in">
+						
+						
+						<li><a href="javascript: navOrderState1Click();">待付款运单<span class="countInNav">(<label id="countOrderState1InNav">0</label>)</span></a></li>
+						<li><a href="javascript: navOrderAfterState2Click();">已付款运单<span class="countInNav">(<label id="countOrderAfterState2InNav">0</label>)</span></a></li>
+						<li><a href="javascript: nav44Click();">所有运单<span class="countInNav">(<label id="countOrderInNav">0</label>)</span></a></li>
+					</ul>
+
+					 <div class="nav-header" data-toggle="collapse"
+						data-target="#legal-menu">
+						<i class="icon-paste"></i>制单中心
+					</div>
+					<ul id="legal-menu" class="nav nav-list collapse in">
+						<!--  <li><a href="javascript:nav43Click()">当前运单</a>
+						</li>-->
+						 <li><a href="javascript: nav12Click();">在线制单</a></li>
+						<!-- <li><a href="javascript: ;">导入运单(无)</a></li>-->
+						<!--  <li><a href="javascript: Endicia_label_Click();">USPS打单</a></li>   -->
+						<!-- <li><a href="javascript: ;">FEDEX打单(无)</a></li>-->
+					</ul> 
+					
+					<div class="nav-header" data-toggle="collapse"
+						data-target="#zizhu-menu">
+						<i class="icon-money"></i>财务记录
+					</div>
+					<ul id="zizhu-menu" class="nav nav-list collapse in">
+						<li><a href="javascript: nav61Click();">充值中心</a></li>
+						<li><a href="javascript: nav62Click();">充值记录</a></li>
+						<!-- <li><a href="javascript:nav52Click()">投诉管理</a></li> -->
+					</ul>
+
+					<div class="nav-header" data-toggle="collapse"
+						data-target="#caiwu-menu">
+						<i class="icon-comments-alt"></i>客服中心
+					</div>
+					<ul id="caiwu-menu" class="nav nav-list collapse in">
+						<li><a href="javascript: nav51Click();">投诉建议</a></li>
+						<!-- <li><a href="javascript:nav63Click()">充值纪录</a></li> -->
+						<!-- <li><a href="javascript:nav64Click()">退款申请</a></li> -->
+					</ul>
+					
+					 <div class="nav-header" data-toggle="collapse"
+						data-target="#caiwu-menu">
+						<i class="icon-comments-alt"></i>商品中心
+					</div>
+					<ul id="caiwu-menu" class="nav nav-list collapse in">
+						<li><a href="javascript: navProductClick();">商品查询</a></li>
+						<li><a href="javascript: navCartClick();">购物车</a></li>
+						<li><a href="javascript: navProductRecordClick();">下单商品</a></li>
+					</ul> 
+				</div>
+			</div>
+
+			<div id="main-content" class="span9">
+				
+
+			</div>
+		</div>
+	</div>
+
+<footer id="footer">
+		<hr>
+		<p class="pull-right"> <a href="#" target="_blank">物流仓储管理系统</a>
+		</p>
+		<p>
+			&copy; 2015 <a href="#"></a>
+		</p>
+	</footer>
+
+	 <script src="${pageContext.request.contextPath }/js/kuaidi_map.js"></script>
+	<script src="${pageContext.request.contextPath }/lib/jquery-1.8.1.min.js" type="text/javascript"></script>
+	 <script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/jquery.form.js"></script> 
+	<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/location.js"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/usalocation.js"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/area.js"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/usaarea.js"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/weiye.check.js"></script>
+	<script src="${pageContext.request.contextPath }/resources/scripts/imgUtil.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/scripts/datetimeUtil.js"></script>
+	<script src="${pageContext.request.contextPath }/javascripts/weiye.user.config.js" type="text/javascript"></script>
+	<script src="${pageContext.request.contextPath }/lib/js/nav0.js"></script>
+	<script src="${pageContext.request.contextPath }/lib/js/nav1.js"></script>
+	<script src="${pageContext.request.contextPath }/lib/js/nav2.js"></script>
+	<script src="${pageContext.request.contextPath }/lib/js/nav4.js"></script>
+	<script src="${pageContext.request.contextPath }/lib/js/nav5.js"></script>
+	<script src="${pageContext.request.contextPath }/lib/js/nav6.js"></script>
+	<script src="${pageContext.request.contextPath }/lib/js/nav7.js"></script>
+	<script src="${pageContext.request.contextPath }/lib/js/EndiciaLabel.js"></script>
+	<!-- Le javascript
+    ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="${pageContext.request.contextPath }/lib/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript">
+
+	 $(document).ready(function(){
+	// alert($("#selfvalue").val());
+		baseUrl = $("#project_name").val();
+		firstSetUrl(baseUrl);
+		getRealTimeCountInNav();
+		moveLogoutCart();
+		var forward = sessionStorage.getItem("forwardClaimPackageClaim");
+		sessionStorage.removeItem("forwardClaimPackageClaim");
+		if(forward){
+			checkLogin();
+			$("#main-content").load("../user/claimPackageClaim.jsp");
+			return false;
+		}
+		var forward = sessionStorage.getItem("forwardRechargePage");
+		sessionStorage.removeItem("forwardRechargePage");
+		if(forward){
+			nav61Click();
+			return false;
+		}
+		var forward = sessionStorage.getItem("forwardProductCheckoutPage");
+		sessionStorage.removeItem("forwardProductCheckoutPage");
+		if(forward){
+			checkLogin();
+			$("#main-content").load("../user/productCheckout.jsp");
+			return false;
+		}
+		var forward = sessionStorage.getItem("forwardProductSearchPage");
+		sessionStorage.removeItem("forwardProductSearchPage");
+		if(forward){
+			checkLogin();
+			$("#main-content").load("../user/productSearch.jsp");
+			return false;
+		}
+		//alert(getPar(self));
+		if($("#selfvalue").val()=="1")
+		{
+			Endicia_label_Click();
+		}
+		else
+		{
+			nav01Click();
+		}
+		return false;
+	});
+	function nav01Click() {
+		$("#main-content").load(user_firstpage_url,function(response,status,xhr){
+      		if(status=="success"){
+      			getglobalargs_cur_usa_cn();//获取汇率
+      			loadNav01Data();
+      		} 
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	
+	function nav11Click() {
+		
+	}
+	function nav12Click() {
+		$("#main-content").load(user_wangshangzhijian_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav12Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav13Click() {
+		$("#main-content").load(user_yubaojilu_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav13Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function navTranshipmentBillState1Click(){
+		window.sessionStorage.setItem("searchState", 1);
+		nav13Click();
+	}
+	function nav131Click(id) {
+		$("#main-content").load(user_yundantijiao_url,{"tid":id},function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav131Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav132Click(id) {
+		$("#main-content").load(user_baoguocaibao_url,{"tid":id});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav14Click() {
+		checkLogin();
+		$("#main-content").load(user_tuihuoguanli_url);
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function navTranshipmentBillState3Click(){
+		window.sessionStorage.setItem("searchState", 3);
+		nav13Click();
+	}
+	function navTranshipmentBillStateN10Click(){
+		window.sessionStorage.setItem("searchState", -10);
+		nav13Click();
+	}
+	function nav15Click() {
+		checkLogin();
+		$("#main-content").load(user_baoguorenling_url);
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav21Click() {
+		$("#main-content").load(user_baoguoyubao_url);
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav23Click() {
+		$("#main-content").load(user_kucunliebiao_url);
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	
+	function nav24Click() {
+		$("#main-content").load(user_shangmenqujian_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav24Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav31Click() {
+	}
+	function nav41Click() {
+	}
+	function nav44Click() {
+		$("#main-content").load(user_lishiyundan_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav44Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function navOrderState1Click(){
+		window.sessionStorage.setItem("searchState", 1);
+		nav44Click();
+	}
+	function navOrderAfterState2Click(){
+		window.sessionStorage.setItem("searchState", 2);
+		window.sessionStorage.setItem("searchAfter", true);
+		nav44Click();
+	}
+	function nav441Click(id) {
+		$("#main-content").load(user_yundanxiangqing_url,{"oid":id},function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav441Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav442Click(id) {
+		
+		$("#main-content").load(user_dingdanzhifu_url,{"oid":id},function(response,status,xhr){
+			
+      		if(status=="success"){
+      			loadNav442Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	
+	function nav443Click(id) {
+		$("#main-content").load(user_dingdanzhifuinfopayed_url,{"oid":id},function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav443Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	
+	
+	function nav51Click() {
+		$("#main-content").load(user_liuyanguanli_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav51Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav52Click() {
+		$("#main-content").load(user_tousuguanli_url);
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);	
+	}
+	function nav61Click() {
+		
+		$("#main-content").load(user_zaixianchongzi_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav61Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav62Click() {
+		$("#main-content").load(user_caiwujilu_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav62Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav64Click() {
+		$("#main-content").load(user_tuikuanshenqing_url);
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav71Click() {
+		$("#main-content").load(user_wodeziliao_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav71Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav73Click() {
+		$("#main-content").load(user_yonghuxinxi_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav73Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav74Click() {
+		$("#main-content").load(user_shouhuodizi_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav74Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function nav741Click() {
+		$("html,body").animate({scrollTop:$("#add").offset().top},300);
+	}
+	function nav742Click(id) {
+		$("#main-content").load(user_xiugaidizi_url,{"id":id},function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav742Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	
+	function nav75Click() {
+		$("#main-content").load(user_xiugaimima_url,function(response,status,xhr){
+      		if(status=="success"){
+      			loadNav75Data();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	function navProductClick(){
+		$("#main-content").load("../user/productList.jsp");
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+    }
+    function navCartClick(){
+		$("#main-content").load("../user/cartList.jsp");
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+    }
+	function navProductRecordClick(){
+		$("#main-content").load("../user/productRecordList.jsp");
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+    }
+	
+	//新添加的Endicia打单功能
+	function Endicia_label_Click() {
+		$("#main-content").load(user_Endicia_label_url,function(response,status,xhr){
+      		if(status=="success"){
+      			//loadNav51Data();
+      			Endicia_label_page_init();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	
+	function checkLogin(){
+		$.ajax({
+			type:"get",
+			url:user_get_self_url,
+			success:function(response) {
+				var code = response.code;
+			 	if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					//alert(22);
+					window.location.href="../login.jsp";
+				} else if("200" != code){
+					// 失败
+					alert("获取会员信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	
+	//转运订单支付页面
+	function tranorderpayClick(id) {
+		$("#main-content").load(user_tran_dingdanzhifu_url,{"oid":id},function(response,status,xhr){
+      		if(status=="success"){
+      			loadtranorderpayData();
+      		}
+    	});
+		$("html,body").animate({scrollTop:$("#main-content").offset().top},300);
+	}
+	var firstTime = true;
+	setInterval(getRealTimeCountInNav, 3000000);
+	function getRealTimeCountInNav(){
+		$.ajax({
+			type: "get",
+			url: "../user/getRealTimeCountInNav",
+			success: function(response) {
+			 	var array = response.data;
+			 	for(var i=0; i<array.length; i++){
+			 		if(!firstTime){
+			 			var count = $("#"+array[2*i]).html();
+			 			var nextCount = array[2*i];
+			 		}
+			 		$("#"+array[2*i]).html(array[2*i+1]);
+			 	}
+			 	firstTime = false;
+			}
+		});
+	}
+    function loadGlobalArgs(){
+		$.ajax({
+   			type: "get",
+   			url: "../globalargs/getcontents",
+   			data : {
+   				"flags" : "logo_big"
+   			},
+   			success: function(response){
+   				var code = response.code;
+   				if("200" == code){
+   					var data = response.data;
+   					if(data != null){
+   						$("#logoHeader").attr("src", "../" + data);
+   						$("#logoFooter").attr("src", "../" + data);
+   					}
+   				}
+   			}
+		});
+    }
+    //吧登录前添加的cart添加到数据库
+    function moveLogoutCart(){
+    	var cartArray = localStorage.getItem("cartArray");
+		if(cartArray != null){
+			cartArray = JSON.parse(cartArray);
+			for(var i=0; i<cartArray.length; i++){
+				$.ajax({
+		   			type: "post",
+		   			url: "../user/cart/add2Cart",
+		   			data : {
+		   				productId : cartArray[i].productId,
+		   				quantity : 1
+		   			},
+				});
+			}
+			localStorage.removeItem("cartArray");
+		}
+    }
+    
+    
+    function getPar(par){
+        //获取当前URL
+        var local_url = document.location.href; 
+        //获取要取得的get参数位置
+        var get = local_url.indexOf(par +"=");
+        if(get == -1){
+            return false;   
+        }   
+        //截取字符串
+        var get_par = local_url.slice(par.length + get + 1);    
+        //判断截取后的字符串是否还有其他get参数
+        var nextPar = get_par.indexOf("&");
+        if(nextPar != -1){
+            get_par = get_par.slice(0, nextPar);
+        }
+        return get_par;
+    }
+</script>
+
+	</body>
+
+</html>
+
+

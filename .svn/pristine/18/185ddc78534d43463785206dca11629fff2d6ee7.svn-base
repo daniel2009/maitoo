@@ -1,0 +1,40 @@
+
+/**
+*  
+* @param zhangjinghqi
+* time 2015-01-22
+* @return
+* @throws ServiceException
+*/
+
+package com.weiye.service;
+
+
+
+import com.weiye.exception.ServiceException;
+
+public interface AuthorityService {
+	
+	/**
+	 * 添加一个职工权限到数据库中
+	 * 
+	 * @param authority
+	 *            要添加的职工权限
+	 * @return 如果添加成功，则返回true；否则返回false。
+	 * @throws ServiceException
+	 *             如果操作过程中出现异常，则抛出此封装异常。
+	 */
+	public boolean addAuthorityEmplyees(String authority_id, String employees_id)
+			throws ServiceException;
+	
+	/**
+	 * 根据员工ID修改权限信息
+	 */
+	public boolean modfiyAuthority(String id) throws ServiceException;
+	/**
+	 * 根据员工ID删除权限
+	 */
+	public boolean deleteAuthority(String id) throws ServiceException;
+	
+	
+}

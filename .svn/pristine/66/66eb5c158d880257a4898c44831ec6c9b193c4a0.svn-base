@@ -1,0 +1,11 @@
+package com.weiye.service;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.SendEmail;
+
+public interface SendEmailService {
+
+	ResponseObject<Object> sendGroupByAdmin(SendEmail sendEmail) throws ServiceException;
+
+}

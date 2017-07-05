@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.AccountDetailDao">
+
+	<resultMap id="account_detail_result_map" type="com.weiye.model.AccountDetail">
+		<id column="id" property="id" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="credit_id" property="creditId" javaType="String" />
+		<result column="emp_id" property="empId" javaType="String" />
+		<result column="amount" property="amount" javaType="String" />
+		<result column="currency" property="currency" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="type" property="type" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="emp_name" property="empName" javaType="String" />
+		<result column="emp_store" property="empStore" javaType="String" />
+		<association column="credit_id" property="credit"
+			select="com.weiye.dao.AccountDao.getCreditById"></association>
+	</resultMap>
+	<resultMap id="account_detail_result_map2" type="com.weiye.model.AccountDetail">
+		<id column="id" property="id" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="credit_id" property="creditId" javaType="String" />
+		<result column="emp_id" property="empId" javaType="String" />
+		<result column="amount" property="amount" javaType="String" />
+		<result column="currency" property="currency" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="type" property="type" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="emp_name" property="empName" javaType="String" />
+		<result column="emp_store" property="empStore" javaType="String" />
+		<result column="groupid" property="groupId" javaType="String" />
+		
+		<association property="user" column="user_id" select="com.weiye.dao.UserDao.getUserById"></association>
+		<association column="credit_id" property="credit"
+			select="com.weiye.dao.AccountDao.getCreditById"></association>
+	</resultMap>
+
+	<insert id="insertAccountDetail" parameterType="com.weiye.model.AccountDetail"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		account_detail(user_id,credit_id,amount,currency,name,type,state,create_date,modify_date,remark,emp_id,emp_name,emp_store)
+		values
+		(#{userId},#{creditId},#{amount},#{currency},#{name},#{type},#{state},#{createDate},#{modifyDate},#{remark},#{empId},#{empName},#{empStore})
+	</insert>
+
+	<update id="modifyAccountDetail" parameterType="com.weiye.model.AccountDetail">
+		update
+		account_detail
+		set state=#{state},
+		remark = #{remark},
+		modify_date=#{modifyDate}
+		where id=#{id} and state='0'
+	</update>
+
+	<delete id="deleteAccountDetailByUserIds">
+		delete from account_detail
+		where user_id in
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="getAccountDetailByUserId" parameterType="java.lang.String" resultMap="account_detail_result_map">
+		select * from account_detail where user_id=#{userId} order by `create_date` desc
+	</select>
+
+	<select id="getById" parameterType="java.lang.String" resultMap="account_detail_result_map2">
+		select * from account_detail where id=#{id}
+	</select>
+	
+	<select id="countByKey" resultType="java.lang.Integer">
+		select count(account_detail.id)
+		from account_detail left join users as u on
+		account_detail.user_id=u.id
+		<where>
+			<if test="userId != null and userId != ''">
+				account_detail.user_id=#{userId}
+			</if>
+			<if test="key != null and key != ''">
+				and u.nick_name like #{key}
+			</if>
+			<if test="state != null and state != ''">
+				and account_detail.state = #{state}
+			</if>
+			<if test="type != null and type != ''">
+				and account_detail.type = #{type}
+			</if>
+			<!--  <if test="groupid != null and groupid != ''">
+				and account_detail.groupid = #{groupid}
+			</if>-->
+		</where>
+	</select>
+
+	<select id="searchByKey" resultMap="account_detail_result_map2">
+		select account_detail.*
+		from account_detail left join users as u on
+		account_detail.user_id=u.id
+		<where>
+			<if test="userId != null and userId != ''">
+				account_detail.user_id=#{userId}
+			</if>
+			<if test="key != null and key != ''">
+				and u.nick_name like #{key}
+			</if>
+			<if test="state != null and state != ''">
+				and account_detail.state = #{state}
+			</if>
+			<if test="type != null and type != ''">
+				and account_detail.type = #{type}
+			</if>
+		</where>
+		order by account_detail.modify_date desc, account_detail.state asc
+		limit
+		#{index},#{size}
+	</select>
+	<select id="checkIfScanPayDetail" resultType="java.lang.String">
+		SELECT state FROM account_detail WHERE user_id=#{userId} AND amount=#{amount} AND id=#{id}
+	</select>
+	<select id="checkStateIfPayDetailByRemark" resultType="java.lang.String">
+		SELECT state FROM account_detail WHERE user_id=#{userId} AND amount=#{amount} AND remark=#{remark}
+	</select>
+	<update id="updateStateByPaySuccess">
+		UPDATE account_detail SET state=1, remark='支付成功', modify_date=#{modifyDate} WHERE user_id=#{userId} AND remark=#{remark}
+	</update>
+	
+	<select id="checkStateIfPayDetailByRemarkno" resultMap="account_detail_result_map2">
+		SELECT account_detail.* FROM account_detail WHERE remark=#{remark}
+		limit 1
+	</select>
+		
+</mapper>

@@ -1,0 +1,131 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>全球速递  美国快递公司 专为华人美国购物 海淘 转运</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" href='css/bootstrap.css' type="text/css" media="screen">
+<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/inner.css" type="text/css" media="screen">
+<link rel="stylesheet" href="demo/switcher.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/es-carousel.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/prettyphoto.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/color1.css" type="text/css" id="theme" />
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<!-- CSS STYLE -->
+
+<link rel="stylesheet" href='css/common.css'> 
+  <link rel="stylesheet" type="text/css" media="all" href="css/style3.css">
+  <link id="main_stylesheet" rel="stylesheet" href='css/indexstyle.css' type="text/css">
+<link rel="stylesheet" type="text/css" href='css/common1.css'>
+
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css" media="screen" />
+<!-- REVOLUTION BANNER CSS SETTINGS -->
+<link rel="stylesheet" href="css/rs-plugin/settings.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/captions.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/portfolio.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/portfolio-shape.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/elements.css" type="text/css" media="screen">
+<!--[if lt IE 9]>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+  <![endif]-->
+</head>
+<body class="home-page stretched">
+	<div id="wrapper">
+ 		<%@ include file="header.jsp" %>
+		<!--==============================content=================================-->
+		<div class="breadcrumb-wrapper">
+			<div class="shadowdrop"></div>
+			<div class="container">
+				<h2>海淘攻略</h2>
+				<ul class="breadcrumb fright">
+					<li><a href="weiyegonglue.jsp">首页</a> <span class="divider">/</span>
+					</li>
+					<li class="active">海淘攻略</li>
+				</ul>
+			</div>
+		</div>
+
+
+		<div >
+			<h1>转运流程</h1>
+
+			<h2>1. 登录站；</h2>
+			<br> 2. 点击右上角注册进入注册页面；<br> 3. 填写邮箱和登录密码，请仔细阅读用户协议，完成注册。<br>
+
+
+
+			<!-- Grid system
+        ================================================== -->
+			<section id="gridSystem">
+			<div >
+				<h1>包裹预报</h1>
+				1.注册完成后，登陆进入会员中心获取国内收件地址； <br>
+				2.将包裹寄到国内仓库，点击我要预报进行入库预报，请准确填写运单号内件物品；<br> 3.
+				填写邮箱和登录密码，请仔细阅读用户协议，完成注册。<br>
+			</div>
+			</section>
+				<section id="yundan">
+				<div>
+					<h1>运单提交</h1>
+					1.包裹入库后可进行包裹入库操作，选择国内收件地址，根据包裹价值选择是否购买保险 <br>
+					2.运单提交完成后在历史运单查看包裹信息。<br>
+
+
+
+				</div>
+				</section>
+			
+		</div>
+		 <%@ include file="footer.jsp" %>
+	</div>
+ 
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="js/jquery.sliderTabs.js"></script>
+<!-- jQuery Slider  -->
+<script type="text/javascript" src="js/rs-plugin/jquery.themepunch.plugins.min.js"></script>
+<script type="text/javascript" src="js/rs-plugin/jquery.themepunch.revolution.min.js"></script>
+<!-- Elastislider  -->
+<script type="text/javascript" src="js/jquery.elastislide.js"></script>
+<!-- Pretty photo  -->
+<script type="text/javascript" src="js/jquery.prettyphoto.js"></script>
+<!-- Carousel  -->
+<script type="text/javascript" src="js/carousel.js"></script>
+<!-- totop  -->
+<script type="text/javascript" src="js/jquery.ui.totop.js"></script>
+<script type="text/javascript" src="js/prettify.js"></script>
+<script type="text/javascript" src="js/application.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<!-- Quicksand  -->
+<script type="text/javascript" src="js/jquery.quicksand.js"></script>
+<!-- Image animated Style  -->
+<script type="text/javascript" src="js/jquery.gridrotator.js"></script>
+<script type="text/javascript" src="js/jquery.mobile.customized.min.js"></script>
+<!-- Accordion  -->
+<script type="text/javascript" src="js/accordion.js"></script>
+<!-- Tabs  -->
+<script type="text/javascript" src="js/tabs.js"></script>
+<!-- Sitemap  -->
+<script type="text/javascript" src="js/sitemap.js"></script>
+<!-- Navigation  -->
+<script type="text/javascript" src="js/nav-small.js"></script>
+<script type="text/javascript" src="js/jquery.mobilemenu.js"></script>
+<!-- Isotope  -->
+<script type="text/javascript" src="js/jquery.isotope.min.js"></script>
+<!-- Metro Style  -->
+<script type="text/javascript" src="js/boxgrid.js"></script>
+<script type="text/javascript" src="demo/switcher.js"></script>
+</body>
+</html>

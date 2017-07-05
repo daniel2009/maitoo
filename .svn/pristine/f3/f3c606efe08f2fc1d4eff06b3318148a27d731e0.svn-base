@@ -1,0 +1,164 @@
+package com.weiye.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.StringUtil;
+import com.weiye.model.Order;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.StoragePosition;
+import com.weiye.model.StoragePositionRecord;
+import com.weiye.model.TranshipmentBill;
+import com.weiye.model.TranshipmentRoute;
+import com.weiye.model.User;
+import com.weiye.service.TranshipmentBillService;
+import com.weiye.service.TranshipmentRouteService;
+import com.weiye.service.OrderService;
+import com.weiye.service.StoragePositionService;
+
+@Controller
+public class TranshipmentRouteController extends BasicController {
+
+	private static final Logger log = Logger.getLogger(TranshipmentRouteController.class);
+	@Resource(name = "transhipmentRouteService")
+	private TranshipmentRouteService transhipmentRouteService;
+	@Resource(name = "transhipmentBillService")
+	private TranshipmentBillService transhipmentBillService;
+	@Resource(name = "orderService")
+	private OrderService orderService;
+	@Resource(name = "storagePositionService")
+	private StoragePositionService storagePositionService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+
+	@RequestMapping(value = "/admin/transhipmentRoute/searchByTranshipmentBill", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<TranshipmentRoute>> searchByTranshipmentBill(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.TRANSHIPMENT_ID, required = false, defaultValue = "") String transhipmentId) {
+		try {
+			return this.transhipmentRouteService.findByTranshipmentBill(transhipmentId);
+		} catch (Exception e) {
+			log.error("获取用户运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取用户转运单路由数据失败");
+		}
+	}
+	
+	@RequestMapping(value = "/admin/transhipmentBill/searchWithRoute", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<PageSplit<TranshipmentBill>> searchWithRoute(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.TRANSHIPMENT_ID, required = false, defaultValue = "") String id,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false, defaultValue = "") String key,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false, defaultValue = "") String state,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_CREATE_DATE_START, required = false, defaultValue = "") String createDateStart,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_CREATE_DATE_END, required = false, defaultValue = "") String createDateEnd,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		String warehouseId;
+		if(((String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY)).equals("1")){
+			warehouseId = null;
+		}else{
+			warehouseId = (String) request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+		}
+		try {
+			return this.transhipmentBillService.searchWithRouteByKey(id, key, type, state, warehouseId, createDateStart, createDateEnd, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取用户运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取转运单列表失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/transhipmentRoute/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyOfAdmin(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.TRANSHIPMENT_ID, required = false) String transhipmentId,
+			@RequestParam(value = ParameterConstants.TRANSHIPMENT_ROUTE_STATE, required = false) String state) {
+		String warehouseId = (String) request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+		try{
+			return this.transhipmentRouteService.add(transhipmentId, state, warehouseId);
+		} catch (Exception e) {
+			log.error("修改运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加转运单路有记录失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/admin/transhipmentRoute/modifystate", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifystateOfAdmin(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.TRANSHIPMENT_ID, required = false) String transhipmentId,
+			@RequestParam(value = ParameterConstants.TRANSHIPMENT_ROUTE_STATE, required = false) String state) {
+		
+		String warehouseId=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			warehouseId = (String) request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if(StringUtil.isEmpty(warehouseId))
+			{
+				return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权执行此操作或没有登陆!");
+			}
+			
+		}
+	
+		try{
+			
+			//li zhang 02232016
+			//使用transhipmentId进行查询运单
+			TranshipmentBill transhipmentBillObject= this.transhipmentBillService.getById(transhipmentId).getData();
+			String orderIdString = transhipmentBillObject.getOrderId();
+			
+			//when the state is 5 and 已经生成运单号,要为order分配相应储藏间。
+			if("5".equals(state) && null != orderIdString) {
+				//用orderid查询order对象
+				Order order = this.orderService.getOrderByOrderId(orderIdString).getData();
+				//获取一个可用的storagePosition，userid
+				StoragePosition storagePosition = this.storagePositionService.findStoragePositionByWarehoseIdTypeRelateUser(warehouseId, "2", order.getChannelId(), order.getUserId()).getData();
+				if (null == storagePosition) 					
+					storagePosition = this.storagePositionService.findNextEmptyStoragePositionByWarehoseIdTypeRelate(warehouseId, "2", order.getChannelId()).getData();
+				
+				if(null != storagePosition){
+					//storage_position_id 和order的id放入storage_position_record
+					List<StoragePositionRecord> storagePositionRecords = new ArrayList<StoragePositionRecord>();
+					storagePositionRecords.add(new StoragePositionRecord(storagePosition.getId(), order.getId()));
+					storagePosition.setRecordList(storagePositionRecords);
+					order.setStoragePosition(storagePosition);
+					//更新order，empName在路由中记录操作人、type1不同用户类型费用不一样
+					String type1 = Constant.USER_TYPE_NORMAL;
+					User user = this.orderService.getOrderUser(order.getId(),order.getOrderId());
+					if (user != null) {
+						type1 = user.getType();
+					}
+					String empName = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+					this.orderService.modifyOrder(order, empName, type1);
+				}
+				
+				return this.transhipmentRouteService.modifystate(state, transhipmentId, warehouseId);
+			}else{
+				return this.transhipmentRouteService.modifystate(state, transhipmentId, warehouseId);
+
+			}
+			
+			
+		} catch (Exception e) {
+			log.error("修改运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加转运单路有记录失败");
+		}
+	}
+}

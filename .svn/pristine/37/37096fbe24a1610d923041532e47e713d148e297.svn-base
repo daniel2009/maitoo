@@ -1,0 +1,45 @@
+package com.weiye.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.model.Commodity;
+
+public interface CommodityDao {
+	public int insertCommodity(Commodity commodity) throws Exception;
+
+	public List<Commodity> getAll(@Param("storeId") String storeId,@Param("channelId") String channelId) throws Exception;
+
+	public String getById(@Param("storeId") String storeId,String id) throws Exception;
+	public String getByOnlyId(@Param("id")String id) throws Exception;
+
+	/***
+	 * 查询转运快递单价
+	 * @param ids  'commodity'.'id' list
+	 * @return 快递单价
+	 * @throws Exception
+	 */
+	public String selectMaxPriceByCommoditys(@Param("storeId") String storeId,@Param("ids") List<String> ids) throws Exception;
+
+	/***
+	 * 查询门市快递单价
+	 * @param ids  'commodity'.'id' list
+	 * @return 快递单价
+	 * @throws Exception
+	 */
+	public String selectMaxMsPriceByCommoditys(@Param("storeId") String storeId,@Param("ids") List<String> ids) throws Exception;
+
+	public String selectMaxVipOnePriceByCommoditys(@Param("storeId") String storeId,@Param("ids") List<String> ids) throws Exception;
+
+	public String selectMaxVipTwoPriceByCommoditys(@Param("storeId") String storeId,@Param("ids") List<String> ids) throws Exception;
+
+	public String selectMaxVipThreePriceByCommoditys(@Param("storeId") String storeId,@Param("ids") List<String> ids) throws Exception;
+
+	public int modifyCommodity(Commodity commodity) throws Exception;
+	
+	public int insertCommodityByList(List<Commodity> list) throws Exception;
+	
+	public String getPriceById(@Param("priceType") String priceType,@Param("id") String id) throws Exception;
+
+}

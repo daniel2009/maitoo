@@ -1,0 +1,54 @@
+package com.weiye.service.impl;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+
+
+
+
+
+
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.NewsUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.NewsDao;
+import com.weiye.dao.TranPriceDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.News;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.TranPrice;
+import com.weiye.service.NewsService;
+import com.weiye.service.TranPriceService;
+
+@Service("tranPriceService")
+public class TranPriceServiceImpl extends BasicService implements TranPriceService {
+	@Autowired
+	private TranPriceDao tranPriceDao;
+
+	public ResponseObject<Object> getalltranprice() throws ServiceException {
+	
+
+		try {
+			List<TranPrice> list = this.tranPriceDao.getAll();
+			if (list !=null) {
+				ResponseObject<Object> obj=new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+				obj.setData(list);
+				return obj;
+			} else {
+				return new ResponseObject<Object>(ResponseCode.NEWS_INSERT_FAILURE, "获取转运价格失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+}

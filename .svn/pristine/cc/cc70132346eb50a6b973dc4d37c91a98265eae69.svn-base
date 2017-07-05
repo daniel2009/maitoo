@@ -1,0 +1,245 @@
+package com.weiye.model;
+
+import java.io.Serializable;
+import java.util.List;
+
+public class Warehouse implements Serializable {
+	private static final long serialVersionUID = 1724526267951882219L;
+	private String id; // 仓库id
+	private String name; // 仓库名称
+	private String company; // 仓库地址
+	private String country; // 国家
+	private String province; // 州
+	private String city; // 城市
+	private String address; // 地址
+	private String zipCode; // 邮编
+	private String telephone; // 电话
+	private String contactName; // 联系人姓名
+	private String serialNo; // 序号,序号越前，越在前面显示。
+	private String remark; // 备注
+	private String createDate; // 创建时间
+	private String groupId;
+	private String printPhoneCN;//打印在运单上的中国电话
+	private String printPhoneUSA;//打印在运单上的美国电话
+	private String printLogo;//打印logo,增考虑加盟店
+	private String print2Code;//打印在运单上的二维码图片
+	private String type;
+	private String toChinaPrice;//从这里转回中国要加的费用
+	private String changeWarehousePrice;//更换门店要交的费用，恩恩，暂时先这样吧
+	private String callOrderAvailable;//是否上门
+	private String callOrderCity;//上门的城市
+	private TranPrice[] tranprice;//对应的转运价格表
+
+	private String printUrl;//打印在运单上的连接
+	private String printWidCode;//打印运单的倒数第2、3位的门店标识
+
+	
+
+	public String getPrintWidCode() {
+		return printWidCode;
+	}
+
+	public void setPrintWidCode(String printWidCode) {
+		this.printWidCode = printWidCode;
+	}
+
+	public String getPrintUrl() {
+		return printUrl;
+	}
+
+	public void setPrintUrl(String printUrl) {
+		this.printUrl = printUrl;
+	}
+
+	public TranPrice[] getTranprice() {
+		return tranprice;
+	}
+
+	public void setTranprice(TranPrice[] tranprice) {
+		this.tranprice = tranprice;
+	}
+
+	public String getChangeWarehousePrice() {
+		return changeWarehousePrice;
+	}
+
+	public void setChangeWarehousePrice(String changeWarehousePrice) {
+		this.changeWarehousePrice = changeWarehousePrice;
+	}
+
+	public String getToChinaPrice() {
+		return toChinaPrice;
+	}
+
+	public void setToChinaPrice(String toChinaPrice) {
+		this.toChinaPrice = toChinaPrice;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getPrintLogo() {
+		return printLogo;
+	}
+
+	public void setPrintLogo(String printLogo) {
+		this.printLogo = printLogo;
+	}
+
+	public String getPrintPhoneCN() {
+		return printPhoneCN;
+	}
+
+	public void setPrintPhoneCN(String printPhoneCN) {
+		this.printPhoneCN = printPhoneCN;
+	}
+
+	public String getPrintPhoneUSA() {
+		return printPhoneUSA;
+	}
+
+	public void setPrintPhoneUSA(String printPhoneUSA) {
+		this.printPhoneUSA = printPhoneUSA;
+	}
+
+	public String getPrint2Code() {
+		return print2Code;
+	}
+
+	public void setPrint2Code(String print2Code) {
+		this.print2Code = print2Code;
+	}
+
+	public String getGroupId() {
+		return this.groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getZipCode() {
+		return zipCode;
+	}
+
+	public void setZipCode(String zipCode) {
+		this.zipCode = zipCode;
+	}
+
+	public String getTelephone() {
+		return telephone;
+	}
+
+	public void setTelephone(String telephone) {
+		this.telephone = telephone;
+	}
+
+	public String getContactName() {
+		return contactName;
+	}
+
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
+	public String getSerialNo() {
+		return serialNo;
+	}
+
+	public void setSerialNo(String serialNo) {
+		this.serialNo = serialNo;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+
+	public String getCallOrderAvailable() {
+		return callOrderAvailable;
+	}
+
+	public void setCallOrderAvailable(String callOrderAvailable) {
+		this.callOrderAvailable = callOrderAvailable;
+	}
+
+	public String getCallOrderCity() {
+		return callOrderCity;
+	}
+
+	public void setCallOrderCity(String callOrderCity) {
+		this.callOrderCity = callOrderCity;
+	}
+}

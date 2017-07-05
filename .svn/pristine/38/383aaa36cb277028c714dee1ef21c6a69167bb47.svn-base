@@ -1,0 +1,87 @@
+package com.weiye.service.impl;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.MD5Util;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.sms.SmsSendUtil;
+import com.weiye.dao.AccountDao;
+import com.weiye.dao.AccountDetailDao;
+import com.weiye.dao.ConsigneeInfoDao;
+import com.weiye.dao.LoginInfoDao;
+import com.weiye.dao.UserDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Account;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.User;
+import com.weiye.service.UserService;
+import com.weiye.service.CodeService;
+
+@Service("codeService")
+public class CodeServiceImpl extends BasicService implements CodeService {
+	@Autowired
+	private UserDao userDao;
+	@Autowired
+	private AccountDao accountDao;
+	@Autowired
+	private AccountDetailDao accountDetailDao;
+	@Autowired
+	private LoginInfoDao loginInfoDao;
+	@Autowired
+	private ConsigneeInfoDao consigneeInfoDao;
+
+
+
+	public boolean checkExistsByPhone(String phone) throws ServiceException {
+		if (StringUtil.isEmpty(phone)) {
+			return false;
+		} else {
+			try {
+				//User user = this.userDao.getUserByAccount(phone);	
+				User user = this.userDao.getUserByPhone(phone);
+				if (user != null && phone.equals(user.getPhone())) {
+					// this user is exists
+					return true;
+				} else {
+					return false;
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+	}
+	
+	public boolean checkExistsByEmail(String email) throws ServiceException {
+		if (StringUtil.isEmpty(email)) {
+			return false;
+		} else {
+			try {
+				User user = this.userDao.getUserByEmailAccount(email);
+				if (user != null && email.equalsIgnoreCase(user.getEmail())) {
+					// this user is exists
+					return true;
+				} else {
+					return false;
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+	}
+	
+}

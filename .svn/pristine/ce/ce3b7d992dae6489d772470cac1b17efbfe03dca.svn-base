@@ -1,0 +1,56 @@
+package com.weiye.controller;
+//package net.usitao.controller;
+//
+//import javax.annotation.Resource;
+//import javax.servlet.http.HttpServletRequest;
+//import javax.servlet.http.HttpServletResponse;
+//
+//import net.usitao.common.constants.Constant;
+//import net.usitao.common.constants.ParameterConstants;
+//import net.usitao.common.constants.ResponseCode;
+//import net.usitao.common.util.StringUtil;
+//import net.usitao.model.ResponseObject;
+//import net.usitao.service.EmployeeService;
+//
+//import org.apache.log4j.Logger;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RequestMethod;
+//import org.springframework.web.bind.annotation.RequestParam;
+//import org.springframework.web.bind.annotation.ResponseBody;
+//
+//public class AuthorityController extends BasicController {
+//
+//	/**
+//	 * 权限控制接口
+//	 */
+//	private static final long serialVersionUID = 7816876664558935269L;
+//	private static final Logger log = Logger.getLogger(AuthorityController.class);
+//	
+//	@Resource(name = "employeeService")
+//	private EmployeeService employeeService;
+//	
+//	@RequestMapping(value = "/admin/emp/authority/list", method = { RequestMethod.GET })
+//	@ResponseBody
+//	public ResponseObject<Object> autuority(HttpServletRequest request,
+//			@RequestParam(value = ParameterConstants.EMPLOYEE_ID) String id,
+//   		 HttpServletResponse response) {
+//   	ResponseObject<Object> responseObj = null;
+//   	if(StringUtil.isEmpty(id)){
+//   		return generateResponseObject(ResponseCode.EMPLOYEE_ID_ERROR, "参数无效");
+//   	}else{
+//   		
+//   		String employees_id = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+//   		try{
+//   			return 
+//   		}catch(Exception e){
+//   			
+//   			
+//   		}
+//   		
+//   	}
+//	return responseObj;
+//   	
+//   	
+//	}
+//
+//}

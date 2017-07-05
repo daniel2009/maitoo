@@ -1,0 +1,481 @@
+﻿
+
+
+//kai 20150911-1 modify
+//js获取项目根路径，如： http://localhost:8083/uimcardprj
+base_url_set_has_sub = false;
+function getRootPath() {
+	// 获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+	var curWwwPath = window.document.location.href;
+	// 获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+	var pathName = window.document.location.pathname;
+	var pos = curWwwPath.indexOf(pathName);
+	// 获取主机地址，如： http://localhost:8083
+	var localhostPaht = curWwwPath.substring(0, pos);
+	// 获取带"/"的项目名，如：/uimcardprj
+	var projectName = pathName
+			.substring(0, pathName.substr(1).indexOf('/') + 1);
+	
+	if(base_url_set_has_sub==true)
+	{
+		return (localhostPaht + projectName);
+	}
+	else
+	{
+		return localhostPaht;
+	}
+}
+/*
+ * 初始化航班信息入口
+ * */
+function init_flyinfo()
+{
+	loadFirstFlyInfoList();
+	
+	$("#a_back_route_list_link").click(function() {
+		/*
+		 * if (!$("#nav5").hasClass("current")) { $("#nav5").click(); }
+		 */
+		// $("#nav55").click();
+		nav55Click();
+		return false;
+	});
+	//点击创建航班
+	$("#createflyid").click(function() {
+		if($("#createflyid").attr("state")=="close")
+		{
+			$("#createflyid").attr("state","open");
+			$("#createflyid").attr("style","width: 230px;height: 30px;font-size: 18px;background-color:green;");
+			$("#showcreatefly").attr("style","");
+		}
+		else
+		{
+			/*$("#createflyid").attr("state","close");
+			$("#createflyid").attr("style","width: 230px;height: 30px;font-size: 18px;background-color:pink;");
+			$("#showcreatefly").attr("style","display:none;");*/
+			
+			var create_fly_no = $(":text[name='create_fly_no']").val();
+			var fly_state = $("select[name='fly_state']").val();
+			var fly_remark = $("textarea[name='fly_remark']").val();
+			if(create_fly_no=="")
+			{
+				alert("航班号不能为空!");
+				return;
+			}
+			if(fly_state=="")
+			{
+				alert("状态不能为空!");
+				return;
+			}
+			$.ajax({
+				type : "post",
+				url : admin_flyinfo_add_url,
+				data : {
+					flightno : create_fly_no,
+					state : fly_state,
+					remark : fly_remark
+				},
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("添加成功");
+						$("#main-content").load(admin_route_export_out_page_url);
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("添加失败，失败原因是:" + response.message);
+					}
+				}
+			});
+			
+		}
+		return false;
+	});
+	$(":submit[name='searchSub']").click(function() {
+		//alert("22222");
+				var oid = $(":text[name='search_flyinfo_no']").val();
+				if (oid == null || oid == '') {
+					var sdate = $(":text[name='sdate']").val();
+					var edate = $(":text[name='edate']").val();
+					var key = $(":text[name='key']").val();
+					var state = $("select[name='state']").val();
+				
+
+					loadFlyInfoList("", key,  state, sdate, edate, "1");
+				} else {
+					$(":text[name='sdate']").val('');
+					$(":text[name='edate']").val('');
+					$(":text[name='key']").val('');
+					$("select[name='state']").val('');
+					loadFlyInfoList(oid, "", "", "",  "", "1");
+				}
+				return false;
+			});
+}
+function loadFirstFlyInfoList() {
+	loadFlyInfoList("", "", "", "", "", "1");
+}
+function loadFlyInfoList(flyno, key, state, sdate, edate, pn) {
+	//alert(flyno);
+	if(state=="-1")
+	{
+		state="";
+	}
+	$(":hidden[name='key']").val(key);
+	$(":hidden[name='state']").val(state);
+	$(":hidden[name='sdate']").val(sdate);
+	$(":hidden[name='edate']").val(edate);
+	$(":hidden[name='pn']").val(pn);
+
+	$.ajax({
+		type : "post",
+		url : admin_flyinfo_list_url,
+		data : {
+			flyno : flyno,
+			key : key,
+			state : state,
+			sd : sdate,
+			ed : edate,
+			pageIndex : pn
+		},
+		success : function(response) {
+			var code = response.code;
+
+			if ("200" == code) {
+				if (response.data == null) {
+					showFlyInfoList(null);
+					showFlyInfoLink(null);
+				} else {
+
+					showFlyInfoList(response.data.datas);
+					showFlyInfoLink(response.data);
+				}
+				afterLoadOrderList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='8'>"
+						+ "<span>&nbsp;&nbsp;获取航班列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+
+	});
+}
+
+function showFlyInfoList(list) {
+
+	var str = "";
+	var strhidden='<input type="hidden" name="hidden_state_value"/>'+'<input type="hidden" name="hidden_remark"/>'+'<input type="hidden" name="hidden_id"/>'+'<input type="hidden" name="hidden_order_state"/>';
+	if (list != null) {
+
+		$.each(list, function() {
+			
+			str += "<tr id='" + this.id + "'>";
+			
+			str +='<td id="flightno_id">'+this.flightno + '</td>';
+			str +='<td id="state_id">'+setStateSelect(this.state)+'</td>';
+			str +='<td style="text-align:center;"><input type="checkbox" name="modifystate_id" id="modifystate_id" checked="checked" value="'+this.id+'"></td>';
+			
+			str +='<td>'+this.warehouseName + '</td>';
+			str +='<td>'+this.ordersno + '</td>';
+			
+			str +='<td>'+this.createDate + '</td>';
+			str +='<td>'+this.modifyDate + '</td>';
+			str +='<td id="idno" style="display:none;">'+this.id + '</td>';
+			str +='<td>'+'<textarea rows="2" style="width:95%" class="text-input" name="remark_id" maxlength="100">'+this.remark+'</textarea></td>';
+			
+			str +='<td>'+'<form action="" id="modify_flyinfo_form'+this.id+'" method="post" enctype="multipart/form-data"><input type="file" name="file" class="text-input">'+strhidden+'</form>'+'</td>';
+			
+			str += "<td id='" + this.flightno + "'><a href='" + this.flightno
+			+ "' name='a_flyinfo_modify_link'>修改</a> | <a href='" + this.id
+		+ "' name='a_flyinfo_del_link'>删除</a></td>";
+
+			str += "</tr>";
+		});
+
+	} else {
+		if (str == null || str == '') {
+			str = "<td style='text-align: left;' colspan='8'>"
+					+ "<span>&nbsp;&nbsp;没有符合您查找要求的航班信息!</span></td>";
+		}
+	}
+
+	$("#u520 table tbody").html(str);
+	
+	$("a[name='a_flyinfo_modify_link']").click(function() {
+		var oid = $(this).attr("href");	
+		var fly_remark= $(this).parent().parent().find("textarea[name='remark_id']").val();
+		var fly_state= $(this).parent().parent().find("select[name='state_id']").val();
+		
+		var order_state=$(this).parent().parent().find(":checkbox[name='modifystate_id']").is(':checked');
+		
+		
+		$(":hidden[name='state_new']").val(order_state);
+			
+		if(fly_state=="-1")
+		{
+			fly_state="";
+		}
+		var flag_modify=0;
+		if(order_state==true)
+		{
+			if (confirm("你是否确定修改此航班信息？ 如果修改，相应的运单状态也会修改对应的状态。")) {
+				flag_modify=1;
+			}
+		}
+		else
+		{
+			if (confirm("你是否确定修改此航班信息？")) {
+				flag_modify=1;
+			}
+		}
+		if(flag_modify!=1)
+		{
+			return false;
+		}
+		var idno=$(this).parent().parent().find("td[id='idno']").html();
+		var picValue =  $(this).parent().parent().find(":file[name='file']").val();
+		if ((picValue != null) && ("" != picValue)) {
+			$(this).parent().parent().find(":hidden[name='hidden_state_value']").val(fly_state);
+			$(this).parent().parent().find(":hidden[name='hidden_remark']").val(fly_remark);
+			$(this).parent().parent().find(":hidden[name='hidden_id']").val(idno);
+			$(this).parent().parent().find(":hidden[name='hidden_order_state']").val(order_state);
+			//$(":hidden[name='state_new']").val(order_state);
+			modify_flyinfo_havapic(idno);
+			return false;
+		}
+		$.ajax({
+			type : "post",
+			url : admin_flyinfo_modify_url,
+			data : {
+				flightno : oid,
+				state : fly_state,
+				remark : fly_remark,
+				order_flag:order_state
+			},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					alert("修改成功");
+					$("#main-content").load(admin_route_export_out_page_url);
+				} else if (code == "607") {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("修改失败，失败原因是:" + response.message);
+				}
+			}
+		});
+
+		return false;
+	});
+	$("a[name='a_flyinfo_del_link']").click(function() {
+		var id = $(this).attr("href");	
+		if (confirm("你是否确定删除此航班信息？ 如果删除，相关联的运单航班信息也会被删除。"))
+		{
+			$.ajax({
+				type : "post",
+				url : admin_flyinfo_del_url,
+				data : {
+					id : id
+				},
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("删除成功");
+						$("#main-content").load(admin_route_export_out_page_url);
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("修改失败，失败原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	});
+	
+}
+//kai 20151119 航班构造状态
+function setStateSelect(stateno)
+{
+	var state_select_str="";
+	state_select_str='<select class="text-input" name="state_id" style="width:85%;">';
+	var slected_s=' selected = "selected" ';
+	if(stateno=="3")
+	{
+		state_select_str+='<option value="-1">请选择状态</option>';
+		state_select_str+='<option value="3"'+slected_s+'>送往集散中心</option>';
+		state_select_str+='<option value="4">集散中心已入库</option>';
+		state_select_str+='<option value="5">送往机场</option>';
+		state_select_str+='<option value="6">空运中</option>';
+		state_select_str+='<option value="7">海关清关</option>';
+		state_select_str+='<option value="8">目的地第三方快递</option>';		
+		state_select_str+='<option value="9">已完成</option>';
+		
+	}
+	else if(stateno=="4")
+	{
+		state_select_str+='<option value="-1">请选择状态</option>';
+		state_select_str+='<option value="3">送往集散中心</option>';
+		state_select_str+='<option value="4"'+slected_s+'>集散中心已入库</option>';
+		state_select_str+='<option value="5">送往机场</option>';
+		state_select_str+='<option value="6">空运中</option>';
+		state_select_str+='<option value="7">海关清关</option>';
+		state_select_str+='<option value="8">目的地第三方快递</option>';		
+		state_select_str+='<option value="9">已完成</option>';
+	}
+	else if(stateno=="5")
+	{
+		state_select_str+='<option value="-1">请选择状态</option>';
+		state_select_str+='<option value="3">送往集散中心</option>';
+		state_select_str+='<option value="4">集散中心已入库</option>';
+		state_select_str+='<option value="5"'+slected_s+'>送往机场</option>';
+		state_select_str+='<option value="6">空运中</option>';
+		state_select_str+='<option value="7">海关清关</option>';
+		state_select_str+='<option value="8">目的地第三方快递</option>';		
+		state_select_str+='<option value="9">已完成</option>';
+	}
+	else if(stateno=="6")
+	{
+		state_select_str+='<option value="-1">请选择状态</option>';
+		state_select_str+='<option value="3">送往集散中心</option>';
+		state_select_str+='<option value="4">集散中心已入库</option>';
+		state_select_str+='<option value="5">送往机场</option>';
+		state_select_str+='<option value="6"'+slected_s+'>空运中</option>';
+		state_select_str+='<option value="7">海关清关</option>';
+		state_select_str+='<option value="8">目的地第三方快递</option>';		
+		state_select_str+='<option value="9">已完成</option>';
+	}
+	else if(stateno=="7")
+	{
+		state_select_str+='<option value="-1">请选择状态</option>';
+		state_select_str+='<option value="3">送往集散中心</option>';
+		state_select_str+='<option value="4">集散中心已入库</option>';
+		state_select_str+='<option value="5">送往机场</option>';
+		state_select_str+='<option value="6">空运中</option>';
+		state_select_str+='<option value="7"'+slected_s+'>海关清关</option>';
+		state_select_str+='<option value="8">目的地第三方快递</option>';		
+		state_select_str+='<option value="9">已完成</option>';
+	}
+	else if(stateno=="8")
+	{
+		state_select_str+='<option value="-1">请选择状态</option>';
+		state_select_str+='<option value="3">送往集散中心</option>';
+		state_select_str+='<option value="4">集散中心已入库</option>';
+		state_select_str+='<option value="5">送往机场</option>';
+		state_select_str+='<option value="6">空运中</option>';
+		state_select_str+='<option value="7">海关清关</option>';
+		state_select_str+='<option value="8"'+slected_s+'>目的地第三方快递</option>';		
+		state_select_str+='<option value="9">已完成</option>';
+	}
+	else if(stateno=="9")
+	{
+			state_select_str+='<option value="-1">请选择状态</option>';
+			state_select_str+='<option value="3">送往集散中心</option>';
+			state_select_str+='<option value="4">集散中心已入库</option>';
+			state_select_str+='<option value="5">送往机场</option>';
+			state_select_str+='<option value="6">空运中</option>';
+			state_select_str+='<option value="7">海关清关</option>';
+			state_select_str+='<option value="8">目的地第三方快递</option>';		
+			state_select_str+='<option value="9"'+slected_s+'>已完成</option>';
+	}
+	else
+	{
+		state_select_str+='<option value="-1">请选择状态</option>';
+		state_select_str+='<option value="3">送往集散中心</option>';
+		state_select_str+='<option value="4">集散中心已入库</option>';
+		state_select_str+='<option value="5">送往机场</option>';
+		state_select_str+='<option value="6">空运中</option>';
+		state_select_str+='<option value="7">海关清关</option>';
+		state_select_str+='<option value="8">目的地第三方快递</option>';		
+		state_select_str+='<option value="9">已完成</option>';
+	}
+	state_select_str+='</select>';
+	return state_select_str;
+}
+function showFlyInfoLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .bulk-actions").show();
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var key = $(":hidden[name='key']").val();
+			var state = $(":hidden[name='state']").val();
+			var sdate = $(":hidden[name='sdate']").val();
+			var edate = $(":hidden[name='edate']").val();
+			loadFlyInfoList("", key,  state, sdate, edate, pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var key = $(":hidden[name='key']").val();
+					var state = $(":hidden[name='state']").val();
+					var sdate = $(":hidden[name='sdate']").val();
+					var edate = $(":hidden[name='edate']").val();
+					//loadOrderList("", key, type, state, sdate, edate, pn);
+					loadFlyInfoList("", key,  state, sdate, edate, pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .bulk-actions").hide();
+		$("tfoot .pagination").html("");
+	}
+}
+
+function modify_flyinfo_havapic(id)
+{
+	var submitstr="modify_flyinfo_form"+id;
+	
+	$("#"+submitstr).ajaxSubmit({
+		type : "post",
+		timeout : 600000,
+		url : admin_flyinfo_modify_havepic_url,
+		success : function(data) {
+			// alert(data);
+			$("#tmpmsgdiv2").html(data);
+			var str = $("#tmpmsgdiv2 pre").html();
+
+			var obj = $.parseJSON(str);
+
+			var code = obj.code;
+
+			if (code == "200") {
+
+				alert("修改成功");
+				$("#main-content").load(admin_route_export_out_page_url);
+			} else if (code == "607") {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("修改失败，原因是:" + obj.message);
+			}
+			return false;
+		},
+		error : function(XmlHttpRequest, textStatus, errorThrown) {
+			alert("操作失败");
+			
+			return false;
+		}
+	});	
+}

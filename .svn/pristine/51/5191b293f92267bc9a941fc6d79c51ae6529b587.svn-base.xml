@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.CallOrderDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.CallOrder">
+		<id column="id" property="id" javaType="String" />
+		<result column="user_id" property="userId" javaType="String"/>
+		<result column="send_name" property="sName" javaType="String"/>
+		<result column="send_province" property="sProvince" javaType="String"/>
+		<result column="send_city" property="sCity" javaType="String" />
+		<result column="send_district" property="sDistrict" javaType="String"/>
+		<result column="send_street_address" property="sStreetAddress" javaType="String" />
+		<result column="send_zip_code" property="sZipCode" javaType="String" />
+		<result column="send_phone" property="sPhone" javaType="String" />
+		<result column="weight" property="weight" javaType="String" />
+		<result column="quantity" property="quantity" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="emp_id" property="empId" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="type" property="type" javaType="String" />
+		<result column="appointment_date" property="appointmentDate" javaType="String" />
+		<result column="confirm_date" property="confirmDate" javaType="String" />
+		<result column="warehouse_id" property="warehouseId" javaType="String" />
+		<result column="warehouse_name" property="warehouseName" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+	</resultMap>
+
+	<insert id="insertCallOrder" parameterType="com.weiye.model.CallOrder"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		`call_order`(user_id,send_name,send_province,send_city,send_district,send_street_address,
+		send_zip_code,send_phone,weight,quantity,state,emp_id,create_date,modify_date,type, appointment_date, warehouse_id, remark)
+		values(#{userId},#{sName},#{sProvince},#{sCity},#{sDistrict},#{sStreetAddress},
+		#{sZipCode},#{sPhone},#{weight},#{quantity},#{state},#{empId},#{createDate},#{modifyDate},#{type}, #{appointmentDate}, #{warehouseId}, #{remark})
+	</insert>
+
+	<update id="updateCallOrder" parameterType="com.weiye.model.CallOrder">
+		UPDATE call_order SET
+			send_name=#{sName}, send_province=#{sProvince}, send_city=#{sCity}, send_district=#{sDistrict}, send_street_address=#{sStreetAddress}, send_zip_code=#{sZipCode}, send_phone=#{sPhone},
+			remark=#{remark}, quantity=#{quantity}, weight=#{weight}, warehouse_id=#{warehouseId}, state=#{state},
+			modify_date=#{modifyDate}
+		WHERE id=#{id} AND user_id=#{userId}
+	</update>
+	
+	<update id="updateCallOrderState" parameterType="java.lang.String">
+		update call_order
+		set state=#{state}, emp_id=#{empId}
+		, modify_date=#{modifyDate}
+		where id=#{id}
+	</update>
+	<update id="audit" parameterType="java.lang.String">
+		UPDATE call_order SET
+			state=#{state}, emp_id=#{empId}, confirm_date=#{confirmDate}, modify_date=#{modifyDate}
+		WHERE id=#{id}
+	</update>
+	<delete id="deleteCallOrder" parameterType="java.lang.String">
+		delete from
+		call_order where id=#{id} and user_id=#{userId}
+	</delete>
+	<select id="countAll" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM call_order
+	</select>
+	<select id="findAll" resultMap="basic_result_map">
+		SELECT c.*, w.name AS warehouse_name FROM call_order c LEFT JOIN warehouse w ON c.warehouse_id=w.id
+		ORDER BY modify_date DESC LIMIT #{firstResult}, #{pageSize}
+	</select>
+	
+	<select id="countAllByUserId" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM call_order WHERE user_id=#{userId}
+	</select>
+	<select id="findAllByUserId" resultMap="basic_result_map">
+		SELECT c.*, w.name AS warehouse_name FROM call_order c LEFT JOIN warehouse w ON c.warehouse_id=w.id 
+		WHERE user_id=#{userId}
+		ORDER BY modify_date DESC LIMIT #{firstResult}, #{pageSize}
+	</select>
+	<select id="findById" resultMap="basic_result_map">
+		SELECT c.*, w.name AS warehouse_name FROM call_order c LEFT JOIN warehouse w ON c.warehouse_id=w.id WHERE c.id=#{id}
+	</select>
+	
+	<select id="countByKey" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM call_order c
+		<where>
+			<if test="type!=null and type!='' and type!='-1' and key!=null and key!=''">
+				c.${type} LIKE #{key}
+			</if>
+			<if test="createDateStart!=null and createDateStart !=''">
+				AND c.create_date <![CDATA[>=]]> #{createDateStart}
+			</if>
+			<if test="createDateEnd!=null and createDateEnd!=''">
+				AND c.create_date <![CDATA[<=]]> #{createDateEnd}
+			</if>
+			<if test="state!=null and state!='' and state!='-1'">
+				AND c.state=#{state}
+			</if>
+			<if test="warehouseId!=null and warehouseId!=''">
+				AND c.warehouse_id=#{warehouseId}
+			</if>			
+		</where>
+	</select>
+	<select id="findByKey" resultMap="basic_result_map">
+		SELECT *, w.name AS warehouse_name FROM call_order c LEFT JOIN warehouse w ON c.warehouse_id=w.id 
+		<where>
+			<if test="type!=null and type!='' and type!='-1' and key!=null and key!=''">
+				c.${type} LIKE #{key}
+			</if>
+			<if test="createDateStart!=null and createDateStart !=''">
+				AND c.create_date <![CDATA[>=]]> #{createDateStart}
+			</if>
+			<if test="createDateEnd!=null and createDateEnd!=''">
+				AND c.create_date <![CDATA[<=]]> #{createDateEnd}
+			</if>
+			<if test="state!=null and state!='' and state!='-1'">
+				AND c.state=#{state}
+			</if>
+			<if test="warehouseId!=null and warehouseId!=''">
+				AND c.warehouse_id=#{warehouseId}
+			</if>			
+		</where>
+		ORDER BY modify_date DESC
+		LIMIT #{firstResult}, #{pageSize}
+	</select>
+</mapper>

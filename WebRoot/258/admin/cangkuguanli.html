@@ -1,0 +1,649 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <style type="text/css">
+        .ui-jqgrid-view > .ui-jqgrid-titlebar {
+            display: block;
+        }
+
+        .table-condensed > tbody > tr .name {
+            background-color: #F1F1F1;
+            width: 150px;
+        }
+        small{color:blue;}
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">店面管理</a>
+                </li>
+
+                <li>
+                    <a href="#"><u>门店配置</u></a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content" id="divGrid">
+
+
+            <div class="row toolrow" id="divAdvanceSearch" style="border:1px solid #ccc">
+                <div class="col-xs-12" style="padding:3px 5px 0px;">
+                    <div style="float:left">
+                        <button type="button" class="btn btn-yellow btn-sm" id="btnAdd">
+                            <span class="icon-pencil"></span>
+                            添加门店
+                        </button>
+                    </div>
+                    <div style="float:right">
+
+                        <label for="keyword" class="control-label width60px">门店名称:</label>
+
+                        <input name="keyword" id="keyword" placeholder="关键字">
+                        <button type="button" class="btn btn-purple btn-sm" id="btnAdvanceSearch">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            搜索
+                        </button>
+                    </div>
+               </div>
+            </div>
+
+
+            <div style="clear:both">
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-xs-12">
+
+                    <!-- PAGE CONTENT BEGINS -->
+                    <table id="yundangrid-table"></table>
+                    <div id="yundangrid-pager"></div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content" id="divAdd" style="display:none">
+
+
+            <div class="row" style=" margin-bottom:30px;">
+                <div class="col-xs-12">
+                    <form action="" class="form" id="add_form_warehose" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="widtype1" value="0">
+                        <table class="table table-bordered  table-striped table-condensed ">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        添加门店信息
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="name">
+                                        门店名称：
+                                    </td>
+                                    <td class="value">
+                                        <input name="name" type="text" placeholder="必填项" />
+
+                                    </td>
+                                </tr>
+                                  <tr>
+                                    <td class="name">
+                                        公司名称：
+                                    </td>
+                                    <td class="value">
+                                        <input name="company" type="text"  />
+
+                                    </td>
+                                </tr>
+                     
+
+                                <tr>
+                                    <td class="name">
+                                        国家/州/市：
+                                    </td>
+                                    <td class="value">
+                                        <input style="width:100px;"  type="text" name="country" placeholder="国家(必填项)">
+                                        /&nbsp;<input style="width:100px;" type="text" name="province" placeholder="州(必填项)">
+                                        /&nbsp;<input style="width:100px;" type="text" name="city" placeholder="市(必填项)">
+<small style="color:blue">此信息会应用于打印面单，请正确填写地址！</small>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="name">
+                                        详细地址：
+                                    </td>
+                                    <td class="value">
+                                        <input name="address" type="text" placeholder="必填项" /><small style="color:blue">此信息会应用于打印面单，请正确填写地址！</small>
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="name">
+                                        邮政编码：
+                                    </td>
+                                    <td class="value">
+                                        <input name="zipCode" type="text" placeholder="必填项" /><small style="color:blue">此信息会应用于打印面单，请正确填写邮编！</small>
+
+                                    </td>
+                                </tr>
+
+                   
+
+              
+
+                                <tr>
+                                    <td class="name">
+                                        门店标识：
+                                    </td>
+                                    <td class="value">
+                                        <input size="2" type="text" name="printWidCode" maxlength="2" value="00" placeholder="必填项"><small style="color:blue">(表示运单号的最后两位字符，只能是数字或大写字母)</small>
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="name">
+                                        联系人：
+                                    </td>
+                                    <td class="value">
+                                        <input type="text" name="contactName">
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        联系手机：
+                                    </td>
+                                    <td class="value">
+                                        <input type="text" name="telephone" maxlength="16">
+
+                                    </td>
+                                </tr>
+                               
+                                <tr>
+                                    <td class="name">
+                                      美国手机：
+                                    </td>
+                                    <td class="value">
+                                        <input type="text" name="printP_USA" maxlength="16"><small>(应用于打印运单)</small>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        中国手机：
+                                    </td>
+                                    <td class="value">
+                                        <input class="text-input small-input" type="text" name="printP_CN" maxlength="16"><small>(应用于打印运单)</small>
+
+                                    </td>
+                                </tr>
+               <tr>
+                                    <td class="name">
+                                        是否发送短信：
+                                    </td>
+                                    <td class="value">
+                                        <input class="text-input small-input" type="checkbox" name="csendmessage" checked="checked" ><small>(门店短信总开关，如果不打开，此门店的运单不会发送任何短信)</small>
+										<input type="hidden" name="sendmessage" value="1" />
+                                    </td>
+                                </tr>
+                                  <tr>
+                                    <td class="name">
+                                        前端显示：
+                                    </td>
+                                    <td class="value">
+                                        <input class="text-input small-input" type="checkbox" name="cshowstore" checked="checked" ><small>(如果不选择，在首页和用户中心将不显示此门店信息，用于不使用本系统录单的门店)</small>
+										<input type="hidden" name="showstore" value="1" />
+                                    </td>
+                                </tr>
+                             
+                                <tr>
+                                    <td class="name">
+                                        备注：
+                                    </td>
+                                    <td class="value">
+                                        <textarea style="height:50px; width:85%;" name="remark"></textarea>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+  <table class="table table-bordered  table-striped table-condensed ">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        上门收货信息
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              
+
+              
+
+                                <tr>
+                                    <td class="name">
+                                        启动上门收货功能：
+                                    </td>
+                                    <td class="value">
+                                        <input type="checkbox" name="ckcallOrderAvailable" value="1" />
+                                        <input type="hidden" name="callOrderAvailable" value="0" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        服务城市：<br/><span style="color:red;">(城市之间直接回车来区分开来)</span>
+                                    </td>
+                                    <td class="value">
+                                        <textarea name="callOrderCity" id="callOrderCity" style="height:60px; width:85%"></textarea>
+
+                                    </td>
+                                </tr>
+                   
+                            </tbody>
+                        </table>
+
+
+
+                        <div class="clearfix form-buttons">
+                            <label class="control-label col-md-5"></label>
+                            <button type="submit" class="btn btn-success btn-sm" id="btnAddSave"><i class="glyphicon glyphicon-ok"></i><strong>添加</strong></button>
+                            <button type="button" class="cancel btn btn-sub btn-sm btn-warning"><i class="glyphicon glyphicon-remove"></i><strong>返回列表</strong></button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content" id="divEdit" style="display:none">
+
+            <div class="row">
+                <div style="margin-top: 10px; margin-bottom: 10px;color:blue" class="well well-sm">
+                    <span>修改门面信息</span>
+                </div>
+            </div>
+            <div class="row" style=" margin-bottom:30px;">
+                <div class="col-xs-12">
+
+
+                    <form action="" class="form" id="add_form_warehose" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="widtype1" value="0">
+                        <input type="hidden" name="id" value="0">
+                       <table class="table table-bordered  table-striped table-condensed ">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        修改门店信息
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="name">
+                                        门店名称：
+                                    </td>
+                                    <td class="value">
+                                        <input name="name" type="text" placeholder="必填项" />
+
+                                    </td>
+                                </tr>
+                           <tr>
+                                    <td class="name">
+                                        公司名称：
+                                    </td>
+                                    <td class="value">
+                                        <input name="company" type="text"  />
+
+                                    </td>
+                                </tr>   
+
+                                <tr>
+                                    <td class="name">
+                                        国家/州/市：
+                                    </td>
+                                    <td class="value">
+                                        <input style="width:100px;"  type="text" name="country" placeholder="国家(必填项)">
+                                        /&nbsp;<input style="width:100px;" type="text" name="province" placeholder="州(必填项)">
+                                        /&nbsp;<input style="width:100px;" type="text" name="city" placeholder="市(必填项)">
+<small style="color:blue">此信息会应用于打印面单，请正确填写地址！</small>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="name">
+                                        详细地址：
+                                    </td>
+                                    <td class="value">
+                                        <input name="address" type="text" placeholder="必填项" /><small style="color:blue">此信息会应用于打印面单，请正确填写地址！</small>
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="name">
+                                        邮政编码：
+                                    </td>
+                                    <td class="value">
+                                        <input name="zipCode" type="text" placeholder="必填项" /><small style="color:blue">此信息会应用于打印面单，请正确填写邮编！</small>
+
+                                    </td>
+                                </tr>
+
+                   
+
+              
+
+                                <tr>
+                                    <td class="name">
+                                        门店标识：
+                                    </td>
+                                    <td class="value">
+                                        <input size="2" type="text" name="printWidCode" maxlength="2" value="00" placeholder="必填项"><small style="color:blue">(表示运单号的最后两位字符，只能是数字或大写字母)</small>
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="name">
+                                        联系人：
+                                    </td>
+                                    <td class="value">
+                                        <input type="text" name="contactName">
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        联系手机：
+                                    </td>
+                                    <td class="value">
+                                        <input type="text" name="telephone" maxlength="16">
+
+                                    </td>
+                                </tr>
+                               
+                                <tr>
+                                    <td class="name">
+                                      美国手机：
+                                    </td>
+                                    <td class="value">
+                                        <input type="text" name="printP_USA" maxlength="16"><small>(应用于打印运单)</small>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        中国手机：
+                                    </td>
+                                    <td class="value">
+                                        <input class="text-input small-input" type="text" name="printP_CN" maxlength="16"><small>(应用于打印运单)</small>
+
+                                    </td>
+                                </tr>
+                                       <tr>
+                                    <td class="name">
+                                        是否发送短信：
+                                    </td>
+                                    <td class="value">
+                                        <input class="text-input small-input" type="checkbox" name="csendmessage" checked="checked" ><small>(门店短信总开关，如果不打开，此门店的运单不会发送任何短信)</small>
+										<input type="hidden" name="sendmessage" value="1" />
+                                    </td>
+                                </tr>
+                                  <tr>
+                                    <td class="name">
+                                        前端显示：
+                                    </td>
+                                    <td class="value">
+                                        <input class="text-input small-input" type="checkbox" name="cshowstore" checked="checked"><small>(如果不选择，在首页和用户中心将不显示此门店信息，用于不使用本系统录单的门店)</small>
+										<input type="hidden" name="showstore" value="1" />
+                                    </td>
+                                </tr>
+              
+                             
+                                <tr>
+                                    <td class="name">
+                                        备注：
+                                    </td>
+                                    <td class="value">
+                                        <textarea style="height:50px; width:85%;" name="remark"></textarea>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+  <table class="table table-bordered  table-striped table-condensed ">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        上门收货信息
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              
+
+              
+
+                                <tr>
+                                    <td class="name">
+                                        启动上门收货功能：
+                                    </td>
+                                    <td class="value">
+                                        <input type="checkbox" name="ckcallOrderAvailable" value="1" />
+                                        <input type="hidden" name="callOrderAvailable" value="0" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        服务城市：<br/><span style="color:red;">(城市之间直接回车来区分开来)</span>
+                                    </td>
+                                    <td class="value">
+                                        <textarea name="callOrderCity" id="callOrderCity" style="height:60px; width:85%"></textarea>
+
+                                    </td>
+                                </tr>
+                   
+                            </tbody>
+                        </table>
+
+
+                        <div class="clearfix form-buttons">
+                            <label class="control-label col-md-5"></label>
+                            <button type="submit" class="btn btn-success btn-sm" id=""><i class="glyphicon glyphicon-ok"></i><strong>保存修改</strong></button>
+                            <button type="button" class="cancel btn btn-sub btn-sm btn-warning"><i class="glyphicon glyphicon-remove"></i><strong>返回列表</strong></button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content" id="divDetail" style="display:none">
+
+            <div class="row">
+                <div style="margin-top: 10px; margin-bottom: 10px;color:blue" class="well well-sm">
+                    <span>员工详细信息</span>
+                </div>
+            </div>
+            <div class="row" style=" margin-bottom:30px;">
+                <div class="col-xs-12">
+
+
+                    <form class="form">
+
+                        <table class="table table-bordered  table-striped table-condensed ">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        员工信息
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td class="name">
+                                        用户编号：
+                                    </td>
+                                    <td class="value">
+                                        <span name="id"></span>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        用户名：
+                                    </td>
+                                    <td class="value">
+                                        <span name="account"></span>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        门市：
+                                    </td>
+                                    <td class="value">
+
+                                        <span name="storeName"></span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="name">
+                                        手机号码：
+                                    </td>
+                                    <td class="value">
+
+                                        <span name="phone"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        拥有权限：
+                                    </td>
+                                    <td class="value">
+
+                                        <span name="auth"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+
+                        <div class="clearfix form-buttons">
+                            <label class="control-label col-md-5"></label>
+
+                            <button type="button" class="cancel btn btn-sub btn-sm btn-warning"><i class="glyphicon glyphicon-remove"></i><strong>返回列表</strong></button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+
+    <!--开关插件-->
+
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <!--表单验证插件-->
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+    <script src="../resources/js/jquery.form.js"></script>
+    <script src="../resources/scripts/common.js"></script>
+
+    <script src="../resources/scripts/cangkuguanli.js"></script>
+</body>
+</html>

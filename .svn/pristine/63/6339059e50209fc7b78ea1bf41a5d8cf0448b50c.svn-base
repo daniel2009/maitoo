@@ -1,0 +1,115 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="key" value=""/>
+	<input type="hidden" name="type" value=""/>
+	<input type="hidden" name="pn" value="1"/>
+	<input type="hidden" name="sdate" value=""/>
+	<input type="hidden" name="edate" value=""/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">门店运单列表
+			当前门店：${emp_store_name }
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">门店运单列表</div>
+			<div class="content_text">
+			
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u31" style="margin: 0px;height: auto;">
+						<div id="u320" style="margin-top: 0px;">
+							<span>
+								<a href="#" id="a_add_msj_order_link">添加运单</a>
+							</span>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+					<table style="width: 100%">
+						<col width="25" />
+						<col width="100px" />
+						<col />
+						<col width="200px"/>
+						<col width="100px" />
+						<col width="80px" />
+						<col width="140px" />
+						<col width="150px" />
+						<thead>
+							<tr>
+								<th>
+									&nbsp;
+								</th>
+								<th id="o_id">
+									运单号
+								</th>
+								<th id="o_usa_no">
+									货物品名
+								</th>
+								<th id="o_user_name">
+									所属用户
+								</th>
+								<th id="o_consignee_name">
+									收件人姓名
+								</th>
+								<th id="o_state">
+									状态
+								</th>
+								<th id="o_create_date">
+									创建时间
+								</th>
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="6">
+									<div class="bulk-actions align-left">
+										&nbsp;
+										<label>
+											<input type="checkbox" name="o_del_check_all"
+												id="o_del_check_all" />
+											全选
+										</label>
+										&nbsp;&nbsp;
+										<a href="#" id="a_delete_order_link">删除</a>
+									</div>
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+							
+							<tr>
+								<td style="text-align: left;" colspan="8">
+									<span>&nbsp;&nbsp;对不起，现在还没有预报信息!</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav54Data();
+	});
+</script>
+</html>

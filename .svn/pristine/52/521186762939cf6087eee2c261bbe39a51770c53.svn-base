@@ -1,0 +1,155 @@
+var emp_account_regex = /^.{2,20}$/;
+var emp_password_regex = /^\S{6,20}$/;
+var emp_store_id_regex = /^[0-9]*$/;
+var emp_sotre_name_regex = /^.{0,20}$/;
+var emp_phone_regex = /^.{0,20}$/;
+
+/*employee*/
+function checkEmpAccount(account) {
+	return emp_account_regex.test(account);
+}
+
+function checkEmpPassword(pwd) {
+	return emp_password_regex.test(pwd);
+}
+
+function checkStoreId(value) {
+	return emp_store_id_regex.test(value);
+}
+
+function checkStoreName(value) {
+	return emp_sotre_name_regex.test(value);
+}
+
+function checkPhone(value) {
+	return emp_phone_regex.test(value);
+}
+/*end the emp check*/
+
+/*start the warehouse check*/
+var warehouse_name_regex = /^.{1,20}$/;
+var warehosue_company_regex = /^.{0,40}$/;
+
+function checkWarehouseName(name) {
+	return warehouse_name_regex.test(name);
+}
+function checkWarehouseCompany(company) {
+	return warehosue_company_regex.test(company);
+}
+function checkWarehouseCountry(country) {
+	return /^.{1,20}$/.test(country);
+}
+function checkWarehouseProvince(province) {
+	return /^.{1,20}$/.test(province);
+}
+function checkWarehouseCity(city) {
+	return /^.{1,20}$/.test(city);
+}
+function checkWarehouseAddress(address) {
+	return /^.{1,100}$/.test(address);
+}
+function checkWarehouseZipCode(zipCode) {
+	return /^.{2,10}$/.test(zipCode);
+}
+function checkWarehouseSerialNo(serialNo) {
+	return /^\d*$/.test(serialNo);
+}
+function checkWarehouseContactName(contactName) {
+	return /^.{0,20}$/.test(contactName);
+}
+function checkWarehouseTelephone(telephone) {
+	return /^.{0,20}$/.test(telephone);
+}
+function checkWarehouseRemark(remark) {
+	return /^.{0,200}$/.test(remark);
+}
+/*end the warehouse check*/
+
+/*start user check*/
+var user_nick_name_regex = /^.{2,40}$/;
+var user_password_regex = /^\S{6,20}$/;
+var user_email_regex = /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/;
+var user_real_name_regex = /^.{0,20}$/;
+var user_phone_regex = /^.{0,20}$/;
+var user_qq_regex = /^\d{0,20}$/;
+var user_country_regex = /^.{0,20}$/;
+var user_address_regex = /^.{0,150}$/;
+
+function checkUserNickName(value) {
+	return user_nick_name_regex.test(value);
+}
+function checkUserPassword(value) {
+	return user_password_regex.test(value);
+}
+function checkUserEmailRegex(value) {
+	
+	return user_email_regex.test(value);
+}
+function checkUserRealName(value) {
+	return user_real_name_regex.test(value);
+}
+function checkUserPhone(value) {
+	return user_phone_regex.test(value);
+}
+function checkUserQQ(value) {
+	return user_qq_regex.test(value);
+}
+function checkUserCountry(value) {
+	return user_country_regex.test(value);
+}
+function checkUserAddress(value) {
+	return user_address_regex.test(value);
+}
+/*end user check*/
+
+/*start message check*/
+var message_content_regex = /^.{1,200}$/;
+function checkMessageContent(value) {
+	return message_content_regex.test(value);
+}
+/*end message check*/
+
+/*start error order info check*/
+function checkErrorOrderInfoOrderId(value) {
+	return /^.{1,30}$/.test(value);
+}
+function checkErrorOrderInfoContent(value) {
+	return /^.{1,200}$/.test(value);
+}
+/*end error order info check*/
+
+/*start error torder info check*/
+function checkErrorTOrderInfoOrderId(value) {
+	return /^.{1,30}$/.test(value);
+}
+function checkErrorTOrderInfoContent(value) {
+	return /^.{1,200}$/.test(value);
+}
+/*end error torder info check*/
+
+/*start pre recharge check*/
+function checkPreAccountRealAmount(amount) {
+	return /^\d+(.\d{0,2})?$/.test(amount);
+}
+function checkPreRechargeReamrk(remark) {
+	return remark == null || remark.length < 200;
+}
+/*end*/
+
+/*start account manager check*/
+function checkAccountRealAmount(value) {
+	return /^(-)?\d+(.\d{0,2})?$/.test(value) && parseFloat(value) != 0;
+}
+function checkAccountReamrk(value) {
+	return /^.{0,20}$/.test(value);
+}
+/*end*/
+
+/*start commodity manager check*/
+function checkCommodityPrice(price) {
+	return (!isNaN(price))&&/^.{1,7}$/.test(price);
+}
+function checkCommodityName(price) {
+	return /^.{1,20}$/.test(price);
+}
+/*end*/

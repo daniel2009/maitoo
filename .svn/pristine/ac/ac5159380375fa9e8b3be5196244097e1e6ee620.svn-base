@@ -1,0 +1,62 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="gonggaoid" value="${param.gonggaoid }" />
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">修改公告
+			<a  href="#" id="a_back_gongao_list_link">返回列表</a>
+				
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">修改公告信息</div>
+			<div class="content_text">
+			
+		
+				<div class="tab-content" id="tab2">
+		          <form action="#" method="post" onSubmit="return false">
+		            <fieldset>
+			            <p>
+			              <label style="display: inline;">公告标题：</label>
+			              <input class="text-input small-input" type="text" name="title" />
+			              <span class="gl_message">*</span>
+			            </p>
+			            <!--  <p>
+			              <label style="display: inline;">添加人：</label>
+			              <input class="text-input small-input" type="text" name="author" />
+			              <span class="gl_message">*</span>
+			            </p>-->
+			            <p>
+			              <label style="display: inline;">公告内容：</label>
+			              <textarea rows="20" cols="16" name="content" ></textarea>
+			              <span class="gl_message">*</span>
+			            </p>
+			            <!-- <p>
+			            	<label style="display: inline;">&nbsp;&nbsp;&nbsp;照&nbsp;&nbsp;&nbsp;片：</label>
+			            	<input class="text-input small-input" type="file" name="pic"/>
+			            </p> -->
+			            <p style="margin-left: 50px;">
+			              <input id="bt_modify_gonggao" class="button" type="submit" value="修改" />
+			              <!-- <input id="bt_add_news_reset" class="button" type="reset" value="重置"/> -->
+			            </p>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+		</div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav423Data();
+	});
+</script>
+</html>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.Send_UserDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.Send_User">
+		<id column="id" property="id" javaType="String" />
+		<result column="phone" property="phone" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="address" property="address" javaType="String" />
+		<result column="dist" property="dist" javaType="String" />
+		<result column="city" property="city" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="company" property="company" javaType="String" />
+		<result column="email" property="email" javaType="String" />
+		<result column="zipcode" property="zipcode" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="use_state" property="useState" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		
+
+		
+	</resultMap>
+	
+	<select id="getById" resultMap="basic_result_map">
+		select * from `send_users` where id=#{id}
+	</select>
+
+	<insert id="insertSendUser" parameterType="com.meitao.model.Send_User"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		send_users(phone,name,address,dist,city,state,company,email,zipcode,create_date,modify_date,use_state,user_id)
+		values(#{phone},#{name},#{address},#{dist},#{city},#{state},#{company},#{email},#{zipcode},#{createDate},#{modifyDate},#{useState},#{userId})
+	</insert>
+	
+	
+	<select id="countOfSendUser" parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		select count(*) from `send_users`
+		<where>
+			<if test="info!=null and info!=''">
+				`send_users`.phone like #{info} or `send_users`.name like #{info} or `send_users`.company like #{info} or `send_users`.email like #{info}
+			</if>
+		</where>
+	</select>
+	
+
+	<select id="searchSendUser" resultMap="basic_result_map">
+		select `send_users`.* from send_users
+		<where>
+			<if test="info!=null and info!=''">
+				`send_users`.phone like #{info} or `send_users`.name like #{info} or `send_users`.company like #{info} or `send_users`.email like #{info}
+			</if>
+		</where>
+		order by `send_users`.modify_date desc
+		limit #{index},#{size}
+	</select>
+	
+	<update id="updateSuser" parameterType="com.meitao.model.Send_User">
+		update `send_users`
+		set name=#{name}, phone=#{phone} ,
+		address=#{address} ,dist=#{dist} ,
+		city=#{city} ,
+		state=#{state} , zipcode=#{zipcode}
+		, modify_date=#{modifyDate}, 
+		`email`=#{email},
+		`company`=#{company}
+		where id=#{id} 
+		<if test="userId!=null and userId!=''">
+			and user_id=#{userId}
+		</if>
+		
+	
+	</update>
+	
+</mapper>

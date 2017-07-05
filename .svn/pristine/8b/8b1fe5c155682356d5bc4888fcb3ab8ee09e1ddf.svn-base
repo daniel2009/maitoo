@@ -1,0 +1,187 @@
+function loadNav51Data() {
+	// 获取留言列表	
+	loadlyinfo("1");
+	
+	$("#datatable tfoot a").click(function() {
+	// 跳页
+		var pn = $(this).attr("href");
+		loadlyinfo(pn);
+		return false;
+	});
+
+	$("#datatable tfoot input").keydown(function(event) {
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				loadlyinfo(pn);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});		
+}
+
+function loadlyinfo(pn) {
+	$.ajax({
+		type:"get",
+		url: "../message/getcount",
+		data:{
+			"pageIndex":pn
+		},
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				$("#totalReplyMessage").html(response.data.count);
+			} else if ("607" == code) {
+				window.location.href = "login.jsp";
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+	$.ajax({
+		type:"get",
+		url:message_search_url,
+		data:{
+			"pageIndex":pn
+		},
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				
+				showlylist(response.data.datas);
+				showpagesplit(response.data);
+				aftershowly();
+				
+			} else if ("607" == code) {
+				window.location.href = "login.jsp";
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+function showChildMsg(list,id) {
+	var str = "<div name='child_msg' id='" + id + "'><hr/>";
+	if (list != null) {
+		$.each(list, function(){
+			var strc = "<strong>" + this.userName + "</strong>：" + this.content + "<hr/>";
+			str += "<div style='margin:5px;'>" + strc + "</div>";
+		});
+	}
+	str += "回复：<textarea name='add_msg' cols='25' rows='3'></textarea>" +
+			"<input name='bt_add_msg' class='button' value='提交' type='submit'/>" +
+			"<input name='bt_cancel' type='button' value='取消' class='button'/>";
+	str += "</div>";
+	return str;
+}
+
+function showlylist(list) {
+	if (list != null && list.length > 0) {
+		$("#datatable tbody").html("");
+		$.each(list,function(){
+			var count = 0;
+			if(this.replyMessages.length == 0){
+				count = 1;
+			}
+			for(var i = 0; i < this.replyMessages.length; i++){
+				if(this.replyMessages[i].userId == this.userId){
+					count ++;
+					continue;
+				}else{
+					break;
+				}
+			}
+			var countView = "";
+			if(count != 0){
+				countView = "<span style='margin: 0 3px; color: #f00;'>(" + count + ")</span>";
+			}
+			str += "<tr>";
+			var str = "<tr><td><a href='" + this.id + "' name='a_back_msg_link'>回复</a>" + countView + "</td>";
+			str += "<td>" + this.id + "</td>";
+			var content = "<strong>" + this.userName + "</strong>：&nbsp;" + this.content;
+			str += "<td style='text-align:left'>" + content + showChildMsg(this.replyMessages,this.id) + "</td>";
+			str += "<td>" + this.createDate + "</td>";
+			str += "<td>" + this.modifyDate + "</td></tr>";
+			$("#datatable tbody").append(str);
+		});
+	}
+}
+
+function showpagesplit(pageSplit) {
+	var rowCount = pageSplit.rowCount;
+	var pageSize = pageSplit.pageSize;
+	var pageNow = pageSplit.pageNow;
+	var pageCount = pageSplit.pageCount;
+	$("#trsize").html(rowCount);
+	$("#tpsize").html(pageCount);
+	$("#first_page").attr("href","1");
+	$("#pre_page").attr("href", pageNow - 1);
+	$("#next_page").attr("href",pageNow + 1);
+	$("#last_page").attr("href", pageCount);
+	$("#datatable tfoot input").val(pageNow);
+}
+
+function aftershowly() {
+	var divshow = true;
+	$("div[name='child_msg']").hide();
+	$("a[name='a_back_msg_link']").click(function(){
+		var el = $(this).parent().parent().find("div[name='child_msg']");
+		if (divshow) {
+			el.show();
+			divshow = false;
+		} else {
+			el.hide();
+			divshow = true;
+		}
+		return false;
+	});
+	$(":input[name='bt_cancel']").click(function(){
+		$(this).parent().parent().find("div[name='child_msg']").hide();
+		return false;
+	});
+	$(":input[name='bt_add_msg']").click(function(){
+		var id = $(this).parent().attr("id");
+		var msg = $(this).parent().find("textarea").val();
+		savemsg(id,msg);
+		return false;
+	});
+}
+
+function savemsg(pid,content) {
+	$.ajax({
+		type:"post",
+		url:message_add_url,
+		data:{
+			"content":content,
+			"pid":pid
+		},
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				alert("操作成功");
+				nav51Click();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("操作失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+function savemsgclick() {
+	var content = $("textarea[name='newcontent']").val();
+	if(content==null||content==""){
+		alert("请输入留言信息后再点新增留言按钮提交留言！");
+		return;
+	}
+	savemsg("",content);
+}
+

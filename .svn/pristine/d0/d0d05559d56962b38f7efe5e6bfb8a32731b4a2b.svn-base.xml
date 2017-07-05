@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.OrderMidfixDao">
+	<resultMap id="basic_result_map" type="com.weiye.model.OrderMidfix">
+		<id column="id" property="id" javaType="String" />
+		<result column="order_midfix" property="orderMidfix" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+	</resultMap>
+	<insert id="inserOrderMidfix" parameterType="com.weiye.model.OrderMidfix"
+		useGeneratedKeys="true" keyProperty="id">
+	intsert into
+	order_midfix(order_midfix,state)
+	value(#{orderMidfix},#{state})
+	</insert>
+	
+	<select id="findOrderMidfixByState" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select order_midfix.*
+		from
+		order_midfix
+		where order_midfix.state=#{state} order by rand() limit 1
+	</select>
+	<update id="updateOrderMidfix" parameterType="com.weiye.model.OrderMidfix">
+		update order_midfix
+		set
+		state=#{state,jdbcType=VARCHAR}
+		where order_midfix=#{orderMidfix}
+	</update>
+</mapper>

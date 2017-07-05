@@ -1,0 +1,5771 @@
+package com.weiye.controller;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import jxl.common.Logger;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.weiye.common.composepics.imgcompose;
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.OrderFreightConstant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.filezip.basiczip;
+import com.weiye.common.kuaidi.KuaiDi;
+import com.weiye.common.kuaidi.KuaiDi100;
+import com.weiye.common.kuaidi.KuaiDiUtil;
+import com.weiye.common.util.ConsigneeInfoUtil;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.OrderUtil;
+import com.weiye.common.util.PropertiesReader;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.UserUtil;
+import com.weiye.dao.globalargsDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ConsigneeInfo;
+import com.weiye.model.DaoHuoYuBao;
+import com.weiye.model.Order;
+import com.weiye.model.OrderDetail;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.Route;
+import com.weiye.model.SumCommodity;
+import com.weiye.model.User;
+import com.weiye.model.WayBill;
+import com.weiye.model.temp.ExportOrder;
+import com.weiye.model.temp.ImportOrder;
+import com.weiye.service.ConsigneeInfoService;
+import com.weiye.service.OrderService;
+import com.weiye.service.UserService;
+import com.weiye.model.temp.ImportthirdOrder;
+
+@Controller
+public class OrderController extends BasicController {
+
+	private static final long serialVersionUID = -4373989587460568712L;
+	private static final Logger log = Logger.getLogger(OrderController.class);
+	@Resource(name = "orderService")
+	private OrderService orderService;
+	@Resource(name = "userService")
+	private UserService userService;
+	
+	
+	@Resource(name = "consigneeInfoService")
+	private ConsigneeInfoService consigneeInfoService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+	@Value(value = "${order.output.templets}")
+	private String orderOutputTempletsFile;
+	@Value("${order.gather.output.templets}")
+	private String orderGatherOutputTempletsFile;
+	@Value(value = "${order.import.templets}")
+	private String orderImportTempletsFile;
+	
+	
+
+	@Value(value = "${order.import.WeiyiordersTemplets}")
+	private String orderImportWeiyiordersTempletsFile;
+	
+	@Value(value = "${order.import.WeiyithirdordersTemplets}")
+	private String orderImportWeiyithirdordersTempletsFile;
+	
+	@Value(value = "${order.import.meitaothirdordersTemplets}")
+	private String orderImportmeitaoithirdordersTempletsFile;
+	
+	@Value(value = "${order.import.flightexampleTemplets}")
+	private String orderImportflightexampleTempletsFile;
+	
+	@Value(value = "${order.import.WeiyiordersstateTemplets}")
+	private String orderImportWeiyiordersstateTempletsFile;
+	
+	
+	@Value(value = "${order.import.orderidtoseanoTemplets}")
+	private String orderImportordertoseanoTempletsFile;
+	
+	@Value(value = "${order.import.seanomodifystateTemplets}")
+	private String orderImportseanomodifystateTempletsFile;
+
+	@Value("${order.output.to.meitao.templets}")
+	private String orderOutputToMeitaoTempletsFile;
+
+	@Value("${order.output.to.dcs.templets}")
+	private String orderOutputToDcsTempletsFile;
+
+	@Value("${order.output.to.weiyi.wrongthird.templets}")
+	private String orderOutputToWeiyiWrongthirdTempletsFile;
+	
+	@Value("${order.output.to.weiyi.templets}")
+	private String orderOutputToWeiyiTempletsFile;
+	
+	@Value("${order.output.to.zhonghhua.templets}")
+	private String orderOutputToZhonghuaTempletsFile;
+	
+	@Value("${order.output.to.state.result.templets}")
+	private String orderOutputToStateResultTempletsFile;
+	
+	@Value("${order.output.to.seano.state.result.templets}")
+	private String orderOutputToSeanoStateResultTempletsFile;
+	
+	@Value("${order.output.to.orderidtoseano.result.templets}")
+	private String orderOutputToOrderidtoseanoResultTempletsFile;
+	
+	@Value("${order.output.to.meitaonew.templets}")
+	private String orderOutputToMeitaonewTempletsFile;
+	
+
+	@Value("${order.output.to.internal.templets}")
+	private String orderOutputToInternalTempletsFile;
+
+	@Value("${order.output.to.internal.Gather.templets}")
+	private String orderOutputToInternalGatherTempletsFile;
+
+	@Value(value = "${default_img_size}")
+	private long defaultCardFileSize;
+	@Value(value = "${save_card_dir}")
+	private String saveCardDir;
+	@Value(value = "${default_img_type}")
+	private String defaultCardFileType;
+	
+	@Value(value = "${default_excel_type}")
+	private String defaultExcelFileType;
+
+	
+	@Value("${order.downloadandupload.use.company.example}")
+	private String ordermodeexample;
+	
+	
+	@Autowired
+	private globalargsDao globalargsDao;
+	
+	
+	
+	/*
+	 * @RequestMapping(value = "/order/modify_cardid", method = {
+	 * RequestMethod.POST })
+	 * 
+	 * @ResponseBody public ResponseObject<Object> modifyCardId(
+	 * HttpServletRequest request,
+	 * 
+	 * @RequestParam(value = "oid") String orderId,
+	 * 
+	 * @RequestParam(value = "cid", required = false, defaultValue = "") String
+	 * cid,
+	 * 
+	 * @RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required =
+	 * false) MultipartFile file) { if (orderId==null||orderId.equals("")) {
+	 * return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+	 * "运单号不正确，请重新输入!"); }
+	 * 
+	 * if (!ConsigneeInfoUtil.validateCardId(cid)) { return
+	 * generateResponseObject(ResponseCode.PARAMETER_ERROR,
+	 * "7身份证号码填写错误，请重新填写！"); }
+	 * 
+	 * String fileName = null; if (file != null && file.getSize() > 0) { if
+	 * (file.getSize() > this.defaultCardFileSize) { return
+	 * generateResponseObject(ResponseCode.PARAMETER_ERROR, "图像文件过大,请重新尝试!"); }
+	 * 
+	 * String originalName = file.getOriginalFilename(); int index =
+	 * originalName.lastIndexOf('.'); index = Math.max(index, 0); fileName =
+	 * this.saveCardDir + File.separator + orderId + "_" +
+	 * StringUtil.generateRandomString(5) + "_" +
+	 * StringUtil.generateRandomInteger(5) + originalName.substring(index); try
+	 * { File file1 = new
+	 * File(request.getSession().getServletContext().getRealPath("/") +
+	 * fileName); file.transferTo(file1); } catch (Exception e) {
+	 * log.error("保存用户图像失败！", e); return
+	 * generateResponseObject(ResponseCode.SHOW_EXCEPTION, "上传失败，请重试或者联系客服!"); }
+	 * }
+	 * 
+	 * try { return this.orderService.modifyCardIdAndUrl(orderId,cid,fileName);
+	 * } catch (Exception e) { log.error("上传身份证失败", e); return
+	 * generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+	 * "上传身份证失败，请重新尝试或者联系客服！"); } }
+	 */
+
+	@RequestMapping(value = "/order/modify_cardid", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyCardId(
+			HttpServletRequest request,
+			@RequestParam(value = "oid") String orderId,
+			@RequestParam(value = "cid", required = false, defaultValue = "") String cid,
+			@RequestParam(value = "cardidname", required = false, defaultValue = "") String cardidname,
+			@RequestParam(value = "cphone", required = false, defaultValue = "") String cphone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+		if (orderId == null || orderId.equals("")) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"运单号不正确，请重新输入!");
+		}
+
+		if (!ConsigneeInfoUtil.validateCardId(cid)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"身份证号码填写错误，请重新填写！");
+		}
+		// String b=aa.substring(aa.length()-n,aa.length());
+		if ((cardidname == null) || (cardidname.equals(""))) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"收件人姓名不能为空!");
+		}
+
+		if ((cphone == null) || (cphone.equals(""))) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"电话号码不能为空!");
+		} else {
+			if (cphone.length() < 6) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"电话号码不能少于6位!");
+			} else {
+				cphone = cphone.substring(cphone.length() - 6, cphone.length());
+			}
+		}
+
+		if ((file == null) || (fileother == null)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"必须上传身份证正反两面的图片!");
+		}
+
+		/*
+		 * try { Order order = this.orderService.getRecvNameByOrderId(orderId);
+		 * if (order != null) { return
+		 * generateResponseObject(ResponseCode.ORDER_RECEIVER_ERROR,
+		 * "没有该单号或收件人有误。"); }
+		 * 
+		 * if(order.getcName()==null||order.getcName()==""
+		 * ||order.getcName()!=cardidname) { return
+		 * generateResponseObject(ResponseCode.ORDER_RECEIVER_ERROR,
+		 * "没有该单号或收件人有误。"); } } catch (Exception e) { log.error("没有该单号或收件人有误。",
+		 * e); return generateResponseObject(ResponseCode.ORDER_RECEIVER_ERROR,
+		 * "没有该单号或收件人有误。"); }
+		 */
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator = "";
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+
+		String fileName = null;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + cid + cardidname + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		}
+
+		String fileNameother = null;
+		if (fileother != null && fileother.getSize() > 0) {
+			if (fileother.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = fileother.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileNameother = this.saveCardDir + strseparator + cid + cardidname
+					+ "_" + StringUtil.generateRandomString(5) + "_" + "other"
+					+ "_" + StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			String temp = originalName.substring(index);
+			try {
+				File file2 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother);
+				fileother.transferTo(file2);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		}
+
+		String filecardtemp = "";
+		if ((fileName != null) && (fileNameother != null)) {
+			imgcompose img = new imgcompose();
+			String str1 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileName;
+			String str2 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileNameother;
+			String str3 = this.saveCardDir + File.separator + cid + cardidname
+					+ "_" + StringUtil.generateRandomString(5) + "_"
+					+ "together" + "_" + StringUtil.generateRandomInteger(5);
+
+			filecardtemp = str3;
+			str3 = request.getSession().getServletContext().getRealPath("/")
+					+ str3;
+			if (img.createcompics(str1, str2, str3)) {
+				filecardtemp = filecardtemp + ".jpg";
+			}
+		}
+
+		try {
+			return this.orderService.modifyCardIdAndUrl(orderId, cid,
+					cardidname, cphone, fileName, fileNameother, filecardtemp);
+
+			// return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+			// "上传身份证失败，请重新尝试或者联系客服！");
+		} catch (Exception e) {
+			log.error("上传身份证失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"上传身份证失败，请重新尝试或者联系客服！");
+		}
+
+	}
+
+	/**
+	 * 第一步检测提交的所有转运单号对应的数据是否以及进行预提交或者是已经提交过了，如果是，则直接返回。否则进行第二步.<br/>
+	 * 第二步，根据不同的请求类型，预拆包，合包进行不同的操作<br/>
+	 * 
+	 * @param request
+	 * @param wayBill
+	 * @return
+	 */
+	@RequestMapping(value = "/order/submit", method = { RequestMethod.GET,
+			RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<List<String>> submissionWaybill(
+			HttpServletRequest request, WayBill wayBill) {
+		
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+		}
+		if (wayBill == null || wayBill.getOrders() == null
+				|| wayBill.getOrders().isEmpty()) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		for (Order order : wayBill.getOrders()) {
+			if (order.getDetails() == null || order.getDetails().length == 0) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"运单至少包含一个转运单信息");
+			}
+		}
+
+		try {
+			ResponseObject<List<String>> responseObj = new ResponseObject<List<String>>();
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			String userName = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_NICK_NAME_SESSION_KEY));
+			String userType = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_TYPE_SESSION_KEY));
+			wayBill.setUserId(userId);
+			wayBill.setName(userName);
+			wayBill.setUserType(userType);
+			wayBill.setOrderType(Constant.ORDER_TYPE_WEB);
+			
+
+			ResponseObject<Object> result = null;
+			result = this.orderService.checkNoSubmit(wayBill,storeid);
+			if (result != null
+					&& ResponseCode.SUCCESS_CODE.equals(result.getCode())) {
+				// 数据正确, 进行运单/订单添加到数据中
+
+				responseObj = this.orderService.addOrdersOfWayBill(wayBill);
+			}
+
+			responseObj.setCode(result.getCode());
+			responseObj.setMessage(result.getMessage());
+			return responseObj;
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+
+	/*
+	 * @RequestMapping(value = "/order/online_submit", method = {
+	 * RequestMethod.GET, RequestMethod.POST })
+	 * 
+	 * @ResponseBody public ResponseObject<Map<String, String>>
+	 * submitionWaybillOfOnline(HttpServletRequest request, Order order) { if
+	 * (order == null) { return
+	 * generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效"); }
+	 * 
+	 * if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) { return
+	 * generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+	 * "手机号码填写不正确，请重新输入！"); }
+	 * 
+	 * String userId =
+	 * StringUtil.obj2String(request.getSession().getAttribute(Constant
+	 * .USER_ID_SESSION_KEY)); order.setUserId(userId); if
+	 * (!OrderUtil.validateOnlinejOrder(order)) { return
+	 * generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效"); }
+	 * 
+	 * if(order.getCardUrl()!=null&&order.getCardUrl()!=""){
+	 * 
+	 * Date date=new Date(); SimpleDateFormat sdf=new
+	 * SimpleDateFormat("yyyyMMdd"); String nowtime = sdf.format(date); String
+	 * fileName = null; order.setCardUrl(order.getCardUrl().substring(1));
+	 * order.setCardUrl(order.getCardUrl().replace("\\", "/")); int index =
+	 * order.getCardUrl().lastIndexOf('.');
+	 * 
+	 * File oldfile = new
+	 * File(request.getSession().getServletContext().getRealPath("/") +
+	 * order.getCardUrl()); //File oldfile = new File(
+	 * "C:\\apache-tomcat-7.0.56\\webapps\\weiye\\resources/pics/card_mkBwb_69405.jpg"
+	 * ); if (oldfile.exists()) { fileName = this.saveCardDir + File.separator
+	 * +nowtime+"_"+ userId+"_" +
+	 * StringUtil.generateRandomString(5)+order.getCardUrl().substring(index);
+	 * File newfile = new
+	 * File(request.getSession().getServletContext().getRealPath("/") +
+	 * fileName); try { OrderUtil.fileChannelCopy(oldfile, newfile);
+	 * order.setCardUrl(fileName); } catch (Exception e) { order.setCardUrl("");
+	 * e.getStackTrace(); } }else {
+	 * log.error(request.getSession().getServletContext().getRealPath("/")
+	 * +order.getCardUrl()+"文件不存在"); order.setCardUrl(""); } } try {
+	 * 
+	 * order.setState(Constant.ORDER_STATE0);
+	 * order.setType(Constant.ORDER_TYPE_ONLINE);
+	 * order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+	 * 
+	 * return this.orderService.addOrderOfOnline(order); } catch (Exception e) {
+	 * log.error("提交运单失败", e); return
+	 * generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败"); } }
+	 */
+
+	@RequestMapping(value = "/order/online_submit", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> submitionWaybillOfOnline(
+			HttpServletRequest request, Order order) {
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+		order.setUserId(userId);
+		if (!OrderUtil.validateOnlinejOrder(order)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		/*
+		 * if(order.getDetails()==null){ return
+		 * generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单中必须输入商品信息");
+		 * }
+		 */
+
+		try {
+			// kai 20150911-1 modify
+			if (order.getCardurl() != "" && (order.getCardurl() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurl(), "UTF-8");
+				order.setCardurl(str);
+			}
+			if (order.getCardurlother() != ""
+					&& (order.getCardurlother() != null))// 进行解码
+			{
+				String str = URLDecoder
+						.decode(order.getCardurlother(), "UTF-8");
+				order.setCardurlother(str);
+			}
+			if (order.getCardurltogether() != ""
+					&& (order.getCardurltogether() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurltogether(),
+						"UTF-8");
+				order.setCardurltogether(str);
+			}
+
+			order.setState(Constant.ORDER_STATE__10);
+			order.setType(Constant.ORDER_TYPE_ONLINE);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+			// kai 20150911
+			return this.orderService.addOrderOfOnlinebyuser(order);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+
+	/*
+	 * 用于用户在线提交时，包含图片的处理方式 //kai 20160224
+	 */
+	@RequestMapping(value = "/order/online_pic_submit", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> addonlineorderhavepic(
+			HttpServletRequest request,
+			// @RequestParam(value = "userId") String userId,//保存地址的用户id
+			@RequestParam(value = "cName", required = false, defaultValue = "") String cName,
+			@RequestParam(value = "cProvince", required = false, defaultValue = "") String cProvince,
+			@RequestParam(value = "cCity", required = false, defaultValue = "") String cCity,
+			@RequestParam(value = "cDistrict", required = false, defaultValue = "") String cDistrict,
+			@RequestParam(value = "cStreetAddress", required = false, defaultValue = "") String cStreetAddress,
+			@RequestParam(value = "cPhone", required = false, defaultValue = "") String cPhone,
+			@RequestParam(value = "cZipCode", required = false, defaultValue = "") String cZipCode,
+
+			@RequestParam(value = "commodityName", required = false, defaultValue = "") String[] commodityName,
+			@RequestParam(value = "commodifyxiangqing", required = false, defaultValue = "") String[] commodifyxiangqing,
+			@RequestParam(value = "commodifyQuantity", required = false, defaultValue = "") String[] commodifyQuantity,
+			@RequestParam(value = "commodifybrands", required = false, defaultValue = "") String[] commodifybrands,
+
+			@RequestParam(value = "mail", required = false, defaultValue = "") String mail,
+			@RequestParam(value = "parceValue", required = false, defaultValue = "") String parceValue,
+			@RequestParam(value = "remark", required = false, defaultValue = "") String remark,
+			
+			@RequestParam(value = "weight", required = false, defaultValue = "") String weight,
+			@RequestParam(value = "tariff", required = false, defaultValue = "") String tariff,
+			@RequestParam(value = "premium", required = false, defaultValue = "") String premium,
+			
+			@RequestParam(value = "sendname", required = false, defaultValue = "") String sendname,
+			@RequestParam(value = "sendphone", required = false, defaultValue = "") String sendphone,
+
+			@RequestParam(value = "warehouse", required = false, defaultValue = "") String warehouse,
+			@RequestParam(value = "channelidname", required = false, defaultValue = "") String cid,
+			
+			@RequestParam(value = "addaddressflag", required = false, defaultValue = "") String addaddressflag,//是否保存收件人地址
+
+			@RequestParam(value = "cardidname", required = false, defaultValue = "") String cardid,
+			@RequestParam(value = "idurlcard", required = false, defaultValue = "") String cardurl,// 身份证正面原路径
+			@RequestParam(value = "idurlcardother", required = false, defaultValue = "") String cardurlother,// 身份证反面原路径
+			@RequestParam(value = "idurlcardtogether", required = false, defaultValue = "") String cardurltogether,// 身份证合成原路径
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+
+		// orderCommoditys:details,
+		Order order = new Order();
+		order.setcName(cName);
+		order.setcProvince(cProvince);
+		order.setcCity(cCity);
+		order.setcDistrict(cDistrict);
+		order.setcStreetAddress(cStreetAddress);
+		order.setcPhone(cPhone);
+		order.setcZipCode(cZipCode);
+		order.setCardid(cardid);
+		OrderDetail[] details;
+
+		order.setWarehouseId(warehouse);
+		order.setChannelId(cid);
+		order.setWeight(weight);
+		order.setPremium(premium);
+		order.setTariff(tariff);
+
+		details = new OrderDetail[commodityName.length];
+		for (int i = 0; i < commodityName.length; i++) {
+			details[i] = new OrderDetail();
+			details[i].setCommodityId(commodityName[i]);
+			details[i].setQuantity(commodifyQuantity[i]);
+			details[i].setXiangqing(commodifyxiangqing[i]);
+			details[i].setBrands(commodifybrands[i]);
+		}
+		order.setDetails(details);
+
+		order.setMail(mail);
+		order.setParceValue(parceValue);
+		order.setRemark(remark);
+		order.setCardid(cardid);
+		
+
+		order.setSenduserName(sendname);
+		order.setSenduserphone(sendphone);
+
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+
+		// 处理提交上来的图片
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator = "";
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+
+		String fileName = null;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+				fileName = null;
+			} else {
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ cardurl);
+				if (file3.exists()) {
+					fileName = cardurl;
+				} else {
+					fileName = null;
+				}
+			}
+		}
+		order.setCardurl(fileName);
+		String fileNameother = null;
+		if (fileother != null && fileother.getSize() > 0) {
+			if (fileother.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = fileother.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileNameother = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file2 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother);
+				fileother.transferTo(file2);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurlother == null) || cardurlother.equalsIgnoreCase("")) {
+				fileNameother = null;
+			} else {
+				// fileNameother = cardurlother;
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ cardurlother);
+				if (file3.exists()) {
+					fileNameother = cardurlother;
+				} else {
+					fileNameother = null;
+				}
+			}
+		}
+		order.setCardurlother(fileNameother);
+
+		// kai 20150921 合成图片
+		String fileNametogether = null;
+		if ((fileName != null) && (fileNameother != null)) {
+			imgcompose img = new imgcompose();
+			String str1 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileName;
+			String str2 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileNameother;
+			String str3 = this.saveCardDir + File.separator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "together"
+					+ "_" + StringUtil.generateRandomInteger(5);
+			String filecardtemp = str3;
+			str3 = request.getSession().getServletContext().getRealPath("/")
+					+ str3;
+			if (img.createcompics(str1, str2, str3)) {
+				filecardtemp = filecardtemp + ".jpg";
+
+				fileNametogether = filecardtemp;
+			}
+		}
+
+		if (fileNametogether == null) {
+			order.setCardurltogether(cardurltogether);
+		} else {
+			order.setCardurltogether(fileNametogether);
+		}
+
+		// URLdecode.(citylist.get(i).getCityName(),"utf-8");
+
+		order.setUserId(userId);
+		if (!OrderUtil.validateOnlinejOrder(order)) {
+
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (order.getDetails() == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"运单中必须输入商品信息");
+		}
+
+		try {
+			if (order.getCardurl() != "" && (order.getCardurl() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurl(), "UTF-8");
+				order.setCardurl(str);
+			}
+
+			order.setState(Constant.ORDER_STATE__10);
+			order.setType(Constant.ORDER_TYPE_ONLINE);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+
+			//要保存提交的收件地址
+			if((addaddressflag!=null)&&(addaddressflag.equalsIgnoreCase("1")))
+			{
+				ConsigneeInfo consigneeInfo = new ConsigneeInfo();
+				consigneeInfo.setUserId(order.getUserId());
+				consigneeInfo.setName(order.getcName());
+				consigneeInfo.setProvince(order.getcProvince());
+				consigneeInfo.setCity(order.getcCity());
+				consigneeInfo.setDistrict(order.getcDistrict());
+				consigneeInfo.setStreetAddress(order.getcStreetAddress());
+				consigneeInfo.setPhone(order.getcPhone());
+				consigneeInfo.setTelephone(order.getcPhone());
+				consigneeInfo.setZipCode(order.getcZipCode());
+				consigneeInfo.setCardId(order.getCardid());
+				consigneeInfo.setCardUrl(order.getCardurl());
+				consigneeInfo.setCardurlother(order.getCardurlother());
+				consigneeInfo.setCardurltogether(order.getCardurltogether());
+				try{
+					this.consigneeInfoService.saveConsigneeInfo(consigneeInfo);
+				}
+				catch (Exception e) {//不影响其它操作
+				 
+				 }
+			}
+			
+			return this.orderService.addOrderOfOnlinebyuser(order);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+
+	}
+
+	/*
+	 * 用于用户在线提交时，包含图片的处理方式 //kai 20150911 kai 20150922 修改添加反面图片的情况
+	 */
+	@RequestMapping(value = "/admin/order/online_pic_modify_url", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> modifyonlineorderpicurl(
+			HttpServletRequest request,
+			@RequestParam(value = "orderidname", required = false, defaultValue = "") String ord,
+			@RequestParam(value = "idurlcard", required = false, defaultValue = "") String cardurl,// 身份证正面原路径
+			@RequestParam(value = "idurlcardother", required = false, defaultValue = "") String cardurlother,// 身份证反面原路径
+			@RequestParam(value = "idurlcardtogether", required = false, defaultValue = "") String cardurltogether,// 身份证合成原路径
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+
+		Order order = new Order();
+		try {
+
+			if (ord == null) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"参数无效");
+			}
+			// 处理提交上来的图片
+
+			// 解决火狐的反斜杠问题 kai 20151006
+			String filetype = this.defaultCardFileType;// 要上传的文件类型
+			String strtest = this.saveCardDir;
+			String strseparator = "";
+			if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+			{
+				strseparator = "/";
+			} else {
+				strseparator = File.separator;
+			}
+			String fileName = null;
+			if (file != null && file.getSize() > 0) {
+				if (file.getSize() > this.defaultCardFileSize) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+				}
+
+				String originalName = file.getOriginalFilename();
+
+				if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR,
+							"上传图像文件格式不对,请重新尝试!");
+				}
+
+				int index = originalName.lastIndexOf('.');
+				index = Math.max(index, 0);
+				fileName = this.saveCardDir + strseparator + ord + "_"
+						+ StringUtil.generateRandomString(5) + "_"
+						+ StringUtil.generateRandomInteger(5)
+						+ originalName.substring(index);
+				try {
+					File file1 = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ fileName);
+					file.transferTo(file1);
+				} catch (Exception e) {
+					log.error("保存用户图像失败,请不要上传图像！", e);
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR,
+							"保存用户图像失败，请去除上传图像后再尝试!");
+				}
+			} else {
+				if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+					fileName = null;
+				} else {
+					// fileName = cardurl;
+					File file3 = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ cardurl);
+					if (file3.exists()) {
+						fileName = cardurl;
+					} else {
+						fileName = null;
+					}
+				}
+			}
+			order.setCardurl(fileName);
+			String fileNameother = null;
+			if (fileother != null && fileother.getSize() > 0) {
+				if (fileother.getSize() > this.defaultCardFileSize) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+				}
+
+				String originalName = fileother.getOriginalFilename();
+				if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR,
+							"上传图像文件格式不对,请重新尝试!");
+				}
+
+				int index = originalName.lastIndexOf('.');
+				index = Math.max(index, 0);
+				fileNameother = this.saveCardDir + strseparator + ord + "_"
+						+ StringUtil.generateRandomString(5) + "_"
+						+ StringUtil.generateRandomInteger(5)
+						+ originalName.substring(index);
+				try {
+					File file2 = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ fileNameother);
+					fileother.transferTo(file2);
+				} catch (Exception e) {
+					log.error("保存用户图像失败,请不要上传图像！", e);
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR,
+							"保存用户图像失败，请去除上传图像后再尝试!");
+				}
+			} else {
+				if ((cardurlother == null) || cardurlother.equalsIgnoreCase("")) {
+					fileNameother = null;
+				} else {
+					// fileNameother = cardurlother;
+					File file3 = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ cardurlother);
+					if (file3.exists()) {
+						fileNameother = cardurlother;
+					} else {
+						fileNameother = null;
+					}
+				}
+			}
+			order.setCardurlother(fileNameother);
+
+			// kai 20150921 合成图片
+			String fileNametogether = null;
+			if ((fileName != null) && (fileNameother != null)) {
+				imgcompose img = new imgcompose();
+				String str1 = request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName;
+				String str2 = request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother;
+				String str3 = this.saveCardDir + File.separator + ord + "_"
+						+ StringUtil.generateRandomString(5) + "_" + "together"
+						+ "_" + StringUtil.generateRandomInteger(5);
+				String filecardtemp = str3;
+				str3 = request.getSession().getServletContext()
+						.getRealPath("/")
+						+ str3;
+				if (img.createcompics(str1, str2, str3)) {
+					filecardtemp = filecardtemp + ".jpg";
+
+					fileNametogether = filecardtemp;
+				}
+			}
+
+			if (fileNametogether == null) {
+				order.setCardurltogether(cardurltogether);
+			} else {
+				order.setCardurltogether(fileNametogether);
+			}
+
+			// order.setCardurl(fileName);
+			order.setOrderId(ord);
+
+			return this.orderService.modifyOrderonlinebyuserpicurl(order);
+
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+
+	}
+
+	/*
+	 * 网上置单的订单修改,不包含提交的图片//kai 20150911
+	 */
+
+	@RequestMapping(value = "/order/online_modify", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> modifyorderOfOnline(
+			HttpServletRequest request, Order order) {
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+
+		// URLdecode.(citylist.get(i).getCityName(),"utf-8");
+
+		order.setUserId(userId);
+		if (!OrderUtil.validateOnlinejOrder(order)) {
+
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (order.getDetails() == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"运单中必须输入商品信息");
+		}
+
+		try {
+			if (order.getCardurl() != "" && (order.getCardurl() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurl(), "UTF-8");
+				order.setCardurl(str);
+			}
+
+			if (order.getCardurlother() != ""
+					&& (order.getCardurlother() != null))// 进行解码
+			{
+				String str = URLDecoder
+						.decode(order.getCardurlother(), "UTF-8");
+				order.setCardurlother(str);
+			}
+			if (order.getCardurltogether() != ""
+					&& (order.getCardurltogether() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurltogether(),
+						"UTF-8");
+				order.setCardurltogether(str);
+			}
+
+			order.setState(Constant.ORDER_STATE__10);
+			order.setType(Constant.ORDER_TYPE_ONLINE);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+
+			// return this.orderService.addOrderOfOnline(order);
+			return this.orderService.modifyOrderonlinebyuser(order);
+		} catch (Exception e) {
+			log.error("修改运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改运单失败");
+		}
+	}
+
+	/*
+	 * 用于用户在线置单的修改时，包含图片的处理方式//kai 20150911 //kai 20160224
+	 */
+	@RequestMapping(value = "/order/online_pic_moddifyorder", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> modifyonlineuserorder(
+			HttpServletRequest request,
+			// @RequestParam(value = "userId") String userId,//保存地址的用户
+			@RequestParam(value = "modifyorderidname", required = false, defaultValue = "") String idmodifyorderid,
+			@RequestParam(value = "cName", required = false, defaultValue = "") String cName,
+			@RequestParam(value = "cProvince", required = false, defaultValue = "") String cProvince,
+			@RequestParam(value = "cCity", required = false, defaultValue = "") String cCity,
+			@RequestParam(value = "cDistrict", required = false, defaultValue = "") String cDistrict,
+			@RequestParam(value = "cStreetAddress", required = false, defaultValue = "") String cStreetAddress,
+			@RequestParam(value = "cPhone", required = false, defaultValue = "") String cPhone,
+			@RequestParam(value = "cZipCode", required = false, defaultValue = "") String cZipCode,
+			
+			@RequestParam(value = "weight", required = false, defaultValue = "") String weight,
+			@RequestParam(value = "tariff", required = false, defaultValue = "") String tariff,
+			@RequestParam(value = "premium", required = false, defaultValue = "") String premium,
+
+			@RequestParam(value = "commodityName", required = false, defaultValue = "") String[] commodityName,
+			@RequestParam(value = "commodifyxiangqing", required = false, defaultValue = "") String[] commodifyxiangqing,
+			@RequestParam(value = "commodifyQuantity", required = false, defaultValue = "") String[] commodifyQuantity,
+			@RequestParam(value = "commodifybrands", required = false, defaultValue = "") String[] commodifybrands,
+
+			@RequestParam(value = "mail", required = false, defaultValue = "") String mail,
+			@RequestParam(value = "parceValue", required = false, defaultValue = "") String parceValue,
+			@RequestParam(value = "remark", required = false, defaultValue = "") String remark,
+
+			@RequestParam(value = "warehouse", required = false, defaultValue = "") String warehouse,
+			@RequestParam(value = "channelidname", required = false, defaultValue = "") String cid,
+			
+			@RequestParam(value = "sendname", required = false, defaultValue = "") String sendname,
+			@RequestParam(value = "sendphone", required = false, defaultValue = "") String sendphone,
+			
+			@RequestParam(value = "addaddressflag", required = false, defaultValue = "") String addaddressflag,//是否保存收件人地址
+
+			@RequestParam(value = "cardidname", required = false, defaultValue = "") String cardid,
+			@RequestParam(value = "idurlcard", required = false, defaultValue = "") String cardurl,// 身份证正面原路径
+			@RequestParam(value = "idurlcardother", required = false, defaultValue = "") String cardurlother,// 身份证反面原路径
+			@RequestParam(value = "idurlcardtogether", required = false, defaultValue = "") String cardurltogether,// 身份证合成原路径
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+
+		if (idmodifyorderid.equalsIgnoreCase("")
+				|| idmodifyorderid.equalsIgnoreCase("null")) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		// orderCommoditys:details,
+		Order order = new Order();
+		order.setOrderId(idmodifyorderid);
+		order.setcName(cName);
+		order.setcProvince(cProvince);
+		order.setcCity(cCity);
+		order.setcDistrict(cDistrict);
+		order.setcStreetAddress(cStreetAddress);
+		order.setcPhone(cPhone);
+		order.setcZipCode(cZipCode);
+		order.setCardid(cardid);
+		OrderDetail[] details;
+		
+		order.setSenduserName(sendname);
+		order.setSenduserphone(sendphone);
+		
+		order.setWeight(weight);
+		order.setTariff(tariff);
+		order.setPremium(premium);
+
+		order.setWarehouseId(warehouse);
+		order.setChannelId(cid);
+
+		details = new OrderDetail[commodityName.length];
+		for (int i = 0; i < commodityName.length; i++) {
+			details[i] = new OrderDetail();
+			details[i].setCommodityId(commodityName[i]);
+			details[i].setQuantity(commodifyQuantity[i]);
+			details[i].setXiangqing(commodifyxiangqing[i]);
+			details[i].setBrands(commodifybrands[i]);
+		}
+		order.setDetails(details);
+
+		order.setMail(mail);
+		order.setParceValue(parceValue);
+		order.setRemark(remark);
+		order.setCardid(cardid);
+
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+
+		// 处理提交上来的图片
+
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator = "";
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+
+		String fileName = null;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+				fileName = null;
+			} else {
+				// fileName = cardurl;
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ cardurl);
+				if (file3.exists()) {
+					fileName = cardurl;
+				} else {
+					fileName = null;
+				}
+			}
+		}
+		order.setCardurl(fileName);
+
+		String fileNameother = null;
+		if (fileother != null && fileother.getSize() > 0) {
+			if (fileother.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = fileother.getOriginalFilename();
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileNameother = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file2 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother);
+				fileother.transferTo(file2);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurlother == null) || cardurlother.equalsIgnoreCase("")) {
+				fileNameother = null;
+			} else {
+				// fileNameother = cardurlother;
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ cardurlother);
+				if (file3.exists()) {
+					fileNameother = cardurlother;
+				} else {
+					fileNameother = null;
+				}
+			}
+		}
+		order.setCardurlother(fileNameother);
+
+		// kai 20150921 合成图片
+		String fileNametogether = null;
+		if ((fileName != null) && (fileNameother != null)) {
+			imgcompose img = new imgcompose();
+			String str1 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileName;
+			String str2 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileNameother;
+			String str3 = this.saveCardDir + File.separator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "together"
+					+ "_" + StringUtil.generateRandomInteger(5);
+			String filecardtemp = str3;
+			str3 = request.getSession().getServletContext().getRealPath("/")
+					+ str3;
+			if (img.createcompics(str1, str2, str3)) {
+				filecardtemp = filecardtemp + ".jpg";
+
+				fileNametogether = filecardtemp;
+			}
+		}
+
+		if (fileNametogether == null) {
+			order.setCardurltogether(cardurltogether);
+		} else {
+			order.setCardurltogether(fileNametogether);
+		}
+
+		// URLdecode.(citylist.get(i).getCityName(),"utf-8");
+
+		order.setUserId(userId);
+		if (!OrderUtil.validateOnlinejOrder(order)) {
+
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (order.getDetails() == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"运单中必须输入商品信息");
+		}
+
+		try {
+			if (order.getCardurl() != "" && (order.getCardurl() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurl(), "UTF-8");
+				order.setCardurl(str);
+			}
+
+			order.setState(Constant.ORDER_STATE__10);
+			order.setType(Constant.ORDER_TYPE_ONLINE);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+
+			// return this.orderService.addOrderOfOnline(order);
+			
+			
+			
+			//要保存提交的收件地址
+			if((addaddressflag!=null)&&(addaddressflag.equalsIgnoreCase("1")))
+			{
+				ConsigneeInfo consigneeInfo = new ConsigneeInfo();
+				consigneeInfo.setUserId(order.getUserId());
+				consigneeInfo.setName(order.getcName());
+				consigneeInfo.setProvince(order.getcProvince());
+				consigneeInfo.setCity(order.getcCity());
+				consigneeInfo.setDistrict(order.getcDistrict());
+				consigneeInfo.setStreetAddress(order.getcStreetAddress());
+				consigneeInfo.setPhone(order.getcPhone());
+				consigneeInfo.setTelephone(order.getcPhone());
+				consigneeInfo.setZipCode(order.getcZipCode());
+				consigneeInfo.setCardId(order.getCardid());
+				consigneeInfo.setCardUrl(order.getCardurl());
+				consigneeInfo.setCardurlother(order.getCardurlother());
+				consigneeInfo.setCardurltogether(order.getCardurltogether());
+				try{
+					this.consigneeInfoService.saveConsigneeInfo(consigneeInfo);
+				}
+				catch (Exception e) {//不影响其它操作
+				 
+				 }
+			}
+			return this.orderService.modifyOrderonlinebyuser(order);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+
+	}
+
+	@RequestMapping(value = "/order/online_submit_has_cardurl", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> submitionWaybillHasCardurlOfOnline(
+			HttpServletRequest request,
+			@RequestParam(value = "cName") String name,
+			@RequestParam(value = "cProvince") String province,
+			@RequestParam(value = "cCity") String city,
+			@RequestParam(value = "cDistrict") String district,
+			@RequestParam(value = "cStreetAddress") String sAdd,
+			@RequestParam(value = "cZipCode") String zcode,
+			@RequestParam(value = "cPhone") String phone,
+			@RequestParam(value = "cCardId", required = false) String cardId,
+			@RequestParam(value = "mail", required = false) String mail,
+			@RequestParam(value = "remark", required = false) String remark,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file) {
+
+		if (!ConsigneeInfoUtil.validateConsigneeName(name)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_NAME_ERROR,
+					"收货人姓名不正确，请重新输入!");
+		}
+
+		if (!ConsigneeInfoUtil.validateProvince(province)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_PROVINCE_ERROR, "省份填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCity(city)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CITY_ERROR,
+					"市填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateDistrict(district)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_DISTRICT_ERROR, "区填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateStreetAddress(sAdd)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_STREET_ADDRESS_ERROR,
+					"街道地址填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateZipCode(zcode)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_ZIP_CODE_ERROR, "邮编填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(phone)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator = "";
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+		String fileName = null;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		}
+
+		try {
+			Order order = new Order();
+			order.setState(Constant.ORDER_STATE0);
+			order.setType(Constant.ORDER_TYPE_ONLINE);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+			order.setCardUrl(fileName);
+			order.setCardId(cardId);
+			order.setcCity(city);
+			order.setcDistrict(district);
+			order.setcName(name);
+			order.setcPhone(phone);
+			order.setcProvince(province);
+			order.setcStreetAddress(sAdd);
+			order.setcZipCode(zcode);
+			order.setMail(mail);
+			order.setRemark(remark);
+			order.setParceValue("0");
+			order.setPremium("0");
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			order.setUserId(userId);
+			return this.orderService.addOrderOfOnline(order);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/order/get", method = { RequestMethod.GET,
+			RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<List<Order>> getOrdersByOrderId(
+			HttpServletRequest request,
+			@RequestParam(value = "oid") String[] orderIds,
+			@RequestParam(value = "state", required = false, defaultValue = "") String state) {
+		if (orderIds == null || orderIds.length == 0) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			ResponseObject<List<Order>> result = this.orderService
+					.getOrderListByOrderIds(Arrays.asList(orderIds));
+			if (result != null && !StringUtil.isEmpty(state)
+					&& ResponseCode.SUCCESS_CODE.equals(result.getCode())) {
+				for (Order o : result.getData()) {
+					if (!state.equals(o.getState())) {
+						return generateResponseObject(
+								ResponseCode.PARAMETER_ERROR,
+								o.getId()
+										+ "运单不属于您需要的"
+										+ OrderUtil.transformerState(0, state)
+										+ "状态，运单状态为:"
+										+ OrderUtil.transformerState(0,
+												o.getState()));
+					}
+				}
+			} else if (result.getData() == null || result.getData().isEmpty()) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"数据库中没有该id对应的运单数据" + Arrays.toString(orderIds));
+			}
+			return result;
+		} catch (Exception e) {
+			log.error("根据id获取订单列表失败");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"根据id获取订单列表出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/order/pay", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> payOrderMoney(HttpServletRequest request,
+			@RequestParam(value = "oid") String[] orderIds) {
+		try {
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			double totalMoney = 0;
+			double rmb = 0;
+			double usd = 0;
+			
+			double usdrate=0;
+			ResponseObject<String> obj=this.orderService.getCurUsaToCn();
+			if((obj.getCode()!=null)&&(obj.getCode().equalsIgnoreCase(ResponseCode.SUCCESS_CODE)))
+			{
+				if((obj.getData()!=null)&&(!obj.getData().equals("")))
+				{
+					String money00=obj.getData();
+					double dou = Double.parseDouble(money00);
+					if(dou>0)
+					{
+						usdrate=dou;
+					}
+				}
+			}
+			
+			List<String> array = new ArrayList<String>();
+			for (String orderId : orderIds) {
+				Order order = this.orderService.getOrderByOrderId(orderId)
+						.getData();
+				if (Constant.ORDER_STATE2.equals(order.getState())
+						&& order.getUserId().equals(userId)) {
+					
+					if(Double.valueOf(order.getTotalMoney())<0)
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+								"你的订单中存在费用小于0的运单！");
+					}
+					
+					totalMoney += Double.valueOf(order.getTotalMoney());
+				} else {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+							"该订单不是处于待付款状态或者该订单不属于您！");
+				}
+				rmb = StringUtil.string2Double(order.getUser().getRmbBalance());
+				usd = StringUtil.string2Double(order.getUser().getUsdBalance());
+				array.add(order.getId());
+			}
+
+			//String cur_usa_cn=this
+			
+			//if (hasPayMoney(usd, rmb, totalMoney)) {
+			if (hasPayMoneyusa(usd, rmb, usdrate,totalMoney)) {
+				double newusd = usd - totalMoney;
+				double newrmb = rmb; // 先用美元支付
+				if (newusd >= 0) {
+					// ignore
+				} else {
+					newusd = 0.0D; // 人民币余额全部支付，开始扣美元的钱
+					newrmb = new BigDecimal((rmb - (totalMoney - usd)*usdrate)).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+					if(newrmb<0)
+					{
+						return generateResponseObject(
+								ResponseCode.ORDER_PAY_ACCOUNT_NOT_MONEY, "帐户余额不足");
+					}
+				}
+				return this.orderService.pay(array, Arrays.asList(orderIds),
+						userId, String.valueOf(totalMoney), newrmb, newusd,
+						true);
+			} else {
+				return generateResponseObject(
+						ResponseCode.ORDER_PAY_ACCOUNT_NOT_MONEY, "帐户余额不足");
+			}
+		} catch (Exception e) {
+			log.error("付款失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"付款失败，请重新尝试");
+		}
+	}
+
+	@RequestMapping(value = "/order/search", produces = {"application/json;charset=UTF-8"}, method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<PageSplit<Order>> searchByKeyOfUser(
+			HttpServletRequest request,
+			@RequestParam(value = "oid", required = false) String oid,
+			@RequestParam(value = "state", required = false) String state,
+			@RequestParam(value = "queryLike", required = false) String queryLike,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+			String column = OrderUtil.getSearchColumnByType("0");
+			pageIndex = Math.max(pageIndex, 1);
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			
+			if(!"".equals(queryLike) && null != queryLike){
+//				return this.orderService.searchOrdersByKeys(queryLike, userId, oid,
+//						column, null, null, state,null,null, defaultPageSize, pageIndex);
+				return this.orderService.searchOrdersByLike(userId, queryLike, state, defaultPageSize, pageIndex);
+				
+			}else{
+				return this.orderService.searchOrdersByKeys(null, userId, oid,
+						column, null, null, state,null,null, defaultPageSize, pageIndex);
+			}
+				
+			
+		} catch (Exception e) {
+			log.error("查询运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+		}
+	}
+
+	@RequestMapping(value = "/order/show", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Order>> showOrders(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			pageIndex = Math.max(pageIndex, 1);
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			return this.orderService.searchOrdersByUserId(userId,
+					defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取订单列表出现异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取订单列表失败!");
+		}
+	}
+
+	@RequestMapping(value = "/route/get_by_guest", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, List<Route>>> getRouteByGuest(
+			HttpServletRequest request,
+			@RequestParam(value = "oid") String[] orderIds) {
+		if (orderIds == null || orderIds.length == 0) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			return this.orderService.getRouteListByGuestOrderId(Arrays
+					.asList(orderIds));
+		} catch (Exception e) {
+			log.error("获取运单失败");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/route/guest", method = { RequestMethod.GET,
+			RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> getRouteByThird(HttpServletRequest request,
+			@RequestParam(value = "kuaidi_type") String kuaidiType,
+			@RequestParam(value = "oids", required = false) String oids,
+			// @RequestParam(value = "third_no" , required = false) String
+			// thirdNo,
+			// @RequestParam(value = "third_pns", required = false) String
+			// thirdPns,
+			@RequestParam(value = "oid", required = false) String[] orderIds) {
+		try {
+			return this.orderService.getRouteListByGuest(kuaidiType, oids/*
+																		 * ,thirdNo
+																		 * ,
+																		 * thirdPns
+																		 */,
+					orderIds);
+		} catch (Exception e) {
+			log.error("获取运单失败");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/route/get_by_guest_from_dcs", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<List<Route>> getRouteByGuestFormDcs(
+			HttpServletRequest request, @RequestParam(value = "oid") String oid) {
+		if (oid == null || oid.equals("")) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		ResponseObject<Order> order;
+		try {
+			order = this.orderService.getOrderByOrderId(oid);
+		} catch (ServiceException e) {
+			return generateResponseObject(ResponseCode.ORDER_NUMBER_ERROR,
+					"获取运单异常，请稍后重试或者联系管理员");
+		}
+		if (order.getCode() != ResponseCode.SUCCESS_CODE) {
+			return generateResponseObject(ResponseCode.ORDER_NUMBER_ERROR,
+					"没有该运单");
+		}
+		ResponseObject<List<Route>> responseObject = new ResponseObject<List<Route>>(
+				ResponseCode.SUCCESS_CODE);
+		if (order.getData().getThirdNo() == null
+				|| order.getData().getThirdNo() == "") {
+			List<String> oids = new ArrayList<String>();
+			oids.add(oid);
+			ResponseObject<Map<String, List<Route>>> ro = null;
+			try {
+				ro = this.orderService.getRouteListByOrderId(oids);
+			} catch (ServiceException e) {
+				return generateResponseObject(ResponseCode.ORDER_NUMBER_ERROR,
+						"获取运单异常，请稍后重试或者联系管理员");
+			}
+			if (ro.getCode() == ResponseCode.SUCCESS_CODE) {
+				responseObject.setData(ro.getData().get(oid));
+				return responseObject;
+			} else {
+				return generateResponseObject(ro.getCode());
+			}
+		}
+		try {
+
+			List<Route> result = new ArrayList<Route>();
+			String content = KuaiDiUtil.SearchkuaiDiInfo(
+					Constant.KUAIDI_TYPE_DCS, order.getData().getThirdNo());
+			JSONObject json = JSONObject.fromObject(content);
+			System.out.println(content);
+			System.out.println(json.getString("code"));
+			// 0：物流单暂无结果，
+			// 1：查询成功，
+			if (json.getString("code").equals("1")) {
+				JSONArray ja = json.getJSONArray("data");
+				for (int i = 0; i < ja.size(); i++) {
+					JSONObject jo = (JSONObject) ja.get(i);
+					Route route = new Route();
+					route.setDate(jo.getString("time"));
+					route.setRemark(jo.getString("message"));
+					route.setState("");
+					result.add(route);
+				}
+			} else {
+				List<String> oids = new ArrayList<String>();
+				oids.add(oid);
+				ResponseObject<Map<String, List<Route>>> ro = this.orderService
+						.getRouteListByOrderId(oids);
+				if (ro.getCode() == ResponseCode.SUCCESS_CODE) {
+					responseObject.setData(ro.getData().get(oid));
+					return responseObject;
+				} else {
+					return generateResponseObject(ro.getCode());
+				}
+			}
+
+			responseObject.setData(result);
+			return responseObject;
+
+		} catch (Exception e) {
+			log.error("获取运单失败");
+			e.printStackTrace();
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/route/get_by_guest_from_meitao", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<String> getRouteByGuestFormMeitao(
+			HttpServletRequest request,
+			@RequestParam(value = "oids") String orderIds) {
+		if (orderIds == null || orderIds == "") {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			ResponseObject<String> responseObject = new ResponseObject<String>(
+					ResponseCode.SUCCESS_CODE);
+			String ret = KuaiDiUtil.SearchkuaiDiInfo(
+					Constant.KUAIDI_TYPE_MEITAO, orderIds);// .sendGet("http://usitao.net/TrackSearch.aspx",
+															// "TXT_TRACKNO="+orderIds);
+			ret = KuaiDiUtil
+					.extractValue(
+							ret,
+							"<div class=\"rndRec\" style=\"float: left; padding: 10px; width: 980px;\">",
+							"<div style=\"clear: both; height: 5px;\"></div>");
+			if (ret != "" && ret != null) {
+				int startIndex = ret.indexOf("<div class=\"tipTitle\">");
+				if (startIndex > -1) {
+					ret = ret.substring(startIndex, ret.length()).trim();
+					ret = ret.replace("美淘转运", "全球速递");
+					ret = ret.replace("美淘", "全球速递");
+				}
+			}
+			responseObject.setData(ret);
+			return responseObject;
+
+		} catch (Exception e) {
+			log.error("获取运单失败");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/route/kuaidi100", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<Route>> searchRouteBykuaidi100(
+			@RequestParam(value = "third_no") String thirdNo,
+			@RequestParam(value = "third_pns") String thirdPns) {
+		if (thirdNo == null || thirdNo.equals("") || thirdPns == null
+				|| thirdPns.equals("")) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		String htmllist[]=null;
+		try {
+			Properties props = PropertiesReader.read(Constant.SYSTEM_PROPERTIES_FILE);
+			//key = props.getProperty("kuaidi.apikey");
+			String htmllist_temp=props.getProperty("kuaidi100.use.url.list");
+			if(!StringUtil.isEmpty(htmllist_temp))
+			{
+				htmllist=htmllist_temp.split(";");
+			}
+		} catch (Exception e) {
+			
+		}
+		
+		
+		
+		try {
+			ResponseObject<List<Route>> responseObject = new ResponseObject<List<Route>>(
+					ResponseCode.SUCCESS_CODE);
+			List<Route> result = new ArrayList<Route>();
+
+			KuaiDi100 kuaidi = new KuaiDi100();
+			String key=this.globalargsDao.getcontentbyflag("kuaidi100_key");
+			String content = kuaidi.SearchkuaiDiInfo(thirdPns, thirdNo,key);
+			
+			String flag="0";
+			if((htmllist!=null)&&(htmllist.length>0))
+			{
+				if(!StringUtil.isEmpty(thirdPns))
+				{
+					for(int i=0;i<htmllist.length;i++)
+					{
+						if(!StringUtil.isEmpty(htmllist[i]))
+						{
+							if(thirdPns.equalsIgnoreCase(htmllist[i]))
+							{
+								flag="1";
+								break;
+							}
+						}
+					}
+				}
+			}
+			
+			
+			if((!StringUtil.isEmpty(thirdPns))&&(flag.equalsIgnoreCase("1")))//ems 返回的是一个链接
+			{
+				Route route = new Route();
+				route.setReturnurl(content);
+				//route.setOrderId(oids);
+				route.setState("");
+				route.setThrid_no( thirdNo);
+				route.setThrid_pns(thirdPns);
+				
+				route.setStateRemark("中国快递公司："+thirdPns+"<br>"+"中国快递单号："+thirdNo);
+				result.add(route);
+				responseObject.setData(result);
+				return responseObject;
+			}
+			
+			
+			JSONObject json = JSONObject.fromObject(content);
+
+			// 0：物流单暂无结果，
+			// 1：查询成功，
+			// 2：接口出现异常，
+			if (json.getString("status").equals("1")) {
+				JSONArray ja = json.getJSONArray("data");
+				for (int i = 0; i < ja.size(); i++) {
+					/*JSONObject jo = (JSONObject) ja.get(i);
+					Route route = new Route();
+					route.setDate(jo.getString("time"));
+					route.setRemark(jo.getString("context"));
+					route.setState("");
+					result.add(route);*/
+					JSONObject jo = (JSONObject) ja.get(i);
+					Route route = new Route();
+					//route.setOrderId(oids);
+					route.setStateRemark("中国快递公司："+thirdPns+"<br>"+"中国快递单号："+thirdNo);
+					//route.setDate(oids);
+					route.setDate(jo.getString("time"));
+					route.setRemark(jo.getString("context"));
+					route.setState("");
+					result.add(route);
+
+				}
+			} else if (json.getString("status").equals("0")) {
+			/*	Route route = new Route();
+				SimpleDateFormat df = new SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss");// 设置日期格式
+				route.setDate(df.format(new Date()));
+				route.setRemark("");
+				route.setState("暂无第三方物流单结果");
+				result.add(route);*/
+			} else {
+				/*log.error("查询运单失败,第三方快递公司=" + thirdPns + "，快递号=" + thirdNo);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"查询失败,请稍后查询");*/
+			}
+
+			responseObject.setData(result);
+			return responseObject;
+
+		} catch (Exception e) {
+			log.error("查询运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"查询失败,请稍后查询");
+		}
+	}
+
+	@RequestMapping(value = "/route/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Map<String, List<Route>>> searchRouteByIds(
+			@RequestParam(value = ParameterConstants.ORDER_PAY_IDS) String[] orderIds) {
+		if (orderIds == null || orderIds.length == 0) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			return this.orderService.getRouteListByOrderId(Arrays
+					.asList(orderIds));
+		} catch (Exception e) {
+			log.error("查找运单路由信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"查找运单路由信息失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/pay", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> msjOrderPay(
+			@RequestParam(value = "id") String id,
+			@RequestParam(value = "type", required = false, defaultValue = "0") String type) {
+		try {
+			Order order = this.orderService.getOrderById(id).getData();
+			User user = order.getUser();
+			if (Constant.ORDER_STATE2.equals(order.getState()) && user != null) {
+				if ("0".equals(type)) {
+					double totalMoney = new BigDecimal(order.getTotalMoney())
+							.doubleValue();
+					if(totalMoney<0)
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+								"支付出错，运单支付费小于0！");
+					}
+					
+					double rmb = StringUtil.string2Double(user.getRmbBalance());
+					double usd = StringUtil.string2Double(user.getUsdBalance());
+					
+					double usdrate=0;
+					ResponseObject<String> obj=this.orderService.getCurUsaToCn();
+					if((obj.getCode()!=null)&&(obj.getCode().equalsIgnoreCase(ResponseCode.SUCCESS_CODE)))
+					{
+						if((obj.getData()!=null)&&(!obj.getData().equals("")))
+						{
+							String money00=obj.getData();
+							double dou = Double.parseDouble(money00);
+							if(dou>0)
+							{
+								usdrate=dou;
+							}
+						}
+					}
+					
+					
+				
+					
+					//if (hasPayMoney(usd, rmb, totalMoney)) {
+					if (hasPayMoneyusa(usd, rmb, usdrate,totalMoney)) {
+						double newusd = usd - totalMoney; // 先用美元支付
+						double newrmb = rmb;
+						if (newusd >= 0) {
+							// ignore
+						} else {
+							newusd = 0.0D; // 美元余额全部支付，开始扣人民币的钱
+							newrmb = new BigDecimal(rmb - (totalMoney - usd)
+									* usdrate).setScale(2,
+									BigDecimal.ROUND_HALF_UP).doubleValue();
+						}
+						
+						if(newrmb<0)
+						{
+							return generateResponseObject(
+									ResponseCode.ORDER_PAY_ACCOUNT_NOT_MONEY, "帐户余额不足");
+						}
+						return this.orderService.pay(Arrays
+								.asList(new String[] { id }), Arrays
+								.asList(new String[] { order.getOrderId() }),
+								order.getUserId(), order.getTotalMoney(),
+								newrmb, newusd, true);
+					} else {
+						return generateResponseObject(
+								ResponseCode.ORDER_PAY_ACCOUNT_NOT_MONEY,
+								"帐户余额不足");
+					}
+				} else if ("1".equals(type)) {
+					// 进行现金支付
+					return this.orderService.pay(
+							Arrays.asList(new String[] { id }),
+							Arrays.asList(new String[] { order.getOrderId() }),
+							order.getUserId(), order.getTotalMoney(), 0, 0,
+							false);
+				} else {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+							"支付类型参数无效");
+				}
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"该订单不是处于待付款状态");
+			}
+		} catch (Exception e) {
+			log.error("支付出现异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/get_one", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Order> getOrderById(
+			@RequestParam(value = "id", required = false, defaultValue = "") String id,
+			@RequestParam(value = "oid", required = false, defaultValue = "") String oid) {
+		try {
+			/*if (StringUtil.isEmpty(oid)) {
+				if (StringUtil.isEmpty(id)) {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+							"参数不能为空");
+				}
+				// 根据运单记录id来获取所有的订单信息
+				return this.orderService.getOrderById(id);
+			}
+			return this.orderService.getOrderByOrderId(oid);*/
+			
+			if (StringUtil.isEmpty(id)) {
+				if (StringUtil.isEmpty(oid)) {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+							"参数不能为空");
+				}
+				// 根据运单记录id来获取所有的订单信息
+				
+				return this.orderService.getOrderByOrderId(oid);
+			}
+			else
+			{
+				ResponseObject<Order> obj=this.orderService.getOrderById(id);
+				if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))
+				{
+					return obj;
+				}
+				else
+				{
+					if (!StringUtil.isEmpty(oid)) {
+						return this.orderService.getOrderByOrderId(oid);
+					}
+					else
+					{
+						return obj;
+					}
+				}
+					
+				
+			}
+		} catch (Exception e) {
+			log.error("获取订单信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取订单详细出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/admin/route/batch_search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<Order>> searchBatchOrders(
+			HttpServletRequest request,
+			@RequestParam(value = "state") String state,
+			@RequestParam(value = "flight", required = false, defaultValue = "") String flight) {
+		
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权执行此操作!");
+			
+		}
+		
+		
+		if (StringUtil.isEmpty(state)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			if (StringUtil.isEmpty(flight)) {
+				flight = null;
+			} else {
+				state = Constant.ORDER_STATE7;
+			}
+			return this.orderService
+					.getOrderListByStatsAndFlight(state, flight);
+		} catch (Exception e) {
+			log.error("获取运单列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取运单列表失败，执行过程中出现异常！");
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/search_by_ids", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<Order>> searchOrdersByIds(
+			@RequestParam(value = "id") String[] orderIds) {
+		if (orderIds == null || orderIds.length == 0) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			return this.orderService.getOrderListByIds(Arrays.asList(orderIds));
+		} catch (Exception e) {
+			log.error("获取运单列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取运单列表失败，执行过程中出现异常！");
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Order>> searchByKeyOfAdmin(
+			HttpServletRequest request,
+			@RequestParam(value = "oid", required = false) String oid,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String key,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false) String state,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPEKEY, required = false) String typekey,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			String storeid=null;
+			String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+			{
+				storeid=null;//表示可以查找所有门店
+				
+			}else
+			{
+				storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+				if((storeid==null)||(storeid.equalsIgnoreCase("")))
+				{
+					return generateResponseObject(ResponseCode.NEED_LOGIN,
+							"你没有登陆!");
+				}
+			}
+			
+			key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+			if (StringUtil.isEmpty(sdate)
+					|| !UserUtil.validateExportDate(sdate)) {
+				sdate = "";
+			} else {
+				sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+			}
+
+			if (StringUtil.isEmpty(edate)
+					|| !UserUtil.validateExportDate(edate)) {
+				edate = "";
+			} else {
+				edate = UserUtil.transformerDateString(edate, " 23:59:59");
+			}
+
+			oid = StringUtil.isEmpty(oid) ? null : oid;
+			String column = OrderUtil.getSearchColumnByType(type);
+			state = OrderUtil.dealState(state);
+			pageIndex = Math.max(pageIndex, 1);
+			return this.orderService.searchOrdersByKeys(oid, null, key, column,
+					sdate, edate, state,typekey,storeid, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("查询运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/delete", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> deleteOrderOfAdmin(
+			@RequestParam(value = "oid") String[] orderIds) {
+		try {
+			return this.orderService.deleteOrderByOrderIds(
+					Arrays.asList(orderIds),
+					Arrays.asList(new String[] { Constant.ORDER_STATE0,
+							Constant.ORDER_STATE1, Constant.ORDER_STATE2,
+							Constant.ORDER_STATE10,Constant.ORDER_STATE__10,Constant.ORDER_STATE__9 }));
+		} catch (Exception e) {
+			log.error("删除订单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除订单失败");
+		}
+	}
+
+	// 用户删除订单
+	@RequestMapping(value = "/order/delete", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> deleteOrderOfUser(HttpServletRequest request,
+			@RequestParam(value = "oid") String orderId) {
+		try {
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			return this.orderService.deleteOrderOfUserByOrderId(userId,
+					orderId,
+					Arrays.asList(new String[] { Constant.ORDER_STATE0,Constant.ORDER_STATE__10 }));
+		} catch (Exception e) {
+			log.error("删除订单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除订单失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/modify", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyOrderOfAdmin(
+			HttpServletRequest request, Order order) {
+		
+		
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+		}
+		
+		if(storeid!=null)
+		{
+			if(!storeid.equalsIgnoreCase(order.getWarehouseId()))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "对不起，你不能修改其它门店或仓库的运单!");
+			}
+		}
+		
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (!OrderUtil.validateModifyOrder(order)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"参数无效,无法通过参数验证");
+		}
+		String storeId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if (StringUtil.isEmpty(storeId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"您不是门店管理员，不能修改运单");
+		}
+		String type = Constant.USER_TYPE_NORMAL;
+		try {
+			User user = this.orderService.getOrderUser(order.getId(),
+					order.getOrderId());
+			if (user != null) {
+				type = user.getType();
+			}
+		} catch (Exception e) {
+			log.error("根据运单号获取该运单所属会员信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"根据运单号获取该运单所属会员信息失败");
+		}
+
+		try {
+			order.setStoreId(storeId);
+			order.setWarehouseId(storeId);
+			String empName = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+			return this.orderService.modifyOrder(order, empName, type);
+		} catch (Exception e) {
+			log.error("修改订单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改订单失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/route/batch_modify", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> batchModifyOrderState(
+			HttpServletRequest request,
+			@RequestParam(value = "oid") String[] orderIds,
+			@RequestParam(value = "state") String state,
+			@RequestParam(value = "flight", required = false, defaultValue = "") String flight,
+			@RequestParam(value = "thridpns", required = false, defaultValue = "") String thridpns,
+			@RequestParam(value = "thridno", required = false, defaultValue = "") String thridno) {
+		if (orderIds == null || orderIds.length == 0
+				|| StringUtil.isEmpty(state)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			// 空运中，才可以修改flight
+			if (!Constant.ORDER_STATE7.equals(state)) {
+				flight = null;
+			}
+			String empName = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+			return this.orderService.batchModifyOrderStateAndFlight(
+					Arrays.asList(orderIds), state, flight, empName, thridpns,
+					thridno);
+		} catch (Exception e) {
+			log.error("修改状态失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改状态失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/modify_state_flight", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyStateOrderOfAdmin(
+			HttpServletRequest request,
+			@RequestParam(value = "orderId") String orderId,
+			@RequestParam(value = "state") String state,
+			@RequestParam(value = "flight", required = false, defaultValue = "") String flight,
+			@RequestParam(value = "thridpns", required = false, defaultValue = "") String thridpns,
+			@RequestParam(value = "thridno", required = false, defaultValue = "") String thridno) {
+		
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+		}
+		
+		
+		
+		
+		if (StringUtil.isEmpty(orderId) || StringUtil.isEmpty(state)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			// 空运中，才可以修改flight
+			if (!Constant.ORDER_STATE7.equals(state)) {
+				flight = null;
+			}
+			String empName = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+		if(storeid!=null)
+		{
+			Order order1 = this.orderService.getOrderByOrderId(orderId)
+						.getData();
+			if((order1.getWarehouseId()!=null))
+			{
+				if(!order1.getWarehouseId().equalsIgnoreCase(storeid))
+				{
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "对不起，你无权修改其它门店或仓库的运单!");
+				}
+			}
+		}	
+			return this.orderService.batchModifyOrderStateAndFlight(
+					Arrays.asList(new String[] { orderId }), state, flight,
+					empName, thridpns, thridno);
+		} catch (Exception e) {
+			log.error("修改状态失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改状态失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/modify_flight", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyFlightOrderOfAdmin(
+			HttpServletRequest request,
+			@RequestParam(value = "orderId") String orderId,
+			@RequestParam(value = "flight") String flight) {
+		if (StringUtil.isEmpty(orderId) || StringUtil.isEmpty(flight)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			String empName = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+			return this.orderService.modifyOrderFlightOfOrderIds(orderId,
+					flight, empName);
+		} catch (Exception e) {
+			log.error("修改航班信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"修改航班信息失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/export", method = { RequestMethod.GET })
+	public void exportOrderDataToExcel(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate)
+			throws Exception {
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return ;
+			
+		}
+		
+		
+		Calendar calendar = Calendar.getInstance();
+		if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+			sdate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		String fileName = "运单数据_" + sdate;
+		if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+			edate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		fileName += "_" + edate + ".xls";
+		sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+		edate = UserUtil.transformerDateString(edate, " 23:59:59");
+
+		List<ExportOrder> orders = new ArrayList<ExportOrder>();
+		OutputStream os=null;
+		try {
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String(fileName.getBytes(), "iso-8859-1"));
+			orders = this.orderService.getExportOrders(sdate, edate);
+			File templeFile = new File(request.getSession().getServletContext()
+					.getRealPath("/")
+					+ this.orderOutputTempletsFile);
+			 os = response.getOutputStream();
+			// 导出数据
+			OrderUtil.exportOrderToExcel(orders, templeFile, os);
+		} catch (Exception e) {
+			log.error("获取运单数据失败", e);
+			throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+		} finally {
+			orders.clear();
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/export_to_meitao", method = { RequestMethod.GET })
+	public void exportOrderDataToMeitaoExcel(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam(value = "wid", required = false, defaultValue = "") String wid,
+			@RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String key,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false) String state)
+			throws Exception {
+
+		List<ExportOrder> orders = new ArrayList<ExportOrder>();
+
+		Calendar calendar = Calendar.getInstance();
+		if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+			sdate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		String fileName = "运单数据_" + sdate;
+		if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+			edate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		fileName += "_" + edate + ".xls";
+		sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+		edate = UserUtil.transformerDateString(edate, " 23:59:59");
+
+		oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+		String column = OrderUtil.getSearchColumnByType(type);
+		state = OrderUtil.dealState(state);
+		OutputStream os=null;
+		try {
+			key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String(fileName.getBytes(), "iso-8859-1"));
+			// orders = this.orderService.getExportOrders(sdate, edate);
+
+			orders = this.orderService.getExportToMeitaoOrders(wid, oid, key,
+					column, sdate, edate, state);
+			File templeFile = new File(request.getSession().getServletContext()
+					.getRealPath("/")
+					+ this.orderOutputToMeitaoTempletsFile);
+			os = response.getOutputStream();
+
+			// 导出数据
+
+			OrderUtil.exportOrderToMeitaoExcel(orders, templeFile, os);
+			// return this.orderService.searchWebOrders(oid, key, column, sdate,
+			// edate, state, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取运单数据失败", e);
+			throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+		} finally {
+			orders.clear();
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+
+	}
+
+	@RequestMapping(value = "/admin/order/export_to_dcs", method = { RequestMethod.GET })
+	public void exportOrderDataToDcsExcel(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam(value = "wid", required = false, defaultValue = "") String wid,
+			@RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String key,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false) String state)
+			throws Exception {
+
+		List<ExportOrder> orders = new ArrayList<ExportOrder>();
+
+		Calendar calendar = Calendar.getInstance();
+		if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+			sdate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		String fileName = "运单数据_" + sdate;
+		if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+			edate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		fileName += "_" + edate + ".xls";
+		sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+		edate = UserUtil.transformerDateString(edate, " 23:59:59");
+
+		oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+		String column = OrderUtil.getSearchColumnByType(type);
+		state = OrderUtil.dealState(state);
+		OutputStream os=null;
+		try {
+			key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String(fileName.getBytes(), "iso-8859-1"));
+			// orders = this.orderService.getExportOrders(sdate, edate);
+
+			orders = this.orderService.getExportToMeitaoOrders(wid, oid, key,
+					column, sdate, edate, state);
+			File templeFile = new File(request.getSession().getServletContext()
+					.getRealPath("/")
+					+ this.orderOutputToDcsTempletsFile);
+			 os = response.getOutputStream();
+
+			// 导出数据
+
+			OrderUtil.exportOrderToDcsExcel(orders, templeFile, os);
+			// return this.orderService.searchWebOrders(oid, key, column, sdate,
+			// edate, state, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取运单数据失败", e);
+			throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+		} finally {
+			orders.clear();
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+
+	}
+
+	// kai 20150916 唯一快递的订单导入
+	@RequestMapping(value = "/admin/order/import_from_weiyi", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> importOrderFromWeiyiExcel(
+			HttpServletRequest request,
+			@RequestParam(value = "wid_upload", required = false) String wid,
+			@RequestParam(value = "cid_upload", required = false) String cid,
+			MultipartFile file) {
+
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作!");
+			
+		}
+		
+		if (file != null && file.getSize() > 0) {
+			List<Order> Orders = null;
+			try {
+				//kai 20151006 判定是不是excel表格
+				String originalName = file.getOriginalFilename();
+				if (!StringUtil.boolpicisgoodornot(originalName, defaultExcelFileType)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "必须上传excel 2003表格,请重新尝试!");
+				}
+				
+				Orders = OrderUtil.readOrderFromWeiyiExcel(file
+						.getInputStream());
+			} catch (OutOfMemoryError e) {
+				log.error("内存不够", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"内存不够");
+			} catch (Exception e) {
+				log.error("读取数据出错", e);
+				String str = e.getMessage();// java.lang.RuntimeException:
+				if ((str != null) && (!str.equalsIgnoreCase(""))) {
+					str = str.replace("java.lang.RuntimeException:", "");
+				}
+
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"读取数据出错原因:" + str);
+			}
+
+			try {
+				int aa = this.orderService.check_import_weiyi_orders(Orders,
+						wid, cid);
+				if (aa == 0)// 用户和商品校验正确
+				{
+					int row = 1;
+					for (Order order : Orders) {
+						// kai 20150911-1 modify
+						order.setWarehouseId(wid);
+						order.setChannelId(cid);
+						String date = DateUtil.date2String(new Date());// 修改时间
+						order.setModifyDate(date);
+						if (order.getCardurl() != ""
+								&& (order.getCardurl() != null))// 进行解码
+						{
+							String str = URLDecoder.decode(order.getCardurl(),
+									"UTF-8");
+							order.setCardurl(str);
+						}
+
+						order.setState(Constant.ORDER_STATE3);
+						order.setType(Constant.ORDER_TYPE_GROUP);
+						order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+						// kai 20150911
+						this.orderService.addOrder_weiyi_import(order, row);// 开始插入数据
+
+					}
+
+				}
+				// String empName = StringUtil.obj2String(request.getSession()
+				// .getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+				// return this.orderService.importMeitaoExcel(Orders,
+				// empName);
+				return generateResponseObject(ResponseCode.SUCCESS_CODE);
+			} catch (Exception e) {
+				log.error("修改数据库失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"提交失败：" + e.getMessage());
+			}
+		}
+		return generateResponseObject(ResponseCode.PARAMETER_ERROR, "文件不能为空");
+	}
+
+	@RequestMapping(value = "/admin/order/import_weiyi_state", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> importOrderDataFromWeiyiStateExcel(
+			HttpServletResponse response,
+			@RequestParam(value = "import_id", required = false) String flagid,//下载id号
+			HttpServletRequest request, MultipartFile file) {
+		
+		String wid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			//return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权批量上传修改状态!");
+			
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(
+					Constant.EMP_STORE_ID_SESSION_KEY));
+			if(!StringUtil.isEmpty(empId))
+			{
+				wid=empId;
+			}
+			else
+			{
+				return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作或没登陆!");
+			}
+			
+			
+			
+		}
+		if (file != null && file.getSize() > 0) {
+			List<ImportOrder> importOrders = null;
+			try {
+				
+				//kai 20151006 判定是不是excel表格
+				String originalName = file.getOriginalFilename();
+				if (!StringUtil.boolpicisgoodornot(originalName, defaultExcelFileType)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "必须上传excel 2003表格,请重新尝试!");
+				}
+				
+				
+				importOrders = OrderUtil.readOrderExcel_weiyi_state(file
+						.getInputStream());
+			} catch (OutOfMemoryError e) {
+				log.error("内存不够",e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"内存不够,"+e.getMessage());
+			} catch (Exception e) {
+				log.error("读取数据出错", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"读取出错,"+e.getMessage());
+			}
+			if (!importOrders.isEmpty()) {
+				try {
+					// 导入员工名称
+					String empName = StringUtil.obj2String(request.getSession()
+							.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+					ResponseObject<Object> obj= this.orderService.importExcelOfOrderState(
+							importOrders, empName,wid);
+					if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))
+					{
+						if((flagid!=null)&&(flagid.equalsIgnoreCase("1")))//导入状态的同时，下载相应的数据
+						{
+							
+							// 添加订单下载功能
+							//String comm_type[]={"0","1","2"};//0表示类别，1表示详情，2表示数量
+							String comm_type[]={"1","2"};//0表示类别，1表示详情，2表示数量
+							List<String> orderIds_down=new ArrayList();
+							for(ImportOrder im:importOrders)
+							{
+								if(im.getOrderId()==null)
+								{
+									continue;
+								}
+								orderIds_down.add(im.getOrderId());
+							}
+	
+							List<ExportOrder> orders = new ArrayList<ExportOrder>();
+							OutputStream os=null;
+	
+							try {
+								
+								
+								//ResponseObject<List<ExportOrder>> result = this.orderService
+								//		.getExportOrderListByOrderIds(orderIds_down);
+								ResponseObject<List<ExportOrder>> result =this.orderService.getExportOrderListByOrderIdsalone(orderIds_down,wid);
+								
+								/*
+								 * for (ExportOrder o : result.getData()) {
+								 * 
+								 * orders.add(o); }
+								 */
+								orders = result.getData();
+								String fileName = "return_orders_" + orders.size() + ".xls";
+								// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+								response.setContentType("application/vnd.ms-excel");
+								response.setHeader("Content-disposition",
+										"attachment;filename="
+												+ new String(fileName.getBytes(), "iso-8859-1"));
+								// orders = this.orderService.getExportOrders(sdate, edate);
+	
+								File templeFile = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ this.orderOutputToWeiyiTempletsFile);
+								 os = response.getOutputStream();
+	
+								// 导出数据唯一快递单子
+								OrderUtil util = new OrderUtil();
+								
+								for(ExportOrder o:orders)
+								{
+									o.setComm_type(comm_type);
+								}
+								
+								//util.exportOrderToWeiyiExcel(orders, templeFile, os);
+								util.exportOrderToMeitao(orders, templeFile, os);//kai 20151027 导出美淘模板
+								
+	
+							} catch (Exception e) {
+								log.error("获取运单数据失败", e);
+								throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+							} finally {
+								orders.clear();
+								if (os != null) {
+									try {
+										os.close();
+									} catch (IOException e) {
+										// ignore
+									}
+								}
+							}
+						
+							
+						}
+						else
+						{
+	
+							
+							// 添加订单下载功能
+							//String comm_type[]={"0","1","2"};//0表示类别，1表示详情，2表示数量
+						/*	String comm_type[]={"1","2"};//0表示类别，1表示详情，2表示数量
+							List<String> orderIds_down=new ArrayList();
+							for(ImportOrder im:importOrders)
+							{
+								if(im.getOrderId()==null)
+								{
+									continue;
+								}
+								orderIds_down.add(im.getOrderId());
+							}
+	
+							List<ExportOrder> orders = new ArrayList<ExportOrder>();*/
+							
+							
+							
+							importOrders=(List<ImportOrder>)obj.getData();
+							if((importOrders==null)||(importOrders.size()<1))
+							{
+								return obj;
+							}
+							
+							
+							OutputStream os=null;
+	
+							try {
+								
+								
+								
+								String fileName = "update_state_result_" + importOrders.size() + ".xls";
+								// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+								response.setContentType("application/vnd.ms-excel");
+								response.setHeader("Content-disposition",
+										"attachment;filename="
+												+ new String(fileName.getBytes(), "iso-8859-1"));
+								// orders = this.orderService.getExportOrders(sdate, edate);
+	
+								File templeFile = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ this.orderOutputToStateResultTempletsFile);
+								 os = response.getOutputStream();
+	
+								OrderUtil.exportOrderStateToResult(importOrders, templeFile, os);
+								
+								//util.exportOrderToWeiyiExcel(orders, templeFile, os);
+								//util.exportOrderToMeitao(orders, templeFile, os);//kai 20151027 导出美淘模板
+								
+	
+							} catch (Exception e) {
+								log.error("获取运单数据失败", e);
+								throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+							} finally {
+							
+								if (os != null) {
+									try {
+										os.close();
+									} catch (IOException e) {
+										// ignore
+									}
+								}
+							}
+						
+							
+						
+							
+						
+						}
+					}
+					else
+					{
+						return obj;
+					}
+				} catch (Exception e) {
+					log.error("修改数据库失败", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+							"修改数据库失败,原因" + e.getMessage());
+				}
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"文件内容不能为空,请检查是否有空行或运单号为空!");
+			}
+		}
+		return generateResponseObject(ResponseCode.PARAMETER_ERROR, "文件不能为空");
+	}
+
+	// kai 20150911
+	@RequestMapping(value = "/admin/order/export_cardpic", method = { RequestMethod.GET })
+	public void exportcardpicToMeitaoExcel(
+			HttpServletRequest request,
+			HttpServletResponse response,
+
+			@RequestParam(value = "wid", required = false, defaultValue = "") String wid,
+			@RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String key,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false) String state)
+			throws Exception {
+
+		List<ExportOrder> orders = new ArrayList<ExportOrder>();
+
+		Calendar calendar = Calendar.getInstance();
+		if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+			sdate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		// String fileName = "运单数据_" + sdate;
+		if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+			edate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		// fileName += "_" + edate + ".xls";
+		sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+		edate = UserUtil.transformerDateString(edate, " 23:59:59");
+
+		// 这里做个限定，如果关键字不为空，则超始时间不定，否则只找当表的下载
+		sdate = StringUtil.isEmpty(key) ? sdate : null;
+
+		oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+		String column = OrderUtil.getSearchColumnByType(type);
+		state = OrderUtil.dealState(state);
+
+		// 图片流
+		InputStream imgInputStream = null;
+		// 输出流
+		OutputStream os = null;
+
+		try {
+			key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+
+			orders = this.orderService.getExportToMeitaoOrders(wid, oid, key,
+					column, sdate, edate, state);
+			String fileName = null;
+			File filetemp;
+			File[] srcfile = new File[orders.size()];
+			String[] orderids = new String[orders.size()];
+			int ii = 0;
+			for (int i = 0; i < orders.size(); i++) {
+				Order ord = orders.get(i);
+				String ordurl = ord.getCardurl();
+				if (ordurl == null) {
+					continue;
+				}
+				if (!(ordurl.equalsIgnoreCase(""))) {
+					filetemp = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ ord.getCardurl());
+					srcfile[ii] = filetemp;
+					orderids[ii] = ord.getOrderId();
+					String oldPath = filetemp.getAbsolutePath();
+					String newPath = request.getSession().getServletContext()
+							.getRealPath("/")
+							+ "resources\\pics\\card\\idnopic\\temp4.jpg";
+					// copyFile(oldPath, newPath);
+					// copy1(oldPath,newPath);
+					ii++;
+				}
+			}
+			String flag = "";
+
+			if (oid == null) {
+				flag = "manycards";
+			} else {
+				flag = oid;
+			}
+
+			// 获取当时的时间缀
+			Date date = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+			String str = sdf.format(date);
+
+			// 解决火狐的反斜杠问题 kai 20151006
+			String filetype = this.defaultCardFileType;// 要上传的文件类型
+			String strtest = this.saveCardDir;
+			String strseparator = "";
+			if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+			{
+				strseparator = "/";
+			} else {
+				strseparator = File.separator;
+			}
+
+			String originalName = str + ".zip";
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + "temp"
+					+ File.separator + StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5) + "_"
+					// + originalName.substring(index);
+					+ originalName;
+
+			File file1 = new File(request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileName);
+
+			/*
+			 * File f1 = new File("/resources/pics/card\\1115_icHLe_87265.png");
+			 * File f2 = new File("/resources/pics/card\\1115_WfMHl_67590.jpg");
+			 * f1 = new File(request.getSession().getServletContext()
+			 * .getRealPath("/") + f1); f2 = new
+			 * File(request.getSession().getServletContext() .getRealPath("/") +
+			 * f2);
+			 * 
+			 * File[] srcfile = { f1, f2 };
+			 */
+
+			// 压缩后的文件
+			if ((srcfile.length > 0) && (srcfile[0] != null)) {
+				basiczip.zipFiles(srcfile, file1, orderids);
+				imgInputStream = new FileInputStream(file1);
+
+				byte[] imgBytes = IOUtils.toByteArray(imgInputStream);
+
+				os = response.getOutputStream();
+
+				os.write(imgBytes);
+			} else {
+
+			}
+
+		} catch (Exception e) {
+			log.error("获取运单数据失败", e);
+			throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+		} finally {
+			// orders.clear();
+			// 6.无论成功与否关闭相应的流
+			try {
+				if (imgInputStream != null) {
+					imgInputStream.close();
+				}
+				if (os != null) {
+					os.close();
+				}
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+			}
+
+		}
+
+	}
+
+	// public ResponseObject<List<Order>> getOrderListByOrderIds(List<String>
+	// orderIds) throws ServiceException;
+	// kai 20150914 modify//添加图片下载
+	// kai 20150915 modify 添加表单下载选择
+
+	@RequestMapping(value = "/admin/order/exporepics", method = { RequestMethod.GET , RequestMethod.POST})
+	@ResponseBody
+	public void searchByKeyforexporepics(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam(value = "button_submit", required = false, defaultValue = "") String button_submit,
+			@RequestParam(value = "o_order_checked_pics", required = false, defaultValue = "") String[] pics_type,
+			@RequestParam(value = "o_order_checked_commoditys", required = false, defaultValue = "") String[] comm_type,//商品下载类型
+			@RequestParam(value = "order_checked_id", required = false, defaultValue = "") String[] orderIds)
+			throws Exception {
+		// 图片流@RequestParam(value = "oid") String[] orderIds
+		if (orderIds.length < 1) {
+			return;
+		}
+
+		if (button_submit.equalsIgnoreCase("pictures download")) {
+
+			if (pics_type.length < 1) {
+				throw new Exception("必须选择下载类型");
+			}
+
+			InputStream imgInputStream = null;
+			// 输出流
+			OutputStream os = null;
+
+			try {
+				if (orderIds.length < 1) {
+					// return
+					// generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					// "参数错误");
+					return;
+				} else {
+
+				}
+				ResponseObject<List<Order>> result = this.orderService
+						.getOrderListByOrderIds(Arrays.asList(orderIds));
+
+				if (result != null
+						&& ResponseCode.SUCCESS_CODE.equals(result.getCode())) {
+
+					String fileName = null;
+					File filetemp;
+					File[] srcfile = new File[(result.getData().size())
+							* pics_type.length];
+					String[] prename = new String[(result.getData().size())
+							* pics_type.length];// 记录图片对应的单号
+					// String[] ordercardids = new
+					// String[result.getData().size()];//记录收件人的身份证id号
+					// String[] orderrevnames = new
+					// String[result.getData().size()];//记录图片对应的收件人名称
+					int ii = 0;
+					for (int j = 0; j < pics_type.length; j++) {
+						for (Order o : result.getData()) {
+							String ordurl = "";
+							String card_flag = "";
+							if (pics_type[j].equalsIgnoreCase("0"))// 身份证正面图
+							{
+								ordurl = o.getCardurl();
+								card_flag = "front";
+							} else if (pics_type[j].equalsIgnoreCase("1"))// 身份证反面图
+							{
+								ordurl = o.getCardurlother();
+								card_flag = "opposite";
+							} else if (pics_type[j].equalsIgnoreCase("2"))// 身份证合成图
+							{
+								ordurl = o.getCardurltogether();
+								card_flag = "composed";
+							} else {
+								continue;
+							}
+							if (ordurl == null) {
+								continue;
+							}
+							File file1 = new File(request.getSession()
+									.getServletContext().getRealPath("/")
+									+ ordurl);
+							if ((!(ordurl.equalsIgnoreCase("")))
+									&& (file1.exists())) {// 文件存在时才操作
+								filetemp = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ ordurl);
+								srcfile[ii] = filetemp;
+								String picname = o.getCardid() + o.getcName();
+								if ((picname == null)
+										|| (picname.equalsIgnoreCase("")))// 如果为空
+								{
+									picname = "cardidandnameisnull";
+								}
+
+								if (ii > 0)// 判断是否有重名
+								{
+									for (int testno = 0; testno < ii; testno++) {
+										if (prename[testno]
+												.equalsIgnoreCase(picname))// 包含重名，加个后缀
+										{
+											picname = picname + "_" + ii;
+											break;
+										}
+									}
+								}
+
+								prename[ii] = picname;
+
+								// prename[ii] =
+								// o.getOrderId()+"_"+o.getcName()+"_"+o.getCardid()+"_"+card_flag;
+
+								ii++;
+							}
+
+						}
+					}
+
+					// 解决火狐的反斜杠问题 kai 20151006
+					String filetype = this.defaultCardFileType;// 要上传的文件类型
+					String strtest = this.saveCardDir;
+					String strseparator = "";
+					if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+					{
+						strseparator = "/";
+					} else {
+						strseparator = File.separator;
+					}
+					// 获取当时的时间缀
+					Date date = new Date();
+					SimpleDateFormat sdf = new SimpleDateFormat(
+							"yyyyMMddHHmmss");
+					String str = sdf.format(date);
+
+					String originalName = str + ".zip";
+					int index = originalName.lastIndexOf('.');
+					index = Math.max(index, 0);
+					fileName = this.saveCardDir + File.separator + "temp"
+							+ strseparator + StringUtil.generateRandomString(5)
+							+ "_" + StringUtil.generateRandomInteger(5) + "_"
+							// + originalName.substring(index);
+							+ originalName;
+
+					File file1 = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ fileName);
+
+					// 压缩后的文件
+					
+
+					if ((srcfile.length > 0) && (srcfile[0] != null)) {
+						basiczip.zipFiles(srcfile, file1, prename);
+						response.setContentType("application/zip");
+						response.setHeader("Content-Disposition", 
+								"attachment; filename=\"" + originalName + "\""); 
+						//response.setHeader("Location","download.zip");
+						imgInputStream = new FileInputStream(file1);
+
+						byte[] imgBytes = IOUtils.toByteArray(imgInputStream);
+
+						os = response.getOutputStream();
+
+						os.write(imgBytes);
+					} else {
+						// return "订单中没有身份证图片，请退回重新选择！";
+					}
+
+				} else if (result.getData() == null
+						|| result.getData().isEmpty()) {
+					return;
+				}
+
+				// return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+				// "查询失败");
+			} catch (Exception e) {
+				log.error("获取运单数据失败", e);
+				throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+			} finally {
+				// orders.clear();
+				// 6.无论成功与否关闭相应的流
+				try {
+					if (imgInputStream != null) {
+						imgInputStream.close();
+					}
+					if (os != null) {
+						os.close();
+					}
+				} catch (IOException e) {
+					System.err.println(e.getMessage());
+				}
+
+			}
+		} else {// 添加订单下载功能
+			
+			if(comm_type.length<1)
+			{
+				comm_type[0]="0";
+				comm_type[1]="1";
+				comm_type[2]="2";
+				comm_type[3]="3";
+			}
+
+			List<ExportOrder> orders = new ArrayList<ExportOrder>();
+			OutputStream os = null;
+			try {
+				ResponseObject<List<ExportOrder>> result = this.orderService
+						.getExportOrderListByOrderIds(Arrays.asList(orderIds));
+
+				/*
+				 * for (ExportOrder o : result.getData()) {
+				 * 
+				 * orders.add(o); }
+				 */
+				orders = result.getData();
+				String fileName = "orders_" + orders.size() + ".xls";
+				// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+				response.setContentType("application/vnd.ms-excel");
+				response.setHeader("Content-disposition",
+						"attachment;filename="
+								+ new String(fileName.getBytes(), "iso-8859-1"));
+				// orders = this.orderService.getExportOrders(sdate, edate);
+
+				/*File templeFile = new File(request.getSession()
+						.getServletContext().getRealPath("/")
+						+ this.orderOutputToWeiyiTempletsFile);*/
+				File templeFile;
+				if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+				{
+					templeFile = new File(request.getSession()
+					.getServletContext().getRealPath("/")
+					+ this.orderOutputToMeitaonewTempletsFile);
+				}
+				else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+				{
+					templeFile = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ this.orderOutputToWeiyiTempletsFile);
+				}
+				else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("zhonghua")))
+				{
+					templeFile = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ this.orderOutputToZhonghuaTempletsFile);
+				}
+				else
+				{
+					templeFile = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ this.orderOutputToMeitaonewTempletsFile);
+				}
+				os = response.getOutputStream();
+
+				// 导出数据唯一快递单子
+				OrderUtil util = new OrderUtil();
+				
+				for(ExportOrder o:orders)
+				{
+					o.setComm_type(comm_type);
+				}
+				
+				//util.exportOrderToWeiyiExcel(orders, templeFile, os);
+				//util.exportOrderToMeitao(orders, templeFile, os);//kai 20151027 导出美淘模板,实质是惟一快递版本
+				if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+				{
+					util.exportOrderToMeitao20151123(orders, templeFile, os);
+				}
+				else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+				{
+					util.exportOrderToMeitao(orders, templeFile, os);//kai 20151027 导出美淘模板,实质是惟一快递版本
+				}
+				else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("zhonghua")))
+				{
+					util.exportOrderToZhongHua(orders, templeFile, os);//kai 20160120 中华快递导出模板
+				}
+				else
+				{
+					util.exportOrderToMeitao20151123(orders, templeFile, os);
+				}
+				
+
+			} catch (Exception e) {
+				log.error("获取运单数据失败", e);
+				throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+			} finally {
+				orders.clear();
+				if (os != null) {
+					try {
+						os.close();
+					} catch (IOException e) {
+						// ignore
+					}
+				}
+			}
+		}
+	}
+
+	// add by chenkanghua
+	@RequestMapping(value = "/admin/order/export_internal", method = { RequestMethod.GET })
+	public void exportOrderDataToInternalExcel(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam(value = "wid", required = false, defaultValue = "") String wid,
+			@RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String key,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false) String state)
+			throws Exception {
+
+		if (wid.equals("-1")) {
+			wid = null;
+		}
+
+		List<ExportOrder> orders = new ArrayList<ExportOrder>();
+
+		Calendar calendar = Calendar.getInstance();
+		if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+			sdate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		String fileName = "清单数据_" + sdate;
+		if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+			edate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		fileName += "_" + edate + ".xls";
+		sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+		edate = UserUtil.transformerDateString(edate, " 23:59:59");
+
+		oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+		String column = OrderUtil.getSearchColumnByType(type);
+		state = OrderUtil.dealState(state);
+		OutputStream os=null;
+		try {
+
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String(fileName.getBytes(), "iso-8859-1"));
+			// orders = this.orderService.getExportOrders(sdate, edate);
+			key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+			orders = this.orderService.getExportToMeitaoOrders(wid, oid, key,
+					column, sdate, edate, state);
+			File templeFile = new File(request.getSession().getServletContext()
+					.getRealPath("/")
+					+ this.orderOutputToInternalTempletsFile);
+			os = response.getOutputStream();
+
+			// 导出数据
+			OrderUtil.exportOrderToInternalExcel(orders, templeFile, os);
+			// return this.orderService.searchWebOrders(oid, key, column, sdate,
+			// edate, state, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取运单数据失败", e);
+			throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+		} finally {
+			orders.clear();
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+
+	}
+
+	// add by chenkanghua
+	@RequestMapping(value = "/admin/order/export_gather", method = { RequestMethod.GET })
+	public void exportOrderDataToGatherExcel(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam(value = "wid", required = false, defaultValue = "") String wid,
+			@RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String key,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false) String state)
+			throws Exception {
+		if (wid.equals("-1")) {
+			wid = null;
+		}
+		// List<ExportOrder> orders = new ArrayList<ExportOrder>();
+		List<SumCommodity> sumcommdity = new ArrayList<SumCommodity>();
+
+		Calendar calendar = Calendar.getInstance();
+		if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+			sdate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		String fileName = "运单汇总数据_" + sdate;
+		if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+			edate = DateUtil.date2String(calendar.getTime(), "yyyy-MM-dd");
+		}
+		fileName += "_" + edate + ".xls";
+		sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+		edate = UserUtil.transformerDateString(edate, " 23:59:59");
+
+		oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+		String column = OrderUtil.getSearchColumnByType(type);
+		state = OrderUtil.dealState(state);
+		OutputStream os=null;
+		try {
+
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String(fileName.getBytes(), "iso-8859-1"));
+			key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+			sumcommdity = this.orderService.exportOrdersGather(wid, oid, key,
+					column, sdate, edate, state);
+
+			File templeFile = new File(request.getSession().getServletContext()
+					.getRealPath("/")
+					+ this.orderOutputToInternalGatherTempletsFile);
+			os = response.getOutputStream();
+
+			// 导出数据
+			OrderUtil.exportOrderSumToExcel(sumcommdity, templeFile, os);
+			// return this.orderService.searchWebOrders(oid, key, column, sdate,
+			// edate, state, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取运单数据失败", e);
+			throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+		} finally {
+			sumcommdity.clear();
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+
+	}
+
+	@RequestMapping(value = { "/admin/order/gather" }, method = { org.springframework.web.bind.annotation.RequestMethod.GET })
+	public void exportOrderGatherToExcel(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam(value = "hz", required = false) String flight)
+			throws Exception {
+		
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			//return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权添加仓库门店!");
+			return;
+		}
+		
+		String fileName = "运单汇总数据_" + flight;
+		fileName = fileName + "_" + flight + ".xls";
+
+		List<SumCommodity> sumcommdity = new ArrayList<SumCommodity>();
+		OutputStream os=null;
+		try {
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String(fileName.getBytes(), "iso-8859-1"));
+			sumcommdity = this.orderService.getExportOrdersGather(flight);
+			File templeFile = new File(request.getSession().getServletContext()
+					.getRealPath("/")
+					+ this.orderGatherOutputTempletsFile);
+			os = response.getOutputStream();
+
+			OrderUtil.exportOrderSumToExcel(sumcommdity, templeFile, os);
+		} catch (Exception e) {
+			log.error("获取运单数据失败", e);
+			throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+		} finally {
+			sumcommdity.clear();
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+	}
+
+	@RequestMapping(value = "/admin/order/import", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> importOrderDataFromExcel(				
+			HttpServletRequest request, MultipartFile file) {
+		if (file != null && file.getSize() > 0) {
+			List<ImportOrder> importOrders = null;
+			try {
+				
+				//kai 20151006 判定是不是excel表格
+				String originalName = file.getOriginalFilename();
+				if (!StringUtil.boolpicisgoodornot(originalName, defaultExcelFileType)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "必须上传excel 2003表格,请重新尝试!");
+				}
+				
+				importOrders = OrderUtil.readOrderExcel(file.getInputStream());
+			} catch (OutOfMemoryError e) {
+				log.error("内存不够", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"内存不够");
+			} catch (Exception e) {
+				log.error("读取数据出错", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"读取数据出错");
+			}
+
+			try {
+				String empName = StringUtil.obj2String(request.getSession()
+						.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+				return this.orderService.importExcelOfOrderState(importOrders,
+						empName,null);
+			} catch (Exception e) {
+				log.error("修改数据库失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"修改数据库失败");
+			}
+		}
+		return generateResponseObject(ResponseCode.PARAMETER_ERROR, "文件不能为空");
+	}
+
+	@RequestMapping(value = "/admin/order/import_from_meitao", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> importOrderFromMeitaoExcel(
+			HttpServletRequest request, MultipartFile file) {
+
+		if (file != null && file.getSize() > 0) {
+			List<ImportOrder> importOrders = null;
+			try {
+				
+				//kai 20151006 判定是不是excel表格
+				String originalName = file.getOriginalFilename();
+				if (!StringUtil.boolpicisgoodornot(originalName, defaultExcelFileType)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "必须上传excel 2003表格,请重新尝试!");
+				}
+				
+				importOrders = OrderUtil.readOrderFromMeitaoExcel(file
+						.getInputStream());
+			} catch (OutOfMemoryError e) {
+				log.error("内存不够", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"内存不够");
+			} catch (Exception e) {
+				log.error("读取数据出错", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"读取数据出错");
+			}
+
+			try {
+				String empName = StringUtil.obj2String(request.getSession()
+						.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+				return this.orderService.importMeitaoExcel(importOrders,
+						empName);
+			} catch (Exception e) {
+				log.error("修改数据库失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"修改数据库失败");
+			}
+		}
+		return generateResponseObject(ResponseCode.PARAMETER_ERROR, "文件不能为空");
+	}
+
+	@RequestMapping(value = "/admin/order/download", method = { RequestMethod.GET })
+	public void getImportOrderDataExcelFile(HttpServletRequest request,
+			HttpServletResponse response) {
+		InputStream input = null;
+		ServletOutputStream os=null;
+		try {
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String("运单状态模板.xls".getBytes(), "iso-8859-1"));
+			input = request.getSession().getServletContext()
+					.getResourceAsStream(this.orderImportTempletsFile);
+			os = response.getOutputStream();
+			byte[] buffer = new byte[1024];
+			int n = 0;
+			while ((n = input.read(buffer)) > 0) {
+				os.write(buffer, 0, n);
+			}
+			os.flush();
+		} catch (Exception e) {
+			log.error("下载文件失败", e);
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+	}
+
+	// 下载订单批量上传的模板
+	@RequestMapping(value = "/admin/order/download_weiyiorders", method = { RequestMethod.GET })
+	public void getImportWeiyiOrdersDataExcelFile(HttpServletRequest request,
+			HttpServletResponse response) {
+		InputStream input = null;
+		ServletOutputStream os=null;
+		try {
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String("upload_orders_templet.xls".getBytes(),
+							"iso-8859-1"));
+			input = request
+					.getSession()
+					.getServletContext()
+					.getResourceAsStream(
+							this.orderImportWeiyiordersTempletsFile);
+			os = response.getOutputStream();
+			byte[] buffer = new byte[1024];
+			int n = 0;
+			while ((n = input.read(buffer)) > 0) {
+				os.write(buffer, 0, n);
+			}
+			os.flush();
+		} catch (Exception e) {
+			log.error("下载文件失败", e);
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+	}
+
+	// 下载订单批量上传的模板
+	@RequestMapping(value = "/admin/order/download_weiyiordersstate", method = { RequestMethod.GET })
+	public void getImportWeiyiOrdersStateDataExcelFile(
+			HttpServletRequest request, HttpServletResponse response) {
+		InputStream input = null;
+		ServletOutputStream os=null;
+		try {
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String("upload_orders_state_templet.xls".getBytes(),
+							"iso-8859-1"));
+			input = request
+					.getSession()
+					.getServletContext()
+					.getResourceAsStream(
+							this.orderImportWeiyiordersstateTempletsFile);
+			os = response.getOutputStream();
+			byte[] buffer = new byte[1024];
+			int n = 0;
+			while ((n = input.read(buffer)) > 0) {
+				os.write(buffer, 0, n);
+			}
+			os.flush();
+		} catch (Exception e) {
+			log.error("下载文件失败", e);
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+	}
+
+	/**
+	 * 第三方平台修改运单状态，字符集为utf-8。
+	 * 
+	 * @param orderId
+	 *            要修改的运单id
+	 * @param state
+	 *            第三方运单状态。<br/>
+	 *            0表示第三方运单状态正常，即收件人已经接收。<br/>
+	 *            1表示第三方运单退回。<br/>
+	 *            2表示第三方运单异常，不是退出的状态。<br/>
+	 *            状态值为1或者2的时候，可以携带备注信息。
+	 * @param remark
+	 *            备注信息
+	 * @return
+	 */
+	@RequestMapping(value = "/third/modify/state", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> thridModifyState(
+			@RequestParam(value = "oid") String orderId,
+			@RequestParam(value = "state", required = false, defaultValue = "0") String state,
+			@RequestParam(value = "remark", required = false, defaultValue = "") String remark,
+			@RequestParam(value = "thridpns", required = false, defaultValue = "") String thridpns,
+			@RequestParam(value = "thridno", required = false, defaultValue = "") String thridno) {
+		ResponseObject<Object> result = new ResponseObject<Object>(
+				ResponseCode.SUCCESS_CODE);
+
+		if (StringUtil.isEmpty(orderId)) {
+			result.setCode(ResponseCode.PARAMETER_ERROR);
+			result.setMessage("运单号(oid)参数值不能为空");
+		}
+
+		if (StringUtil.isEmpty(state)) {
+			result.setCode(ResponseCode.PARAMETER_ERROR);
+			result.setMessage("运单状态(state)参数值不能为空");
+		}
+
+		if ("0".equals(state) || "1".equals(state) || "2".equals(state)) {
+			if ("0".equals(state)) {
+				state = Constant.ORDER_STATE10;
+			} else {
+				String str = "";
+				if ("1".equals(state)) {
+					str = "第三方快递退回";
+				} else {
+					str = "第三方快递异常";
+				}
+				if (!StringUtil.isEmpty(remark)) {
+					remark = str + "；" + remark;
+				}
+				state = Constant.ORDER_STATE9;
+			}
+
+			// modify order state
+			try {
+				List<String> oids = new ArrayList<String>();
+				oids.add(orderId);
+				return this.orderService.modifyOrderOfThrid(oids, state,
+						remark, thridpns, thridno);
+			} catch (Exception e) {
+				result.setCode(ResponseCode.SHOW_EXCEPTION);
+				result.setMessage("修改运单状态出现异常，请联系系统管理员");
+			}
+		} else {
+			result.setCode(ResponseCode.PARAMETER_ERROR);
+			result.setMessage("运单状态(state)参数值只能是0(收件人接收)、1(退回)以及2(其他异常)三种值中间的一种。");
+		}
+
+		return result;
+	}
+
+	/*
+	 * 查询订单状态 add by kai//kai 20150911
+	 */
+	@RequestMapping(value = "/order/searchstate", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Order>> searchstateByKeyOfUser(
+			HttpServletRequest request,
+			@RequestParam(value = "state", required = false) String state,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			state = StringUtil.isEmpty(state) ? null : state.trim()
+					.toUpperCase();
+			// String column = OrderUtil.getSearchColumnByType("0");
+			pageIndex = Math.max(pageIndex, 1);
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			return this.orderService.searchOrdersByKeys(null, userId, null,
+					null, null, null, state,null,null, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("查询运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+		}
+	}
+
+	
+	
+	
+	@RequestMapping(value = "/admin/tran/fastpay", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> tranOrderPay(HttpServletRequest request,
+			DaoHuoYuBao dhyb) {
+		// @RequestParam(value = "id") String id,
+		// @RequestParam(value = "type", required = false, defaultValue = "0")
+		// String type) {
+		try {
+			/*
+			 * Order order = this.orderService.getOrderById(id).getData(); User
+			 * user = order.getUser(); if
+			 * (Constant.ORDER_STATE2.equals(order.getState()) && user != null)
+			 * { if ("0".equals(type)) { double totalMoney = new
+			 * BigDecimal(order.getTotalMoney()) .doubleValue(); double rmb =
+			 * StringUtil.string2Double(user.getRmbBalance()); double usd =
+			 * StringUtil.string2Double(user.getUsdBalance()); if
+			 * (hasPayMoney(usd, rmb, totalMoney)) { double newusd = usd -
+			 * totalMoney; // 先用美元支付 double newrmb = rmb; if (newusd >= 0) { //
+			 * ignore } else { newusd = 0.0D; // 美元余额全部支付，开始扣人民币的钱 newrmb = new
+			 * BigDecimal(rmb - (totalMoney - usd)
+			 * OrderFreightConstant.usd2rmb).setScale(2,
+			 * BigDecimal.ROUND_HALF_UP).doubleValue(); } return
+			 * this.orderService.pay(Arrays .asList(new String[] { id }), Arrays
+			 * .asList(new String[] { order.getOrderId() }), order.getUserId(),
+			 * order.getTotalMoney(), newrmb, newusd, true); } else { return
+			 * generateResponseObject( ResponseCode.ORDER_PAY_ACCOUNT_NOT_MONEY,
+			 * "帐户余额不足"); } } else if ("1".equals(type)) { // 进行现金支付 return
+			 * this.orderService.pay( Arrays.asList(new String[] { id }),
+			 * Arrays.asList(new String[] { order.getOrderId() }),
+			 * order.getUserId(), order.getTotalMoney(), 0, 0, false); } else {
+			 * return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+			 * "支付类型参数无效"); } } else { return
+			 * generateResponseObject(ResponseCode.PARAMETER_ERROR,
+			 * "该订单不是处于待付款状态"); }
+			 */
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "出现异常");
+		} catch (Exception e) {
+			log.error("支付出现异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "出现异常");
+		}
+	}
+
+	/**
+	 * 第一步检测提交的所有转运单号对应的数据是否以及进行预提交或者是已经提交过了，如果是，则直接返回。否则进行第二步.<br/>
+	 * 第二步，根据不同的请求类型，预拆包，合包进行不同的操作<br/>
+	 * 
+	 * @param request
+	 * @param wayBill
+	 * @return
+	 */
+	// kai 管理员提交转运为订单
+	@RequestMapping(value = "/admin/order/transubmit", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<List<String>> submissionWaybillbyadmin(
+			HttpServletRequest request,
+			@RequestParam(value = "tranid", required = false) String tranid,
+			@RequestParam(value = "trantype", required = false) String trantype) {
+
+		
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+		}
+		
+		
+		
+		
+		
+		if ((tranid == null)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"运单号不能为空");
+		}
+		if ((trantype == null)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"转运类型不能为空");
+		}
+		if (!(trantype.equalsIgnoreCase("1")))// 只有极速转运可以在此提交
+		{
+			
+			if(trantype.equalsIgnoreCase("2"))		
+			{
+				
+			}
+			else if(trantype.equalsIgnoreCase("3"))//用户自提
+			{
+				
+			}
+			else
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"只有极速转运的，用户授权的或自提的转运单才能直接生成运单!");
+			}
+			
+		}
+		
+		WayBill wayBill = new WayBill();
+		// List<Order> orders;
+		List<Order> orders = new ArrayList<Order>();
+		Order order1 = new Order();
+		String empId = StringUtil.obj2String(request.getSession().getAttribute(
+				Constant.EMP_ID_SESSION_KEY));
+		order1.setEmpId(empId);
+		List<String> trids = new ArrayList<String>();
+		trids.add(tranid);
+
+		OrderDetail[] details = new OrderDetail[1];
+		details[0] = new OrderDetail();
+		details[0].setTranshipmentId(tranid);
+
+		order1.setTranshipmentIds(trids);
+		order1.setDetails(details);
+		orders.add(order1);
+
+		wayBill.setOrders(orders);
+
+		if (wayBill == null || wayBill.getOrders() == null
+				|| wayBill.getOrders().isEmpty()) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		for (Order order : wayBill.getOrders()) {
+			if (order.getDetails() == null || order.getDetails().length == 0) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"运单至少包含一个转运单信息");
+			}
+		}
+
+		try {
+			ResponseObject<List<String>> responseObj = new ResponseObject<List<String>>();
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			String userName = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_NICK_NAME_SESSION_KEY));
+			String userType = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_TYPE_SESSION_KEY));
+			
+			
+			wayBill.setUserId(userId);
+			wayBill.setName(userName);
+			wayBill.setUserType(userType);
+			wayBill.setOrderType(Constant.ORDER_TYPE_WEB);
+			wayBill.setType(Constant.ORDER_SUBMIT_TYPE_MUBOX);// 设置为合箱,只有一个，所以没影响
+			wayBill.setTrantype(trantype);
+			ResponseObject<Object> result = null;
+			result = this.orderService.checkNoSubmit(wayBill,storeid);
+			if (result != null
+					&& ResponseCode.SUCCESS_CODE.equals(result.getCode())) {
+				// 数据正确, 进行运单/订单添加到数据中
+
+				// responseObj = this.orderService.addOrdersOfWayBill(wayBill);
+
+				responseObj = this.orderService
+						.addOrdersOfWayBillquick(wayBill);
+
+			}
+
+			responseObj.setCode(result.getCode());
+			responseObj.setMessage(result.getMessage());
+			return responseObj;
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+
+	/**
+	 * 第一步检测提交的所有转运单号对应的数据是否以及进行预提交或者是已经提交过了，如果是，则直接返回。否则进行第二步.<br/>
+	 * 第二步，根据不同的请求类型，预拆包，合包进行不同的操作<br/>
+	 * 
+	 * @param request
+	 * @param wayBill
+	 * @return
+	 */
+	// kai 20151002 组合订单的提交
+	@RequestMapping(value = "/order/tran_mux_submit", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<List<String>> submaxtranorderWaybill(
+			HttpServletRequest request, WayBill wayBill) {
+		if (wayBill == null || wayBill.getOrders() == null
+				|| wayBill.getOrders().isEmpty()) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		/*
+		 * for (Order order : wayBill.getOrders()) { if (order.getDetails() ==
+		 * null || order.getDetails().length == 0) { return
+		 * generateResponseObject(ResponseCode.PARAMETER_ERROR,
+		 * "运单至少包含一个转运单信息"); } }
+		 */
+		if (wayBill.getCommodityIdList().length == 0)// 至少包含一个商品
+		{
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (wayBill.getConsigneeInfo() == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		if (!ConsigneeInfoUtil.validateCardId(wayBill.getConsigneeInfo()
+				.getCardId())) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"身份证号码填写错误，请重新填写！");
+		}
+
+		try {
+
+			String url = wayBill.getConsigneeInfo().getCardUrl();
+			if (url != "" && (url != null))// 进行解码
+			{
+				String str = URLDecoder.decode(url, "UTF-8");
+				wayBill.getConsigneeInfo().setCardUrl(str);
+
+			}
+			url = wayBill.getConsigneeInfo().getCardurlother();
+			if (url != "" && (url != null))// 进行解码
+			{
+				String str = URLDecoder.decode(url, "UTF-8");
+				wayBill.getConsigneeInfo().setCardurlother(str);
+
+			}
+			url = wayBill.getConsigneeInfo().getCardurltogether();
+			if (url != "" && (url != null))// 进行解码
+			{
+				String str = URLDecoder.decode(url, "UTF-8");
+				wayBill.getConsigneeInfo().setCardurltogether(str);
+				;
+
+			}
+
+			ResponseObject<List<String>> responseObj = new ResponseObject<List<String>>();
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			String userName = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_NICK_NAME_SESSION_KEY));
+			String userType = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_TYPE_SESSION_KEY));
+			wayBill.setUserId(userId);
+			wayBill.setName(userName);
+			wayBill.setUserType(userType);
+			wayBill.setOrderType(Constant.ORDER_TYPE_WEB);
+
+			ResponseObject<Object> result = null;
+			// result = this.orderService.checkNoSubmit(wayBill);
+
+			result = this.orderService.check_mux_Submit(wayBill);
+
+			if (result != null
+					&& ResponseCode.SUCCESS_CODE.equals(result.getCode())) {
+				// 数据正确, 进行运单/订单添加到数据中
+
+				// responseObj = this.orderService.addOrdersOfWayBill(wayBill);
+				responseObj = this.orderService
+						.addOrdersOfWayBillbyusermux(wayBill);
+			}
+
+			responseObj.setCode(result.getCode());
+			responseObj.setMessage(result.getMessage());
+			List<String> obj = new ArrayList<String>();
+
+			return responseObj;
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+
+	// kai 20151002 组合订单的提交
+	@RequestMapping(value = "/order/tran_mux_submit_have_pics", method = {
+			RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<List<String>> submaxtranorderhavepics(
+			HttpServletRequest request,
+			@RequestParam(value = "name", required = false, defaultValue = "") String name,
+			@RequestParam(value = "province", required = false, defaultValue = "") String province,
+			@RequestParam(value = "city", required = false, defaultValue = "") String city,
+			@RequestParam(value = "dist", required = false, defaultValue = "") String dist,
+			@RequestParam(value = "sadd", required = false, defaultValue = "") String sadd,
+			@RequestParam(value = "phone", required = false, defaultValue = "") String phone,
+			@RequestParam(value = "zcode", required = false, defaultValue = "") String zcode,
+			@RequestParam(value = "parceValue", required = false, defaultValue = "") String parceValue,
+			@RequestParam(value = "premium", required = false, defaultValue = "") String premium,
+			@RequestParam(value = "remark", required = false, defaultValue = "") String remark,
+			@RequestParam(value = "s_warehouseid", required = false, defaultValue = "") String wid,
+			@RequestParam(value = "s_channelid", required = false, defaultValue = "") String cid,// 渠道
+			@RequestParam(value = "s_commidty_list", required = false, defaultValue = "") String[] commlists,// 渠道
+			@RequestParam(value = "cid", required = false, defaultValue = "") String cardid,
+			@RequestParam(value = "idurlcard", required = false, defaultValue = "") String cardurl,// 身份证正面原路径
+			@RequestParam(value = "idurlcardother", required = false, defaultValue = "") String cardurlother,// 身份证反面原路径
+			@RequestParam(value = "idurlcardtogether", required = false, defaultValue = "") String cardurltogether,// 身份证合成原路径
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+		WayBill wayBill = new WayBill();
+
+		ConsigneeInfo info = new ConsigneeInfo();
+		info.setName(name);
+		info.setProvince(province);
+		info.setCity(city);
+		info.setDistrict(dist);
+		info.setStreetAddress(sadd);
+		info.setPhone(phone);
+		info.setZipCode(zcode);
+		info.setCardId(cardid);
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+
+		// 处理提交上来的图片
+
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator = "";
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+		String fileName = null;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+				fileName = null;
+			} else {
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ cardurl);
+				if (file3.exists()) {
+					fileName = cardurl;
+				} else {
+					fileName = null;
+				}
+			}
+		}
+		info.setCardUrl(fileName);
+		// order.setCardurl(fileName);
+		String fileNameother = null;
+		if (fileother != null && fileother.getSize() > 0) {
+			if (fileother.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = fileother.getOriginalFilename();
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileNameother = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file2 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother);
+				fileother.transferTo(file2);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurlother == null) || cardurlother.equalsIgnoreCase("")) {
+				fileNameother = null;
+			} else {
+				// fileNameother = cardurlother;
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ cardurlother);
+				if (file3.exists()) {
+					fileNameother = cardurlother;
+				} else {
+					fileNameother = null;
+				}
+			}
+		}
+		// order.setCardurlother(fileNameother);
+		info.setCardurlother(fileNameother);
+
+		// kai 20150921 合成图片
+		String fileNametogether = null;
+		if ((fileName != null) && (fileNameother != null)) {
+			imgcompose img = new imgcompose();
+			String str1 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileName;
+			String str2 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileNameother;
+			String str3 = this.saveCardDir + File.separator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "together"
+					+ "_" + StringUtil.generateRandomInteger(5);
+			String filecardtemp = str3;
+			str3 = request.getSession().getServletContext().getRealPath("/")
+					+ str3;
+			if (img.createcompics(str1, str2, str3)) {
+				filecardtemp = filecardtemp + ".jpg";
+
+				fileNametogether = filecardtemp;
+			}
+		}
+
+		if (fileNametogether == null) {
+			info.setCardurltogether(cardurltogether);
+			// order.setCardurltogether(cardurltogether);
+		} else {
+			// order.setCardurltogether(fileNametogether);
+			info.setCardurltogether(fileNametogether);
+		}
+
+		wayBill.setConsigneeInfo(info);
+
+		// 设置订单信息
+		Order order = new Order();
+		order.setRemark(remark);
+		order.setParceValue(parceValue);
+		order.setWarehouseId(wid);
+		order.setChannelId(cid);
+		order.setUserId(userId);
+		order.setPremium(premium);
+
+		List<Order> array = new ArrayList<Order>();
+		array.add(order);
+		wayBill.setOrders(array);
+
+		// 初始化商品列表
+		wayBill.setUserId(userId);
+		wayBill.setCommodityIdList(commlists);
+
+		try {
+
+			ResponseObject<List<String>> result = submaxtranorderWaybill(
+					request, wayBill);
+			// responseObj.setCode(result.getCode());
+			// responseObj.setMessage(result.getMessage());
+			// List<String> obj = new ArrayList<String>();
+
+			return result;
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+
+	// kai 20150912 在线置单提交修改时的方式
+	@RequestMapping(value = "/admin/order/modifyonline", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyOrderonlineOfAdmin(
+			HttpServletRequest request, Order order) {
+		
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+		}
+		
+		if(storeid!=null)
+		{
+			if(!storeid.equalsIgnoreCase(order.getWarehouseId()))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "你只能把置单归属于你自己的门店!");
+			}
+		}
+		
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		
+		
+		if (!OrderUtil.validateModifyOrder(order)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"参数无效,无法通过参数验证");
+		}
+		String storeId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if (StringUtil.isEmpty(storeId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"您不是门店管理员，不能修改运单");
+		}
+		String type = Constant.USER_TYPE_NORMAL;
+		try {
+			User user = this.orderService.getOrderUser(order.getId(),
+					order.getOrderId());
+			if (user != null) {
+				type = user.getType();
+			}
+		} catch (Exception e) {
+			log.error("根据运单号获取该运单所属会员信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"根据运单号获取该运单所属会员信息失败");
+		}
+
+		try {
+			order.setStoreId(storeId);
+			order.setWarehouseId(storeId);
+			String empName = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+			return this.orderService.modifyOrderonline(order, empName, type);
+		} catch (Exception e) {
+			log.error("修改订单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改订单失败");
+		}
+	}
+	
+	
+	
+	// kai 20151106导入第三方的快递单号，唯一快递的订单导入
+		@RequestMapping(value = "/admin/order/third_import_from_weiyi", method = { RequestMethod.POST })
+		@ResponseBody
+		public ResponseObject<Object> thirdimportOrderFromWeiyiExcel(
+				HttpServletRequest request,
+				HttpServletResponse response,
+				@RequestParam(value = "wid_upload", required = false) String wid,
+				@RequestParam(value = "cid_upload", required = false) String cid,
+				MultipartFile file) {
+
+			if(StringUtil.isEmpty(wid)||StringUtil.isEmpty(cid))
+			{
+				return generateResponseObject(
+						ResponseCode.PARAMETER_ERROR, "必须选择仓库/门店和渠道!");
+			}
+			String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+			{
+				String empId = StringUtil.obj2String(request.getSession().getAttribute(
+						Constant.EMP_STORE_ID_SESSION_KEY));
+				if(!StringUtil.isEmpty(empId)&&(empId.equalsIgnoreCase(wid)))
+				{
+					
+				}
+				else
+				{
+					return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作或没登陆!");
+				}
+				
+			}
+			if (file != null && file.getSize() > 0) {
+				List<Order> Orders = null;
+				try {
+					//kai 20151006 判定是不是excel表格
+					String originalName = file.getOriginalFilename();
+					if (!StringUtil.boolpicisgoodornot(originalName, defaultExcelFileType)) {
+						return generateResponseObject(
+								ResponseCode.CONSIGNEE_CARD_ERROR, "必须上传excel 2003表格,请重新尝试!");
+					}
+					if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+					{
+						Orders=OrderUtil.readOrderFromMeitaothirdExcel(file.getInputStream());
+					}
+					else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+					{
+						Orders=OrderUtil.readOrderFromWeiyithirdExcel(file.getInputStream());
+						Orders=OrderUtil.orders_clear(Orders);
+					}
+					else
+					{
+						Orders=OrderUtil.readOrderFromMeitaothirdExcel(file.getInputStream());
+					}
+					//Orders = OrderUtil.readOrderFromWeiyiExcel(file
+					//		.getInputStream());
+					//Orders=OrderUtil.readOrderFromWeiyithirdExcel(file.getInputStream());
+					//Orders=OrderUtil.readOrderFromMeitaothirdExcel(file.getInputStream());
+				} catch (OutOfMemoryError e) {
+					log.error("内存不够", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+							"内存不够,"+e.getMessage());
+				} catch (Exception e) {
+					log.error("读取数据出错,"+e.getMessage());
+					String str = e.getMessage();// java.lang.RuntimeException:
+					if ((str != null) && (!str.equalsIgnoreCase(""))) {
+						str = str.replace("java.lang.RuntimeException:", "");
+					}
+
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+							"读取数据出错原因:" + str);
+				}
+				OutputStream os = null;
+				try {
+					if(Orders==null)
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "没有读取到数据!");
+					}
+					
+					ImportthirdOrder Iorders=new ImportthirdOrder();
+					Iorders.setOrders(Orders);
+					ImportthirdOrder torder=this.orderService.check_thirdimport_weiyi_orders(Iorders, wid, cid);
+					if(torder==null)
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "读取参数出错，可能仓库或俯首选择出错!");
+					}
+					
+					
+					
+					
+			        int flag=0;
+			        String[] orderflag=torder.getOrderflag();
+					for(int i=0;i<orderflag.length;i++)
+					{
+						if((orderflag[i]==null)||(!orderflag[i].equalsIgnoreCase("0")))//订单不存在
+						{
+							flag=1;
+							break;
+						}
+					}
+					
+					//去掉用户不存在的限制
+					/*if(flag!=1)
+					{
+						String[] userflag=torder.getUserflag();
+						for(int i=0;i<userflag.length;i++)
+						{
+							if((userflag[i]==null)||(!userflag[i].equalsIgnoreCase("0")))//用户不存在
+							{
+								flag=1;
+								break;
+							}
+						}
+					}*/
+					if(flag==1)
+					{
+						
+						String fileName = "third_wrong_orders_" + torder.getOrders().size() + ".xls";
+						// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+						response.setContentType("application/vnd.ms-excel");
+						response.setHeader("Content-disposition",
+								"attachment;filename="
+										+ new String(fileName.getBytes(), "iso-8859-1"));
+						// orders = this.orderService.getExportOrders(sdate, edate);
+						
+						/*File templeFile = new File(request.getSession()
+								.getServletContext().getRealPath("/")
+								+ this.orderOutputToWeiyiWrongthirdTempletsFile);*/
+						File templeFile;
+						if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+						{
+							templeFile = new File(request.getSession()
+									.getServletContext().getRealPath("/")
+									+ this.orderOutputToMeitaonewTempletsFile);
+						
+						}else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+						{
+							templeFile = new File(request.getSession()
+									.getServletContext().getRealPath("/")
+									+ this.orderOutputToWeiyiWrongthirdTempletsFile);
+						}
+						else
+						{
+							templeFile = new File(request.getSession()
+									.getServletContext().getRealPath("/")
+									+ this.orderOutputToMeitaonewTempletsFile);
+						}
+						os = response.getOutputStream();
+
+						// 导出数据唯一快递单子
+						OrderUtil util = new OrderUtil();
+						List<ImportthirdOrder> list1=new ArrayList<ImportthirdOrder>();
+						list1.add(Iorders);
+						//OrderUtil.exportOrderTocheckthirdExcel(list1, templeFile, os); 
+						if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+						{
+							OrderUtil.exportOrderTocheckthirdExcelmeitao(list1, templeFile, os); 
+						}else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+						{
+							OrderUtil.exportOrderTocheckthirdExcel(list1, templeFile, os); 
+						}
+						else
+						{
+							OrderUtil.exportOrderTocheckthirdExcelmeitao(list1, templeFile, os); 
+						}
+						
+					}
+					else
+					{							
+		
+						ResponseObject<Object> obj=this.orderService.addOrder_thirdorder_import(Iorders, wid, cid);//开始导入数据
+						if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))
+						{
+							
+							String fileName = "success_report_" + torder.getOrders().size() + ".xls";
+							// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+							response.setContentType("application/vnd.ms-excel");
+							response.setHeader("Content-disposition",
+									"attachment;filename="
+											+ new String(fileName.getBytes(), "iso-8859-1"));
+							// orders = this.orderService.getExportOrders(sdate, edate);
+							
+							/*File templeFile = new File(request.getSession()
+									.getServletContext().getRealPath("/")
+									+ this.orderOutputToWeiyiWrongthirdTempletsFile);*/
+							File templeFile;
+							if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+							{
+								templeFile = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ this.orderOutputToMeitaonewTempletsFile);
+							
+							}else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+							{
+								templeFile = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ this.orderOutputToWeiyiWrongthirdTempletsFile);
+							}
+							else
+							{
+								templeFile = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ this.orderOutputToMeitaonewTempletsFile);
+							}
+							os = response.getOutputStream();
+
+							// 导出数据唯一快递单子
+							OrderUtil util = new OrderUtil();
+							List<ImportthirdOrder> list1=new ArrayList<ImportthirdOrder>();
+							list1.add(Iorders);
+							//OrderUtil.exportOrderTocheckthirdExcel(list1, templeFile, os); 
+							if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+							{
+								//OrderUtil.exportOrderTocheckthirdExcelmeitao(list1, templeFile, os); 
+								OrderUtil.exportOrderToresultthirdExcel_meitao(list1, templeFile, os); 
+							}else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+							{
+								//OrderUtil.exportOrderTocheckthirdExcel(list1, templeFile, os); 
+								OrderUtil.exportOrderTothirdExcelresult_weiyi(list1, templeFile, os); //导出操作结果
+							}
+							else
+							{
+								//OrderUtil.exportOrderTocheckthirdExcelmeitao(list1, templeFile, os); 
+								OrderUtil.exportOrderToresultthirdExcel_meitao(list1, templeFile, os); 
+							}
+						}
+						else
+						{
+							return obj;
+						}
+						//return generateResponseObject(ResponseCode.SUCCESS_CODE);
+					}
+					
+					
+					
+					
+				} catch (Exception e) {
+					log.error("修改数据库失败"+e.getMessage());
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+							"提交失败：" + e.getMessage());
+				}
+				finally {
+					if (os != null) {
+						try {
+							os.close();
+						} catch (IOException e) {
+							// ignore
+						}
+					}
+				}
+			}
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "文件不能为空");
+		}
+		
+		// 用户打印订单
+		
+
+		
+		@RequestMapping(value = "/order/userprint", method = { RequestMethod.POST,RequestMethod.GET })
+		@ResponseBody
+		public ResponseObject<Object> printOrderOfUser(HttpServletRequest request,
+				@RequestParam(value = "id") String orderId) {
+			try {
+				String userId = StringUtil.obj2String(request.getSession()
+						.getAttribute(Constant.USER_ID_SESSION_KEY));
+				ResponseObject<Order> result = new ResponseObject<Order>(ResponseCode.SUCCESS_CODE);
+				ResponseObject<Object> obj=new ResponseObject<Object>(); 
+				ResponseObject<Order>  order=this.orderService.getOrderByOrderId(orderId);
+				
+				obj.setCode(order.getCode());
+				obj.setData(order.getData());
+				obj.setMessage(obj.getMessage());
+			return obj;
+			} catch (Exception e) {
+				log.error("获取数据订单失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取订单失败");
+			}
+		}
+		
+		/*@RequestMapping(value = "/admin/order/get_one", method = { RequestMethod.GET })
+		@ResponseBody
+		public ResponseObject<Order> getOrderById(
+				@RequestParam(value = "id", required = false, defaultValue = "") String id,
+				@RequestParam(value = "oid", required = false, defaultValue = "") String oid) {
+			try {
+				if (StringUtil.isEmpty(oid)) {
+					if (StringUtil.isEmpty(id)) {
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+								"参数不能为空");
+					}
+					// 根据运单记录id来获取所有的订单信息
+					return this.orderService.getOrderById(id);
+				}
+				return this.orderService.getOrderByOrderId(oid);
+			} catch (Exception e) {
+				log.error("获取订单信息失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"获取订单详细出现异常");
+			}*/
+		//}
+		
+		@RequestMapping(value = "/admin/order/get", method = { RequestMethod.GET,
+				RequestMethod.POST })
+		@ResponseBody
+		public ResponseObject<List<Order>> getOrdersByOrderIdbyadmin(
+				HttpServletRequest request,
+				@RequestParam(value = "oid") String[] orderIds,
+				@RequestParam(value = "state", required = false, defaultValue = "") String state) {
+			if (orderIds == null || orderIds.length == 0) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+			}
+			
+			String empName = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+		
+			
+			try {
+				
+				ResponseObject<List<Order>> result = this.orderService
+						.getOrderListByOrderIds(Arrays.asList(orderIds));
+				if (result != null && !StringUtil.isEmpty(state)
+						&& ResponseCode.SUCCESS_CODE.equals(result.getCode())) {
+					for (Order o : result.getData()) {
+						if (!state.equals(o.getState())) {
+							return generateResponseObject(
+									ResponseCode.PARAMETER_ERROR,
+									o.getId()
+											+ "运单不属于您需要的"
+											+ OrderUtil.transformerState(0, state)
+											+ "状态，运单状态为:"
+											+ OrderUtil.transformerState(0,
+													o.getState()));
+						}
+					}
+				} else if (result.getData() == null || result.getData().isEmpty()) {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+							"数据库中没有该id对应的运单数据" + Arrays.toString(orderIds));
+				}
+				else if(result != null && StringUtil.isEmpty(state)//只反回0,1状态
+						&& ResponseCode.SUCCESS_CODE.equals(result.getCode()))
+				{
+					for (Order o : result.getData()) {
+						if ((Constant.ORDER_STATE2.equalsIgnoreCase(o.getState()))||(Constant.ORDER_STATE1.equalsIgnoreCase(o.getState()))) {}
+						else
+						{
+							return generateResponseObject(
+									ResponseCode.PARAMETER_ERROR,
+									o.getId()
+											+ "运单不属于您需要的"
+											+ OrderUtil.transformerState(0, state)
+											+ "状态，运单状态为:"
+											+ OrderUtil.transformerState(0,
+													o.getState()));
+						}
+					}
+				}
+				return result;
+			} catch (Exception e) {
+				log.error("根据id获取订单列表失败");
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"根据id获取订单列表出现异常");
+			}
+		}
+
+
+		@RequestMapping(value = "/admin/order/payorders", method = { RequestMethod.POST })
+		@ResponseBody
+		public ResponseObject<Object> payOrdersMoney(HttpServletRequest request,
+				@RequestParam(value = "oid") String[] orderIds,
+				@RequestParam(value = "userid") String userid,
+				@RequestParam(value = "paytype") String paytype				
+				) {
+			try {
+				/*String userId = StringUtil.obj2String(request.getSession()
+						.getAttribute(Constant.USER_ID_SESSION_KEY));*/
+				String userId=userid;
+				/*if(userid=="")
+				{
+					return generateResponseObject(
+							ResponseCode.USER_ID_ERROR, "提取用户信息错误!");
+				}
+				else
+				{
+					userId=userid;
+				}*/
+				double totalMoney = 0;
+				double rmb = 0;
+				double usd = 0;
+				
+				double usdrate=0;
+				ResponseObject<String> obj=this.orderService.getCurUsaToCn();
+				if((obj.getCode()!=null)&&(obj.getCode().equalsIgnoreCase(ResponseCode.SUCCESS_CODE)))
+				{
+					if((obj.getData()!=null)&&(!obj.getData().equals("")))
+					{
+						String money00=obj.getData();
+						double dou = Double.parseDouble(money00);
+						if(dou>0)
+						{
+							usdrate=dou;
+						}
+					}
+				}
+				
+				List<String> array = new ArrayList<String>();
+				for (String orderId : orderIds) {
+					Order order = this.orderService.getOrderByOrderId(orderId)
+							.getData();
+					if ((Constant.ORDER_STATE2.equals(order.getState()) || Constant.ORDER_STATE1.equals(order.getState()))
+							&& order.getUserId().equals(userId)) {
+						if(Double.valueOf(order.getTotalMoney())<0)
+						{
+							return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+									"该订单"+order.getUserId()+"的费用小于0！");
+						}
+						totalMoney += Double.valueOf(order.getTotalMoney());
+					} else {
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+								"该订单"+order.getUserId()+"不是处于待审核或待付款状态或者属于指定用户！");
+					}
+					rmb = StringUtil.string2Double(order.getUser().getRmbBalance());
+					usd = StringUtil.string2Double(order.getUser().getUsdBalance());
+					array.add(order.getId());
+				}
+
+				//String cur_usa_cn=this
+				
+				//if (hasPayMoney(usd, rmb, totalMoney)) {
+				if((paytype!=null)&&(paytype.equalsIgnoreCase("0")))
+				{
+					if (hasPayMoneyusa(usd, rmb, usdrate,totalMoney)) {
+						double newusd = usd - totalMoney;
+						double newrmb = rmb; // 先用美元支付
+						if (newusd >= 0) {
+							// ignore
+						} else {
+							newusd = 0.0D; // 人民币余额全部支付，开始扣美元的钱
+							newrmb = new BigDecimal((rmb - (totalMoney - usd)*usdrate)).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+							if(newrmb<0)
+							{
+								return generateResponseObject(
+										ResponseCode.ORDER_PAY_ACCOUNT_NOT_MONEY, "帐户余额不足");
+							}
+						}
+						return this.orderService.pay(array, Arrays.asList(orderIds),
+								userId, String.valueOf(totalMoney), newrmb, newusd,
+								true);
+					} else {
+						return generateResponseObject(
+								ResponseCode.ORDER_PAY_ACCOUNT_NOT_MONEY, "帐户余额不足");
+					}
+				} 
+				else if((paytype!=null)&&(paytype.equalsIgnoreCase("1")))//现金支付
+				{
+					// 进行现金支付
+					return this.orderService.pay(
+							array,
+							Arrays.asList(orderIds),
+							userId, String.valueOf(totalMoney), 0, 0,
+							false);
+				}
+				else
+				{
+					return generateResponseObject(
+							ResponseCode.ORDER_PAY_ACCOUNT_NOT_MONEY, "支付方式不正确！");
+				}
+			} catch (Exception e) {
+				log.error("付款失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"付款失败，请重新尝试");
+			}
+		}
+		
+		// 下载订单批量上传的模板
+		@RequestMapping(value = "/admin/order/download_thirdweiyiorders", method = { RequestMethod.GET })
+		public void getImportWeiyithirdOrdersDataExcelFile(HttpServletRequest request,
+				HttpServletResponse response) {
+			InputStream input = null;
+			ServletOutputStream os=null;
+			try {
+				response.setContentType("application/vnd.ms-excel");
+				response.setHeader("Content-disposition", "attachment;filename="
+						+ new String("upload_thirdorders_templet.xls".getBytes(),
+								"iso-8859-1"));
+				
+				if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+				{
+					input = request
+							.getSession()
+							.getServletContext()
+							.getResourceAsStream(
+									this.orderImportmeitaoithirdordersTempletsFile);
+				}
+				else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+				{
+				input = request
+						.getSession()
+						.getServletContext()
+						.getResourceAsStream(
+								this.orderImportWeiyithirdordersTempletsFile);
+				}
+				else
+				{
+					input = request
+							.getSession()
+							.getServletContext()
+							.getResourceAsStream(
+									this.orderImportmeitaoithirdordersTempletsFile);
+				}
+				os = response.getOutputStream();
+				byte[] buffer = new byte[1024];
+				int n = 0;
+				while ((n = input.read(buffer)) > 0) {
+					os.write(buffer, 0, n);
+				}
+				os.flush();
+			} catch (Exception e) {
+				log.error("下载文件失败", e);
+			} finally {
+				if (input != null) {
+					try {
+						input.close();
+					} catch (IOException e) {
+						// ignore
+					}
+				}
+				if (os != null) {
+					try {
+						os.close();
+					} catch (IOException e) {
+						// ignore
+					}
+				}
+			}
+		}
+		
+		//kai 20151121 添加订单归属于一个航班中
+		@RequestMapping(value = "/admin/order/modifyordersfly", method = {
+				RequestMethod.GET, RequestMethod.POST })
+		@ResponseBody
+		public ResponseObject<Object> modify(
+				HttpServletRequest request,
+				@RequestParam(value = "flightno") String flightno,
+				@RequestParam(value = "state") String state,
+				@RequestParam(value = "str_orders", required = false, defaultValue = "") String[] str_orders) {
+			
+			String supperadmin = (String) request.getSession().getAttribute(
+					Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if ((supperadmin == null) || (!supperadmin.equalsIgnoreCase("1"))) {
+				return generateResponseObject(
+						ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权添加或修改航班信息!");
+
+			}
+			if((state!=null)&&(state.equalsIgnoreCase("")))
+			{
+				state=null;
+			}
+			if((flightno==null)||(flightno.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效,航班号不能为空!");
+			}
+			if((str_orders==null)||(str_orders.length<1))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效,至少要有一个运单号!");
+			}
+			try {
+			String empName = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+			return this.orderService.modifyOrderstoflight(str_orders, flightno,state,empName);
+			} catch (Exception e) {
+				
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"修改运单状态失败");
+			}
+		}
+		
+		@RequestMapping(value = "/user/order/searchAfterOrderState", method = { RequestMethod.GET })
+		@ResponseBody
+		public ResponseObject<PageSplit<Order>> searchAfterOrderState(HttpServletRequest request,
+				@RequestParam(value = "oid", required = false) String oid,
+				@RequestParam(value = "state", required = false) String state,
+				@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+			try {
+				String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+				Order order = new Order();
+				order.setUserId(userId);
+				order.setState(state);
+				return this.orderService.searchAfterOrderState(order, defaultPageSize, pageIndex);
+			} catch (Exception e) {
+				log.error("查询运单失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+			}
+		}
+		
+		
+		// 下载订单批量上传的模板
+		@RequestMapping(value = "/admin/order/download_flight_example", method = { RequestMethod.GET })
+		public void getImportflightexampleDataExcelFile(HttpServletRequest request,
+				HttpServletResponse response) {
+			InputStream input = null;
+			ServletOutputStream os=null;
+			try {
+				response.setContentType("application/vnd.ms-excel");
+				response.setHeader("Content-disposition", "attachment;filename="
+						+ new String("upload_flyno_example_templet.xls".getBytes(),
+								"iso-8859-1"));
+				
+				input = request
+						.getSession()
+						.getServletContext()
+						.getResourceAsStream(
+								this.orderImportflightexampleTempletsFile);
+				os = response.getOutputStream();
+				byte[] buffer = new byte[1024];
+				int n = 0;
+				while ((n = input.read(buffer)) > 0) {
+					os.write(buffer, 0, n);
+				}
+				os.flush();
+			} catch (Exception e) {
+				log.error("下载文件失败", e);
+			} finally {
+				if (input != null) {
+					try {
+						input.close();
+					} catch (IOException e) {
+						// ignore
+					}
+				}
+				if (os != null) {
+					try {
+						os.close();
+					} catch (IOException e) {
+						// ignore
+					}
+				}
+			}
+		}
+		
+	@RequestMapping(value = "/admin/order/getAllStateCount", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<String[]> getAllStateCount(HttpServletRequest request){
+		String warehouseId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if("1".equals(StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY)))){
+			warehouseId = null;
+		}
+		try{
+			return this.orderService.getAllStateCount(warehouseId);
+		}catch(Exception e){
+			log.error("根据用户获取事件数量出现异常");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据用户获取事件数量出现异常");
+		}
+	}
+	
+	
+	//导入系统运单对应海关运单
+	@RequestMapping(value = "/admin/order/import_order_to_seatax1", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> importOrderseataxExcel1(
+			HttpServletResponse response,
+			HttpServletRequest request, @RequestParam(value = "file_sea1", required = false) MultipartFile file) {
+		
+		String wid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			//return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权批量上传修改状态!");
+			
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(
+					Constant.EMP_STORE_ID_SESSION_KEY));
+			if(!StringUtil.isEmpty(empId))
+			{
+				wid=empId;
+			}
+			else
+			{
+				return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作或没登陆!");
+			}
+			
+			
+			
+		}
+		if (file != null && file.getSize() > 0) {
+			List<ImportOrder> importOrders = null;
+			try {
+				
+				//kai 20151006 判定是不是excel表格
+				String originalName = file.getOriginalFilename();
+				if (!StringUtil.boolpicisgoodornot(originalName, defaultExcelFileType)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "必须上传excel 2003表格,请重新尝试!");
+				}
+				
+				
+				importOrders = OrderUtil.readOrderSeaTaxExcel1(file
+						.getInputStream());
+			} catch (OutOfMemoryError e) {
+				log.error("内存不够",e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"内存不够,"+e.getMessage());
+			} catch (Exception e) {
+				log.error("读取数据出错", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"读取出错,"+e.getMessage());
+			}
+			if (!importOrders.isEmpty()) {
+				try {
+					// 导入员工名称
+					String empName = StringUtil.obj2String(request.getSession()
+							.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+					ResponseObject<Object> obj= this.orderService.importExcelOfseanno1(
+							importOrders, empName,wid);
+					
+					
+					
+					
+					if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))
+					{
+						
+							
+							
+							
+							importOrders=(List<ImportOrder>)obj.getData();
+							if((importOrders==null)||(importOrders.size()<1))
+							{
+								return obj;
+							}
+							
+							
+							OutputStream os=null;
+	
+							try {
+								
+								
+								
+								String fileName = "update_state_result_" + importOrders.size() + ".xls";
+								// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+								response.setContentType("application/vnd.ms-excel");
+								response.setHeader("Content-disposition",
+										"attachment;filename="
+												+ new String(fileName.getBytes(), "iso-8859-1"));
+								// orders = this.orderService.getExportOrders(sdate, edate);
+	
+								File templeFile = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ this.orderOutputToOrderidtoseanoResultTempletsFile);
+								 os = response.getOutputStream();
+	
+								OrderUtil.exportOrderSeaNoModifyToResult(importOrders, templeFile, os);
+								
+								//util.exportOrderToWeiyiExcel(orders, templeFile, os);
+								//util.exportOrderToMeitao(orders, templeFile, os);//kai 20151027 导出美淘模板
+								
+	
+							} catch (Exception e) {
+								log.error("获取运单数据失败", e);
+								throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+							} finally {
+							
+								if (os != null) {
+									try {
+										os.close();
+									} catch (IOException e) {
+										// ignore
+									}
+								}
+							}
+						
+							
+						
+							
+						
+						
+					}
+					else
+					{
+						return obj;
+					}
+				} catch (Exception e) {
+					log.error("修改数据库失败", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+							"修改数据库失败,原因" + e.getMessage());
+				}
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"文件内容不能为空,请检查是否有空行或运单号为空!");
+			}
+		}
+		return generateResponseObject(ResponseCode.PARAMETER_ERROR, "文件不能为空");
+	}
+	
+	
+	
+	//导入海关对应第三方运单
+		@RequestMapping(value = "/admin/order/import_order_to_seatax2", method = { RequestMethod.POST })
+		@ResponseBody
+		public ResponseObject<Object> importseataxtothirdorderExcel1(
+				HttpServletResponse response,
+				HttpServletRequest request, @RequestParam(value = "file_sea2", required = false) MultipartFile file) {
+			
+			String wid=null;
+			String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			
+			if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+			{
+				//return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权批量上传修改状态!");
+				
+				String empId = StringUtil.obj2String(request.getSession().getAttribute(
+						Constant.EMP_STORE_ID_SESSION_KEY));
+				if(!StringUtil.isEmpty(empId))
+				{
+					wid=empId;
+				}
+				else
+				{
+					return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作或没登陆!");
+				}
+				
+				
+				
+			}
+			if (file != null && file.getSize() > 0) {
+				List<ImportOrder> importOrders = null;
+				try {
+					
+					//kai 20151006 判定是不是excel表格
+					String originalName = file.getOriginalFilename();
+					if (!StringUtil.boolpicisgoodornot(originalName, defaultExcelFileType)) {
+						return generateResponseObject(
+								ResponseCode.CONSIGNEE_CARD_ERROR, "必须上传excel 2003表格,请重新尝试!");
+					}
+					
+					
+					importOrders = OrderUtil.readOrderSeaTaxtothirdExcel2(file
+							.getInputStream());
+				} catch (OutOfMemoryError e) {
+					log.error("内存不够",e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+							"内存不够,"+e.getMessage());
+				} catch (Exception e) {
+					log.error("读取数据出错", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+							"读取出错,"+e.getMessage());
+				}
+				if (!importOrders.isEmpty()) {
+					try {
+						// 导入员工名称
+						String empName = StringUtil.obj2String(request.getSession()
+								.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+						ResponseObject<Object> obj= this.orderService.importExcelstateOfseanno2(
+								importOrders, empName,wid);
+						
+						
+						
+						
+						if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))
+						{
+							
+								
+								
+								
+								importOrders=(List<ImportOrder>)obj.getData();
+								if((importOrders==null)||(importOrders.size()<1))
+								{
+									return obj;
+								}
+								
+								
+								OutputStream os=null;
+		
+								try {
+									
+									
+									
+									String fileName = "update_state_result2_" + importOrders.size() + ".xls";
+									// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+									response.setContentType("application/vnd.ms-excel");
+									response.setHeader("Content-disposition",
+											"attachment;filename="
+													+ new String(fileName.getBytes(), "iso-8859-1"));
+									// orders = this.orderService.getExportOrders(sdate, edate);
+		
+									File templeFile = new File(request.getSession()
+											.getServletContext().getRealPath("/")
+											+ this.orderOutputToSeanoStateResultTempletsFile);
+									 os = response.getOutputStream();
+		
+									OrderUtil.exportOrderSeaNoModifystateToResult2(importOrders, templeFile, os);
+									
+									//util.exportOrderToWeiyiExcel(orders, templeFile, os);
+									//util.exportOrderToMeitao(orders, templeFile, os);//kai 20151027 导出美淘模板
+									
+		
+								} catch (Exception e) {
+									log.error("获取运单数据失败", e);
+									throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+								} finally {
+								
+									if (os != null) {
+										try {
+											os.close();
+										} catch (IOException e) {
+											// ignore
+										}
+									}
+								}
+							
+								
+							
+								
+							
+							
+						}
+						else
+						{
+							return obj;
+						}
+					} catch (Exception e) {
+						log.error("修改数据库失败", e);
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+								"修改数据库失败,原因" + e.getMessage());
+					}
+				} else {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+							"文件内容不能为空,请检查是否有空行或运单号为空!");
+				}
+			}
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "文件不能为空");
+		}
+		
+		
+		
+		// 下载上传海关模版
+		@RequestMapping(value = "/admin/order/download_seatax1", method = { RequestMethod.GET })
+		public void getImportseanoDataExcelFile(
+				HttpServletRequest request, HttpServletResponse response) {
+			InputStream input = null;
+			ServletOutputStream os=null;
+			try {
+				
+				
+				
+				response.setContentType("application/vnd.ms-excel");
+				response.setHeader("Content-disposition", "attachment;filename="
+						+ new String("upload_orders_seano_templet.xls".getBytes(),
+								"iso-8859-1"));
+				input = request
+						.getSession()
+						.getServletContext()
+						.getResourceAsStream(
+								this.orderImportordertoseanoTempletsFile);
+				os = response.getOutputStream();
+				byte[] buffer = new byte[1024];
+				int n = 0;
+				while ((n = input.read(buffer)) > 0) {
+					os.write(buffer, 0, n);
+				}
+				os.flush();
+			} catch (Exception e) {
+				log.error("下载文件失败", e);
+			} finally {
+				if (input != null) {
+					try {
+						input.close();
+					} catch (IOException e) {
+						// ignore
+					}
+				}
+				if (os != null) {
+					try {
+						os.close();
+					} catch (IOException e) {
+						// ignore
+					}
+				}
+			}
+		}
+		
+		// 下载通过海关号修改状态模板
+				@RequestMapping(value = "/admin/order/download_seatax2", method = { RequestMethod.GET })
+				public void getImportseanomodifystateDataExcelFile(
+						HttpServletRequest request, HttpServletResponse response) {
+					InputStream input = null;
+					ServletOutputStream os=null;
+					try {
+						response.setContentType("application/vnd.ms-excel");
+						response.setHeader("Content-disposition", "attachment;filename="
+								+ new String("upload_orders_seano_state_templet.xls".getBytes(),
+										"iso-8859-1"));
+						input = request
+								.getSession()
+								.getServletContext()
+								.getResourceAsStream(
+										this.orderImportseanomodifystateTempletsFile);
+						os = response.getOutputStream();
+						byte[] buffer = new byte[1024];
+						int n = 0;
+						while ((n = input.read(buffer)) > 0) {
+							os.write(buffer, 0, n);
+						}
+						os.flush();
+					} catch (Exception e) {
+						log.error("下载文件失败", e);
+					} finally {
+						if (input != null) {
+							try {
+								input.close();
+							} catch (IOException e) {
+								// ignore
+							}
+						}
+						if (os != null) {
+							try {
+								os.close();
+							} catch (IOException e) {
+								// ignore
+							}
+						}
+					}
+				}
+				
+				
+				
+				@RequestMapping(value = "/admin/order/exporeorderlist", method = { RequestMethod.GET,RequestMethod.POST })
+				@ResponseBody
+				public ResponseObject<PageSplit<Order>> searchByKeyOforders(
+						HttpServletRequest request,
+						 HttpServletResponse response,
+				        @RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+				        @RequestParam(value = "key", required = false) String key,
+				        @RequestParam(value = "type", required = false, defaultValue = "") String type,
+				        @RequestParam(value = "sdate", required = false) String sdate,
+				        @RequestParam(value = "edate", required = false) String edate,
+				        @RequestParam(value = "state", required = false) String state,
+				        @RequestParam(value = "typekey", required = false) String typekey,
+				        @RequestParam(value = "commudity_hidden", required = false) String commudity_hidden,			        
+				        @RequestParam(value = "wid_download", required = false) String wid,
+				        @RequestParam(value = "cid_downloadload", required = false) String cid) {
+					try {
+						int pageIndex=1;
+						
+						
+						if((state!=null)&&(state.equalsIgnoreCase("-1")))
+						{
+							state="";
+						}
+						if((type!=null)&&(type.equalsIgnoreCase("-1")))
+						{
+							type="";
+						}
+						if((wid!=null)&&(wid.equalsIgnoreCase("-1")))
+						{
+							wid="";
+						}
+						if((state!=null)&&(state.equalsIgnoreCase("-1")))
+						{
+							state="";
+						}
+						if((cid!=null)&&(cid.equalsIgnoreCase("-1")))
+						{
+							cid="";
+						}
+						
+						
+						String storeid=null;
+						String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+						if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+						{
+							storeid=null;//表示可以查找所有门店
+							
+						}else
+						{
+							storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+							if((storeid==null)||(storeid.equalsIgnoreCase("")))
+							{
+								return generateResponseObject(ResponseCode.NEED_LOGIN,
+										"你没有登陆!");
+							}
+						}
+						
+						if(storeid!=null)
+						{
+							if(!StringUtil.isEmpty(wid))
+							{
+								if(!storeid.equalsIgnoreCase(wid))
+								{
+									return generateResponseObject(ResponseCode.PARAMETER_ERROR, "对不起，你不能下载其它门店的运单!");
+								}
+							}
+							else
+							{
+								wid=storeid;
+							}
+							
+						}
+						
+						key =  new String(key.getBytes("ISO-8859-1"), "utf-8");
+						
+						if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+							sdate = "";
+						} else {
+							sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+						}
+
+						if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+							edate = "";
+						} else {
+							edate = UserUtil.transformerDateString(edate, " 23:59:59");
+						}
+						
+						if((wid!=null)&&(wid.equalsIgnoreCase("-1")))
+						{
+							wid=null;
+						}
+						if((cid!=null)&&(cid.equalsIgnoreCase("-1")))
+						{
+							cid=null;
+						}
+
+						oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+						
+						ResponseObject<PageSplit<Order>> obj=null;
+						if((type!=null)&&(type.equalsIgnoreCase("2")))
+						{
+							
+							//String column = OrderUtil.getSearchColumnByType(type);
+							state = OrderUtil.dealState(state);
+							pageIndex = Math.max(pageIndex, 1);
+							int pagesize=0x7fffffff;//设置数量为最大值
+							//return this.orderService.searchWebOrders(oid, key, column, sdate, edate, state, pagesize, pageIndex);
+							//return this.orderService.searchWebOrdersincludewidcid(oid, key, column, sdate, edate, state,wid,cid, pagesize, pageIndex);
+							 obj=this.orderService.searchWebOrdersincludewidcidbybelonguser(oid, key, sdate, edate, state,typekey,wid,cid, pagesize, pageIndex);
+						}
+						else
+						{
+							String column = OrderUtil.getSearchColumnByType(type);
+							state = OrderUtil.dealState(state);
+							pageIndex = Math.max(pageIndex, 1);
+							int pagesize=0x7fffffff;//设置数量为最大值
+							//return this.orderService.searchWebOrders(oid, key, column, sdate, edate, state, pagesize, pageIndex);
+							obj=this.orderService.searchWebOrdersincludewidcid(oid, key, column, sdate, edate, state,typekey,wid,cid, pagesize, pageIndex);
+						}
+						
+						
+						
+// 添加订单下载功能
+						
+						String[] comm_type;
+						
+						if(StringUtil.isEmpty(commudity_hidden))
+						{
+							comm_type=new String[4];
+							comm_type[0]="0";
+							comm_type[1]="1";
+							comm_type[2]="2";
+							comm_type[3]="3";
+						}
+						else
+						{
+							comm_type=commudity_hidden.split(",");
+						}
+
+						List<ExportOrder> orders = new ArrayList<ExportOrder>();
+						List<String> orderIds = new ArrayList<String>();
+						
+						List<Order> orderlists= new ArrayList<Order>();
+						if((obj==null)||(!ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))||(obj.getData()==null)||(obj.getData().getPageCount()<1))
+						{
+							return obj;
+						}
+						else
+						{
+							orderlists=(List<Order>)obj.getData().getDatas();
+							for(Order o:orderlists)
+							{
+								orderIds.add(o.getOrderId());
+							}
+						}
+						
+						
+						OutputStream os = null;
+						try {
+							ResponseObject<List<ExportOrder>> result = this.orderService
+									.getExportOrderListByOrderIds(orderIds);
+
+							/*
+							 * for (ExportOrder o : result.getData()) {
+							 * 
+							 * orders.add(o); }
+							 */
+							orders = result.getData();
+							String fileName = "orders_" + orders.size() + ".xls";
+							// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+							response.setContentType("application/vnd.ms-excel");
+							response.setHeader("Content-disposition",
+									"attachment;filename="
+											+ new String(fileName.getBytes(), "iso-8859-1"));
+							// orders = this.orderService.getExportOrders(sdate, edate);
+
+							/*File templeFile = new File(request.getSession()
+									.getServletContext().getRealPath("/")
+									+ this.orderOutputToWeiyiTempletsFile);*/
+							File templeFile;
+							if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+							{
+								templeFile = new File(request.getSession()
+								.getServletContext().getRealPath("/")
+								+ this.orderOutputToMeitaonewTempletsFile);
+							}
+							else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+							{
+								templeFile = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ this.orderOutputToWeiyiTempletsFile);
+							}
+							else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("zhonghua")))
+							{
+								templeFile = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ this.orderOutputToZhonghuaTempletsFile);
+							}
+							else
+							{
+								templeFile = new File(request.getSession()
+										.getServletContext().getRealPath("/")
+										+ this.orderOutputToMeitaonewTempletsFile);
+							}
+							os = response.getOutputStream();
+
+							// 导出数据唯一快递单子
+							OrderUtil util = new OrderUtil();
+							
+							for(ExportOrder o:orders)
+							{
+								o.setComm_type(comm_type);
+							}
+							
+							//util.exportOrderToWeiyiExcel(orders, templeFile, os);
+							//util.exportOrderToMeitao(orders, templeFile, os);//kai 20151027 导出美淘模板,实质是惟一快递版本
+							if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("meitao")))
+							{
+								util.exportOrderToMeitao20151123(orders, templeFile, os);
+							}
+							else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("weiyi")))
+							{
+								util.exportOrderToMeitao(orders, templeFile, os);//kai 20151027 导出美淘模板,实质是惟一快递版本
+							}
+							else if((ordermodeexample!=null)&&(ordermodeexample.equalsIgnoreCase("zhonghua")))
+							{
+								util.exportOrderToZhongHua(orders, templeFile, os);//kai 20160120 中华快递导出模板
+							}
+							else
+							{
+								util.exportOrderToMeitao20151123(orders, templeFile, os);
+							}
+							
+
+						} catch (Exception e) {
+							log.error("获取运单数据失败", e);
+							throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+						} finally {
+							orders.clear();
+							if (os != null) {
+								try {
+									os.close();
+								} catch (IOException e) {
+									// ignore
+								}
+							}
+						}
+					
+						return generateResponseObject(ResponseCode.SUCCESS_CODE, "操作完成!");
+					} catch (Exception e) {
+						log.error("查询运单失败", e);
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+					}
+				}	
+				
+			
+				//添加顾客批量查询
+				@RequestMapping(value = "/route/guest_orders", method = { RequestMethod.GET,
+						RequestMethod.POST })
+				@ResponseBody
+				public ResponseObject<List<Map<String, Object>>> getRouteByguestuseorderids(HttpServletRequest request,
+						@RequestParam(value = "kuaidi_type") String kuaidiType,//查询的类型
+						@RequestParam(value = "oids", required = false) String[] orderIds) {//要查询的单号
+					try {
+						return this.orderService.getroutesbyguestOrderonlinebyuser(kuaidiType, orderIds);
+					} catch (Exception e) {
+						log.error("获取运单失败");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取运单失败");
+					}
+				}
+
+				
+				
+				//添加其它网站连入本系统的接口
+				
+				@RequestMapping(value = "/route/orders", produces={"application/json;charset=UTF-8"}, method = { RequestMethod.GET,
+						RequestMethod.POST })
+				@ResponseBody
+				public String getRouteByThirdwebsite(HttpServletRequest request,
+						//HttpServletResponse response,
+						@RequestParam(value = "kuaidi_type") String kuaidiType,
+						@RequestParam(value = "oids", required = false) String oids,
+						// @RequestParam(value = "third_no" , required = false) String
+						// thirdNo,
+						// @RequestParam(value = "third_pns", required = false) String
+						// thirdPns,
+						@RequestParam(value = "oid", required = false) String[] orderIds,
+						@RequestParam(value = "callback", required = false) String callback
+						) {
+					try {
+						
+								
+								ResponseObject<Object> obj=	this.orderService.getRouteListByGuest(kuaidiType, oids/*
+																					 * ,thirdNo
+																					 * ,
+																					 * thirdPns
+																					 */,
+								orderIds);
+							
+								
+								
+							//	response.setContentType("text/plain");  
+						      //  response.setHeader("Pragma", "No-cache");  
+						      //  response.setHeader("Cache-Control", "no-cache");  
+						      //  response.setDateHeader("Expires", 0);  
+						        Map<String,Object> map = new HashMap<String,Object>();   
+						        map.put("code", obj.getCode());  
+						        map.put("message", obj.getMessage());
+						        map.put("data", obj.getData());
+						      //  PrintWriter out = response.getWriter();       
+						        JSONObject resultJSON = JSONObject.fromObject(map); //根据需要拼装json  
+						        //String jsonpCallback = request.getParameter("jsonpCallback");//客户端请求参数  
+						        String str=callback+"("+resultJSON+")";
+						       // resultJSON=URLEncoder.encode(resultJSON, "UTF-8");
+						        return str;
+						      //  out.println(jsonpCallback+"("+resultJSON.toString(1,1)+")");//返回jsonp格式数据  
+						      //  out.flush();  
+						      //  out.close();  
+								
+								
+					} catch (Exception e) {
+						log.error("获取运单失败");
+						return callback+"(获取运单失败)";
+					}
+				}
+}

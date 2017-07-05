@@ -1,0 +1,53 @@
+package com.weiye.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.HtmlSpiderUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.SpiderOrder;
+import com.weiye.service.SpiderOrderService;
+
+@Service("spiderOrderService")
+public class SpiderOrderServiceImpl implements SpiderOrderService{
+	
+//	private static final String[][] PRICE_TYPE = {{"RMB", "￥", "¥", "CNY"}, {"USD", "$", "US"}, {"EUR", "€"}};
+	
+	@Override
+	public ResponseObject<SpiderOrder> search(String urlString) throws ServiceException {
+		ResponseObject<SpiderOrder> responseObject = new ResponseObject<SpiderOrder>();
+		if(StringUtil.isEmpty(urlString) && (0 == urlString.indexOf("http://") || 0 == urlString.indexOf("https://"))){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("无效参数");
+		}else{
+			SpiderOrder spiderOrder = HtmlSpiderUtil.search(urlString);
+			
+			
+			
+			if(null == spiderOrder){
+				responseObject.setCode(ResponseCode.SPIDER_ORDER_NOT_EXISTS);
+				responseObject.setMessage("找不到对应商品");
+			}else{
+				//加入如果接收到的不是价格，反回失败
+				try{
+					
+					
+					Double aa=Double.valueOf(spiderOrder.getPrice());
+				}
+				catch(Exception e)
+				{
+					responseObject.setCode(ResponseCode.SPIDER_ORDER_NOT_EXISTS);
+					responseObject.setMessage("价格提取失败!");
+					return responseObject;
+				}
+				
+				responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				responseObject.setData(spiderOrder);
+			}
+		}
+		return responseObject;
+	}
+
+}

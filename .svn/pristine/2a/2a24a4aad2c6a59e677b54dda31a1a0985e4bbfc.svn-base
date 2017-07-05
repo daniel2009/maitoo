@@ -1,0 +1,22 @@
+package com.weiye.dao;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.model.Storage;
+import com.weiye.model.StoragePosition;
+import com.weiye.model.StoragePositionRecord;
+import com.weiye.model.User;
+
+public interface StoragePositionRecordDao {
+
+	int insert(StoragePositionRecord storagePositionRecord) throws Exception;
+
+	int deleteByRelate(StoragePositionRecord storagePositionRecord) throws Exception;
+
+	int countByStoragePosition(StoragePosition storagePosition) throws Exception;
+
+	int insertByUser(@Param("storage")Storage storage, @Param("storagePosition")StoragePosition storagePosition, @Param("user")User user, @Param("array")String[] stateArray) throws Exception;
+
+	int deleteByStoragePosition(StoragePosition storagePosition) throws Exception;
+
+}

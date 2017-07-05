@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Webxury| Fleet</title>
+    <meta charset="utf-8" />
+    <!-- Page Loader - Needs to be placed in header for loading at top of all content -->
+    <script type="text/javascript" src="js/pace.min.js"></script>
+    <link href="css/pace-loading-bar.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/animate.shipping.css">
+    <link rel="stylesheet" type="text/css" href="css/ShippingIcon.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" id="main-style" type="text/css" href="css/style.css">
+</head>
+
+<body class="blue page-loading">
+    <!-- Section Start - Header -->
+    <section class='header' id='header'>
+        <!-- Header Top Bar - Start -->
+         <div class="topbar-wrap">
+            <div class="container">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 logo-area">
+                    <div class="logo">
+                        <div>
+                         <a href="../fleet/index.html">
+                            <img id="logoHeader" src="img/logo_s.jpg" alt="Header Image" class="img-responsive"><!--<i class="icon icon-logo white"></i>-->
+                       </a>
+                        </div>
+                        <!--<span class="name">SHIPPING</span>
+                        <span class="small">Logistics & Transport</span>-->
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-9 col-sm-8 col-xs-5 menu-area pull-right">
+                    <!-- Menu Top Bar - Start -->
+                    <div class="topbar">
+                        <div class="menu">
+                            <div class="primary inviewport animated delay2" data-effect="">
+                                <div class='cssmenu'>
+                                    <!-- Menu - Start -->
+                                    <ul class='menu-ul'>
+                                        <li class='has-sub'>
+                                            <a href='index.html'><b>首页</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='price.html'><b>包裹标准</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='about-us-2.html'><b>关于我们</b></a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='contact.html'><b>联系我们</b></a>
+                                        </li>
+                                        <!--<li class='has-sub'>
+                                            <a href='location.html'><b>公司地点</b></a>
+                                        </li>-->
+                                        <!--  <li class='has-sub'>
+                                            <a href='News.html'><b>新闻公告</b></a>
+                                        </li> -->
+                                         <li class='has-sub'>
+                                            <a href='login.jsp'><b>登陆</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='registe.html'><b>注册</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='upload.html'><b>上传ID</b></a>
+                                        </li>
+                                          
+                                    </ul>
+                                    <!-- Menu - End -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Menu Top Bar - End -->
+                    <!-- Mobile Menu - Start -->
+                    <div class="menu-mobile col-xs-10 pull-right cssmenu">
+                        <i class="icon icon-menu menu-toggle"></i>
+                        <ul class="menu" id='parallax-mobile-menu'>
+                        </ul>
+                    </div>
+                    <!-- Mobile Menu - End -->
+                </div>
+            </div>
+        </div>
+        <!-- Header Top Bar - End -->
+        <div class="header-bg header-small">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 slantbar hidden-xs"></div>
+            <!-- Header Tracking Box - Start -->
+            
+            <!-- Header Tracking Box - End -->
+            <!-- Header Content Slide - Start -->
+            <div style="position:relative;display:inline-block;width:100%;height:50%;">
+                <img src="img/banner-4s.jpg" alt="Header Image" class="img-responsive">
+                <div class="bg-overlay"></div>
+                <div class="main-wrap">
+                    <div class="container">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 main-content">
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Content Slide - End -->
+        </div>
+    </section>
+    <!-- Section End - Header -->
+    <!-- Section Start - Get In Touch -->
+    <section class='contact' id='contact'>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                    <!-- Contact Form - Start -->
+                    <div class='row'>
+                  		<h4>上传身份证</h4><br/>
+                        <p>中国海关邮政包裹清关身份证比对系统 <span style=' color:#F00;'>(必填*)</span></p>
+                        <form action='send_email.php' method='post'>
+                            
+                             <div class='col-xs-12'>
+                             	<label>运单号<span style=' color:#F00;'>*</span></label>
+                                <input type='text' placeholder='' class='transition' name="oid" style="width:50%;">
+                            </div>
+                           
+                            <div class='col-xs-12'>
+                            <label>收件人-身份证姓名<span style=' color:#F00;'>*</span></label>
+                                <input type='text' placeholder='' class='transition' name="cardidname" style="width:50%;">
+                            </div>
+                            <div class='col-xs-12'>
+                            <label>收件人-电话号码<span style=' color:#F00;'>*</span></label>
+                               <input type='text' placeholder='' class='transition' name="cphone" style="width:50%;">
+                            </div>
+                             <div class='col-xs-12'>
+                            <label>收件人-身份证号<span style=' color:#F00;'>*</span></label>
+                               <input type='text' placeholder='' class='transition' name="cid" style="width:50%;">
+                            </div>
+                            <div class='col-xs-12'>
+                            <label>上传身份证正面图片<span style=' color:#F00;'>*</span></label>
+                               <input type='file' placeholder='' class='transition' style="width:50%;" name="file">
+                            </div>
+                            <div class='col-xs-12'>
+                            <label>上传身份证背面图片<span style=' color:#F00;'>*</span></label>
+                               <input type='file' placeholder='' class='transition' style="width:50%;" name="fileother">
+                            </div>
+                            
+                            <div class='col-xs-4'>
+                                <button type='button' class='btn btn-primary transition' onclick="javscript: submitId();">提交</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Contact Form - End -->
+                </div>
+               
+            </div>
+        </div>
+    </section>
+    <!-- Section End - Get In Touch 
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="row">
+            <div id="contact-map" class="gmap"></div>
+        </div>
+    </div>
+    <!-- Section Start - Footer -->
+    <section class='footer bg-black parallax ' id='footer'>
+        <div class="bg-overlay"></div>
+        <div class="container">
+            <div class="row">
+                <!-- Text Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 text-widget inviewport animated delay1" data-effect="fadeInUp">
+                    <div class="logo">
+                        <div>
+                        <a href="../fleet/index.html">
+                            <img src="img/logo.jpg" alt="Header Image" class="img-responsive" style="width:50%; height:50%;">
+                       </a>
+                        </div>
+                    </div>
+                    <p>公司简介</p>
+                    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	企业愿景：开放、包容、创新、和谐 </p>
+					<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    企业使命：高效、安全、无所不达 </p>
+					<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	企业核心价值观 ：以客为尊，诚信为本 </p>
+                </div>
+                <!-- Text Widget - End -->
+                <!-- News Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 news-widget inviewport animated delay2" data-effect="fadeInUp">
+                    <h4>微信公众号</h4>
+                    <div class="headul left-align"></div>
+                    <div class="news-wrap row">
+                        <div class="pic col-md-3 col-xs-3 col-sm-3 col-lg-3">
+                            <img alt="news-image" class="img-responsive" src="img/news-1.jpg">
+                        </div>
+                        <div class="info col-md-9 col-xs-9 col-sm-9 col-lg-9">
+                            <h5 class="title"><a href='#'>公众号名称(或微信号)</a></h5>
+                            <div class="date">william18559</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- News Widget - End -->
+                <!-- Contact Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 contact-widget inviewport animated delay3" data-effect="fadeInUp">
+                    <h4>公司地址</h4>
+                    <div class="headul left-align"></div>
+                    <p>地址: 2428 W Valley Blvd, Alhambra  
+                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CA 91803</p>
+                    <p>电子邮箱: zhonghuaex@126.com
+						<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2095781316@qq.com
+                        <br> 联系电话:  1-626-620-1616（客服）&nbsp;
+						<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1-626-551-8756（销售及代理业务）</p>
+                </div>
+                <!-- Contact Widget - End -->
+            </div>
+        </div>
+        <!-- Copyright Bar - Start -->
+        <div class="copyright">
+            <div class="col-md-12">
+                <div class="container">
+                    <div class="">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 message inviewport animated delay1" data-effect="fadeInUp">
+                            <span class="">中華快递 2016 ALL RIGHTS RESERVED. Copyright & Powered by WebXury Inc奢瑞科技</span>
+                        </div>
+                        <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 social">
+                            <a href="#" class="inviewport animated delay1" data-effect="fadeInUp"><i class="icon icon-facebook text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay2" data-effect="fadeInUp"><i class="icon icon-twitter text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay3" data-effect="fadeInUp"><i class="icon icon-dribbble text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay4" data-effect="fadeInUp"><i class="icon icon-google-plus text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay5" data-effect="fadeInUp"><i class="icon icon-youtube-play text-on-primary"></i></a>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Copyright Bar - End -->
+    </section>
+    <!-- Section End - Footer -->
+    <!-- Javascript & CSS Files moved to bottom of page for faster loading -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/inviewport-1.3.2.js"></script>
+    <!-- Google Map -->
+   <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyArv9ALhBv6ihfhABHEAkFg0-JHywhtgjM&amp;sensor=false"></script>
+    <script type="text/javascript" src="js/gmap.js"></script>-->
+    <!--Fancybox -->
+    <script type="text/javascript" src="js/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" src="js/jquery.fancybox-media.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery.fancybox.css" media="screen" />
+    <!-- Bootstrap Carousel -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Main JS -->
+    <script type="text/javascript" src="js/main.js"></script>
+    
+    <!-- original js -->
+    <script type="text/javascript" src="../resources/scripts/jquery.form.js"></script>
+	<script>
+		loadGlobalArgs();
+		function submitId() {
+			var oid = $(":text[name='oid']").val();
+			var cid = $(":text[name='cid']").val();
+			var cardidname= $(":text[name='cardidname']").val();
+			var file = $(":file[name='file']").val();
+			var cphone = $(":text[name='cphone']").val();
+			var fileother = $(":file[name='fileother']").val();
+			if((file==""||file==null)||(fileother==""||fileother==null)){
+				alert("必须上传正反两面身份证图片!");
+				return false;	
+			}
+			var validate = true;
+			
+			if(oid==""||oid==null){
+				$(":text[name='oid']").css({ "border-color": "red" });
+				$(":text[name='oid']").change(function(){
+					if($(":text[name='oid']").val()!=null)
+						$(":text[name='oid']").css({ "border-color": "" });
+				});
+				validate = false;
+			}
+			if(cid==""||cid==null){
+				$(":text[name='cid']").css({ "border-color": "red" });
+				$(":text[name='cid']").change(function(){
+					if($(":text[name='cid']").val()!=null)
+						$(":text[name='cid']").css({ "border-color": "" });
+				});
+				validate = false;
+			}
+			if(cphone==""||cphone==null){
+				$(":text[name='cphone']").css({ "border-color": "red" });
+				$(":text[name='cphone']").change(function(){
+					if($(":text[name='cphone']").val()!=null)
+						$(":text[name='cphone']").css({ "border-color": "" });
+				});
+				validate = false;
+			}
+			
+			if(cardidname==""||cardidname==null){
+				$(":text[name='cardidname']").css({ "border-color": "red" });
+				$(":text[name='cardidname']").change(function(){
+					if($(":text[name='cardidname']").val()!=null)
+						$(":text[name='cardidname']").css({ "border-color": "" });
+				});
+				validate = false;
+			}
+			if(!validate){
+				alert("红色框中的信息必须正确填写，才可以微分证！");
+				return false;
+			}
+			
+			if(cphone.length<6)
+			{
+				alert("电话号码不能少于6位");
+				return false;
+			}
+			
+			$("#submitId").ajaxSubmit( {
+				type : "post",
+				url : "../order/modify_cardid",
+				success : function(data) {
+					$("#tmpmsgdiv").html(data);
+					var str = $("#tmpmsgdiv pre").html();
+					var obj = $.parseJSON(str);
+					var code = obj.code;
+					if (code == "200") {
+						alert("上传成功");
+					} else {
+						alert("上传身份证失败，原因是:" + obj.message);
+					}
+					return false;
+				},
+				error : function(XmlHttpRequest, textStatus, errorThrown) {
+					alert("操作失败,请重试");
+					return false;
+				}
+			});
+		}
+    function loadGlobalArgs(){
+		$.ajax({
+   			type: "get",
+   			url: "../globalargs/getcontents",
+   			data : {
+   				"flags" : "logo_big"
+   			},
+   			success: function(response){
+   				var code = response.code;
+   				if("200" == code){
+   					var data = response.data;
+   					if(data != null){
+   						//$("#logoHeader").attr("src", "../" + data);
+   						//$("#logoFooter").attr("src", "../" + data);
+   					}
+   				}
+   			}
+		});
+    }
+</script>
+</body>
+
+</html>

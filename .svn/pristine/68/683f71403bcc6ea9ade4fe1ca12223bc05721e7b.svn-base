@@ -1,0 +1,38 @@
+package com.weiye.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.model.ReturnPackage;
+import com.weiye.model.TranshipmentBill;
+
+public interface ReturnPackageDao {
+
+	int countAll() throws Exception;
+
+	List<ReturnPackage> findAll(@Param("firstResult") int firstResult, @Param("pageSize")int pageSize) throws Exception;
+
+	int countByUser(@Param("userId") String userId) throws Exception;
+	List<ReturnPackage> findByUser(@Param("userId") String userId, @Param("firstResult") int firstResult, @Param("pageSize")int pageSize) throws Exception;
+
+	int insert(ReturnPackage returnPackage) throws Exception;
+
+	int audit(@Param("id") String id, @Param("empId")String empId, @Param("state")String state, @Param("empRemark")String empRemark, @Param("empExpressNo")String empExpressNo, @Param("empExpressCompany")String empExpressCompany, @Param("empPic")String empPic, @Param("shippingFee")String shippingFee, @Param("modifyDate")String modifyDate) throws Exception;
+
+	ReturnPackage findById(@Param("id") String id) throws Exception;
+
+	int checkState(@Param("id") String id, @Param("state")String state) throws Exception;
+
+	int updateByUser(ReturnPackage returnPackage) throws Exception;
+
+	public int countByKey(@Param("id")String id, @Param("key")String key, @Param("type")String type, @Param("userId") String userId, @Param("state")String state,
+			@Param("createDateStart")String createDateStart, @Param("createDateEnd")String createDateEnd) throws Exception;
+	public List<ReturnPackage> searchByKey(@Param("id")String id, @Param("key")String key, @Param("type")String type, @Param("userId") String userId, @Param("state")String state,
+			@Param("createDateStart")String createDateStart, @Param("createDateEnd")String createDateEnd, @Param("firstResult")int firstResult, @Param("pageSize")int pageSize) throws Exception;
+
+	int deleteByTranshipmentIdAndUserId(@Param("transhipmentId")String transhipmentId, @Param("userId")String userId) throws Exception;
+
+
+
+}

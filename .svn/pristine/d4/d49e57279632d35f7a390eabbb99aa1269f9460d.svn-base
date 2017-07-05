@@ -1,0 +1,197 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="oid" value=""/>
+	<input type="hidden" name="key" value=""/>
+	<input type="hidden" name="type" value=""/>
+	<input type="hidden" name="state" value=""/>
+	<input type="hidden" name="sdate" value=""/>
+	<input type="hidden" name="edate" value=""/>
+	<input type="hidden" name="pn" value="1"/>
+	<input type="hidden" name="typekey" value=""/>
+	
+		<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">运单路由管理</p>
+
+		<div class="box_content">
+			<div class="content_title">运单路由列表</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u55" style="padding-top: 5px;">
+						<div id="u550">
+						<form action="" >
+						&nbsp;&nbsp;&nbsp;运单号：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" class="text-input" size="15" name="oid"/>
+						<input class="button" type="submit" value="搜索" name="searchSub" />
+						</form><br/>
+							<form action="" >
+								<!--运单号：<input type="text" class="text-input" size="10" name="oid"/>-->
+								&nbsp;&nbsp;
+								创建日期：
+								<input  type="text" class="text-input Wdate" size="10" name="sdate" id="sd" onClick="WdatePicker()"/>
+								~
+								<input  type="text" class="text-input Wdate" size="10" name="edate" id="ed" onClick="WdatePicker()"/>
+								&nbsp;&nbsp;&nbsp;&nbsp;
+								关键字：
+								<input class="text-input" size="10" type="text" name="key" maxlength="16"/>
+								<select class="text-input" name="type">
+									<option value="-1">
+										请选择搜索方式
+									</option>
+									<option value="0">
+										运单号
+									</option>
+									<option value="2">
+										所属用户
+									</option>
+									<option value="3">
+										收件人姓名
+									</option>
+								</select>
+								<select class="text-input" name="state">
+									<option value="-1">
+										请选择状态
+									</option>
+									<option value="0">等待审核</option>
+									<option value="1">未付款</option>
+									<option value="2">已入库</option>
+									<option value="3">送往集散中心</option>
+									<option value="4">集散中心已入库</option>
+									<option value="5">送往机场</option>
+									<option value="6">空运中</option>
+									<option value="7">海关清关</option>
+									<option value="8">目的地第三方快递</option>
+									<option value="9">收件人已接收</option>
+								</select>
+								<select class="text-input" name="typekey" style="width:100px;">
+									<option value="">
+										请选择类型
+									</option>
+									
+									<option value="1">门市运单</option>
+									<option value="2">转运运单</option>
+									<option value="3">网上置单</option>
+									<option value="4">第三方运单</option>
+									<!-- <option value="5">上门收货</option> -->
+									<option value="6">空运单</option>
+									<option value="7">批量生成门市运单</option>
+									
+								</select>
+								<input class="button" type="submit" value="高级搜索" name="searchSub" />
+							</form>
+						</div>
+						<div id="u551">
+							<span>
+								&nbsp;&nbsp;&nbsp;&nbsp;
+								<a href="#" id="a_route_export_out_link">航班管理</a>
+								&nbsp;&nbsp;|&nbsp;&nbsp;
+								<a href="#" id="a_route_export_in_link">导入运单状态</a>
+								<!--&nbsp;&nbsp;|&nbsp;&nbsp;
+								<a href="#" id="a_batch_modify_state_link">批量修改状态</a>-->
+								<!--&nbsp;&nbsp;|&nbsp;&nbsp;
+								<a href="#" id="a_print_order_link">打印运单</a>-->
+							</span>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+
+					<table style="width: 100%">
+					<colgroup>
+						<col width="3%"/>
+						<col width="10%" />
+						<col width="9%" />
+						<col width="11%" />
+						<!-- <col/> -->
+						<col width="7%" />
+						<col width="11%"/>
+						<col width="11%" />
+						<col width="11%"/>
+						<col width="6%"/>
+						<col width="12%"/>
+						<col width="10%"/>
+						</colgroup>
+						<thead>
+							<tr>
+								<th>
+									&nbsp;
+								</th>
+								<th id="u_id">
+									运单号
+								</th>
+								<th id="u_nick_name">
+									所属用户
+								</th>
+								<th id="u_phone">
+									收件人姓名
+								</th>
+								<!-- <th id="u_email">
+									货物品名
+								</th> -->
+								<th id="u_qq">
+									运费($)
+								</th>
+								<th>
+									当前状态
+								</th>
+								<th id="u_sign_date">
+									航班号
+								</th>
+								<th id="u_balance">
+									第三方快递
+								</th>
+								<th>
+									&nbsp;
+								</th>
+								<th id="u_type">
+									创建时间
+								</th>
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="9">
+									<div class="bulk-actions align-left">
+										&nbsp;
+										<label>
+											<input type="checkbox" name="o_del_check_all"
+												id="o_del_check_all" />
+											全选
+										</label>
+										&nbsp;&nbsp;
+										<a href="#" title="您必须确认你要删除的数据是否已经无效，否则删除后再也找不回数据" id="a_delete_route_order_link">删除</a>
+									</div>
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav55Data();
+	});
+</script>
+</html>

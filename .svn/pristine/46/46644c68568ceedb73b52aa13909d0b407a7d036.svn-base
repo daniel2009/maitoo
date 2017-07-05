@@ -1,0 +1,34 @@
+package com.weiye.service.impl;
+
+
+import com.weiye.exception.ServiceException;
+import com.weiye.service.AuthorityService;
+
+
+
+public class AuthorityServiceImpl  extends BasicService implements AuthorityService {
+
+	@Override
+	public boolean addAuthorityEmplyees(String authorityId, String employeesId)
+			throws ServiceException {
+		// TODO Auto-generated method stub
+		
+		
+		
+		return false;
+	}
+
+	@Override
+	public boolean deleteAuthority(String id) throws ServiceException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean modfiyAuthority(String id) throws ServiceException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	
+}

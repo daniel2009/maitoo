@@ -1,0 +1,65 @@
+
+/*---------------------------------
+   reset from fleet/style.css Form Fields
+-----------------------------------*/
+
+form input.green,
+form textarea.green {
+    background-image: inherit;
+    background-position: 97% 15px;
+    background-repeat: no-repeat;
+}
+
+form input,
+form textarea {
+    background-position: 97% 15px;
+    width: inherit;
+}
+
+form input {
+    background-color: #f5f5f5;
+    color: #757575;
+    border: 0px solid rgba(255, 255, 255, 0.5);
+    height: inherit;
+    padding: inherit;
+    margin-bottom: inherit;
+    vertical-align: inherit;
+}
+
+form textarea {
+    background-color: #f5f5f5;
+    color: #757575;
+    border: 0px solid rgba(255, 255, 255, 0.5);
+    height: inherit;
+    padding: inherit;
+    margin-bottom: inherit;
+    vertical-align: inherit;
+}
+
+form .btn-primary.btn-block {
+    height: 50px;
+    line-height: 30px;
+    font-size: 18px;
+}
+
+input:active,
+input:focus,
+textarea:active,
+textarea:focus {
+    outline: none;
+    border: 0px solid #03a9f4;
+    background-color: #eeeeee;
+}
+
+form label {
+    display: inline;
+    text-transform: uppercase;
+    margin-bottom: inherit;
+}
+
+form #c_send {
+    margin: 0px;
+}
+
+
+

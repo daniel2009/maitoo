@@ -1,0 +1,19 @@
+package com.weiye.service;
+
+import java.util.List;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Gonggao;
+import com.weiye.model.Order;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.AutoSend;
+import com.weiye.model.SpencialChannelOrder;;
+
+public interface SpencialChannelOrderService {
+
+	//public ResponseObject<Object> Checkmoney(SpencialChannelOrder Sorder) throws ServiceException;
+
+	public abstract double calculationSOrderFreight(SpencialChannelOrder Sorder) throws ServiceException;
+
+}

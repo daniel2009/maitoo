@@ -1,0 +1,1646 @@
+package com.weiye.controller;
+
+import java.io.File;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.weiye.common.composepics.imgcompose;
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.ConsigneeInfoUtil;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.OrderUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.model.Order;
+import com.weiye.model.OrderDetail;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.User;
+import com.weiye.service.OrderService;
+import com.weiye.service.UserService;
+
+@Controller
+public class MsjOrderController extends BasicController {
+
+	private static final long serialVersionUID = -7483583832857530911L;
+	private static final Logger log = Logger.getLogger(MsjOrderController.class);
+	@Resource(name = "orderService")
+	private OrderService orderService;
+	@Resource(name = "userService")
+	private UserService userService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+	
+
+	@Value(value = "${default_img_size}")
+	private long defaultCardFileSize;
+	@Value(value = "${save_card_dir}")
+	private String saveCardDir;
+	
+
+	@RequestMapping(value = "/admin/msjorder/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Order>> searchByKeyOfAdmin(
+	        HttpServletRequest request,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			String storeId = StringUtil
+			        .obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+			if (StringUtil.isEmpty(storeId)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门市管理员");
+			}
+			pageIndex = Math.max(pageIndex, 1);
+			return this.orderService.searchMsjOrders(storeId, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("查询门市件运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/emptyorder/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Order>> searchEmptyOrderByKeyOfAdmin(
+	        HttpServletRequest request,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String orderKey,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			String storeId = StringUtil
+			        .obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+			if (StringUtil.isEmpty(storeId)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门市管理员");
+			}
+			pageIndex = Math.max(pageIndex, 1);
+			return this.orderService.searchEmptyOrders(storeId,orderKey,defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("查询门市件运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/msjorder/delete", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> deleteMsjOrder(@RequestParam(value = "oid") String[] ids) {
+		try {
+			return this.orderService.deleteOrderByOrderIds(Arrays.asList(ids), Arrays
+			        .asList(new String[] { Constant.ORDER_STATE2 }));
+		} catch (Exception e) {
+			log.error("删除订单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除订单失败");
+		}
+	}
+	
+	@RequestMapping(value = "/admin/emptyorder/delete", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> deleteEmptyOrder(@RequestParam(value = "oid") String[] ids) {
+		try {
+			return this.orderService.deleteOrderByOrderIds(Arrays.asList(ids), Arrays
+			        .asList(new String[] { Constant.ORDER_STATE0 }));
+		} catch (Exception e) {
+			log.error("删除订单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除订单失败");
+		}
+	}
+
+	
+	//kai 20150912 门市件中，添加包含身份证图片的
+	
+		@RequestMapping(value = "/admin/msjorder_pic/submit", method = { RequestMethod.POST })
+		@ResponseBody
+		public ResponseObject<Map<String, String>>  add1Consignee(
+		        HttpServletRequest request,	        
+		        @RequestParam(value = "cUserId") String userId,//保存地址的用户id
+		        @RequestParam(value = "orderId") String orderId,//保存地址的用户id
+		        @RequestParam(value = "from_user_name") String userName,//用于userid为空时
+		        @RequestParam(value = "from_user_real_name") String userRealName,//用于userid为空时
+		        @RequestParam(value = "cName") String cName,//保存地址的用户id
+		        @RequestParam(value = "cProvince") String cProvince,//保存地址的用户id
+		        @RequestParam(value = "cCity") String cCity,//保存地址的用户id
+		        @RequestParam(value = "cDistrict") String cDistrict,//保存地址的用户id
+		        @RequestParam(value = "cStreetAddress") String cStreetAddress,//保存地址的用户id
+		        @RequestParam(value = "cZipCode") String cZipCode,//保存地址的用户id
+		        @RequestParam(value = "cPhone") String cPhone,//保存地址的用户id
+		        @RequestParam(value = "weight") String weight,//保存地址的用户id
+		        @RequestParam(value = "sum_weight") String sumjwweight,//进位前的价格总
+		        @RequestParam(value = "weightKg") String weightKg,//保存地址的用户id
+		        @RequestParam(value = "tariff") String tariff,//保存地址的用户id
+		        @RequestParam(value = "other") String other,//保存地址的用户id
+		        @RequestParam(value = "mail") String mail,//保存地址的用户id
+		        @RequestParam(value = "premium") String premium,//保存地址的用户id
+		        @RequestParam(value = "remark") String remark,//保存地址的用户id
+		        
+		        @RequestParam(value = "commodityName") String[] commodityName,
+		        @RequestParam(value = "commodifyQuantity") String[] commodifyQuantity,
+		        @RequestParam(value = "commodifyxiangqing") String[] commodifyxiangqing,
+		        @RequestParam(value = "sjweight") String[] sjweight,//weight
+		        @RequestParam(value = "commodifybrands") String[] commodifybrands,//商品商标
+		        @RequestParam(value = "jwweight") String[] jwweight,//jwweight，进位前的重量
+		        
+		        @RequestParam(value = "length") String length,//保存地址的用户id
+		        @RequestParam(value = "width") String width,//保存地址的用户id
+		        @RequestParam(value = "height") String height,//保存地址的用户id
+		        @RequestParam(value = "parceValue") String parceValue,//保存地址的用户id
+		        @RequestParam(value = "channelidname") String channelId,//保存地址的用户id
+		        @RequestParam(value = "cardidname") String cardid,//保存地址的用户id
+		        @RequestParam(value = "idurlcard", required = false, defaultValue = "") String cardurl,//身份证正面原路径
+		        @RequestParam(value = "idurlcardother", required = false, defaultValue = "") String cardurlother,//身份证正面原路径
+		        @RequestParam(value = "idurlcardtogether", required = false, defaultValue = "") String cardurltogether,//身份证合成原路径
+	            @RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+	            @RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+			
+			
+			
+			 Order order;
+			order=new Order();
+			order.setUserId(userId);
+			if(!StringUtil.isEmpty(orderId))
+			{
+				order.setOrderId(orderId.toUpperCase());
+			}
+			
+			order.setUserName(userRealName);
+			order.setcName(cName);
+			order.setcProvince(cProvince);
+			order.setcCity(cCity);
+			order.setcDistrict(cDistrict);
+			order.setcStreetAddress(cStreetAddress);
+			order.setcZipCode(cZipCode);
+			order.setcPhone(cPhone);
+			order.setWeight(weight);
+			order.setJwweight(sumjwweight);
+			order.setWeightKg(weightKg);
+			order.setTariff(tariff);
+			order.setOther(other);
+			order.setMail(mail);
+			order.setPremium(premium);
+			order.setRemark(remark);
+			order.setLength(length);
+			order.setWidth(width);
+			order.setHeight(height);
+			order.setParceValue(parceValue);
+			order.setChannelId(channelId);
+			order.setOr("0");
+			order.setTypeKey(Constant.ORDER_TYPE_KEY_1);//设置类型为门市
+			
+			//String[][] commodifys
+			String[][] strcomms;
+			if(commodityName.length>1)
+			{
+				strcomms=new String[commodityName.length][6];
+				for(int i=0;i<commodityName.length;i++)
+				{
+					strcomms[i][0]=commodityName[i];
+					strcomms[i][1]=commodifyQuantity[i];
+					strcomms[i][2]=commodifyxiangqing[i];
+					strcomms[i][3]=sjweight[i];
+					strcomms[i][4]=commodifybrands[i];
+					strcomms[i][5]=jwweight[i];
+					
+					order.setOrderCommoditys(strcomms);
+				}
+			}
+			else if(commodityName.length==1)
+			{
+				strcomms=new String[6][1];
+				strcomms[0][0]=commodityName[0];
+				strcomms[1][0]=commodifyQuantity[0];
+				strcomms[2][0]=commodifyxiangqing[0];
+				strcomms[3][0]=sjweight[0];
+				try{
+				strcomms[4][0]=commodifybrands[0];
+				
+				} catch (Exception e) {
+					strcomms[4][0]="";
+				}
+				
+				strcomms[5][0]=jwweight[0];
+				order.setOrderCommoditys(strcomms);
+				
+			}
+			String fileName = null;
+			if (file != null && file.getSize() > 0) {
+				if (file.getSize() > this.defaultCardFileSize) {
+					return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+				}
+
+				String originalName = file.getOriginalFilename();
+				int index = originalName.lastIndexOf('.');
+				index = Math.max(index, 0);
+				fileName = this.saveCardDir + File.separator + userId + "_" + StringUtil.generateRandomString(5) + "_"
+				        + StringUtil.generateRandomInteger(5) + originalName.substring(index);
+				try {
+					File file1 = new File(request.getSession().getServletContext().getRealPath("/") + fileName);
+					file.transferTo(file1);
+				} catch (Exception e) {
+					log.error("保存用户图像失败,请不要上传图像！", e);
+					return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ERROR, "保存用户图像失败，请去除上传图像后再尝试!");
+				}
+			}
+			else
+			{
+			/*	if((cardurl==null)||cardurl.equalsIgnoreCase(""))
+				{
+					fileName=null;
+				}
+				else
+				{
+					fileName=cardurl;
+				}
+				*/
+				
+				if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+					fileName = null;
+				} else {
+					File file3 = new File(request.getSession().getServletContext()
+							.getRealPath("/")
+							+ cardurl);
+					if (file3.exists()) {
+						fileName = cardurl;
+					} else {
+						fileName = null;
+					}
+				}
+				
+				
+				
+				
+			}
+	        order.setCardurl(fileName);
+	        
+	        String fileNameother = null;
+			if (fileother != null && fileother.getSize() > 0) {
+				if (fileother.getSize() > this.defaultCardFileSize) {
+					return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+				}
+
+				String originalName = fileother.getOriginalFilename();
+				int index = originalName.lastIndexOf('.');
+				index = Math.max(index, 0);
+				fileNameother = this.saveCardDir + File.separator + userId + "_" + StringUtil.generateRandomString(5) + "_"
+				        + StringUtil.generateRandomInteger(5) + originalName.substring(index);
+				try {
+					File file2 = new File(request.getSession().getServletContext().getRealPath("/") + fileNameother);
+					fileother.transferTo(file2);
+				} catch (Exception e) {
+					log.error("保存用户图像失败,请不要上传图像！", e);
+					return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ERROR, "保存用户图像失败，请去除上传图像后再尝试!");
+				}
+			}
+			else
+			{
+				/*if((cardurlother==null)||cardurlother.equalsIgnoreCase(""))
+				{
+					fileNameother=null;
+				}
+				else
+				{
+					fileNameother=cardurlother;
+				}*/
+				
+				
+				if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+					fileName = null;
+				} else {
+					File file3 = new File(request.getSession().getServletContext()
+							.getRealPath("/")
+							+ cardurl);
+					if (file3.exists()) {
+						fileName = cardurl;
+					} else {
+						fileName = null;
+					}
+				}
+				
+			}
+	        order.setCardurlother(fileNameother);
+	        
+	        
+	        
+	        
+	        //kai 20150921 合成图片
+	        String fileNametogether = null;
+	        if((fileName!=null)&&(fileNameother!=null))
+			{
+				imgcompose img=new imgcompose();
+				String str1=request.getSession().getServletContext().getRealPath("/") + fileName;
+				String str2=request.getSession().getServletContext().getRealPath("/") + fileNameother;
+				String str3=this.saveCardDir + File.separator + userId + "_" + StringUtil.generateRandomString(5) + "_"+"together"+ "_"
+				        + StringUtil.generateRandomInteger(5);
+				String filecardtemp=str3;
+				str3=request.getSession().getServletContext().getRealPath("/")+str3;
+				if(img.createcompics(str1, str2,str3))
+				{
+					filecardtemp=filecardtemp+".jpg";
+					
+					fileNametogether=filecardtemp;
+				}
+			}
+	        
+	        if(fileNametogether==null)
+	        {
+	        	order.setCardurltogether(cardurltogether);
+	        }
+	        else
+	        {
+	        	order.setCardurltogether(fileNametogether);
+	        }
+	        
+	        
+	        order.setCardid(cardid);
+			
+	        if(order.getUserId().equals(""))//没有选择用户的情况下，调用另一函数来处理
+	        {
+	        	order.setUserId(userName);
+	        	
+	        	return submissionWaybillOfAdmin2(request,order);
+	        }
+	        //下面的流程复制自没图片的处理方式
+			if (order == null) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+			}
+
+			if (!OrderUtil.validateMsjOrder(order)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+			}
+			
+			if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+			      return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR, "手机号码填写不正确，请重新输入！");
+			}
+			
+			String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+			if (StringUtil.isEmpty(storeId)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门店管理员，不能添加门店运单");
+			}
+			
+			try {
+				//Map<String, Integer> map = new HashMap<String, Integer>();
+				//kai 20150912 解码路径
+				if (order.getCardurl() != "" && (order.getCardurl() != null))// 进行解码
+				{
+					String str = URLDecoder.decode(order.getCardurl(), "UTF-8");
+					order.setCardurl(str);
+				}
+				
+				
+				String[][] commodifys = order.getOrderCommoditys();
+				
+				List<OrderDetail> list = new ArrayList<OrderDetail>();
+				//List<String> commodityId = new ArrayList<String>();
+				if ((commodifys != null) && (commodifys.length == 6) && (commodifys[0].length == 1)) {
+			        OrderDetail detail = new OrderDetail();
+			        detail.setCommodityId(commodifys[0][0]);
+			        detail.setQuantity(commodifys[1][0]);
+			        detail.setXiangqing(commodifys[2][0]);
+			        detail.setSjweight(commodifys[3][0]);
+			        try
+			        {
+			        	detail.setBrands(commodifys[4][0]);
+			        }
+			        catch (Exception e) {
+			        	detail.setBrands("");
+			        }
+			        detail.setJwweight(commodifys[5][0]);
+			        //detail.setJfweight(commodifys[4][0]);
+			        detail.setTranshipmentId("-1");
+			        list.add(detail);
+			         
+			        //commodityId.add(commodifys[0][0]);
+			     
+			    }else if (commodifys != null && commodifys.length >= 2) {
+					System.out.println("=======iftest==============");
+			        System.out.println(commodifys.length);
+			        System.out.println(commodifys[0].length);
+					for (String[] arr : commodifys) {
+				          OrderDetail detail = new OrderDetail();
+				          detail.setCommodityId(arr[0]);
+				          detail.setQuantity(arr[1]);
+				          detail.setXiangqing(arr[2]);
+				          detail.setSjweight(arr[3]);
+				          detail.setBrands(arr[4]);
+				          detail.setJwweight(arr[5]);
+				          //detail.setJfweight(arr[4]);
+				          detail.setTranshipmentId("-1");
+				          list.add(detail);
+				          //commodityId.add(arr[0]);
+						  System.out.println("=============6345t8375619287459================");
+					      System.out.println(arr[0].toString());
+					}
+
+				} else {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单中必须输入商品信息");
+				}
+				
+				
+				String type = Constant.USER_TYPE_STORE;
+				try {
+					User user = this.userService.getUserById(order.getUserId()).getData();
+					
+					if (user != null) {
+						type = user.getType();
+					} else {
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "会员编号为:" + order.getUserId()
+						        + "的会员不存在，请重新查看！");
+					}
+				} catch (Exception e) {
+					log.error("根据运单号获取该运单所属会员信息失败", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据运单号获取该运单所属会员信息失败");
+				}
+		
+				
+				String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+				order.setWarehouseId(storeId);
+				order.setStoreId(storeId);
+				order.setEmpId(empId);
+				order.setDetails(list.toArray(new OrderDetail[0]));
+				order.setState(Constant.ORDER_STATE2);
+				order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+				
+				
+				if(StringUtil.isEmpty(order.getSenduserName()))
+				{
+					order.setSenduserName(userRealName);
+				}
+
+				/* 运费计算 start    */
+				try {
+					order.setType(Constant.ORDER_TYPE_STORE);
+					order.setTotalMoney(String.valueOf(this.orderService.calculationOrderFreight(order,type)));
+					order.setCommodityCost(String.valueOf(this.orderService.calculationOrderCostFreight(order)));
+				} catch (Exception e) {
+					log.error("计算快递价格失败", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "计算快递价格失败");
+				}
+				/*运费计算 end */
+				
+				return this.orderService.addOrder(order, type);
+			} catch (Exception e) {
+				log.error("提交运单失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+			}
+		}
+	
+	
+	@RequestMapping(value = "/admin/msjorder/submit", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> submissionWaybillOfAdmin(HttpServletRequest request, Order order) {
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (!OrderUtil.validateMsjOrder(order)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		
+		if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+		      return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR, "手机号码填写不正确，请重新输入！");
+		}
+		
+		String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if (StringUtil.isEmpty(storeId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门店管理员，不能添加门店运单");
+		}
+		
+		try {
+			//Map<String, Integer> map = new HashMap<String, Integer>();
+			String[][] commodifys = order.getOrderCommoditys();
+			
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			//List<String> commodityId = new ArrayList<String>();
+			if ((commodifys != null) && (commodifys.length == 6) && (commodifys[0].length == 1)) {
+		        OrderDetail detail = new OrderDetail();
+		        detail.setCommodityId(commodifys[0][0]);
+		        detail.setQuantity(commodifys[1][0]);
+		        detail.setXiangqing(commodifys[2][0]);
+		        detail.setSjweight(commodifys[3][0]);
+		        try
+		        {
+		        	detail.setBrands(commodifys[4][0]);
+		        }
+		        catch (Exception e) {
+		        	detail.setBrands("");
+		        }
+		        detail.setJwweight(commodifys[5][0]);
+		        //detail.setJfweight(commodifys[4][0]);
+		        detail.setTranshipmentId("-1");
+		        list.add(detail);
+		         
+		        //commodityId.add(commodifys[0][0]);
+		     
+		    }else if (commodifys != null && commodifys.length >= 2) {
+				System.out.println("=======iftest==============");
+		        System.out.println(commodifys.length);
+		        System.out.println(commodifys[0].length);
+				for (String[] arr : commodifys) {
+			          OrderDetail detail = new OrderDetail();
+			          detail.setCommodityId(arr[0]);
+			          detail.setQuantity(arr[1]);
+			          detail.setXiangqing(arr[2]);
+			          detail.setSjweight(arr[3]);
+			          detail.setBrands(arr[4]);
+			          detail.setJwweight(arr[5]);
+			          //detail.setJfweight(arr[4]);
+			          detail.setTranshipmentId("-1");
+			          list.add(detail);
+			          //commodityId.add(arr[0]);
+					  System.out.println("=============6345t8375619287459================");
+				      System.out.println(arr[0].toString());
+				}
+
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单中必须输入商品信息");
+			}
+			
+			
+			String type = Constant.USER_TYPE_STORE;
+			try {
+				User user = this.userService.getUserById(order.getUserId()).getData();
+				if (user != null) {
+					type = user.getType();
+				} else {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "会员编号为:" + order.getUserId()
+					        + "的会员不存在，请重新查看！");
+				}
+			} catch (Exception e) {
+				log.error("根据运单号获取该运单所属会员信息失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据运单号获取该运单所属会员信息失败");
+			}
+	
+			
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+			order.setWarehouseId(storeId);
+			order.setStoreId(storeId);
+			order.setEmpId(empId);
+			order.setDetails(list.toArray(new OrderDetail[0]));
+			order.setState(Constant.ORDER_STATE2);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+			order.setTypeKey(Constant.ORDER_TYPE_KEY_1);//设置类型为门市
+			/* 运费计算 start    */
+			try {
+				order.setType(Constant.ORDER_TYPE_STORE);
+				order.setTotalMoney(String.valueOf(this.orderService.calculationOrderFreight(order,type)));
+				order.setCommodityCost(String.valueOf(this.orderService.calculationOrderCostFreight(order)));
+				
+			} catch (Exception e) {
+				log.error("计算快递价格失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "计算快递价格失败");
+			}
+			/*运费计算 end */
+			
+			return this.orderService.addOrder(order, type);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+	
+	@RequestMapping(value = "/admin/emptyorder/submit", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> submissionWaybillOfAdmin3(HttpServletRequest request) {
+		
+		String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if (StringUtil.isEmpty(storeId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门店管理员，不能添加空运单");
+		}
+		Order order = new Order();
+		try {
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+			order.setWarehouseId(storeId);
+			order.setStoreId(storeId);
+			order.setEmpId(empId);
+			order.setState(Constant.ORDER_STATE0);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+			order.setType(Constant.ORDER_TYPE_STORE);
+			
+			return this.orderService.addOrderOfEmpty(order);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加空运单失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/admin/msjorder_no_userid/submit", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> submissionWaybillOfAdmin2(HttpServletRequest request, 
+			 Order order) {
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (!OrderUtil.validateMsjOrder(order)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效,请检查寄件人，收件人,商品等信息!");
+		}
+		
+		if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+		      return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR, "手机号码填写不正确，0和1开头的必须是11位数字(中国),其它的可以是10位或11位数字，请重新输入！");
+		}
+		
+		String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if (StringUtil.isEmpty(storeId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门店管理员，不能添加门店运单");
+		}
+
+		try {
+			//kai 20150912 解码路径
+			if (order.getCardurl() != "" && (order.getCardurl() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurl(), "UTF-8");
+				order.setCardurl(str);
+			}
+			if (order.getCardurlother() != "" && (order.getCardurlother() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurlother(), "UTF-8");
+				order.setCardurlother(str);
+			}
+			
+			if (order.getCardurltogether() != "" && (order.getCardurltogether() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurltogether(), "UTF-8");
+				order.setCardurltogether(str);
+			}			
+			
+			//Map<String, Integer> map = new HashMap<String, Integer>();
+			String[][] commodifys = order.getOrderCommoditys();
+			
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			//List<String> commodityId = new ArrayList<String>();
+			if ((commodifys != null) && (commodifys.length == 6) && (commodifys[0].length == 1)) {
+		        OrderDetail detail = new OrderDetail();
+		        detail.setCommodityId(commodifys[0][0]);
+		        detail.setQuantity(commodifys[1][0]);
+		        detail.setXiangqing(commodifys[2][0]);
+		        detail.setSjweight(commodifys[3][0]);
+		        //detail.setJfweight(commodifys[4][0]);
+		        
+		        try
+		        {
+		        	detail.setBrands(commodifys[4][0]);
+		        }
+		        catch (Exception e) {
+		        	detail.setBrands("");
+		        }
+		        detail.setJwweight(commodifys[5][0]);
+		        detail.setTranshipmentId("-1");
+		        list.add(detail);
+		         
+		        //commodityId.add(commodifys[0][0]);
+		     
+		    }else if (commodifys != null && commodifys.length >= 2) {
+				System.out.println("=======iftest==============");
+		        System.out.println(commodifys.length);
+		        System.out.println(commodifys[0].length);
+				for (String[] arr : commodifys) {
+			          OrderDetail detail = new OrderDetail();
+			          detail.setCommodityId(arr[0]);
+			          detail.setQuantity(arr[1]);
+			          detail.setXiangqing(arr[2]);
+			          detail.setSjweight(arr[3]);
+			          detail.setBrands(arr[4]);
+			          detail.setJwweight(arr[5]);
+			          //detail.setJfweight(arr[4]);
+			          detail.setTranshipmentId("-1");
+			          list.add(detail);
+			          //commodityId.add(arr[0]);
+					  System.out.println("=============6345t8375619287459================");
+				      System.out.println(arr[0].toString());
+				}
+
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单中必须输入商品信息");
+			}
+			
+			
+			String type = Constant.USER_TYPE_STORE;
+			try {
+				User user = this.userService.getUserByPhone(order.getUserId()).getData();// 。getUserByPhone.getUserById(order.getUserId()).getData();
+				if (user != null) {
+					type = user.getType();
+					order.setUserId(user.getId());
+				} else {
+					User u=new User();
+					//StringUtil.isEmpty(order.getUserId()) ? null : order.getUserId()
+					
+					u.setPhone(StringUtil.isEmpty(order.getUserId()) ? null : order.getUserId());
+					u.setRealName(order.getUserName());
+					u.setType(Constant.USER_TYPE_STORE);
+					u.setRegType(Constant.USER_REG_TYPE_PHONE);//注册类型为手机
+					u.setPhoneState(Constant.USER_PHONE_STATE0);//表示无验证的电话
+					u.setEmailState(Constant.USER_EMAIL_STATE0);//邮箱状态为未验证
+					String password="";
+					for (int i = 0; i < 8; i++) {
+						password += (int) (Math.random() * 10);
+					}
+					u.setPassword(password);
+					u.setNickName(order.getUserId());
+					
+					u.setRegType(Constant.USER_REG_TYPE_PHONE);//注册类型为手机
+					u.setPhoneState(Constant.USER_PHONE_STATE0);//表示无验证的电话
+					u.setEmailState(Constant.USER_EMAIL_STATE0);//邮箱状态为未验证
+					
+					ResponseObject<Object> obj = this.userService.addUser(u);
+					
+					if(obj.getCode()== ResponseCode.SUCCESS_CODE){
+						Map<String, String> map = (Map<String, String>) obj.getData();
+						String userId = map.get("id");
+						order.setUserId(userId);
+					}else{
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "增加用户信息异常！");
+					}
+				}
+			} catch (Exception e) {
+				log.error("根据运单号获取该运单所属会员信息失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据运单号获取该运单所属会员信息失败");
+			}
+	
+			
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+			order.setWarehouseId(storeId);
+			order.setStoreId(storeId);
+			order.setEmpId(empId);
+			order.setDetails(list.toArray(new OrderDetail[0]));
+			order.setState(Constant.ORDER_STATE2);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+			order.setTypeKey(Constant.ORDER_TYPE_KEY_1);//设置类型为门市
+			if(StringUtil.isEmpty(order.getSenduserName()))
+			{
+				order.setSenduserName(order.getUserName());
+			}
+
+			/* 运费计算 start    */
+			try {
+				order.setType(Constant.ORDER_TYPE_STORE);
+				order.setTotalMoney(String.valueOf(this.orderService.calculationOrderFreight(order,type)));
+				order.setCommodityCost(String.valueOf(this.orderService.calculationOrderCostFreight(order)));
+			} catch (Exception e) {
+				log.error("计算快递价格失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "计算快递价格失败");
+			}
+			/*运费计算 end */
+			
+			return this.orderService.addOrder(order, type);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/admin/emptyorder/modify", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> emptyOrderModifyOfAdmin(HttpServletRequest request, 
+			 Order order) {
+		
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+		}
+		
+	
+		
+		
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (!OrderUtil.validateMsjOrder(order)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		
+		if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+		      return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR, "手机号码填写不正确，请重新输入！");
+		}
+		
+		String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if (StringUtil.isEmpty(storeId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门店管理员，不能修改门店空运单");
+		}
+
+		try {
+			
+			if(storeid!=null)
+			{
+				ResponseObject<Order> orderobj=this.orderService.getOrderByOrderId(order.getOrderId());
+				Order obj=orderobj.getData();
+				if(obj==null)
+				{
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "没有相应的运单！");
+				}
+				else
+				{
+					if((obj.getWarehouseId()==null))
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单中没有对应的仓库或门店号！");
+					}
+					else
+					{
+						if(!obj.getWarehouseId().equalsIgnoreCase(storeid))
+						{
+							return generateResponseObject(ResponseCode.PARAMETER_ERROR, "对不起，你无权操作其它仓库或门店的空运单！");
+						}
+					}
+				}
+			}
+			String[][] commodifys = order.getOrderCommoditys();
+			
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			//List<String> commodityId = new ArrayList<String>();
+			if ((commodifys != null) && (commodifys.length == 6) && (commodifys[0].length == 1)) {
+		        OrderDetail detail = new OrderDetail();
+		        detail.setCommodityId(commodifys[0][0]);
+		        detail.setQuantity(commodifys[1][0]);
+		        detail.setXiangqing(commodifys[2][0]);
+		        detail.setSjweight(commodifys[3][0]);
+		        try
+		        {
+		        	detail.setBrands(commodifys[4][0]);
+		        }
+		        catch (Exception e) {
+		        	detail.setBrands("");
+		        }
+		        detail.setJwweight(commodifys[5][0]);
+		        //detail.setJfweight(commodifys[4][0]);
+		        detail.setTranshipmentId("-1");
+		        list.add(detail);
+		         
+		        //commodityId.add(commodifys[0][0]);
+		     
+		    }else if (commodifys != null && commodifys.length >= 2) {
+				System.out.println("=======iftest==============");
+		        System.out.println(commodifys.length);
+		        System.out.println(commodifys[0].length);
+				for (String[] arr : commodifys) {
+			          OrderDetail detail = new OrderDetail();
+			          detail.setCommodityId(arr[0]);
+			          detail.setQuantity(arr[1]);
+			          detail.setXiangqing(arr[2]);
+			          detail.setSjweight(arr[3]);
+			          detail.setBrands(arr[4]);
+			          detail.setJwweight(arr[5]);
+			          //detail.setJfweight(arr[4]);
+			          detail.setTranshipmentId("-1");
+			          list.add(detail);
+			          //commodityId.add(arr[0]);
+					  System.out.println("=============6345t8375619287459================");
+				      System.out.println(arr[0].toString());
+				}
+
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单中必须输入商品信息");
+			}
+			
+			
+			/*String type = Constant.USER_TYPE_STORE;
+			try {
+				User user = this.userService.getUserByPhone(order.getUserId()).getData();// 。getUserByPhone.getUserById(order.getUserId()).getData();
+				if (user != null) {
+					type = user.getType();
+					order.setUserId(user.getId());
+				} else {
+					User u=new User();
+					u.setPhone(order.getUserId());
+					u.setRealName(order.getUserName());
+					u.setType(Constant.USER_TYPE_STORE);
+					u.setPassword("weiye123456");
+					ResponseObject<Object> obj = this.userService.addUser(u);
+					
+					if(obj.getCode()== ResponseCode.SUCCESS_CODE){
+						Map<String, String> map = (Map<String, String>) obj.getData();
+						String userId = map.get("id");
+						order.setUserId(userId);
+					}else{
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "增加用户信息异常！");
+					}
+				}
+			} catch (Exception e) {
+				log.error("根据运单号获取该运单所属会员信息失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据运单号获取该运单所属会员信息失败");
+			}*/
+	
+			
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+			String empName = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+			String empStoreName = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_NAME_SESSION_KEY));
+			//这里转换了一下
+			String phone = order.getUserId();
+			order.setUserId("");
+			order.setWarehouseId(storeId);
+			order.setStoreId(storeId);
+			order.setEmpId(empId);
+			order.setState(Constant.ORDER_STATE2); //末付款
+			String date = DateUtil.date2String(new Date());
+			order.setPayDate(date);
+			order.setDetails(list.toArray(new OrderDetail[0]));
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+			order.setType(Constant.ORDER_TYPE_STORE);
+			
+			return this.orderService.modifyEmptyOrder(phone,order,empName/*,empStoreName*/);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+
+	
+	
+	
+	@RequestMapping(value = "/admin/emptyorder_no_userid/modify_submit", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> adminemptyordernouseridmodify(HttpServletRequest request, 
+			 Order order) {
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		
+		if(StringUtil.isEmpty(order.getId())&&StringUtil.isEmpty(order.getOrderId()))
+		{
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单号和id不能同时为空!");
+		}
+
+		if (!OrderUtil.validateMsjOrder(order)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效,请检查寄件人，收件人,商品等信息!");
+		}
+		
+		if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+		      return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR, "手机号码填写不正确，0和1开头的必须是11位数字(中国),其它的可以是10位或11位数字，请重新输入！");
+		}
+		
+		String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if (StringUtil.isEmpty(storeId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门店管理员，不能添加门店运单");
+		}
+
+		try {
+			//kai 20150912 解码路径
+			if (order.getCardurl() != "" && (order.getCardurl() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurl(), "UTF-8");
+				order.setCardurl(str);
+			}
+			if (order.getCardurlother() != "" && (order.getCardurlother() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurlother(), "UTF-8");
+				order.setCardurlother(str);
+			}
+			
+			if (order.getCardurltogether() != "" && (order.getCardurltogether() != null))// 进行解码
+			{
+				String str = URLDecoder.decode(order.getCardurltogether(), "UTF-8");
+				order.setCardurltogether(str);
+			}			
+			
+			//Map<String, Integer> map = new HashMap<String, Integer>();
+			String[][] commodifys = order.getOrderCommoditys();
+			
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			//List<String> commodityId = new ArrayList<String>();
+			if ((commodifys != null) && (commodifys.length == 6) && (commodifys[0].length == 1)) {
+		        OrderDetail detail = new OrderDetail();
+		        detail.setCommodityId(commodifys[0][0]);
+		        detail.setQuantity(commodifys[1][0]);
+		        detail.setXiangqing(commodifys[2][0]);
+		        detail.setSjweight(commodifys[3][0]);
+		        //detail.setJfweight(commodifys[4][0]);
+		        
+		        try
+		        {
+		        	detail.setBrands(commodifys[4][0]);
+		        }
+		        catch (Exception e) {
+		        	detail.setBrands("");
+		        }
+		        detail.setJwweight(commodifys[5][0]);
+		        detail.setTranshipmentId("-1");
+		        list.add(detail);
+		         
+		        //commodityId.add(commodifys[0][0]);
+		     
+		    }else if (commodifys != null && commodifys.length >= 2) {
+				System.out.println("=======iftest==============");
+		        System.out.println(commodifys.length);
+		        System.out.println(commodifys[0].length);
+				for (String[] arr : commodifys) {
+			          OrderDetail detail = new OrderDetail();
+			          detail.setCommodityId(arr[0]);
+			          detail.setQuantity(arr[1]);
+			          detail.setXiangqing(arr[2]);
+			          detail.setSjweight(arr[3]);
+			          detail.setBrands(arr[4]);
+			          detail.setJwweight(arr[5]);
+			          //detail.setJfweight(arr[4]);
+			          detail.setTranshipmentId("-1");
+			          list.add(detail);
+			          //commodityId.add(arr[0]);
+					  System.out.println("=============6345t8375619287459================");
+				      System.out.println(arr[0].toString());
+				}
+
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单中必须输入商品信息");
+			}
+			
+			
+			String type = Constant.USER_TYPE_STORE;
+			try {
+				User user = this.userService.getUserByPhone(order.getUserId()).getData();// 。getUserByPhone.getUserById(order.getUserId()).getData();
+				if (user != null) {
+					type = user.getType();
+					order.setUserId(user.getId());
+				} else {
+					User u=new User();
+					//StringUtil.isEmpty(order.getUserId()) ? null : order.getUserId()
+					
+					u.setPhone(StringUtil.isEmpty(order.getUserId()) ? null : order.getUserId());
+					u.setRealName(order.getUserName());
+					u.setType(Constant.USER_TYPE_STORE);
+					String password="";
+					for (int i = 0; i < 8; i++) {
+						password += (int) (Math.random() * 10);
+					}
+					u.setPassword(password);
+					u.setNickName(order.getUserId());
+					
+					u.setRegType(Constant.USER_REG_TYPE_PHONE);//注册类型为手机
+					u.setPhoneState(Constant.USER_PHONE_STATE0);//表示无验证的电话
+					u.setEmailState(Constant.USER_EMAIL_STATE0);//邮箱状态为未验证
+					
+					ResponseObject<Object> obj = this.userService.addUser(u);
+					
+					if(obj.getCode()== ResponseCode.SUCCESS_CODE){
+						Map<String, String> map = (Map<String, String>) obj.getData();
+						String userId = map.get("id");
+						order.setUserId(userId);
+					}else{
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "增加用户信息异常！");
+					}
+				}
+			} catch (Exception e) {
+				log.error("根据运单号获取该运单所属会员信息失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据运单号获取该运单所属会员信息失败");
+			}
+	
+			
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+			order.setWarehouseId(storeId);
+			order.setStoreId(storeId);
+			order.setEmpId(empId);
+			order.setDetails(list.toArray(new OrderDetail[0]));
+			order.setState(Constant.ORDER_STATE2);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+			//order.setTypeKey(Constant.ORDER_TYPE_KEY_1);//设置类型为门市
+			if(StringUtil.isEmpty(order.getSenduserName()))
+			{
+				order.setSenduserName(order.getUserName());
+			}
+
+			/* 运费计算 start    */
+			try {
+				order.setType(Constant.ORDER_TYPE_STORE);
+				order.setTotalMoney(String.valueOf(this.orderService.calculationOrderFreight(order,type)));
+				order.setCommodityCost(String.valueOf(this.orderService.calculationOrderCostFreight(order)));
+			} catch (Exception e) {
+				log.error("计算快递价格失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "计算快递价格失败");
+			}
+			/*运费计算 end */
+			
+			return this.orderService.modifyemptyOrder(order, type);
+			//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/admin/emptyorder/submit_haveuserid", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> adminemptyordersubmit(HttpServletRequest request, Order order) {
+		if (order == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+
+		if(StringUtil.isEmpty(order.getId())&&StringUtil.isEmpty(order.getOrderId()))
+		{
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单号和id不能同时为空!");
+		}
+		if (!OrderUtil.validateMsjOrder(order)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		
+		if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+		      return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR, "手机号码填写不正确，请重新输入！");
+		}
+		
+		String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if (StringUtil.isEmpty(storeId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门店管理员，不能添加门店运单");
+		}
+		
+		try {
+			//Map<String, Integer> map = new HashMap<String, Integer>();
+			String[][] commodifys = order.getOrderCommoditys();
+			
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			//List<String> commodityId = new ArrayList<String>();
+			if ((commodifys != null) && (commodifys.length == 6) && (commodifys[0].length == 1)) {
+		        OrderDetail detail = new OrderDetail();
+		        detail.setCommodityId(commodifys[0][0]);
+		        detail.setQuantity(commodifys[1][0]);
+		        detail.setXiangqing(commodifys[2][0]);
+		        detail.setSjweight(commodifys[3][0]);
+		        try
+		        {
+		        	detail.setBrands(commodifys[4][0]);
+		        }
+		        catch (Exception e) {
+		        	detail.setBrands("");
+		        }
+		        detail.setJwweight(commodifys[5][0]);
+		        //detail.setJfweight(commodifys[4][0]);
+		        detail.setTranshipmentId("-1");
+		        list.add(detail);
+		         
+		        //commodityId.add(commodifys[0][0]);
+		     
+		    }else if (commodifys != null && commodifys.length >= 2) {
+				System.out.println("=======iftest==============");
+		        System.out.println(commodifys.length);
+		        System.out.println(commodifys[0].length);
+				for (String[] arr : commodifys) {
+			          OrderDetail detail = new OrderDetail();
+			          detail.setCommodityId(arr[0]);
+			          detail.setQuantity(arr[1]);
+			          detail.setXiangqing(arr[2]);
+			          detail.setSjweight(arr[3]);
+			          detail.setBrands(arr[4]);
+			          detail.setJwweight(arr[5]);
+			          //detail.setJfweight(arr[4]);
+			          detail.setTranshipmentId("-1");
+			          list.add(detail);
+			          //commodityId.add(arr[0]);
+					  System.out.println("=============6345t8375619287459================");
+				      System.out.println(arr[0].toString());
+				}
+
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单中必须输入商品信息");
+			}
+			
+			
+			String type = Constant.USER_TYPE_STORE;
+			try {
+				User user = this.userService.getUserById(order.getUserId()).getData();
+				if (user != null) {
+					type = user.getType();
+				} else {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "会员编号为:" + order.getUserId()
+					        + "的会员不存在，请重新查看！");
+				}
+			} catch (Exception e) {
+				log.error("根据运单号获取该运单所属会员信息失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据运单号获取该运单所属会员信息失败");
+			}
+	
+			
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+			order.setWarehouseId(storeId);
+			order.setStoreId(storeId);
+			order.setEmpId(empId);
+			order.setDetails(list.toArray(new OrderDetail[0]));
+			order.setState(Constant.ORDER_STATE2);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+			order.setTypeKey(Constant.ORDER_TYPE_KEY_1);//设置类型为门市
+			/* 运费计算 start    */
+			try {
+				order.setType(Constant.ORDER_TYPE_STORE);
+				order.setTotalMoney(String.valueOf(this.orderService.calculationOrderFreight(order,type)));
+				order.setCommodityCost(String.valueOf(this.orderService.calculationOrderCostFreight(order)));
+				
+			} catch (Exception e) {
+				log.error("计算快递价格失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "计算快递价格失败");
+			}
+			/*运费计算 end */
+			
+			//return this.orderService.addOrder(order, type);
+			return this.orderService.modifyemptyOrder(order, type);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+	
+	//kai 20160121 提交空运单
+	
+			@RequestMapping(value = "/admin/emptyorder_pic/submit", method = { RequestMethod.POST })
+			@ResponseBody
+			public ResponseObject<Map<String, String>>  adminemptyorderpicsubmit(
+			        HttpServletRequest request,	        
+			        @RequestParam(value = "cUserId") String userId,//保存地址的用户id
+			        @RequestParam(value = "order_id") String id,//订单id
+			        @RequestParam(value = "order_oid") String orderId,//运单id号		       
+			        @RequestParam(value = "from_user_name") String userName,//用于userid为空时
+			        @RequestParam(value = "from_user_real_name") String userRealName,//用于userid为空时
+			        @RequestParam(value = "cName") String cName,//保存地址的用户id
+			        @RequestParam(value = "cProvince") String cProvince,//保存地址的用户id
+			        @RequestParam(value = "cCity") String cCity,//保存地址的用户id
+			        @RequestParam(value = "cDistrict") String cDistrict,//保存地址的用户id
+			        @RequestParam(value = "cStreetAddress") String cStreetAddress,//保存地址的用户id
+			        @RequestParam(value = "cZipCode") String cZipCode,//保存地址的用户id
+			        @RequestParam(value = "cPhone") String cPhone,//保存地址的用户id
+			        @RequestParam(value = "weight") String weight,//保存地址的用户id
+			        @RequestParam(value = "sum_weight") String sumjwweight,//进位前的价格总
+			        @RequestParam(value = "weightKg") String weightKg,//保存地址的用户id
+			        @RequestParam(value = "tariff") String tariff,//保存地址的用户id
+			        @RequestParam(value = "other") String other,//保存地址的用户id
+			        @RequestParam(value = "mail") String mail,//保存地址的用户id
+			        @RequestParam(value = "premium") String premium,//保存地址的用户id
+			        @RequestParam(value = "remark") String remark,//保存地址的用户id
+			        
+			        @RequestParam(value = "commodityName") String[] commodityName,
+			        @RequestParam(value = "commodifyQuantity") String[] commodifyQuantity,
+			        @RequestParam(value = "commodifyxiangqing") String[] commodifyxiangqing,
+			        @RequestParam(value = "sjweight") String[] sjweight,//weight
+			        @RequestParam(value = "commodifybrands") String[] commodifybrands,//商品商标
+			        @RequestParam(value = "jwweight") String[] jwweight,//jwweight，进位前的重量
+			        
+			        @RequestParam(value = "length") String length,//保存地址的用户id
+			        @RequestParam(value = "width") String width,//保存地址的用户id
+			        @RequestParam(value = "height") String height,//保存地址的用户id
+			        @RequestParam(value = "parceValue") String parceValue,//保存地址的用户id
+			        @RequestParam(value = "channelidname") String channelId,//保存地址的用户id
+			        @RequestParam(value = "cardidname") String cardid,//保存地址的用户id
+			        @RequestParam(value = "idurlcard", required = false, defaultValue = "") String cardurl,//身份证正面原路径
+			        @RequestParam(value = "idurlcardother", required = false, defaultValue = "") String cardurlother,//身份证正面原路径
+			        @RequestParam(value = "idurlcardtogether", required = false, defaultValue = "") String cardurltogether,//身份证合成原路径
+		            @RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+		            @RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+				
+				
+				
+				if(StringUtil.isEmpty(id)&&StringUtil.isEmpty(orderId))
+				{
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单号和id不能同时为空!");
+				}
+				
+				 Order order;
+				order=new Order();
+				order.setUserId(userId);
+				if(!StringUtil.isEmpty(orderId))
+				{
+					order.setOrderId(orderId.toUpperCase());
+				}
+				order.setId(id);
+				order.setOrderId(orderId);
+				order.setUserName(userRealName);
+				order.setcName(cName);
+				order.setcProvince(cProvince);
+				order.setcCity(cCity);
+				order.setcDistrict(cDistrict);
+				order.setcStreetAddress(cStreetAddress);
+				order.setcZipCode(cZipCode);
+				order.setcPhone(cPhone);
+				order.setWeight(weight);
+				order.setJwweight(sumjwweight);
+				order.setWeightKg(weightKg);
+				order.setTariff(tariff);
+				order.setOther(other);
+				order.setMail(mail);
+				order.setPremium(premium);
+				order.setRemark(remark);
+				order.setLength(length);
+				order.setWidth(width);
+				order.setHeight(height);
+				order.setParceValue(parceValue);
+				order.setChannelId(channelId);
+				order.setOr("0");
+				order.setTypeKey(Constant.ORDER_TYPE_KEY_1);//设置类型为门市
+				order.setSenduserName(userRealName);
+				
+				//String[][] commodifys
+				String[][] strcomms;
+				if(commodityName.length>1)
+				{
+					strcomms=new String[commodityName.length][6];
+					for(int i=0;i<commodityName.length;i++)
+					{
+						strcomms[i][0]=commodityName[i];
+						strcomms[i][1]=commodifyQuantity[i];
+						strcomms[i][2]=commodifyxiangqing[i];
+						strcomms[i][3]=sjweight[i];
+						strcomms[i][4]=commodifybrands[i];
+						strcomms[i][5]=jwweight[i];
+						
+						order.setOrderCommoditys(strcomms);
+					}
+				}
+				else if(commodityName.length==1)
+				{
+					strcomms=new String[6][1];
+					strcomms[0][0]=commodityName[0];
+					strcomms[1][0]=commodifyQuantity[0];
+					strcomms[2][0]=commodifyxiangqing[0];
+					strcomms[3][0]=sjweight[0];
+					//strcomms[4][0]=commodifybrands[0];
+					try{
+						strcomms[4][0]=commodifybrands[0];
+						
+						} catch (Exception e) {
+							strcomms[4][0]="";
+						}
+					strcomms[5][0]=jwweight[0];
+					order.setOrderCommoditys(strcomms);
+					
+				}
+				String fileName = null;
+				if (file != null && file.getSize() > 0) {
+					if (file.getSize() > this.defaultCardFileSize) {
+						return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+					}
+
+					String originalName = file.getOriginalFilename();
+					int index = originalName.lastIndexOf('.');
+					index = Math.max(index, 0);
+					fileName = this.saveCardDir + File.separator + userId + "_" + StringUtil.generateRandomString(5) + "_"
+					        + StringUtil.generateRandomInteger(5) + originalName.substring(index);
+					try {
+						File file1 = new File(request.getSession().getServletContext().getRealPath("/") + fileName);
+						file.transferTo(file1);
+					} catch (Exception e) {
+						log.error("保存用户图像失败,请不要上传图像！", e);
+						return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ERROR, "保存用户图像失败，请去除上传图像后再尝试!");
+					}
+				}
+				else
+				{
+				/*	if((cardurl==null)||cardurl.equalsIgnoreCase(""))
+					{
+						fileName=null;
+					}
+					else
+					{
+						fileName=cardurl;
+					}
+					*/
+					
+					if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+						fileName = null;
+					} else {
+						File file3 = new File(request.getSession().getServletContext()
+								.getRealPath("/")
+								+ cardurl);
+						if (file3.exists()) {
+							fileName = cardurl;
+						} else {
+							fileName = null;
+						}
+					}
+					
+					
+					
+					
+				}
+		        order.setCardurl(fileName);
+		        
+		        String fileNameother = null;
+				if (fileother != null && fileother.getSize() > 0) {
+					if (fileother.getSize() > this.defaultCardFileSize) {
+						return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+					}
+
+					String originalName = fileother.getOriginalFilename();
+					int index = originalName.lastIndexOf('.');
+					index = Math.max(index, 0);
+					fileNameother = this.saveCardDir + File.separator + userId + "_" + StringUtil.generateRandomString(5) + "_"
+					        + StringUtil.generateRandomInteger(5) + originalName.substring(index);
+					try {
+						File file2 = new File(request.getSession().getServletContext().getRealPath("/") + fileNameother);
+						fileother.transferTo(file2);
+					} catch (Exception e) {
+						log.error("保存用户图像失败,请不要上传图像！", e);
+						return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ERROR, "保存用户图像失败，请去除上传图像后再尝试!");
+					}
+				}
+				else
+				{
+					/*if((cardurlother==null)||cardurlother.equalsIgnoreCase(""))
+					{
+						fileNameother=null;
+					}
+					else
+					{
+						fileNameother=cardurlother;
+					}*/
+					
+					
+					if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+						fileName = null;
+					} else {
+						File file3 = new File(request.getSession().getServletContext()
+								.getRealPath("/")
+								+ cardurl);
+						if (file3.exists()) {
+							fileName = cardurl;
+						} else {
+							fileName = null;
+						}
+					}
+					
+				}
+		        order.setCardurlother(fileNameother);
+		        
+		        
+		        
+		        
+		        //kai 20150921 合成图片
+		        String fileNametogether = null;
+		        if((fileName!=null)&&(fileNameother!=null))
+				{
+					imgcompose img=new imgcompose();
+					String str1=request.getSession().getServletContext().getRealPath("/") + fileName;
+					String str2=request.getSession().getServletContext().getRealPath("/") + fileNameother;
+					String str3=this.saveCardDir + File.separator + userId + "_" + StringUtil.generateRandomString(5) + "_"+"together"+ "_"
+					        + StringUtil.generateRandomInteger(5);
+					String filecardtemp=str3;
+					str3=request.getSession().getServletContext().getRealPath("/")+str3;
+					if(img.createcompics(str1, str2,str3))
+					{
+						filecardtemp=filecardtemp+".jpg";
+						
+						fileNametogether=filecardtemp;
+					}
+				}
+		        
+		        if(fileNametogether==null)
+		        {
+		        	order.setCardurltogether(cardurltogether);
+		        }
+		        else
+		        {
+		        	order.setCardurltogether(fileNametogether);
+		        }
+		        
+		        
+		        order.setCardid(cardid);
+				
+		        if(order.getUserId().equals(""))//没有选择用户的情况下，调用另一函数来处理
+		        {
+		        	order.setUserId(userName);
+		        	
+		        	return adminemptyordernouseridmodify(request,order);
+		        }
+		        //下面的流程复制自没图片的处理方式
+				if (order == null) {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+				}
+
+				if (!OrderUtil.validateMsjOrder(order)) {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+				}
+				
+				if (!ConsigneeInfoUtil.validatePhone(order.getcPhone())) {
+				      return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR, "手机号码填写不正确，请重新输入！");
+				}
+				
+				String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+				if (StringUtil.isEmpty(storeId)) {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "您不是门店管理员，不能添加门店运单");
+				}
+				
+				try {
+					//Map<String, Integer> map = new HashMap<String, Integer>();
+					//kai 20150912 解码路径
+					if (order.getCardurl() != "" && (order.getCardurl() != null))// 进行解码
+					{
+						String str = URLDecoder.decode(order.getCardurl(), "UTF-8");
+						order.setCardurl(str);
+					}
+					
+					
+					String[][] commodifys = order.getOrderCommoditys();
+					
+					List<OrderDetail> list = new ArrayList<OrderDetail>();
+					//List<String> commodityId = new ArrayList<String>();
+					if ((commodifys != null) && (commodifys.length == 6) && (commodifys[0].length == 1)) {
+				        OrderDetail detail = new OrderDetail();
+				        detail.setCommodityId(commodifys[0][0]);
+				        detail.setQuantity(commodifys[1][0]);
+				        detail.setXiangqing(commodifys[2][0]);
+				        detail.setSjweight(commodifys[3][0]);
+				        try
+				        {
+				        	detail.setBrands(commodifys[4][0]);
+				        }
+				        catch (Exception e) {
+				        	detail.setBrands("");
+				        }
+				        detail.setJwweight(commodifys[5][0]);
+				        //detail.setJfweight(commodifys[4][0]);
+				        detail.setTranshipmentId("-1");
+				        list.add(detail);
+				         
+				        //commodityId.add(commodifys[0][0]);
+				     
+				    }else if (commodifys != null && commodifys.length >= 2) {
+						System.out.println("=======iftest==============");
+				        System.out.println(commodifys.length);
+				        System.out.println(commodifys[0].length);
+						for (String[] arr : commodifys) {
+					          OrderDetail detail = new OrderDetail();
+					          detail.setCommodityId(arr[0]);
+					          detail.setQuantity(arr[1]);
+					          detail.setXiangqing(arr[2]);
+					          detail.setSjweight(arr[3]);
+					          detail.setBrands(arr[4]);
+					          detail.setJwweight(arr[5]);
+					          //detail.setJfweight(arr[4]);
+					          detail.setTranshipmentId("-1");
+					          list.add(detail);
+					          //commodityId.add(arr[0]);
+							  System.out.println("=============6345t8375619287459================");
+						      System.out.println(arr[0].toString());
+						}
+
+					} else {
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单中必须输入商品信息");
+					}
+					
+					
+					String type = Constant.USER_TYPE_STORE;
+					try {
+						User user = this.userService.getUserById(order.getUserId()).getData();
+						
+						if (user != null) {
+							type = user.getType();
+						} else {
+							return generateResponseObject(ResponseCode.PARAMETER_ERROR, "会员编号为:" + order.getUserId()
+							        + "的会员不存在，请重新查看！");
+						}
+					} catch (Exception e) {
+						log.error("根据运单号获取该运单所属会员信息失败", e);
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据运单号获取该运单所属会员信息失败");
+					}
+			
+					
+					String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+					order.setWarehouseId(storeId);
+					order.setStoreId(storeId);
+					order.setEmpId(empId);
+					order.setDetails(list.toArray(new OrderDetail[0]));
+					order.setState(Constant.ORDER_STATE2);
+					order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_STORE);
+					
+					
+					if(StringUtil.isEmpty(order.getSenduserName()))
+					{
+						order.setSenduserName(userRealName);
+					}
+
+					/* 运费计算 start    */
+					try {
+						order.setType(Constant.ORDER_TYPE_STORE);
+						order.setTotalMoney(String.valueOf(this.orderService.calculationOrderFreight(order,type)));
+						order.setCommodityCost(String.valueOf(this.orderService.calculationOrderCostFreight(order)));
+					} catch (Exception e) {
+						log.error("计算快递价格失败", e);
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "计算快递价格失败");
+					}
+					/*运费计算 end */
+					
+					//return this.orderService.addOrder(order, type);
+					return this.orderService.modifyemptyOrder(order, type);
+				} catch (Exception e) {
+					log.error("提交运单失败", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+				}
+			}
+}

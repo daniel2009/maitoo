@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.SeaNumberDao">
+	<resultMap id="basic_result_map" type="com.meitao.model.SeaNumber">
+		<id column="id" property="id" javaType="String" />
+		<result column="order_id" property="orderId" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		
+	</resultMap>
+
+	<insert id="insertSeaNumber" parameterType="com.meitao.model.SeaNumber">
+		insert into
+		sea_number(order_id,state,create_date,modify_date)
+		values(#{orderId},#{state},#{createDate},#{modifyDate})
+	</insert>
+
+	<select id="getallnumbers" resultType="java.lang.Integer">
+		select count(distinct `sea_number`.id)  from sea_number
+	</select>
+	
+	<select id="getavailablenumbers" resultType="java.lang.Integer">
+		select count(distinct `sea_number`.id) from sea_number where state!='1'
+	</select>
+	<select id="getunavailablenumbers" resultType="java.lang.Integer">
+		select count(distinct `sea_number`.id) from sea_number where state='1'
+	</select>
+	<select id="getone" resultMap="basic_result_map">
+		select sea_number.* from sea_number where state!='1' limit 1
+	</select>
+	<update id="updatestate">
+		update `sea_number`
+		set `state`=#{state},
+		`modify_date`=#{modifyDate}
+		where order_id=#{orderId}
+	</update>
+	
+	<select id="countOfsearchSeaNumber" resultType="java.lang.Integer">
+		select count(distinct `sea_number`.id) from `sea_number`
+		<where>
+			<if test="orderId!=null and orderId!=''">
+				and `sea_number`.`order_id` like #{orderId}
+			</if>
+			<if test="state!=null and state!=''">
+				and `sea_number`.`state` = #{state}
+			</if>
+		</where>
+	</select>
+	<select id="searchSeaNumber" resultMap="basic_result_map">
+		select sea_number.* from `sea_number`
+		<where>
+			<if test="orderId!=null and orderId!=''">
+				and `sea_number`.`order_id` like #{orderId}
+			</if>
+			<if test="state!=null and state!=''">
+				and `sea_number`.`state` = #{state}
+			</if>
+		</where>
+		order by `sea_number`.create_date desc
+		limit
+		#{index},#{size}
+	</select>
+	<delete id="deleteoneseanumber" parameterType="java.lang.String">
+		delete from sea_number
+		where id=#{id}
+	</delete>
+	<select id="existorderid" resultType="java.lang.Integer">
+		select count(distinct `sea_number`.id) from sea_number where order_id=#{orderId}
+	</select>
+	
+</mapper>

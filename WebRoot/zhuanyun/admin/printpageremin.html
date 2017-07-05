@@ -1,0 +1,677 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>打印</title>
+    <style type="text/css">
+        * {
+            font-family: 'Microsoft YaHei';
+            font-size: 15px;
+            font-weight: 600;
+            word-break: break-all;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        tr {
+            height: 20px;
+            width:325px;
+        }
+
+        span {
+            font-size: 15px;
+        }
+
+        .part {
+            width: 650px;
+            padding: 0px 0px;
+            border-bottom: 3px solid #000;
+        }
+
+        .td50 {
+            width: 325px;
+        }
+    </style>
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+    <script src="../resources/scripts/common.js"></script>
+        
+</head>
+<body>
+    <div style="margin:0 auto; width:14cm;padding-top:1px;color:#000">
+        <div class="part" style="width: 650px; ">
+            <table>
+                <tr>
+                    <td style="padding-left:0px;padding-right:0px;padding-bottom: 30px;width:100px;text-align:center;">
+                        <span name="" style="font-size:25px">标准<br/>快件</span>
+                    </td>
+                    <td style="padding-left:0px;text-align:center;width:550px" >
+                        <img src=""  width="398.4px" height="49.8px" id="imaseanumber" style="padding-left: 0px;"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="part">
+            <table>
+                <tr>
+                    <td class="td50">
+                        寄件人：<span name="" id="send_name"></span>
+                    </td>
+
+                    <td class="td50">邮编：<span name="" id="send_zipcode"></span></td>
+
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        地址：<span name="" id="send_address"></span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        重量(Kg)：<span name="" id="sjweight"></span>
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+        <div class="part">
+            <table>
+                <tr>
+                    <td class="td50">
+                        收件人：<span name="" id="receive_name"></span>
+                    </td>
+
+                    <td class="td50">
+                        寄达市：<span name="" id="receive_city"></span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="td50">
+                        电话：<span name="" id="receive_phone"></span>
+                    </td>
+                    <td class="td50">
+                        邮编：<span name="" id="receive_zipcode"></span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        地址：<span name="" id="receive_address"></span>
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td>
+                        收件人签名：
+                    </td>
+
+                    <td>签收时间：</td>
+
+                </tr>
+            </table>
+        </div>
+        <div class="part">
+            <table>
+                <tr style="">
+                    <td colspan="2">
+
+                        <table>
+                            <tr>
+                                 <td style="width: 80px" >订单ID：</td>
+                                <td  style="width:570px"><span><img src="" width="398.4px" height="49.8px" id="imgorderid" /></span>
+                            </tr>
+                        </table>
+
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="2" style="height:50px;">
+                        内件:<span name="" id="commudityinfo"></span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="td50">
+                       <span style="font-size:20px;"> 始发地：</span><span name="" style="font-size:18px">美国</span>
+                    </td>
+                    <td class="td50">
+                      <span style="font-size:20px;">  目的地：</span><span name="" id="" style="font-size:18px;">中国&nbsp;</span><span name="" id="provice00" style="font-size:18px;"></span>
+                    </td>
+
+                </tr>
+                <!--  <tr>
+                    <td colspan="2">
+                        地址：<span name="" id="send_address2"></span>
+                    </td>
+
+                </tr>-->
+
+
+            </table>
+        </div>
+        <div class="part">
+            <table>
+
+                <tr>
+                    <td class="td50">
+                        收件人：<span name="" id="receive_name2"></span>
+                    </td>
+                    <td class="td50">
+                        电话：<span name="" id="receive_phone2"></span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        地址：<span name="" id="receive_address2"></span>
+                    </td>
+
+                </tr>
+
+
+            </table>
+        </div>
+        <div class="part" style="border-bottom:0">
+            <table>
+
+                <tr>
+                    <td  colspan="2" style="text-align:center;width:650px;">
+                        <img src=""  width="398.4px" height="49.8px" id="imaseanumber2" style="padding-left:0px"/>
+                    </td>
+                   <!--   <td style="padding-left:30px;font-size:18px;">
+                        HTY<br />
+                        &nbsp;US
+                    </td>-->
+
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+</body>
+
+
+<script type="text/javascript">
+    function removenull(str) {
+        if ((str == "null") || (str == "") || (str == null) || (str == "undefined")) {
+            return "";
+        }
+        else {
+            return str;
+        }
+    }
+    function getPar(par) {
+        //获取当前URL
+        var local_url = document.location.href;
+        //获取要取得的get参数位置
+        var get = local_url.indexOf(par + "=");
+        if (get == -1) {
+            return false;
+        }
+        //截取字符串
+        var get_par = local_url.slice(par.length + get + 1);
+        //判断截取后的字符串是否还有其他get参数
+        var nextPar = get_par.indexOf("&");
+        if (nextPar != -1) {
+            get_par = get_par.slice(0, nextPar);
+        }
+        return get_par;
+    }
+    $(document)
+                .ready(
+                        function () {
+                            id = getPar("id");
+                            //alert(id);
+                            $.ajax({
+                                type: "get",
+                                url: "/admin/m_order/get_one_by_id_46",
+                                data: {
+                                    "id": id
+                                },
+                                success: function (
+												response) {
+                                    var code = response.code;
+                                    if ("200" == code) {
+                                        $("#send_date").html(response.data.nowtime);//保存当前发件日期
+                                        $("#send_phone").html(response.data.suser.phone);//发件人电话
+                                        $("#send_name").html(response.data.suser.name);//发件人姓名
+                                        $("#send_zipcode").html(removenull(response.data.suser.zipcode));//发件人姓名
+
+
+                                        var send_address = removenull(response.data.suser.address);
+
+                                        if (removenull(response.data.suser.dist) != "") {
+                                            send_address = send_address + ",&nbsp;" + removenull(response.data.suser.dist);
+                                        }
+                                        if (removenull(response.data.suser.city) != "") {
+                                            send_address = send_address + ",&nbsp;" + removenull(response.data.suser.city);
+                                        }
+                                        if (removenull(response.data.suser.state) != "") {
+                                            send_address = send_address + ",&nbsp;" + removenull(response.data.suser.state);
+                                        }
+                                        
+
+                                        $("#send_address").html(send_address);//发件人地址
+
+                                        //收件人信息
+
+                                        //匹配海关单的数据
+										if(response.data.ruser.cardlib!=null||response.data.ruser.cardlib!="")
+										{
+										 $("#receive_name").html(response.data.ruser.cardlib.cname);//收件人姓名
+										 $("#receive_name2").html(response.data.ruser.cardlib.cname);//收件人姓名
+										}
+										else
+										{
+											$("#receive_name").html(response.data.ruser.name);//收件人姓名
+											$("#receive_name2").html(response.data.ruser.name);//收件人姓名
+										}
+                                        $("#receive_company").html(response.data.ruser.company);//收件人公司
+                                        $("#receive_phone").html(response.data.ruser.phone);//收件人电话
+                                        
+                                        $("#receive_zipcode").html(removenull(response.data.ruser.zipcode));//收件人姓名
+
+                                        $("#receive_city").html(removenull(response.data.ruser.city));//收件人所在市
+
+                                        var receive_address = removenull(response.data.ruser.address);
+                                        if (removenull(response.data.ruser.dist) != "") {
+                                            receive_address = removenull(response.data.ruser.dist) + "&nbsp;" + receive_address;
+                                        }
+                                        if (removenull(response.data.ruser.city) != "") {
+                                            receive_address = removenull(response.data.ruser.city) + "&nbsp;" + receive_address;
+                                        }
+                                        if (removenull(response.data.ruser.state) != "") {
+                                            receive_address = removenull(response.data.ruser.state) + "&nbsp;" + receive_address;
+                                        }
+                                        
+                                        $("#provice00").html(removenull(response.data.ruser.state));
+                                        /*if(removenull(response.data.ruser.zipcode)!="")
+                                        {
+                                            receive_address=removenull(response.data.ruser.zipcode)+"&nbsp;"+receive_address;
+                                        }*/
+                                        $("#receive_address").html(receive_address);//收件人地址
+                                        $("#storeId").html(response.data.storeId);//门店id
+                                        $("#employeeId").html(response.data.employeeId);//员工id号
+                                        //获取商品信息
+                                        var commudityinfo = "";
+                                        var i = 0;
+                                        $.each(response.data.detail, function () {
+                                            commudityinfo = commudityinfo + this.productName + "*" + this.quantity + ";";
+                                            i = i + 1;
+                                            if (i == response.data.detail.length)
+                                            { }
+                                            else
+                                            {
+                                                commudityinfo = commudityinfo + "&nbsp;";
+                                            }
+                                        });
+                                        $("#commudityinfo").html(commudityinfo);//商品信息
+                                        $("#sea_value").html(response.data.value);//海关申报价
+                                        $("#tariff").html(response.data.tariff);//关税
+                                        
+                                        var sjweight=parseFloat(response.data.sjweight)*0.4536;
+                                        var weight=parseFloat(response.data.weight)*0.4536;
+                                        var weight1=weight;
+                                        if(isNaN(parseFloat(weight))||(parseFloat(weight)<=0))//重量获取失败
+                                        {
+                                        	 if(isNaN(parseFloat(sjweight))||(parseFloat(sjweight)<=0))
+  	                                        {
+                                        		 alert("运单重量错误!");
+                                        		 return false;
+  	                                        }
+                                        	else
+                                        	{
+                                        		weight1=sjweight;
+                                        	}
+                                        }
+                                        else
+                                        {
+                                  
+                                        	weight1=weight;
+                                        }
+                                       
+		                            var f_x = Math.round(weight1 * 100) / 100;
+									var s_x = f_x.toString();
+									var pos_decimal = s_x.indexOf('.');
+									if (pos_decimal < 0) {
+										pos_decimal = s_x.length;
+										s_x += '.';
+									}
+									while (s_x.length <= pos_decimal + 2) {
+										s_x += '0';
+									}
+                                        
+                                        
+                                        
+                                        $("#sjweight").html(s_x);//实际重量
+                                        $("#others").html(response.data.other);//其它费用
+                                        $("#insurance").html(response.data.insurance);//保险
+                                        $("#totalmoney").html(response.data.totalmoney);//总价钱
+
+                                        //表格2数据
+                                        $("#send_date2").html(response.data.nowtime);//保存当前发件日期
+                                        $("#send_phone2").html(response.data.suser.phone);//发件人电话
+                                        $("#send_name2").html(response.data.suser.name);//发件人姓名
+
+                                        $("#send_address2").html(send_address);//发件人地址
+
+                                        //收件人信息
+
+                                        $("#receive_company2").html(response.data.ruser.company);//收件人公司
+                                        $("#receive_phone2").html(response.data.ruser.phone);//收件人电话
+                                        
+                                        $("#receive_zipcode2").html(response.data.ruser.zipcode);//收件人姓名
+                                        $("#receive_address2").html(receive_address);//收件人地址
+                                        
+                                        $("#sjweight2").html(s_x);
+                                        $("#storeId2").html(response.data.storeId);//门店id
+                                        $("#employeeId2").html(response.data.employeeId);//员工id号
+                                        $("#commudityinfo2").html(commudityinfo);//商品信息
+                                       // var rannumber1=Math.random();
+                                     //   var src1 = "/barcode4j/generate?msg=" + response.data.orderId+ "&type=code39&height=8&ranno="+rannumber1;
+                                     //   $("#imgorderid").attr("src", src1);//二维码
+                                         
+
+   
+									//	var rannumber2=Math.random();
+                                      //  var src2 = "/barcode4j/generate1?msg=" + response.data.sorderId + "&type=code39&height=9&ranno="+rannumber2;
+                                      // $("#imaseanumber2").attr("src", src2);//海关二维码
+                                       // top.open(src2);
+                                      //  var rannumber3=Math.random();
+                                      //  var src3 = "/barcode4j/generate2?msg=" + response.data.sorderId + "&type=code39&height=9&ranno="+rannumber3;
+                                       // top.open(src3);
+                                      //  $("#imaseanumber").attr("src", src2);//海关二维码
+                                      //  $("#barcode2").attr("src",src1);//二维码
+                                        //var storeid = response.data.storeId;
+                                       // var orderid = response.data.orderId;
+                                      //  var sorderId = response.data.sorderId;
+                                      
+                                      
+                                      var rannumber1=Math.random();
+                                      var src1 = "/barcode4j/generate1?msg=" + response.data.orderId + "&type=code128&hrsize=1.6mm&height=6.5&ranno="+rannumber1;
+                                        //获取二维码长度
+                                          $(function(){
+											getImageWidth(src1,function(w,h){
+											//var width1="398.4px";
+											
+											//var height1="63.6px";
+											
+											/*	w=w*541/478;
+												var f_x2 = Math.round(w * 100) / 100;
+												var s_x2 = f_x2.toString();
+												var pos_decimal2 = s_x2.indexOf('.');
+												while (s_x2.length <= pos_decimal2 + 2) {
+													s_x2 += '0';
+												}
+											
+											if(parseFloat(s_x2)-parseInt(s_x2)!=0)
+											{
+												s_x2=parseInt(s_x2)+1;
+											}*/
+											s_x2=532;//实测发现，长度达到这个值后，比较好扫描
+											$("#imgorderid").attr("width", s_x2);//设定宽度
+											$("#imgorderid").attr("height", h);//设定高度度
+											
+											
+											
+											$("#imgorderid").attr("src", src1);//加入连接
+											
+											var rannumber2=Math.random();
+                                        	var src2 = "/barcode4j/generate1?msg=" + response.data.sorderId + "&type=code128&hrsize=1.6mm&height=6.5&mw=0.25&ranno="+rannumber2;
+											$(function(){
+												getImageWidth(src2,function(w,h){
+												//var width2="392px";
+												//var height2="64px";
+												/*if(w*0.8>398.4)
+												{
+													width2=w*0.6;
+													height2=h*0.8;
+												}
+												else
+												{
+													width2=w*0.8;
+													height2=h*0.8;
+												}*/
+												/*w=w*541/478;
+												var f_x1 = Math.round(w * 100) / 100;
+												var s_x1 = f_x1.toString();
+												var pos_decimal1 = s_x1.indexOf('.');
+												while (s_x1.length <= pos_decimal1 + 2) {
+													s_x1 += '0';
+												}
+													
+												if(parseFloat(s_x1)-parseInt(s_x1)!=0)
+												{
+													s_x1=parseInt(s_x1)+1;
+												}*/	
+												s_x1=541;//实测发现，达到这个值比较好扫描
+												$("#imaseanumber").attr("width", s_x1);//设定宽度
+												$("#imaseanumber2").attr("width", s_x1);//设定宽度
+												$("#imaseanumber").attr("height", h);//设定高度度
+												$("#imaseanumber2").attr("height", h);//设定高度度
+												
+												$("#imaseanumber2").attr("src", src2);//海关二维码
+												$("#imaseanumber").attr("src", src2);//海关二维码
+												 getprintwarehouse(response.data.storeId);
+												
+											});
+											
+										});
+										});
+										});
+                                        
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                       
+
+                                    }
+                                    else if ("607" == code) {
+                                       // alert("您尚未登录或登录已失效！");
+                                        top.location.href = "../admin/login.html";
+                                    }
+                                    else {
+                                        alert("提交出错，出错原因：" + response.message);
+                                    }
+
+                                }
+                            });
+
+
+                        });
+                        
+                        
+                        
+     function getdedaytime()
+     {
+     isLoad = true;
+     }         
+                        
+
+    function getprintwarehouse(warehouseid) {
+        $.ajax({
+            async: true,
+            type: "get",
+            url: "../../admin/warehouse/get_one",
+            data: {
+                "id": warehouseid
+            },
+            success: function (response) {
+            
+            
+            
+                var code = response.code;
+                if ("200" == code) {
+                 
+                    $("#warehouseAddress").html(removenull(response.data.address) + "&nbsp;&nbsp;" + removenull(response.data.city) + "&nbsp;" + removenull(response.data.province) + "&nbsp;" + removenull(response.data.country) + "&nbsp;" + removenull(response.data.zipCode));
+
+                    var url = response.data.print2Code;
+                    //alert(url);
+                    if (removenull(url) == "") {
+
+                        $("#qrcodeurl").attr("src", "");
+                        $("#qrcodeurl2").attr("src", "");
+                    } else {
+                        $("#qrcodeurl").attr("src", "../.." + url);
+                        $("#qrcodeurl2").attr("src", "../.." + url);
+                    }
+                    if (removenull(response.data.printPhoneUSA) == "") {
+                        $("#usa_phone").html("");
+                        $("#usa_phone2").html("");
+                    } else {
+                        $("#usa_phone").html("美国：" + response.data.printPhoneUSA);
+                        $("#usa_phone2").html("美国：" + response.data.printPhoneUSA);
+                    }
+                    if (removenull(response.data.printPhoneCN)) {
+                        $("#china_phone").html("");
+                        $("#china_phone2").html("");
+                    } else {
+                        $("#china_phone").html("中国：" + response.data.printPhoneCN);
+                        $("#china_phone2").html("中国：" + response.data.printPhoneCN);
+                    }
+
+                }
+                //logo处理
+                if (removenull(response.data.printLogo) == "") {
+
+                } else {
+
+                    $("#print_logo").attr("src", "../.." + response.data.printLogo);
+                    $("#print_logo2").attr("src", "../.." + response.data.printLogo);
+                }
+
+                var site = "Website/网址:";
+                if (removenull(response.data.printUrl) != "") {
+                    site = site + response.data.printUrl;
+
+                }
+                $("#print_site_url").html(site);
+                $("#print_site_url2").html(site);
+
+
+                setTimeout("getglobalargs()", 200);
+              //  getglobalargs();
+            }
+        });
+    }
+
+    function getglobalargs() {
+        //var flags="print_logo_flag,print_order_hit,print_site_url";//获取logo图片,包裹提示,网站的url
+        var flags = "print_order_hit,print_site_url,print_commudity_ornot,print_label_send_name,print_label_send_phone";//获取logo图片,包裹提示,网站的url
+        $.ajax({
+            type: "post",
+            url: "../../admin/globalargs/getcontents",
+            data: {
+                "flags": flags
+            },
+            success: function (response) {
+                var code = response.code;
+
+                if ("200" == code) {
+setTimeout("getdedaytime()", 200);
+                    if (response.data != null) {
+
+                        /*if((response.data[0]=="")||(response.data[0]=="null")||(response.data[0]=="undefined")||(response.data[0]==null))
+						{
+
+						}
+						else
+						{
+
+							//$("#print_logo").attr("src",getRootPath()+response.data[0]);
+							//$("#print_logo2").attr("src",getRootPath()+response.data[0]);
+						}*/
+
+                        if ((response.data[0] == "")
+								|| (response.data[0] == "null")
+								|| (response.data[0] == "undefined")
+								|| (response.data[0] == null)) {
+
+                        } else {
+                            $("#print_order_hit").html(response.data[0]);
+
+                        }
+
+                        if ((response.data[1] == "")
+								|| (response.data[1] == "null")
+								|| (response.data[1] == "undefined")
+								|| (response.data[1] == null)) {
+
+                        } else {
+                            //$("#print_site_url").html(response.data[1]);
+                            //$("#print_site_url2").html(response.data[1]);
+                            if ($("#print_site_url").html() == "") {
+                                $("#print_site_url").html(response.data[1]);
+                            }
+
+                            if ($("#print_site_url2").html() == "") {
+                                $("#print_site_url2").html(response.data[1]);
+                            }
+
+                        }
+
+                        var print_commudity_ornot = response.data[2];
+                        //alert(print_commudity_ornot);
+                        //alert($("#print_table1 div[name='remark2']").html());
+                        if (print_commudity_ornot != "yes") {
+                            $("#commudityinfo2").html("");
+                        }
+
+                        var print_label_send_name = response.data[3];
+                        if (print_label_send_name == "no") {
+                            //id="from_user2"
+                            $("#send_name2").html("&nbsp;");//不显示发件人信息
+                        }
+                        var print_label_send_phone = response.data[4];
+                        if (print_label_send_phone == "no") {
+                            $("#send_phone2").html("&nbsp;");//不显示发件人的电话
+
+                        }
+                       
+                    } else {
+
+                    }
+                } else {
+
+                }
+
+            }
+        });
+    }
+
+
+    var isLoad = false; // 控制变量
+    
+    
+    function getImageWidth(url,callback){
+	var img = new Image();
+	img.src = url;
+	
+	// 如果图片被缓存，则直接返回缓存数据
+	if(img.complete){
+	    callback(img.width, img.height);
+	}else{
+            // 完全加载完毕的事件
+	    img.onload = function(){
+		callback(img.width, img.height);
+	    }
+        }
+	
+}
+
+
+</script>
+</html>

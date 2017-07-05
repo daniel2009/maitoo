@@ -1,0 +1,68 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+</head>
+
+<body>
+	<input type="hidden" name="oid" value="${param.oid }" />
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">运单详情 <a href="javascript:nav44Click()" class="btn"
+							style="background: #007FFF;color: #FFFFFF;display:inline">返回</a></p>
+		<div class="box_content">
+			<div class="content_title">运单详情 </div>
+			<div class="content_text">
+				运单详情：
+				<div class="tab_box">
+					<table id="datatable" class="table">
+						<thead>
+							<tr>
+								<th>运单号</th>
+								<th style="width:80px">货物信息</th>
+								<th style="width:60px">品牌</th>
+								<th style="width:30px">重量</th>
+								<th style="width:40px">收件人</th>
+								<th style="width:30px">运费</th>
+								<th>预报日期</th>
+								<th>收货地址</th>
+								<th>状态</th>
+								<!--状态显示已付款还是为付款等信息-->
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+				路由详情：
+				<table id="routetable" class="table">
+					<thead>
+						<tr>
+							<th>时间</th>
+							<th>状态</th>
+							<th>状态说明</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<div style="clear:both;"></div>
+					<br/>
+		<div style="margin-left:10px;display:none;" id="show_return_title"><strong>快递公司代号：</strong><span id="expresscompanyname" style="color:red;"></span>&nbsp;&nbsp;<strong>快递公司单号：</strong><span id="expresscompanycodes" style="color:red;"></span><span>&nbsp;&nbsp;查询结果如下(或请到<a href="http://www.kuaidi100.com/">快递100</a>查询单号)：</span></div>
+		<iframe src="" id="returnurl" style="display:none;">
+		
+		
+		</iframe>
+				
+				
+				
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

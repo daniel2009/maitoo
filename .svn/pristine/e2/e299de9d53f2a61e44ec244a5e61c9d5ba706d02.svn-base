@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0042)http://www.xlobo.com/Public/coreValue.aspx -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/wpa_first_heart_beat.php"></script><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/crmqq.php"></script><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/contains.js"></script><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/localStorage.js"></script><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/Panel.js"></script>
+    
+    <title>阳光国际速递</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+     <link href="./pricing_files/reset.css" rel="stylesheet">
+<link href="./pricing_files/site.css" rel="stylesheet">
+<!-- Favicons
+    ================================================== -->
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="img/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/apple-touch-icon-114x114.png">
+    <!-- Bootstrap 
+    ================================================== -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/jasny-bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="font-awesome-4.2.0/css/font-awesome.css">
+    <!-- Animate 
+    ================================================== -->
+    <link href='css/animate.css' rel='stylesheet' type='text/css'>
+    <!-- Add fancyBox CSS files -->
+    <link rel="stylesheet" type="text/css" href="js/fancybox/jquery.fancybox.css?v=2.1.5" media="screen" />
+    <!-- BxSlider CSS -->
+    <link rel="stylesheet" type="text/css" href="js/bxslider/jquery.bxslider.css?v=2.1.5" media="screen" />
+    <!-- Custom Css 
+    ================================================== -->
+    <link rel="stylesheet" type="text/css" href="css/rs-wp-v1.2.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/responsive.css">
+    <!-- Google Fonts 
+    ================================================== -->
+    <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
+      <link href="./shining_files/reset.css" rel="stylesheet">
+<link href="./shining_files/site.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="./shining_files/bootstrap.css">
+     <script src="./shining_files/Ymt.min.js"></script>
+<script src="./shining_files/jquery-1.5.2.min.js"></script>
+    
+     <script src="./pricing_files/Ymt.min.js"></script>
+<script src="./pricing_files/jquery-1.5.2.min.js"></script>
+
+</head>
+<body>
+<style>
+hr.style-seven {
+    height: 30px;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px 0 0 0;
+    border-radius: 20px;
+}
+hr.style-seven:before { /* Not really supposed to work, but does */
+    display: block;
+    content: "";
+    height: 30px;
+    margin-top: -31px;
+    border-style: solid;
+    border-color: black;
+    border-width: 0 0 1px 0;
+    border-radius: 20px;
+}
+</style>
+      <!-- header S -->
+   <div class="xlobo_hd">
+        <div class="ly_in">
+           <h1> <img src="./shining_files/shining_logo_.png"></h1>
+           
+            <div class="main_nav">
+                <ul class="main_nav_list">
+                    <li class="cur"><a href="./index.html">首页</a></li>
+                    <li><a href="./pricing.html">收费标准</a></li>
+                    <li><a href="./about_us.html">关于我们</a></li>
+                    <li><a href="./location.html">地点</a></li>
+		    <li><a href="./../newsandgonggao.jsp"  target="_blank">公告</a>/ <a href="./xieyi_mt.html" target="_blank">协议</a> </li>
+                    <li><a href="./../login.jsp">注册</a> &nbsp;/&nbsp; <a href="./../login.jsp">登陆</a> </li>
+                    <li><a href="./../shangchuan.jsp" target="_blank">上传身份证</a></li> 
+
+            	    <li> <a class="qqOn" target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=76085666&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:2278808484:41 &r=0.8940031429092906" alt="美国洛杉矶" title="美国洛杉矶"></a> </li>
+
+                </ul>
+            </div>
+            
+
+
+            </div>
+
+
+<script>
+    function gocn(url) {
+        
+    $.ajax({
+        url: "/api/changelanguageapi/ChangeLanguageToCn",
+        type: 'post',
+
+        contentType: 'application/json',
+        success: function (result) {
+            location.href = url;
+        }
+    });
+    }
+</script>
+        </div>
+    </div>
+    <!-- header E -->
+    <!-- main S -->
+    <div class="main">
+        <!-- banner S -->
+        <div class="worth_banner">
+            <div class="ly_in">
+                <h2>关于我们</h2>
+                <!--<p>跨境电子商务国际物流解决方案专家</p>-->
+            </div>
+        </div>
+        <!-- banner E -->
+        <!-- banner E -->
+        <div class="ly_in core_values">
+            <div class="rst_title">
+                <h1>阳光国际快递 </h1> <h2>FAQ</h2>
+            </div>
+            <div class="row rst_shortcode_table">
+                
+                <div class="col-xs-12 col-md-12">
+                  <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>问：你们是怎么清关的?</b><br/>答：我们是委托具备国家认可行业资质的清关公司按海关的要求提供清关文件和相关资料如实向海关申报/严格按海关的通关流程进行货件入境的清关。</p>
+
+  <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>问：为何其他快递不需要身份证，只有你们快递需要身份证?</b><br/>答：根据中国海关总署修订后的《中华人民共和国海关对进出境快件监管办法》，入境到中国大陆的个人包裹经海关查验需向海关提供收件人身份证影印件等相关信息。
+<br/>您可以到海关网站查询相关规定：中华人民共和国海关总署官方网站 
+<br/>TEL: +86-10-6519-4114.
+</p>
+
+ <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>问：在什么地方可以查询到海关规定?</b><br/>答：可到中国海关官方网页查询海关对入境货件的管理规定，网址 如下：<br/>http://www.customs.gov.cn/tabid/3407/Default.aspx </p>
+ <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>问：我买的东西要征收关税吗? </b><br/>答：您购买的商品是否需要征关税，需要根据具体品名对照海关的规定和相关税则，品名和申报价值是个重要依据，简单的说：超过海关的限定就要按税则征收关税。</p>
+ <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>问：如果要征收关税，怎么支付?</b><br/>答：个人物品海关征收行邮税，遇到海关需要征收关税，我们的客服专员将通知您关税金额，您可以授权由我司代为支付关税，我们会从您账户扣除关税。</p>
+ <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>问：哪些物品国家禁止进境?</b><br/>答：各种武器、仿真武器、弹药及爆炸物品；伪造的货币及伪造的有价证券；对中国政治、经济、文化、道德有害的印刷品、胶卷、照片、唱片、影片、录音带、录像带、激光视盘、计算机存储介质及其它物品；各种烈性毒药；鸦片、吗啡、海洛因、大麻以及其它能使人成瘾的麻醉品、精神药物；带有危险性病菌、害虫及其它有害生物的动物、植物及其产品；有碍人畜健康的、来自疫区的以及其它能传播疾病的食品、药品或其它物品。</p>
+ <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>问：二手物品也需要征税么? </b><br/>答：海关允许进口的二手物品均按同类物品的新产品核定完税价格，并根据此完税价格和相关税率征税后放行。 </p>
+ <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>问：超出合理自用部分海关如何处理?</b><br/>答：超出合理自用部分将会被要求做货物报关或者退运。</p>
+                </div>
+            </div>
+            <hr class="style-seven">
+           <div class="row rst_shortcode_table">
+                
+                <div class="col-xs-12 col-md-12">
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- main E -->
+   
+    <!-- footer S -->
+
+    
+
+<div class="xlobo_ft">
+    <div class="ly_in">
+       
+        
+         <div class="global_site"> <span>联系我们：</span>
+            <ul class="global_site_list">
+                <li class="st1"><i></i><a href="./location.html">地址：18513 Gale Ave. City of Industry CA 91748</a></li>
+                <li class="st2"><i></i><a href="#" target="_blank">联系电话：(310)997-0057</a></li>
+                <li class="st3"><i></i><a href="#" target="_blank">Email(电子邮箱)：info@shiningexpress.com</a></li>
+                <li class="st4"><i></i><a href="#" target="_blank"></a></li>
+            </ul>
+        </div>
+
+       
+       
+        <div class="copy_right">
+            <p>
+            
+                <a href="#" target="_blank">帮助及问答</a>
+                <a href="#" target="_blank">资源下载</a>
+                <a href="#" target="_blank">加盟合作</a>
+                <a href="#" target="_blank">服务协议</a>
+
+                
+            </p>
+            <p>Copyright © 2015 Shining Express. All Rights Reserved.</p>
+        </div>
+    </div>
+</div>
+    
+    <!-- footer E -->
+    
+  <script src="./pricing_files/main.js"></script>
+<script src="./pricing_files/changeLang.js"></script>
+
+
+
+</body></html>

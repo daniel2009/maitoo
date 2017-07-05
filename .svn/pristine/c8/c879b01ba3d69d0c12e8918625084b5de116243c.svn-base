@@ -1,0 +1,143 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name=userInfo/>
+	<input type="hidden" name="labelInfo"/>
+	<input type="hidden" name="sdate"/>
+	<input type="hidden" name="edate"/>
+	<input type="hidden" name="pn"/>
+
+	
+	
+	
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">Endicial label列表</p>
+
+		<div class="box_content">
+			<div class="content_title">usps信息列表</div>
+			<div class="content_text">
+	
+		
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u51" style="padding-top: 5px;">
+						<div id="u510">
+						<form action="" >
+							所属用户信息：<input type="text" class="text-input" size="20" name="userInfo"maxlength="16"/>
+							&nbsp;&nbsp;label内容信息：<input type="text" class="text-input" size="20" name="labelInfo"maxlength="16"/>
+							&nbsp;&nbsp;
+								入库日期：
+								<input type="text" class="text-input Wdate" size="10" name="sdate" id="sd" onClick="WdatePicker()"/>
+								~
+								<input type="text" class="text-input Wdate" size="10" name="edate" id="ed" onClick="WdatePicker()"/>
+								<input class="button" type="submit" value="高级搜索" name="searchSub" />
+							
+						</form>
+					
+						</div>
+						
+						
+				
+						
+						
+						<div style="clear: both;"></div>
+						
+					</div>
+<div  style="margin-left: 90%;margin-top: 20px;">
+							<span>
+								<a href="javascript:nav_endicialabel_Click();" style="font-size:14px;">添加label</a>
+							</span>
+						</div>
+					<table style="width: 100%">
+						<col width="50px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="300px" />
+						
+						<col width="100px" />
+						
+						<col width="100px" />
+						<col />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="150px" />
+						 
+						<thead>
+							<tr>
+								<th>
+									订单号
+								</th>
+								<th>
+									创建时间
+								</th>
+								<th >
+									发件人
+								</th>
+								<th>
+									发件人电话
+								</th>
+								<th >
+									发件人地址
+								</th>
+								<th >
+									收件人
+								</th>
+								<th >
+									收件人电话
+								</th>
+								<th >
+									收件人地址
+								</th>
+								<th>
+									费用
+								</th>
+								<th>
+									操作人
+								</th>							
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="12">							
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+							<tr>
+								<td style="text-align: left;" colspan="12">
+									<span>&nbsp;&nbsp;对不起，现在还没有label信息!</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		
+		endicialabellistData();//包裹认领调用数据接口
+	});
+</script>
+</html>

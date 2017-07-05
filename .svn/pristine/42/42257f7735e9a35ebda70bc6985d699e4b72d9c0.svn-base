@@ -1,0 +1,204 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+<div class="block">
+	<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">商品列表</p>
+	<div class="box_content">
+		<div class="content_title">商品列表</div>
+		<div class="content_text">
+				<div class="tab-content default-tab">
+					<div id="u31" style="margin: 0px;height: auto;">
+						<div id="u320" style="margin-top: 0px;">
+							<span>
+								<a href="#" onclick="javascript: addProduct();">添加商品</a>
+							</span>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+					<div id="u51" style="padding-top: 5px;">
+						<div id="u510">
+							<form id="searchForm" style="display: flex;">
+								<div>关键字：<input class="text-input" size="20" type="text" name="key" ></div>
+								<div>买家编号：<input class="text-input" size="20" type="text" name="userId" ></div>
+								<div>价格范围:<input type="number" name="priceStart">~<input type="number" name="priceEnd"></div>
+								<input class="button" type="button" value="高级搜索" onclick="javascript: search();" />
+							</form>
+						</div>
+					</div>
+					<table style="width: 100%">
+						<thead>
+							<tr>
+								<th style="width: 50px;">编号</th>
+								<th style="width: 100px;">类型</th>
+								<th>商品名</th>
+								<th style="width: 100px;">价格</th>
+								<th style="width: 50px;">库存</th>
+								<th>图1</th>
+								<th style="width: 100px;">修改日期</th>
+								<th style="width: 100px;">操作</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td id="pagination" colspan="8" style="text-align: right;">共<span id="trsize">0</span>条
+									<a id="first_page" href="1" name="to_page">首页</a> |
+									<a id="pre_page" name="to_page">上一页</a> |
+									<input type="number" class="bor" style="width: 50px;" min="0" step="1" /> / <span id="tpsize">0</span>|
+									<a id="next_page" name="to_page">下一页</a> |
+									<a id="last_page" name="to_page">未页</a>&nbsp;&nbsp;
+								</td>
+							</tr>
+						</tfoot>
+						<tbody id="tbody">
+							<tr>
+								<td style="text-align: left;" colspan="8">
+									<span>&nbsp;&nbsp;对不起，没有找到对应的购买记录!</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		var formData = new FormData();
+		loadList(formData);
+		$("#pagination a[name='to_page']").click(function() {
+			// 跳页
+			var pn = $(this).attr("href");
+			var formData = new FormData(document.getElementById("searchForm"));
+			formData.append("pageIndex", pn);
+			loadList(formData);
+			return false;
+		});
+
+		$("#pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var formData = new FormData(document.getElementById("searchForm"));
+					formData.append("pageIndex", pn);
+					loadList(formData);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	});
+	function loadList(formData){
+		$.ajax({
+			type : "post",
+			url : "../admin/product/findAll",
+			data : formData,
+			processData : false,
+			contentType : false,
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if (response.data == null) {
+						showList(null);
+						showPage(null);
+					} else {
+						showList(response.data.datas);
+						showPage(response.data);
+					}
+					clearWrongImg();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					var info = "<td style='text-align: left;' colspan='8'><span>&nbsp;&nbsp;获取商品列表失败!原因是：" + response.message + "</span></td>";
+					$("#tbody").html(info);
+				}
+				return false;
+			}
+		});
+	}
+	function showList(list) {
+		var string = "";
+		$("#tbody").html(string);
+		if (list != null) {
+			$.each(list, function() {
+				string += "<tr>";
+				string += "<td>" + this.id + "</td>";
+				string += "<td>" + this.typeName + "</td>";
+				string += "<td>" + this.name + "</td>";
+				var price = this.price;
+				if(price == "" || price == -999999){
+					price = "<span style='color: #f00;'>待定</span>";
+				}
+				string += "<td>" + this.currency + "&nbsp;" + price + "</td>";
+				string += "<td>" + this.quantity + "</td>";
+				string += "<td><img src='../" + this.pic1 + "' style='max-width: 300px; max-height: 300px;'></td>";
+				string += "<td>" + this.modifyDate + "</td>";
+				string += "<td><a href='#' onclick='javascript: modifyProduct(" + this.id + ")'>修改</a>|<a href='#' onclick='javascript: deleteProduct(" + this.id + ")'>删除</a></td>";
+				string += "</tr>";
+			});
+		} else {
+			if (string == null || string == '') {
+				string = "<tr><td style='text-align: left;' colspan='6'><span>&nbsp;&nbsp;对不起，没有找到对应的信息!</span></td></tr>";
+			}
+		}
+		$("#tbody").html(string);
+	}
+
+	function showPage(pageSplit) {
+		var rowCount = 0;
+		var pageNow = 0;
+		var pageCount = 0;
+		if (pageSplit != null) {
+			rowCount = pageSplit.rowCount;
+			pageNow = pageSplit.pageNow;
+			pageCount = pageSplit.pageCount;
+		}
+		$("#trsize").html(rowCount);
+		$("#tpsize").html(pageCount);
+		$("#first_page").attr("href","1");
+		$("#pre_page").attr("href", pageNow - 1);
+		$("#next_page").attr("href",pageNow + 1);
+		$("#last_page").attr("href", pageCount);
+	}
+	function search(){
+		var formData = new FormData(document.getElementById("searchForm"));
+		loadList(formData);
+	}
+	function modifyProduct(id){
+		window.sessionStorage.setItem("productId", id);
+		$("#main-content").load("../admin/productModify.jsp");
+	}
+	function deleteProduct(id){
+		if(confirm("确认删除吗")){
+			$.ajax({
+				type : "post",
+				url : "../admin/product/delete",
+				data : {id : id},
+				success : function(response) {
+					var code = response.code;
+					if ("200" == code) {
+						alert("删除成功！");
+						navProductClick();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("删除失败！原因是：" + response.message);
+					}
+					return false;
+				}
+			});
+		}
+	}
+	function addProduct(){
+		$("#main-content").load("../admin/productAdd.jsp");
+	}
+</script>
+</html>

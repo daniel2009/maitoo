@@ -1,0 +1,115 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="userId" value=""/>
+	<input type="hidden" name="key" value=""/>
+	<input type="hidden" name="type" value=""/>
+	<input type="hidden" name="pn" value="1"/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">帐号列表</p>
+
+		<div class="box_content">
+			<div class="content_title">帐号列表</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u31" style="padding-top: 5px;">
+						<div id="u310">
+							<form action="" >
+								用户编号：<input type="text" class="text-input small-input" name="userId"/>
+								&nbsp;&nbsp;&nbsp;&nbsp;
+								关键字：<input class="text-input small-input" type="text" name="key" />
+								<select class="text-input" name="type">
+									<option value="all" selected="selected">
+										请选择搜索方式
+									</option>
+									<option value="name">
+										按用户名
+									</option>
+									<option value="phone">
+										按电话号码
+									</option>
+									<option value="email">
+										按Eamil
+									</option>
+									<option value="qq">
+										按QQ
+									</option>
+								</select>
+								&nbsp;&nbsp;
+								<input class="button" type="submit" value="搜索" name="searchSub" />
+							</form>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+
+					<form action="">
+					<table style="width: 100%">
+						<col width="90px" />
+						<col width="150px"/>
+						<col width="150px" />
+						<col width="200px" />
+						<col width="130px" />
+						<col/>
+						<col width="50px" />
+						<thead>
+							<tr>
+								<th>
+									用户编号
+								</th>
+								<th id="u_nick_name">
+									用户名
+								</th>
+								<th>
+									账户余额
+								</th>
+								<th id="u_sign_date">
+									充值金额
+								</th>
+								<th id="u_balance">
+									货币类型
+								</th>
+								<th>
+									备注
+								</th>
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="5">
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav62Data();
+	});
+</script>
+</html>

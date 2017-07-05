@@ -1,0 +1,772 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>打印</title>
+<style type="text/css">
+* {
+	font-family: 'Microsoft YaHei';
+	font-size: 30px;
+	font-weight: 550;
+	word-break: break-all;
+	padding: 0px;
+	margin: 0px;
+}
+
+tr {
+	height: 35px;
+	width: 1000px;
+}
+
+span {
+	font-size: 30px;
+}
+
+.part {
+	width: 1000px;
+	padding: 0px 0px;
+	border: 1px solid #000;
+}
+
+.td50 {
+	width: 650px;
+}
+</style>
+<script src="../resources/js/jquery-1.10.2.min.js"></script>
+<script src="../resources/scripts/common.js"></script>
+<script src="../resources/scripts/provinceJ.js"></script>
+
+
+</head>
+<body>
+	<div style="margin:0 auto; width:10cm;padding-top:5px;color:#000">
+		<div class="part" style="width: 1000px; ">
+			<table>
+				<tr style="text-align:center">
+					<td style="padding-left:0px;text-align:center;width:100px">
+						<img src="/images/timg.jpg" width="200px" height="144px"
+						id="logoprint" style="padding-left: 0px;" />
+					</td>
+					<td style="padding-left:0px;text-align:center;width:800px">
+						<img src="" width="398.4px" height="49.8px" id="imaseanumber"
+						style="padding-left: 0px;" />
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="part">
+			<table >
+
+
+				<tr >
+					<td rowspan="3" style="width:50px;border-right:2px solid #000;text-align:center;" ><strong>收<br />件<br />人</strong>
+					</td>
+					<td style="width:950px" colspan="2"><span name="" id="receive_name"></span>
+					</td>
+
+
+
+				</tr>
+				<tr>
+					<td class="td50" colspan="2">电话：<span name=""
+						id="receive_phone"></span>
+					</td>
+
+
+				</tr>
+				<tr>
+					<td colspan="2">地址：<span name="" id="receive_address"></span>
+					</td>
+
+				</tr>
+
+				
+			</table>
+		</div>
+		<div class="part">
+			<table>
+				<tr>
+				<td rowspan="3" style="width:50px;border-right:2px solid #000;text-align:center;" ><strong>寄<br />件<br />人</strong>
+					</td>
+				
+					<td style="width:600px"><span name="" id="send_name"></span></td>
+
+					<td style="width:350px;border-left:2px solid #000;" rowspan="4"><span>代收/到付：XXXXX</span><br />
+						<span>保价 到付：XXXXX</span><br /> <span>保价 费用：XXXXX</span><br /> <span>其它
+							说明：XXXXX</span></td>
+
+				</tr>
+				<tr>
+					<td style="width:600px">电话： <span name="" id="send_phone"></span>
+					</td>
+
+
+				</tr>
+				<tr>
+					<td>地址：<span name="" id="send_address"></span>
+					</td>
+
+				</tr>
+				
+			</table>
+		</div>
+
+		<div class="part">
+			<table>
+				<tr>
+				<td rowspan="3" style="width:50px;border-right:2px solid #000;text-align:center;" ><strong>目<br />的<br />地</strong>
+					</td>
+					<td class="td50"><span style="font-size:50px;padding-left: 20px;"
+						id="address_flag"></span></td>
+
+
+
+				</tr>
+
+			</table>
+		</div>
+		<div class="part">
+			<table>
+				<tr>
+					<td style="width:550px;padding-left: 50px;"><span>收件人签收/日期：</span></td>
+					<td rowspan="4" style="width:450px;border-left:2px solid #000;"><span>始发：烟台芝罘区六部</span><br />
+						<span>到达：中山板芙站</span></td>
+
+
+				</tr>
+				<tr>
+					<td class="td50" style="padding-left: 50px;">运单编号：<span id="hiutao_orderId"></span>
+					</td>
+
+
+				</tr>
+				<tr>
+					<td style="padding-left: 50px;">打印日期：<span name="" id="print_date">2016-05-12
+							04:25:21</span>
+					</td>
+
+				</tr>
+
+				
+			</table>
+		</div>
+
+		<div class="part">
+			<table>
+				<tr style="">
+					<td colspan="2">
+
+						<table>
+						<tr><td style="width:1000px;padding-left: 50px;">您对此单的签收，代表您已验收，确认商品信息无误，包装完好，<br/>没有划痕、破损等表面质量问题。</td></tr>
+							<tr style="text-align:left;">
+
+								<td style="width:1000px;padding-left: 100px;"><span><img src=""
+										width="398.4px" height="49.8px" id="imaseanumber2" /></span></td>
+							</tr>
+						</table>
+
+					</td>
+
+				</tr>
+
+
+
+			</table>
+		</div>
+
+		<div class="part">
+			<table>
+				<tr>
+				<td rowspan="3" style="width:100px;border-right:2px solid #000;text-align:center;" ><strong>收件人</strong>
+					</td>
+					<td style="width:900px" colspan="2"><span name="" id="receive_name2"></span>
+					</td>
+
+
+
+				</tr>
+				<tr>
+					<td class="td50" colspan="2">电话：<span name=""
+						id="receive_phone2"></span>
+					</td>
+
+
+				</tr>
+				<tr>
+					<td colspan="2">地址：<span name="" id="receive_address2"></span>
+					</td>
+
+				</tr>
+
+				
+			</table>
+		</div>
+
+
+		<div class="part">
+			<table>
+				<tr>
+				<td rowspan="3" style="width:100px;border-right:2px solid #000;text-align:center;" ><strong>寄件人</strong>
+					</td>
+					<td style="width:550px"><span name="" id="send_name2"></span></td>
+
+					<td style="width:350px;border-left:2px solid #000;" rowspan="4"><span>代收/到付：XXXXX</span><br />
+						<span>保价 到付：XXXXX</span><br /> <span>保价 费用：XXXXX</span><br /> <span>其它
+							说明：XXXXX</span></td>
+
+				</tr>
+				<tr>
+					<td >电话： <span name="" id="send_phone2"></span>
+					</td>
+
+
+				</tr>
+				<tr>
+					<td>地址：<span name="" id="send_address2"></span>
+					</td>
+
+				</tr>
+				
+			</table>
+		</div>
+
+
+
+		<div class="part" style="border-bottom:0;padding-bottom: 15px;">
+			<table>
+
+				<tr>
+				<td style="text-align:right;width:200px;font-size:25px">国际运单号</td>
+					<td colspan="2" style="text-align:left;width:800px;"><img
+						src="" width="398.4px" height="49.8px" id="imgorderid"
+						style="padding-left:0px" /></td>
+					<!--   <td style="padding-left:30px;font-size:18px;">
+                        HTY<br />
+                        &nbsp;US
+                    </td>-->
+
+				</tr>
+
+			</table>
+
+		</div>
+	</div>
+</body>
+
+
+<script type="text/javascript">
+	var printornot = false;
+	var numberprint = 0;
+	var isLoad = false; // 控制变量     
+	function removenull(str) {
+		if ((str == "null") || (str == "") || (str == null)
+				|| (str == "undefined")) {
+			return "";
+		} else {
+			return str;
+		}
+	}
+	function getPar(par) {
+		//获取当前URL
+		var local_url = document.location.href;
+		//获取要取得的get参数位置
+		var get = local_url.indexOf(par + "=");
+		if (get == -1) {
+			return false;
+		}
+		//截取字符串
+		var get_par = local_url.slice(par.length + get + 1);
+		//判断截取后的字符串是否还有其他get参数
+		var nextPar = get_par.indexOf("&");
+		if (nextPar != -1) {
+			get_par = get_par.slice(0, nextPar);
+		}
+		return get_par;
+	}
+	$(document)
+			.ready(
+					function() {
+						var orderId = getPar("orderId");
+						var date = getPar("date");
+						//alert(id);
+						$
+								.ajax({
+									type : "post",
+									url : "/admin/m_order/print_huitong_orderId",
+									data : {
+										"orderId" : orderId,
+										"date" : date
+									},
+									success : function(response) {
+
+										var code = response.code;
+
+										if (code == "41000") {
+											if (confirm("此运单已经打印过，是否继续？")) {
+
+											} else {
+												return false;
+											}
+										}
+
+										// alert(code);
+										if ("200" == code || code == "41000") {
+
+											printornot = true;//执行打印
+											//收件人姓名
+											$("#receive_name").html(
+													response.data.ruser.name);//收件人姓名
+											$("#receive_name2").html(
+													response.data.ruser.name);//收件人姓名
+											//收件人电话
+											$("#receive_phone").html(
+													response.data.ruser.phone);//收件人电话
+											$("#receive_phone2").html(
+													response.data.ruser.phone);//收件人电话
+
+
+											//目的地省市
+											if(removenull(response.data.ruser.state)!="")
+											{
+												var strp=provinceForShort(response.data.ruser.state)+"-"+removenull(response.data.ruser.city);
+												$("#address_flag").html(strp);
+											}
+											else
+											{
+												$("#address_flag").html(removenull(response.data.ruser.city));
+											}
+
+											var receive_address = removenull(response.data.ruser.address);
+											if (removenull(response.data.ruser.dist) != "") {
+												receive_address = removenull(response.data.ruser.dist)
+														+ "" + receive_address;
+											}
+											if (removenull(response.data.ruser.city) != "") {
+												receive_address = removenull(response.data.ruser.city)
+														+ "" + receive_address;
+											}
+											if (removenull(response.data.ruser.state) != "") {
+												receive_address = removenull(response.data.ruser.state)
+														+ "" + receive_address;
+											}
+											if (removenull(response.data.ruser.zipcode) != "") {
+												receive_address = receive_address
+														+ "&nbsp;"
+														+ removenull(response.data.ruser.zipcode);
+											}
+
+											$("#receive_address").html(
+													receive_address);//收件人地址
+											$("#receive_address2").html(
+													receive_address);//收件人地址
+
+											//发件人信息
+											$("#send_name").html(
+													response.data.suser.name);//发件人姓名
+											$("#send_name2").html(
+													response.data.suser.name);//发件人姓名
+											$("#send_phone").html(
+													response.data.suser.phone);//发件人电话
+											$("#send_phone2").html(
+													response.data.suser.phone);//发件人电话
+
+											var send_address = removenull(response.data.suser.address);
+											if (removenull(response.data.suser.dist) != "") {
+												send_address = removenull(response.data.suser.dist)
+														+ "" + send_address;
+											}
+											if (removenull(response.data.suser.city) != "") {
+												send_address = removenull(response.data.suser.city)
+														+ "" + send_address;
+											}
+											if (removenull(response.data.suser.state) != "") {
+												send_address = removenull(response.data.suser.state)
+														+ "" + send_address;
+											}
+											if (removenull(response.data.suser.zipcode) != "") {
+												send_address = send_address
+														+ "&nbsp;"
+														+ removenull(response.data.suser.zipcode);
+											}
+											$("#send_address").html(
+													send_address);//发件人地址
+											$("#send_address2").html(
+													send_address);//发件人地址
+
+											$("#hiutao_orderId").html(
+													response.data.huitongNo);//汇通单号 
+											$("#print_date").html(
+													response.data.nowtime);//打印时间 
+
+											var rannumber1 = Math.random();
+											var orderId1="*"+response.data.orderId.trim()+"*";
+											var src1 = "/barcode4j/generate1?msg="
+													+ orderId1
+													+ "&type=code39&hrsize=3.5mm&height=9&ranno="
+													+ rannumber1;
+											//获取二维码长度
+											$(function() {
+												getImageWidth(
+														src1,
+														function(w, h) {
+															//var width1="398.4px";
+
+															//var height1="63.6px";
+
+															//w=w;
+															var f_x2 = Math
+																	.round(w * 100) / 100;
+															var s_x2 = f_x2
+																	.toString();
+															var pos_decimal2 = s_x2
+																	.indexOf('.');
+															while (s_x2.length <= pos_decimal2 + 2) {
+																s_x2 += '0';
+															}
+
+															if (parseFloat(s_x2)
+																	- parseInt(s_x2) != 0) {
+																s_x2 = parseInt(s_x2) + 1;
+															}
+															//s_x2=532;//实测发现，长度达到这个值后，比较好扫描
+															$("#imgorderid")
+																	.attr(
+																			"width",
+																			s_x2);//设定宽度
+															$("#imgorderid")
+																	.attr(
+																			"height",
+																			h);//设定高度度
+
+															$("#imgorderid")
+																	.attr(
+																			"src",
+																			src1);//加入连接
+															$("#imgorderid")
+																	.attr(
+																			"onload",
+																			"onload_flag1()");//判断装载完成标志
+															var rannumber2 = Math
+																	.random();
+															var orderId2="";		
+															if(removenull(response.data.huitongNo)!="")
+															{
+																orderId2="*"+response.data.huitongNo.trim()+"*";
+															}
+															
+															var src2 = "/barcode4j/generate1?msg="
+																	+ orderId2
+																	+ "&type=code39&hrsize=4mm&height=11&mw=0.20&ranno="
+																	+ rannumber2;
+															$(function() {
+																getImageWidth(
+																		src2,
+																		function(
+																				w,
+																				h) {
+																			//var width2="392px";
+																			//var height2="64px";
+																			/*if(w*0.8>398.4)
+																			{
+																				width2=w*0.6;
+																				height2=h*0.8;
+																			}
+																			else
+																			{
+																				width2=w*0.8;
+																				height2=h*0.8;
+																			}*/
+																			//w=w*541/478;
+																			var f_x1 = Math
+																					.round(w * 100) / 100;
+																			var s_x1 = f_x1
+																					.toString();
+																			var pos_decimal1 = s_x1
+																					.indexOf('.');
+																			while (s_x1.length <= pos_decimal1 + 2) {
+																				s_x1 += '0';
+																			}
+
+																			if (parseFloat(s_x1)
+																					- parseInt(s_x1) != 0) {
+																				s_x1 = parseInt(s_x1) + 1;
+																			}
+																			//s_x1=541;//实测发现，达到这个值比较好扫描
+																			$(
+																					"#imaseanumber")
+																					.attr(
+																							"width",
+																							s_x1);//设定宽度
+																			$(
+																					"#imaseanumber2")
+																					.attr(
+																							"width",
+																							s_x1);//设定宽度
+																			$(
+																					"#imaseanumber")
+																					.attr(
+																							"height",
+																							h);//设定高度度
+																			$(
+																					"#imaseanumber2")
+																					.attr(
+																							"height",
+																							h);//设定高度度
+
+																			$(
+																					"#imaseanumber2")
+																					.attr(
+																							"src",
+																							src2);//汇通条形码
+																			$(
+																					"#imaseanumber")
+																					.attr(
+																							"src",
+																							src2);//汇通条形码
+
+																			$(
+																					"#imaseanumber2")
+																					.attr(
+																							"onload",
+																							"onload_flag2()");//判断装载完成标志
+																			$(
+																					"#imaseanumber")
+																					.attr(
+																							"onload",
+																							"onload_flag3()");//判断装载完成标志
+																			// getprintwarehouse(response.data.storeId);
+																			setTimeout(
+																					"printhuitong_user()",
+																					100);
+
+																		});
+
+															});
+														});
+											});
+
+										} else if ("607" == code) {
+											// alert("您尚未登录或登录已失效！");
+											top.location.href = "../admin/login.html";
+										} else {
+											alert("提交出错，出错原因："
+													+ response.message);
+										}
+
+									}
+								});
+
+					});
+
+	function getdedaytime() {
+		isLoad = true;
+	}
+	var isload_flag1 = false;
+	var isload_flag2 = false;
+	var isload_flag3 = false;
+	function onload_flag1() {
+		isload_flag1 = true;
+	}
+	function onload_flag2() {
+		isload_flag2 = true;
+	}
+	function onload_flag3() {
+		isload_flag3 = true;
+	}
+
+	function printhuitong_user() {
+
+		if (numberprint > 35) {
+			getdedaytime();
+			return false;
+		} else {
+			if (isload_flag1 && isload_flag2 && isload_flag3) {
+
+				getdedaytime();
+				return false;
+			} else {
+				numberprint++;
+				setTimeout("printhuitong_user()", 100);
+			}
+		}
+		numberprint++;
+	}
+
+	function getprintwarehouse(warehouseid) {
+		$.ajax({
+			async : true,
+			type : "get",
+			url : "../../admin/warehouse/get_one",
+			data : {
+				"id" : warehouseid
+			},
+			success : function(response) {
+
+				var code = response.code;
+				if ("200" == code) {
+
+					$("#warehouseAddress").html(
+							removenull(response.data.address) + "&nbsp;&nbsp;"
+									+ removenull(response.data.city) + "&nbsp;"
+									+ removenull(response.data.province)
+									+ "&nbsp;"
+									+ removenull(response.data.country)
+									+ "&nbsp;"
+									+ removenull(response.data.zipCode));
+
+					var url = response.data.print2Code;
+					//alert(url);
+					if (removenull(url) == "") {
+
+						$("#qrcodeurl").attr("src", "");
+						$("#qrcodeurl2").attr("src", "");
+					} else {
+						$("#qrcodeurl").attr("src", "../.." + url);
+						$("#qrcodeurl2").attr("src", "../.." + url);
+					}
+					if (removenull(response.data.printPhoneUSA) == "") {
+						$("#usa_phone").html("");
+						$("#usa_phone2").html("");
+					} else {
+						$("#usa_phone").html(
+								"美国：" + response.data.printPhoneUSA);
+						$("#usa_phone2").html(
+								"美国：" + response.data.printPhoneUSA);
+					}
+					if (removenull(response.data.printPhoneCN)) {
+						$("#china_phone").html("");
+						$("#china_phone2").html("");
+					} else {
+						$("#china_phone").html(
+								"中国：" + response.data.printPhoneCN);
+						$("#china_phone2").html(
+								"中国：" + response.data.printPhoneCN);
+					}
+
+				}
+				//logo处理
+				if (removenull(response.data.printLogo) == "") {
+
+				} else {
+
+					$("#print_logo").attr("src",
+							"../.." + response.data.printLogo);
+					$("#print_logo2").attr("src",
+							"../.." + response.data.printLogo);
+				}
+
+				var site = "Website/网址:";
+				if (removenull(response.data.printUrl) != "") {
+					site = site + response.data.printUrl;
+
+				}
+				$("#print_site_url").html(site);
+				$("#print_site_url2").html(site);
+
+				setTimeout("getglobalargs()", 200);
+				//  getglobalargs();
+			}
+		});
+	}
+
+	function getglobalargs() {
+		//var flags="print_logo_flag,print_order_hit,print_site_url";//获取logo图片,包裹提示,网站的url
+		var flags = "print_order_hit,print_site_url,print_commudity_ornot,print_label_send_name,print_label_send_phone";//获取logo图片,包裹提示,网站的url
+		$.ajax({
+			type : "post",
+			url : "../../admin/globalargs/getcontents",
+			data : {
+				"flags" : flags
+			},
+			success : function(response) {
+				var code = response.code;
+
+				if ("200" == code) {
+					setTimeout("getdedaytime()", 200);
+					if (response.data != null) {
+
+						/*if((response.data[0]=="")||(response.data[0]=="null")||(response.data[0]=="undefined")||(response.data[0]==null))
+						{
+
+						}
+						else
+						{
+
+							//$("#print_logo").attr("src",getRootPath()+response.data[0]);
+							//$("#print_logo2").attr("src",getRootPath()+response.data[0]);
+						}*/
+
+						if ((response.data[0] == "")
+								|| (response.data[0] == "null")
+								|| (response.data[0] == "undefined")
+								|| (response.data[0] == null)) {
+
+						} else {
+							$("#print_order_hit").html(response.data[0]);
+
+						}
+
+						if ((response.data[1] == "")
+								|| (response.data[1] == "null")
+								|| (response.data[1] == "undefined")
+								|| (response.data[1] == null)) {
+
+						} else {
+							//$("#print_site_url").html(response.data[1]);
+							//$("#print_site_url2").html(response.data[1]);
+							if ($("#print_site_url").html() == "") {
+								$("#print_site_url").html(response.data[1]);
+							}
+
+							if ($("#print_site_url2").html() == "") {
+								$("#print_site_url2").html(response.data[1]);
+							}
+
+						}
+
+						var print_commudity_ornot = response.data[2];
+						//alert(print_commudity_ornot);
+						//alert($("#print_table1 div[name='remark2']").html());
+						if (print_commudity_ornot != "yes") {
+							$("#commudityinfo2").html("");
+						}
+
+						var print_label_send_name = response.data[3];
+						if (print_label_send_name == "no") {
+							//id="from_user2"
+							$("#send_name2").html("&nbsp;");//不显示发件人信息
+						}
+						var print_label_send_phone = response.data[4];
+						if (print_label_send_phone == "no") {
+							$("#send_phone2").html("&nbsp;");//不显示发件人的电话
+
+						}
+
+					} else {
+
+					}
+				} else {
+
+				}
+
+			}
+		});
+	}
+
+	function getImageWidth(url, callback) {
+		var img = new Image();
+		img.src = url;
+
+		// 如果图片被缓存，则直接返回缓存数据
+		if (img.complete) {
+			callback(img.width, img.height);
+		} else {
+			// 完全加载完毕的事件
+			img.onload = function() {
+				callback(img.width, img.height);
+			}
+		}
+
+	}
+</script>
+</html>

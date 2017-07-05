@@ -1,0 +1,184 @@
+package com.weiye.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.OrderDao;
+import com.weiye.dao.TranshipmentBillDao;
+import com.weiye.dao.TranshipmentRouteDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Order;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.TranshipmentBill;
+import com.weiye.model.TranshipmentRoute;
+import com.weiye.service.OrderService;
+import com.weiye.service.StoragePositionService;
+import com.weiye.service.TranshipmentBillService;
+import com.weiye.service.TranshipmentRouteService;
+
+@Service("transhipmentRouteService")
+public class TranshipmentRouteServiceImpl implements TranshipmentRouteService {
+	@Autowired
+	private TranshipmentRouteDao transhipmentRouteDao;
+	@Autowired
+	private TranshipmentBillDao transhipmentBillDao;
+	
+	@Resource(name = "transhipmentBillService")
+	private TranshipmentBillService transhipmentBillService;
+	
+	@Resource(name = "orderService")
+	private OrderService orderService;
+	
+	@Autowired
+	private OrderDao orderDao;
+
+	@Override
+	public ResponseObject<List<TranshipmentRoute>> findByTranshipmentBill(
+			String transhipmentId) throws ServiceException {
+		ResponseObject<List<TranshipmentRoute>> responseObject = new ResponseObject<List<TranshipmentRoute>>();
+		try {
+			List<TranshipmentRoute> list = this.transhipmentRouteDao
+					.findByTranshipmentBillId(transhipmentId);
+			if (list == null || list.size() <= 0) {
+				responseObject.setCode(ResponseCode.TRANSHIPMENT_EMPTY_LIST);
+				responseObject.setMessage("列表数据为空");
+			} else {
+				responseObject.setData(list);
+				responseObject.setCode(ResponseCode.SUCCESS_CODE);
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> add(String transhipmentId, String state,
+			String warehouseId) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if (StringUtil.isEmpty(transhipmentId)) {
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数错误");
+		} else {
+			TranshipmentRoute transhipmentRoute = new TranshipmentRoute();
+			transhipmentRoute.setDate(DateUtil.date2String(new Date()));
+			transhipmentRoute.setRemark("录入人:门市员工");
+			transhipmentRoute.setState(state);
+			transhipmentRoute.setTranshipmentId(transhipmentId);
+			transhipmentRoute.setWarehouseId(warehouseId);
+			try {
+				int result = this.transhipmentRouteDao
+						.insert(transhipmentRoute);
+				if (state
+						.equals(Constant.TRANSHIPMENT_ROUTE_STATE_INTO_WAREHOUSE)) {
+					this.transhipmentBillDao.updateWarehouseId(transhipmentId,
+							warehouseId);
+				} else if (state
+						.equals(Constant.TRANSHIPMENT_ROUTE_STATE_OUT_OF_WAREHOUSE)) {
+					this.transhipmentBillDao.updateFromWarehousePrice(
+							transhipmentId, warehouseId);
+				}
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject
+							.setCode(ResponseCode.TRANSHIPMENT_ROUTE_INSERT_ERROR);
+					responseObject.setMessage("添加路由记录失败");
+				}
+
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> add(TranshipmentRoute transhipmentRoute)
+			throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if (transhipmentRoute == null) {
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数错误");
+		} else {
+			try {
+				int result = this.transhipmentRouteDao
+						.insert(transhipmentRoute);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject
+							.setCode(ResponseCode.TRANSHIPMENT_ROUTE_INSERT_ERROR);
+					responseObject.setMessage("添加路由记录失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	public ResponseObject<Object> modifystate(String state, String id,
+			String storeId) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if (StringUtil.isEmpty(state) || (StringUtil.isEmpty(id))) {
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数错误");
+		}
+
+		/*
+		 * if(transhipmentRoute == null){
+		 * responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+		 * responseObject.setMessage("参数错误"); }else{ try { int result =
+		 * this.transhipmentRouteDao.insert(transhipmentRoute); if(result > 0){
+		 * responseObject.setCode(ResponseCode.SUCCESS_CODE); }else{
+		 * responseObject.setCode(ResponseCode.TRANSHIPMENT_ROUTE_INSERT_ERROR);
+		 * responseObject.setMessage("添加路由记录失败"); } } catch (Exception e) {
+		 * throw ExceptionUtil.handle2ServiceException(e); } }
+		 */
+		try {
+			int k = this.transhipmentBillDao.updateTranshipmentBillStatebyid(
+					id, state, storeId);
+			if (k < 1) {
+				responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			} else {
+				TranshipmentBill bill=this.transhipmentBillDao.getById(id);
+				//操作成功，插入仓位
+				boolean a=this.transhipmentBillService.useStoragePosition(bill);
+				
+				if(a==false)//插入失败，重新查找原来是否存在，如果不存在，将分配一个新的
+				{
+					
+				}
+				if(Constant.TRANSHIPMENT_STATE5.equalsIgnoreCase(bill.getState()))//此状态要给运单分配仓位
+				{
+					 if(StringUtil.isEmpty(bill.getOrderId()))//这样分配全仓位?
+					 {
+						// Order order=this.orderService.getOrderByOrderId(bill.getOrderId());
+						 Order order = this.orderDao.getByOrderId(bill.getOrderId());//这里会不会包含仓库信息？
+						 if(order!=null)
+						 {
+							 this.orderService.useStoragePosition(order);
+						 }
+					 }
+				}
+				
+				responseObject.setCode(ResponseCode.SUCCESS_CODE);
+			}
+			return responseObject;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		
+	}
+}

@@ -1,0 +1,210 @@
+package com.weiye.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Order;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.Route;
+import com.weiye.model.SumCommodity;
+import com.weiye.model.User;
+import com.weiye.model.WayBill;
+import com.weiye.model.temp.ExportOrder;
+import com.weiye.model.temp.ImportOrder;
+import com.weiye.model.temp.ImportthirdOrder;
+
+
+public interface OrderService {
+	public ResponseObject<Object> checkNoSubmit(WayBill wayBill,String storeid) throws ServiceException;
+
+	public ResponseObject<Object> checkOrderNumberOfTranshipments(WayBill wayBill) throws ServiceException;
+
+	public ResponseObject<List<String>> addOrdersOfWayBill(WayBill wayBill) throws ServiceException;
+
+	public ResponseObject<Map<String, String>> addOrder(Order order, String userType) throws ServiceException;
+	public ResponseObject<Map<String, String>> addOrderbytranship(Order order, String userType) throws ServiceException;
+	
+	public ResponseObject<Map<String, String>> addOrderOfOnline(Order order) throws ServiceException;
+	
+	public ResponseObject<Map<String, String>> addOrderOfEmpty(Order order) throws ServiceException;
+
+	public ResponseObject<Object> pay(List<String> ids, List<String> orderIds, String userId, String amount,
+	        double newrmb, double newusd, boolean accountPay) throws ServiceException;
+
+	public ResponseObject<Map<String, List<Route>>> getRouteListByOrderId(List<String> ids) throws ServiceException;
+
+	public ResponseObject<Map<String, List<Route>>> getRouteListByGuestOrderId(List<String> ids) throws ServiceException;
+	
+	public ResponseObject<List<Order>> getOrderListByStatsAndFlight(String state, String flight)
+	        throws ServiceException;
+
+	public ResponseObject<List<Order>> getOrderListByIds(List<String> ids) throws ServiceException;
+
+	public ResponseObject<List<Order>> getOrderListByOrderIds(List<String> orderIds) throws ServiceException;
+	
+	//kai 20150915
+	public ResponseObject<List<ExportOrder>> getExportOrderListByOrderIds(List<String> orderIds) throws ServiceException;
+
+	public ResponseObject<PageSplit<Order>> searchOrdersByUserId(String userId, int pageSize, int pageNow)
+	        throws ServiceException;
+
+	public ResponseObject<PageSplit<Order>> searchOrdersByKeys(String oid, String userId, String key, String column,
+	        String sdate, String edate, String state,String typekey,  String storeid,int pageSize, int pageNow) throws ServiceException;
+	
+	//li zhang 03022016
+	public ResponseObject<PageSplit<Order>> searchOrdersByLike(String userId, String query, String type, int pageSize,
+			int pageNow) throws ServiceException;
+
+	public ResponseObject<PageSplit<Order>> searchMsjOrders(String storeId, int pageSize, int pageNow)
+	        throws ServiceException;
+	
+	public ResponseObject<PageSplit<Order>> searchEmptyOrders(String storeId,String orderKey, int pageSize, int pageNow)
+	        throws ServiceException;
+
+	public ResponseObject<PageSplit<Order>> searchWebOrders(String orderId, String key, String column, String sdate,
+	        String edate, String state,String typekey,String storeid, int pageSize, int pageNow) throws ServiceException;
+	
+	public ResponseObject<PageSplit<Order>> searchWebOrdersbybelonguser(String orderId, String key, String sdate,
+	        String edate, String state,String typekey,String storeid, int pageSize, int pageNow) throws ServiceException; 
+	
+	
+	
+	public ResponseObject<PageSplit<Order>> searchWebOrdersincludewidcid(String orderId, String key, String column, String sdate,
+	        String edate, String state,String typekey,String wid,String cid, int pageSize, int pageNow) throws ServiceException;
+	
+	public ResponseObject<PageSplit<Order>> searchWebOrdersincludewidcidbybelonguser(String orderId, String key, String sdate,
+	        String edate, String state,String typekey,String wid,String cid, int pageSize, int pageNow) throws ServiceException;
+
+	public ResponseObject<Object> deleteOrderByOrderIds(List<String> orderIds, List<String> states)
+	        throws ServiceException;
+	
+	public ResponseObject<Object> deleteOrderOfUserByOrderId(String userId,String orderId, List<String> states)
+	        throws ServiceException;
+	
+	public ResponseObject<Object> deleteRetailOrderByOrderIds(List<String> orderIds) throws ServiceException;
+
+	public ResponseObject<Object> modifyOrder(Order order, String empName, String userType) throws ServiceException;
+	
+	public ResponseObject<Object> modifyEmptyOrder(String phone,Order order, String empName/*,String empStoreName*/) throws ServiceException;
+
+	public ResponseObject<Object> modifyOrderOfThrid(List<String> orderIds, String state, String remark, String thridpns, String thridno)
+	        throws ServiceException;
+
+	public ResponseObject<Object> batchModifyOrderStateAndFlight(List<String> orderIds, String state, String flight,
+	        String name, String thridpns, String thridno) throws ServiceException;
+
+	public ResponseObject<Object> modifyOrderFlightOfOrderIds(String orderId, String flight, String empName)
+	        throws ServiceException;
+
+	public ResponseObject<List<Order>> getOrderListByTranshipmentId(String id) throws ServiceException;
+
+	public ResponseObject<Order> getOrderById(String id) throws ServiceException;
+
+	public ResponseObject<Order> getOrderByOrderId(String oid) throws ServiceException;
+	//public ResponseObject<Order> getRecvNameByOrderId(List<String> list) throws ServiceException;
+	
+	public List<ExportOrder> getExportOrders(String sdate, String edate) throws ServiceException;
+	
+	//add by chenkanghua
+	public List<ExportOrder> getExportToMeitaoOrders(String wid,String orderId, String key, String column, String sdate,
+	        String edate, String state) throws ServiceException;
+
+	
+	public abstract List<SumCommodity> getExportOrdersGather(String flight)
+			    throws ServiceException;
+	
+	public abstract List<SumCommodity> exportOrdersGather(String wid,String orderId, String key, String column, String sdate,
+	        String edate, String state) throws ServiceException;
+
+	
+	public ResponseObject<Object> importExcelOfOrderState(List<ImportOrder> importOrders, String empName,String wid)
+	        throws ServiceException;
+	
+	//add by chenkanghua
+	public ResponseObject<Object> importMeitaoExcel(List<ImportOrder> importOrders, String empName)
+	        throws ServiceException;
+
+	public ResponseObject<Object> importRetailOrder(List<Order> orders, String empName,String storeId) throws ServiceException; 
+	
+	public ResponseObject<List<Map<String, Object>>> createRetailOrder(int size) throws ServiceException;
+
+	public ResponseObject<List<Map<String, Object>>> getRetailOrder(String soid, String eoid, int size) throws ServiceException;
+
+	public ResponseObject<Map<String, Object>> getRetailOrderCount() throws ServiceException;
+	
+	public User getOrderUser(String id, String orderId) throws ServiceException;
+	
+	//public abstract String selectMaxPriceByCommoditys(List<String> commodityId) throws ServiceException;
+	//public abstract String selectMaxMsPriceByCommoditys(List<String> commodityId) throws ServiceException;
+	public abstract double calculationOrderFreight(Order order,String type) throws ServiceException;
+
+	public ResponseObject<Object> modifyCardIdAndUrl(String orderId, String cid, String cname,String cphone,String fileName,String fileNameother,String filecardtogether) throws ServiceException;
+
+	public ResponseObject<Object> getRouteListByGuest(
+			String kuaidiType, String oids/*, String thirdNo, String thirdPns*/,
+			String[] orderIds) throws ServiceException;
+	
+	//kai 20150911
+	public ResponseObject<Map<String, String>>  modifyOrderonlinebyuser(Order order) throws ServiceException;
+	public ResponseObject<Map<String, String>> addOrderOfOnlinebyuser(Order order) throws ServiceException ;
+	//kai 20150911-1 
+	public ResponseObject<Map<String, String>>  modifyOrderonlinebyuserpicurl(Order order) throws ServiceException;
+	//kai 20150912
+	public ResponseObject<Object> modifyOrderonline(Order order, String empName, String userType) throws ServiceException;
+	public int check_import_weiyi_orders(List<Order> orders,String wid,String cid);
+	public ResponseObject<Object> addOrder_weiyi_import(Order order,int row) throws ServiceException;	
+	
+	//kai 20151002 组合运单提交时,检查合法性
+		public ResponseObject<Object> check_mux_Submit(WayBill wayBill) throws ServiceException;
+		public ResponseObject<List<String>> addOrdersOfWayBillbyusermux(WayBill wayBill) throws ServiceException;
+		public ResponseObject<List<String>> addOrdersOfWayBillquick(WayBill wayBill) throws ServiceException;
+		
+		public ResponseObject<List<ExportOrder>> getExportOrderListByOrderIdsalone(
+				List<String> orderIds,String wid) throws ServiceException;
+		
+		public ImportthirdOrder check_thirdimport_weiyi_orders(ImportthirdOrder Iorders,String wid,String cid)throws ServiceException;
+		public ResponseObject<Object> addOrder_thirdorder_import(ImportthirdOrder iports,String wid,String cid) throws ServiceException;
+		
+		public ResponseObject<String> getCurUsaToCn() throws ServiceException;
+		
+		public ResponseObject<PageSplit<Order>> searchWebOrdersincludpaymoneybyadmin(String orderId, String key, String sdate,
+		        String edate, String state,String wid,String cid, int pageSize, int pageNow) throws ServiceException;
+		
+		public double calculationOrderCostFreight(Order order) throws ServiceException;
+		
+		public ResponseObject<PageSplit<Order>> searchWebOrdersbyflyno(String flyno) throws ServiceException;
+		
+		public ResponseObject<Object> modifyOrderstoflight(String[] orderId, String flight,String state,String empName)
+		        throws ServiceException;
+
+		public boolean payByPosition(Order order, String state) throws ServiceException;
+
+		public ResponseObject<Object> takeBySelf(String id, String empName) throws ServiceException;
+
+		public ResponseObject<PageSplit<Order>> searchAfterOrderState(Order order, int pageSize, int pageIndex) throws ServiceException;
+		
+		public boolean useStoragePosition(Order order) throws ServiceException;
+
+		public ResponseObject<String[]> getAllStateCount(String warehouseId) throws ServiceException;
+		
+		public ResponseObject<Object> importExcelOfseanno1(
+				List<ImportOrder> importOrders, String empName,String wid)
+				throws ServiceException ;
+		
+		 public ResponseObject<Object> importExcelstateOfseanno2(
+					List<ImportOrder> importOrders, String empName,String wid)
+					throws ServiceException ;
+		 
+		 public ResponseObject<Map<String, String>> modifyemptyOrder(Order order,
+					String userType) throws ServiceException;
+		 
+		 //批量查询
+		 public ResponseObject<List<Map<String, Object>>> getroutesbyguestOrderonlinebyuser(
+					String kuaidiType,
+					String[] orderids) throws ServiceException;
+	
+}

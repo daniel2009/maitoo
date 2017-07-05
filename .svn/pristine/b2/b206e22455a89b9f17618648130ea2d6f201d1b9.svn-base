@@ -1,0 +1,470 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+    pageEncoding="utf-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>全球速递  美国快递公司 专为华人美国购物 海淘 转运</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="keywords"  content="全球速递,美国快递公司,专为华人美国购物,海淘 ,转运 ,海淘 转运" />
+<meta name="description" content="既省时又省钱省力的海淘转运平台,为您提供更多折扣更多关税补贴." />
+
+<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+
+<link rel="stylesheet" href='css/bootstrap.css' type="text/css" media="screen">
+<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/inner.css" type="text/css" media="screen">
+<link rel="stylesheet" href="demo/switcher.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/es-carousel.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/prettyphoto.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/color1.css" type="text/css" id="theme" />
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<!-- CSS STYLE -->
+
+<link rel="stylesheet" href='css/common.css'> 
+<link rel="stylesheet" type="text/css" media="all" href="css/style3.css">
+<link id="main_stylesheet" rel="stylesheet" href='css/indexstyle.css' type="text/css">
+<link rel="stylesheet" type="text/css" href='css/common1.css'>
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css" media="screen" />
+<!-- REVOLUTION BANNER CSS SETTINGS -->
+<link rel="stylesheet" href="css/rs-plugin/settings.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/captions.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/portfolio.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/portfolio-shape.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/elements.css" type="text/css" media="screen">
+<!--[if lt IE 9]>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+  <![endif]-->
+</head>
+<body class="home-page stretched">
+	<div id="wrapper">
+		<%@ include file="header.jsp" %>
+		<!--============================== Slider =================================-->
+		<div class="fullwidthbanner-container">
+			<div class="shadowdrop"></div>
+			<div class="fullwidthabnner">
+				<ul>
+					<!-- THE 4 SLIDE -->
+					<li data-transition="fade" data-slotamount="7"
+						data-masterspeed="300">
+						<img src="img/rs-slider/slides/bg/4.jpg" alt="bgslider-blue2" data-fullwidthcentering="true">
+						<div class="tp-caption sfl" data-x="27" data-y="17" data-speed="300" data-start="500"></div></li>
+				</ul>
+				<div class="tp-bannertimer"></div>
+			</div>
+		</div>
+
+
+
+		<!--==============================content=================================-->
+  <section id="content"> 
+    <div id="banners">
+      <div class="container">
+        <ul class="banners_cycle">
+          <li class="banners_item style-1 ">
+            <div class="tail">
+              <div class="inner"><i class="fontawesome-icon medium circle-yes icon-globe"></i>
+                <h4>转运</h4>
+                <p>为您提供海外的专用收货地址，使您拥有当地居民有同样的购物便利</p>
+                <a href="#" class="button">Read More</a> </div>
+            </div>
+          </li>
+          <li class="banners_item style-2 nomargin">
+            <div class="tail">
+              <div class="inner"><i class="fontawesome-icon medium circle-yes icon-lightbulb"></i>
+                <h4>代购</h4>
+                <p>一站订购 快速代购淘 ，免代购费，你只需支付货款及快递费</p>
+                <a href="#" class="button">Read More</a> </div>
+            </div>
+          </li>
+          <li class="banners_item style-3 ">
+            <div class="tail">
+              <div class="inner"><i class="fontawesome-icon medium circle-yes icon-link"></i>
+                <h4>商场</h4>
+                <p>美国大量奢侈品打折,我们货物直接从美国商家购买，保证真品</p>
+                <a href="#" class="button">Read More</a> </div>
+            </div>
+          </li>
+          <li class="banners_item style-4 nomargin">
+            <div class="tail">
+              <div class="inner"><i class="fontawesome-icon medium circle-yes icon-hand-down"></i>
+                <h4>返利</h4>
+                <p>通过我们的网站返利链接购买产品，亨受转运折扣，个别产品免转运费</p>
+                <a href="#" class="button">Read More</a> </div>
+            </div>
+          </li>
+          <li class="banners_item style-5 ">
+            <div class="tail">
+              <div class="inner"><i class="fontawesome-icon medium circle-yes icon-upload-alt"></i>
+                <h4>上门取件</h4>
+                <p>美国上门取件寄到中国，我们自有清关团队，同时可以走USPS特惠线路</p>
+                <a href="#" class="button">Read More</a> </div>
+            </div>
+          </li>
+          <li class="banners_item style-6 nomargin">
+            <div class="tail">
+              <div class="inner"><i class="fontawesome-icon medium circle-yes icon-text-width"></i>
+                <h4>仓储</h4>
+                <p>为了满足美国卖家对于美国仓储需求，为客户，提供美国仓储配货服务</p>
+                <a href="#" class="button">Read More</a> </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- <div class="container">
+      <div class="row">
+					<article class="span3">
+						<div class="title">
+							<h4 class="indent-1">
+								<a href="#">转运公告</a>
+							</h4>
+						</div>
+						<div class="img-border">
+							<div class="img-slidewrap">
+								<ul class="img-slidecontrol">
+									<li><a href="#imgslider" class="next"><i
+											class="icon-chevron-right icon-white"></i>
+									</a>
+									</li>
+									<li><a href="#imgslider" class="prev"><i
+											class="icon-chevron-left icon-white"></i>
+									</a>
+									</li>
+								</ul>
+								<ul class="img-slider" id="imgslider">
+									<li class="img-slide"><img src="img/page1-img2.jpg"
+										alt="" />
+										<ul class="team-social">
+											<li class="twitter-team"><a href="#">Twitter</a>
+											</li>
+											<li class="facebook-team"><a href="#">Facebook</a>
+											</li>
+											<li class="dribbble-team"><a href="#">Dribbble</a>
+											</li>
+											<li class="skype-team"><a href="#">Skype</a>
+											</li>
+										</ul></li>
+									<li class="img-slide"><img src="img/page1-img3.jpg"
+										alt="" />
+										<ul class="team-social">
+											<li class="twitter-team"><a href="#">Twitter</a>
+											</li>
+											<li class="facebook-team"><a href="#">Facebook</a>
+											</li>
+											<li class="dribbble-team"><a href="#">Dribbble</a>
+											</li>
+											<li class="skype-team"><a href="#">Skype</a>
+											</li>
+										</ul></li>
+									<li class="img-slide"><img src="img/page1-img4.jpg"
+										alt="" />
+										<ul class="team-social">
+											<li class="twitter-team"><a href="#">Twitter</a>
+											</li>
+											<li class="facebook-team"><a href="#">Facebook</a>
+											</li>
+											<li class="dribbble-team"><a href="#">Dribbble</a>
+											</li>
+											<li class="skype-team"><a href="#">Skype</a>
+											</li>
+										</ul></li>
+								</ul>
+							</div>
+						</div>
+						<ul class="list-feature">
+							<li><a href="#">快递禁运物品清单</a>
+							</li>
+							<li><a href="#">海淘商品推荐</a>
+							</li>
+							<li><a href="#">具体操作流程</a>
+							</li>
+							<li><a href="#">海淘攻略</a>
+							</li>
+							<li><a href="#">我们的服务以及价格</a>
+							</li>
+							<li><a href="#">新闻动态--关于我们</a>
+							</li>
+						</ul>
+					</article>
+					 <article class="span3">
+						<div class="title">
+							<h4 class="indent-1">
+								<a href="#">常见问题</a>
+							</h4>
+						</div>
+						<ul class="list-blog">
+							<li>
+								<div class="overlow post-holder-sm extra">
+
+									<div class="date-1">
+										<span><a href="#">美国仓库签收后需要多久可以入库?</a>
+										</span>
+									</div>
+									<br>
+									<div class="date-1">
+										<span><a href="#">付款后到转国内快递的时效是多久?</a>
+										</span>
+									</div>
+									<br>
+									<div class="date-1">
+										<span><a href="#">每周有几个航班?</a>
+										</span>
+									</div>
+									<br>
+									<div class="date-1">
+										<span><a href="#">你们清关口岸有哪些?</a>
+										</span>
+									</div>
+									<br>
+									<div class="date-1">
+										<span><a href="#">是否收取体积费?</a>
+										</span>
+									</div>
+									<br>
+									<div class="date-1">
+										<span><a href="#">美国仓库的上班时间是什么时候?</a>
+										</span>
+									</div>
+
+								</div></li>
+
+
+						</ul>
+					</article> 
+					<article class="span6">
+						<div class="title">
+							<h4 class="indent-1">快递查询</h4>
+						</div>
+
+
+
+
+						<div class="index_l fl">
+							<br>
+							<form action="/php/query_status.php" method="get" target="_blank">
+								<input name="action" type="hidden" value="5">
+								<div class="tracking">
+									<div class="tracking_c">
+										<textarea name="orderId" cols="" rows=""
+											onFocus="this.value='';">请输入运单号，提示：可批量查询，多个单号以英文分号分开，如：WY1000000;WY1000001</textarea>
+									</div>
+									<div class="tracking_ok">
+										<a href="javascript:searchRoute()" class="btn btn-warning" data-type="submit">查询</a>
+									</div>
+								</div>
+							</form>
+						</div>
+					</article>
+				</div>
+			</div>-->
+
+					<!-- info box -->
+      
+  </section>
+  <%@ include file="footer.jsp" %>
+</div>
+
+<script type="text/javascript" src='js/jquery-1.9.1.min.js'></script>
+<script type="text/javascript" charset="utf-8" src='js/jquery.leanModal.min.js'></script>
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="js/jquery.sliderTabs.js"></script>
+<!-- jQuery Slider  -->
+<script type="text/javascript" src="js/rs-plugin/jquery.themepunch.plugins.min.js"></script>
+<script type="text/javascript" src="js/rs-plugin/jquery.themepunch.revolution.min.js"></script>
+<!-- Elastislider  -->
+<script type="text/javascript" src="js/jquery.elastislide.js"></script>
+<!-- Pretty photo  -->
+<script type="text/javascript" src="js/jquery.prettyphoto.js"></script>
+<!-- Carousel  -->
+<script type="text/javascript" src="js/carousel.js"></script>
+<!-- totop  -->
+<script type="text/javascript" src="js/jquery.ui.totop.js"></script>
+<script type="text/javascript" src="js/prettify.js"></script>
+<script type="text/javascript" src="js/application.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<!-- Quicksand  -->
+<script type="text/javascript" src="js/jquery.quicksand.js"></script>
+<!-- Image animated Style  -->
+<script type="text/javascript" src="js/jquery.gridrotator.js"></script>
+<script type="text/javascript" src="js/jquery.mobile.customized.min.js"></script>
+<!-- Accordion  -->
+<script type="text/javascript" src="js/accordion.js"></script>
+<!-- Tabs  -->
+<script type="text/javascript" src="js/tabs.js"></script>
+<!-- Sitemap  -->
+<script type="text/javascript" src="js/sitemap.js"></script>
+<!-- Navigation  -->
+<script type="text/javascript" src="js/nav-small.js"></script>
+<script type="text/javascript" src="js/jquery.mobilemenu.js"></script>
+<!-- Isotope  -->
+<script type="text/javascript" src="js/jquery.isotope.min.js"></script>
+<!-- Metro Style  -->
+<script type="text/javascript" src="js/boxgrid.js"></script>
+<script type="text/javascript" src="demo/switcher.js"></script>
+<!-- Elastislider  -->
+<script>
+				jQuery("#carousel-blog").elastislide({
+					imageW 		: 270,
+					minItems		: 2,
+					speed			: 600,
+					easing		: "easeOutQuart",
+					margin		: 30,
+					border		: 0,
+					onClick		: function() {}
+				});</script>
+<!-- Image animated Style  -->
+<script type="text/javascript">	
+			$(function() {
+			
+				$( '#ri-grid' ).gridrotator( {
+					rows : 4,
+					columns : 8,
+					maxStep : 2,
+					interval : 2000,
+					w1024 : {
+						rows : 5,
+						columns : 6
+					},
+					w768 : {
+						rows : 5,
+						columns : 5
+					},
+					w480 : {
+						rows : 6,
+						columns : 4
+					},
+					w320 : {
+						rows : 7,
+						columns : 4
+					},
+					w240 : {
+						rows : 7,
+						columns : 3
+					},
+				} );
+			
+			});
+		</script>
+<!-- Metro Style  -->
+<script>
+			$(function() {
+				Boxgrid.init();
+			});
+</script>
+<script>
+			$(function() {
+				$("#panel").css("height","230px"); 
+				setTimeout(function() {
+					$("#panel").css("height","0px"); 
+				},5000);
+			});
+</script>
+<!-- Revolution Slider  -->
+<script>
+			var api;
+			jQuery(document).ready(function() {
+				 api =  jQuery('.fullwidthabnner').revolution(
+								{
+									delay:9000,
+									startheight:370,
+									startwidth:960,
+
+									hideThumbs:10,
+
+									thumbWidth:100,							// Thumb With and Height and Amount (only if navigation Tyope set to thumb !)
+									thumbHeight:50,
+									thumbAmount:5,
+
+									navigationType:"both",					//bullet, thumb, none, both		(No Thumbs In FullWidth Version !)
+									navigationArrows:"verticalcentered",		//nexttobullets, verticalcentered, none
+									navigationStyle:"round",				//round,square,navbar
+
+									touchenabled:"on",						// Enable Swipe Function : on/off
+									onHoverStop:"on",						// Stop Banner Timet at Hover on Slide on/off
+
+									navOffsetHorizontal:0,
+									navOffsetVertical:20,
+
+									stopAtSlide:-1,
+									stopAfterLoops:-1,
+
+									shadow:1,								//0 = no Shadow, 1,2,3 = 3 Different Art of Shadows  (No Shadow in Fullwidth Version !)
+									fullWidth:"on"							// Turns On or Off the Fullwidth Image Centering in FullWidth Modus
+								});
+			});
+			
+			function loadVideo(){
+				jQuery("#video_link").html('iframe src="http://player.vimeo.com/video/32001208?title=0&amp;byline=0&amp;portrait=0" width="460" height="259"></iframe>');
+			}
+		</script>
+<script type="text/javascript">
+  	// initialise plugins
+		jQuery(function(){
+			// Banners button
+			jQuery('ul.banners_cycle li').mouseenter(function(){
+				jQuery(this).find('.button').stop(false,true).fadeIn();
+			});
+			jQuery('ul.banners_cycle li').mouseleave(function(){
+				jQuery(this).find('.button').stop(false,true).fadeOut();
+			});
+			
+			// Banners
+			jQuery('ul.banners_cycle li:not(.style-1)').mouseenter(function(){
+				jQuery(this).css('z-index','6');
+				jQuery(this).stop(false, true).animate({right:'-64px'}, {easing:"swing", duration: 300});
+				jQuery(this).animate({right:'0'});
+			});
+			jQuery('ul.banners_cycle li:not(.style-1)').mouseleave(function(){
+				jQuery(this).stop(false, true).animate({right:'-64px'});
+				jQuery(this).stop(false, true).animate({right:'0'}, 'slow');
+			});
+			
+			// Banner #2
+			jQuery('ul.banners_cycle li.style-2').mouseleave(function(){
+				jQuery(this).css('z-index','5');
+			});
+			// Banner #3
+			jQuery('ul.banners_cycle li.style-3').mouseleave(function(){
+				jQuery(this).css('z-index','4');
+			});
+			// Banner #4
+			jQuery('ul.banners_cycle li.style-4').mouseleave(function(){
+				jQuery(this).css('z-index','3');
+			});
+			// Banner #5
+			jQuery('ul.banners_cycle li.style-5').mouseleave(function(){
+				jQuery(this).css('z-index','2');
+			});
+			// Banner #6
+			jQuery('ul.banners_cycle li.style-6').mouseenter(function(){
+				jQuery('body').css('overflow-x','hidden');
+			});
+			jQuery('ul.banners_cycle li.style-6').mouseleave(function(){
+				jQuery(this).css('z-index','1');
+				jQuery('body').css('overflow-x','hidden');
+			});
+		});
+  </script>
+  
+  <script type="text/javascript">
+  function searchRoute(){
+		var value = $("textarea[name='orderId']").val();
+		//window.location.href = "route-dcs.jsp?oid=" + value;
+		window.location.href = "route-kd100.jsp?oid=" + value;
+		return false;
+	};
+  </script>
+  
+
+</body>
+</html>

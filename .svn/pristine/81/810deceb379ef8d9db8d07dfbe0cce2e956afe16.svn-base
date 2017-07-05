@@ -1,0 +1,140 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">认领包裹
+			<a href="#" id="a_back_claim_package_list_link" class="button">返回列表</a>
+			<script>
+				$("#a_back_claim_package_list_link").click(function(){
+					nav15Click();
+					return false;
+				})
+			</script>
+		</p>
+
+		<div class="box_content">
+			<div class="content_title">认领包裹</div>
+			<div class="content_text">
+		
+				<div class="tab-content" id="tab2">
+					<article>
+						认领标题：<label id="title"></label><br/>
+						公司：<label id="company"></label><br/>
+						创建时间：<label id="createDate"></label><br/>
+						认领内容：<label id="content1"></label><br/>
+						<div style="display:flex;">
+							认领套图:
+							<figure style="flex:1;">
+								<img id="pic1">
+							</figure>
+							<figure style="flex:1;">
+								<img id="pic2">
+							</figure>
+							<figure style="flex:1;">
+								<img id="pic3">
+							</figure>
+						</div>
+					</article>
+					<hr/>
+		          <form action="" id="form" method="post" enctype="multipart/form-data">
+		            <fieldset>
+			            <p>
+			              <label class="cllabel">认领单号：</label>
+			              <input class="text-input small-input" type="text" id="renlingId" name="renlingId" readonly/><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label class="cllabel">包裹号：</label>
+			              <input class="text-input small-input" type="text" name="baoguoId" maxlength="36"/>
+			            </p>
+			           <p>
+			              <label class="cllabel">包裹描述：</label>
+			              <textarea rows="4" cols="10" class="text-input textarea wysiwyg" name="baoguoRemark" ></textarea>
+			            </p>
+			            <p>
+			            	<input type="file" name="picture1">
+			            	<input type="file" name="picture2">
+			            	<input type="file" name="picture3">
+			            	<input type="file" name="picture4">
+			            	<input type="file" name="picture5">（上传支持JPG，PNG，BMP等图片格式，最大不超过4MB）
+			            </p>
+			            <p style="margin-left: 50px;">
+			              <input id="bt_add_renlingbaoguo" class="button" type="button" value="提交" onclick="javascript:claimPackage();" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline;"/>
+			              <input class="button" type="reset" value="重置" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline;">
+			            </p>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+		</div>
+		
+		<div id="tmpmsgdiv1" style="display:none;"></div>
+	</body>
+	<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/jquery.form.js"></script> 
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		var sessionStorage = window.sessionStorage;
+		var renlingId = sessionStorage.getItem("claimPackageId");
+		document.getElementById("renlingId").value = renlingId;
+		sessionStorage.removeItem("cleaimPackageId");
+		$.ajax({
+			type: "get",
+			url: "../claimPackage/get",
+			data: { 
+				id:renlingId
+			},
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var data = response.data;
+					if(data != null){
+						document.getElementById("title").innerHTML = data.title;
+						document.getElementById("content1").innerHTML = data.content;
+						document.getElementById("company").innerHTML = data.company;
+						document.getElementById("createDate").innerHTML = data.createDate;
+						document.getElementById("pic1").src = "/weiye" + data.pic1;
+						document.getElementById("pic2").src = "/weiye" + data.pic2;
+						document.getElementById("pic3").src = "/weiye" + data.pic3;
+					}
+					clearWrongImg();
+				}else{
+					alert("获取详细信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function claimPackage(){
+		var httpRequest = new XMLHttpRequest();
+		var url = "../user/claimPackage/claim";
+		httpRequest.onreadystatechange = function(){
+			if(4 == httpRequest.readyState){
+				if(200 == httpRequest.status){
+					var response = eval("(" + httpRequest.responseText + ")");
+					var code = response.code;
+					if("200" == code){
+						alert("提交成功，等待审核");
+						nav15Click();
+					}else if("607" == code){
+						alert("登录过期，请重新登录");
+						window.location.href = "login.jsp";
+					}else{
+						alert("添加失败，失败原因:" + response.message);
+					}
+				}
+			}
+			return false;
+		};
+		httpRequest.open("post", url, true);
+		httpRequest.send(new FormData(document.getElementById("form")));
+		return false;
+	}
+</script>
+</html>

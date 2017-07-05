@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.MdetailDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.M_OrderDetail">
+		<result column="order_id" property="orderId" javaType="String" />
+		<result column="id" property="id"
+			javaType="String" />
+		<result column="commodityId" property="commodityId" javaType="String" />
+		<result column="quantity" property="quantity" javaType="String" />
+		<result column="productName" property="productName" javaType="String" />
+		<result column="brands" property="brands" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="weight" property="weight" javaType="String" />
+		<result column="value" property="value" javaType="String" />
+		<result column="tariff" property="tariff" javaType="String" />
+		<result column="other" property="other" javaType="String"/>
+		<result column="or" property="or" javaType="String"/>
+		<result column="remark" property="remark" javaType="String"/>
+		<result column="ctype" property="ctype" javaType="String"/>
+		
+		<result column="cprice" property="cprice" javaType="String"/>
+		<result column="allcprice" property="allcprice" javaType="String"/>
+		
+		
+	</resultMap>
+	
+
+	<insert id="insertMDetail" parameterType="com.meitao.model.M_OrderDetail">
+		insert into
+		`m_detail` (`order_id`, `commodityId`, `quantity`, `productName`, `brands`,
+		`name`, `weight`, `value`, `tariff`, `other`,`or`,`remark`,`ctype`,`cprice`,`allcprice`)
+		values
+		<foreach collection="list" item="detail" separator=",">
+			(#{detail.orderId},#{detail.commodityId}, #{detail.quantity}, #{detail.productName}, #{detail.brands},
+			#{detail.name},#{detail.weight}, #{detail.value}, #{detail.tariff}, #{detail.other},#{detail.or},#{detail.remark},#{detail.ctype},#{detail.cprice},#{detail.allcprice})
+		</foreach>
+	</insert>
+	
+	<select id="getAllByOrderId" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select `m_detail`.*
+		from `m_detail` 
+		where `m_detail`.`order_id`=#{orderId}
+	</select>
+	
+	
+	<delete id="deleteByOrderIds">
+		delete from `m_detail`
+		where `order_id` in
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

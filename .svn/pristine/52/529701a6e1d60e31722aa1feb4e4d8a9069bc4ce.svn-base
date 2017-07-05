@@ -1,0 +1,83 @@
+package com.weiye.controller;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.EmployeeUtil;
+import com.weiye.common.util.PropertiesReader;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.UserUtil;
+import com.weiye.common.util.sms.MailSendUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.SpencialChannel;
+import com.weiye.model.SpencialChannelOrder;
+import com.weiye.model.User;
+import com.weiye.service.AutoSendService;
+import com.weiye.service.CommonService;
+import com.weiye.service.EmployeeService;
+import com.weiye.service.GlobalArgsService;
+import com.weiye.service.SpencialChannelOrderService;
+import com.weiye.service.UserService;
+
+@Controller
+public class SpencialChannelOrderController extends BasicController {
+	private static final long serialVersionUID = 1562088470123455201L;
+	private static final Logger log = Logger.getLogger(SpencialChannelOrderController.class);
+	
+	@Resource(name = "spencialChannelOrderService")
+	private SpencialChannelOrderService spencialChannelOrderService;
+
+	
+
+	@RequestMapping(value = "/sorder/ms/checkmoney", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> getChannelbycheckorder(HttpServletRequest request,
+			SpencialChannelOrder sorder) {
+		try {
+			
+			if(StringUtil.isEmpty(sorder.getCid()))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "获取渠道信息失败，参数出错!");
+			}
+			double totalprice=this.spencialChannelOrderService.calculationSOrderFreight(sorder);
+			
+			
+	
+			ResponseObject<Object> responseObj = new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			responseObj.setData(totalprice);
+			
+			return responseObj;
+		} catch (Exception e) {
+			log.error("计算价格出现异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, e.getMessage());
+		}
+	}
+	
+}

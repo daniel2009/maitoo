@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>美淘快递·新闻公告</title>
+    <meta charset="utf-8" />
+    <!-- Page Loader - Needs to be placed in header for loading at top of all content -->
+    <script type="text/javascript" src="js/pace.min.js"></script>
+    <link href="css/pace-loading-bar.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/animate.shipping.css">
+    <link rel="stylesheet" type="text/css" href="css/ShippingIcon.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" id="main-style" type="text/css" href="css/style.css">
+            <script type="text/javascript">
+   
+
+        function checkCode() {
+            $("#spanError").css("display", "none");
+
+            var code = $("#searchinput").val();
+            if (code == null) {
+                $("#spanError").css("display", "block");
+                alert("面单号不存在");
+            } else {
+               // this.document.location = "newwaybill.jsp?oid=" + escape(code);
+               if((code!="")||(code!="undefined")||(code!=null))
+            	{
+            	   code=code.trim();
+            	}
+               
+               this.document.location = "route-kd100.jsp?oid=" + escape(code);
+            }
+        }
+
+        function BillCodeOnKeyDown(obj, event) {
+            // 输入回车时，焦点转移同一行的重量输入框
+            if (event.keyCode == '13') {
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
+
+                checkCode();
+            }
+        }
+        function BillCodeOnKeyDown_click() {
+        	checkCode();
+        }
+    </script>
+</head>
+
+<body class="blue page-loading">
+    <!-- Section Start - Header -->
+    <section class='header' id='header'>
+        <!-- Header Top Bar - Start -->
+       <div class="topbar-wrap">
+            <div class="container">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 logo-area">
+                    <div class="logo">
+                        <div>
+                        <a href="index.html">
+                            <img src="img/logo.jpg" alt="Header Image" class="img-responsive"><!--<i class="icon icon-logo white"></i>-->
+                            </a>
+                        </div>
+                        <!--<span class="name">SHIPPING</span>
+                        <span class="small">Logistics & Transport</span>-->
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-9 col-sm-8 col-xs-5 menu-area pull-right">
+                    <!-- Menu Top Bar - Start -->
+                    <div class="topbar">
+                        <div class="menu">
+                            <div class="primary inviewport animated delay2" data-effect="">
+                                <div class='cssmenu'>
+                                    <!-- Menu - Start -->
+                                    <ul class='menu-ul'>
+                                        <li class='has-sub'>
+                                            <a href='index.html'><b>首页</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='price.html'><b>收费标准</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='about-us-2.html'><b>关于我们</b></a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='contact.html'><b>联系我们</b></a>
+                                        </li>
+                                        <!--<li class='has-sub'>
+                                            <a href='location.html'><b>公司地点</b></a>
+                                        </li>-->
+                                         <li class='has-sub'>
+                                            <a href='News.html'><b>新闻公告</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='login.jsp'><b>登陆</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='registe.html'><b>注册</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='upload.html'><b>上传ID</b></a>
+                                        </li>
+                                          
+                                    </ul>
+                                    <!-- Menu - End -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Menu Top Bar - End -->
+                    <!-- Mobile Menu - Start -->
+                    <div class="menu-mobile col-xs-10 pull-right cssmenu">
+                        <i class="icon icon-menu menu-toggle"></i>
+                        <ul class="menu" id='parallax-mobile-menu'>
+                        </ul>
+                    </div>
+                    <!-- Mobile Menu - End -->
+                </div>
+            </div>
+        </div>
+        <!-- Header Top Bar - End -->
+        <div class="header-bg header-small">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 slantbar hidden-xs"></div>
+            <!-- Header Tracking Box - Start -->
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 white-wrap hidden-xs">
+                <div class="white-box">
+                    <div class="track-order">
+                        <div class="track-logo transition col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <i class="icon icon-logo"></i>
+                        </div>
+                        <div class=" col-lg-9 col-md-9 col-sm-9 col-xs-9 track-form-wrap">
+                               <form method='post' action="#" class="track-form">
+                                <input type="text" id="searchinput" placeholder="单号" onkeydown=" BillCodeOnKeyDown(this, event); ">
+                               <!--  <i class="icon icon-magnify" onclick="checkCode();"></i> -->
+                                 <a href="javascript: BillCodeOnKeyDown_click()"><i class="icon icon-magnify" ></i></a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Tracking Box - End -->
+            <!-- Header Content Slide - Start -->
+            <div style="position:relative;display:inline-block;width:100%;height:auto;">
+                <img src="img/banner-2s.jpg" alt="Header Image" class="img-responsive">
+                <div class="bg-overlay"></div>
+                <div class="main-wrap">
+                    <div class="container">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 main-content">
+                            <h1>新闻与公告</h1>
+                            <div class="headul"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Content Slide - End -->
+        </div>
+    </section>
+    <!-- Section End - Header -->
+    <!-- Section Start - Blogs -->
+    <section class='blogs' id='blogs'>
+        <div class="container">
+            <div class="row" id="newstable">
+               
+        
+            </div>
+            <!-- PAGER -->
+				<div id="page_split" style="margin: 0 auto;text-align:center;margin-top:30px">
+					<div class="pagination" style="font-size: 15px;margin-right: 30px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 30px;border:1px solid #B2CEBA;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+				<!-- /PAGER -->
+			</div>
+        </div>
+    </section>
+    <!-- Section End - Blogs -->
+    <!-- Section Start - Footer -->
+   <section class='footer bg-black parallax ' id='footer'>
+        <div class="bg-overlay"></div>
+        <div class="container">
+            <div class="row">
+                <!-- Text Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 text-widget inviewport animated delay1" data-effect="fadeInUp">
+                    <div class="logo">
+                        <div>
+                        <a href="index.html">
+                            <img src="img/logo.jpg" alt="Header Image" class="img-responsive" style="width:50%; height:50%;">
+                            </a>
+                        </div>
+                    </div>
+                    <p>公司简介</p>
+                    
+                </div>
+                <!-- Text Widget - End -->
+                <!-- News Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 news-widget inviewport animated delay2" data-effect="fadeInUp">
+                    <h4>微信公众号</h4>
+                    <div class="headul left-align"></div>
+                    <div class="news-wrap row">
+                        <div class="pic col-md-3 col-xs-3 col-sm-3 col-lg-3">
+                            <img alt="news-image" class="img-responsive" src="img/news-1.jpg">
+                        </div>
+                        <div class="info col-md-9 col-xs-9 col-sm-9 col-lg-9">
+                            <h5 class="title"><a href='#'>公众号名称(或微信号)</a></h5>
+                            <div class="date">william18559</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- News Widget - End -->
+                <!-- Contact Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 contact-widget inviewport animated delay3" data-effect="fadeInUp">
+                    <h4>公司地址</h4>
+                    <div class="headul left-align"></div>
+                    <p>地址: 2428 w valley blvd, alhambra  
+                        
+                        <br>CA 91803</p>
+                    <p>电子邮箱: williamliang111@yahoo.com
+                        <br> 联系电话:  (626)620-1616&nbsp;(626)382-3025&nbsp;(626)410-8845</p>
+                </div>
+                <!-- Contact Widget - End -->
+            </div>
+        </div>
+        <!-- Copyright Bar - Start -->
+        <div class="copyright">
+            <div class="col-md-12">
+                <div class="container">
+                    <div class="">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 message inviewport animated delay1" data-effect="fadeInUp">
+                            <span class="">&copy; Copyright WebXury Inc. 2016. ® All Rights Reserved </span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 social">
+                            <a href="#" class="inviewport animated delay1" data-effect="fadeInUp"><i class="icon icon-facebook text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay2" data-effect="fadeInUp"><i class="icon icon-twitter text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay3" data-effect="fadeInUp"><i class="icon icon-dribbble text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay4" data-effect="fadeInUp"><i class="icon icon-google-plus text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay5" data-effect="fadeInUp"><i class="icon icon-youtube-play text-on-primary"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Copyright Bar - End -->
+    </section>
+    <!-- Section End - Footer -->
+    <!-- Javascript & CSS Files moved to bottom of page for faster loading -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/inviewport-1.3.2.js"></script>
+    <!-- Main JS -->
+    <script type="text/javascript" src="js/main.js"></script>
+</body>
+
+<script type="text/javascript">
+function loadNewsList(key,column,pageNow) {
+	key = encodeURI(key);
+	$.ajax( {
+		post : "get",
+		url : "../../news/search_size",
+		data : {
+			"key" : key,
+			"column" : column,
+			"size":10,
+			"pageIndex" : pageNow
+		},
+		success : function(response) {
+			var code = response.code;
+			//alert(code);
+			if ("200" == code) {
+				
+				if((response.data==null)||(response.data.datas==null))
+				{
+					showNewsList(null);
+					showNewsLink(null);
+				}
+				else
+				{
+					showNewsList(response.data.datas);
+					showNewsLink(response.data);
+				}
+				//afterLoadNewsList();
+				//afterLoadNewsList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+
+
+
+
+function showNewsList(list) {
+	var str = "";
+	$("#newstable").html("");
+	var flag=0;
+	if (list != null) {
+		//alert(list.length);
+		$
+				.each(
+						list,
+						function() {
+							
+							var str="";
+							
+							if(flag==0)
+							{
+								str +='<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 blog blog_small blog_right">';
+								flag=1;
+							}
+							else
+							{
+								str +='<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 blog blog_small blog_left">';
+								flag=0;
+							}
+							
+							
+							
+							str+='<div class="row">';
+							str +='<div class="col-lg-4 col-md-4 col-sm-5 col-xs-5  pic inviewport animated delay1 hiddenthis visiblethis fadeIn" data-effect="fadeIn">';
+							
+							if((this.pic1==null)||(this.pic1=="null")||(this.pic1=="")||(this.pic1=="undefined"))
+							{
+								//str+='<img src="images/logo.png" alt="post1">';
+								str+='<img alt="blog-image" class="img-responsive" src="img/logo.jpg">';
+							}
+							else
+							{
+								str+='<img src="'+"../.."+this.pic1+'" alt="post1">';
+							}
+							
+							//str+='<img src="'+"../.."+this.pic1+'" alt="post1">';
+							str+=' </div>';
+							str+='<div class="col-lg-8 col-md-8 col-sm-7 col-xs-7 inviewport animated delay1 hiddenthis visiblethis fadeIn" data-effect="fadeIn">';
+							str+='<div class="info">';
+							str+='<span class="date">'+this.releasetime+'</span>';
+							
+							
+							str+='<h3 class="title"><a href="blog-single.html?type=0&id='+this.id+'">'+this.title+'</a></h3>';
+							
+							
+							
+							
+							str+='<p>';
+							
+							str+=this.content;
+							
+							str+='</p>';
+							str+="<a class='btn btn-primary text-on-primary' href='blog-single.html?type=0&id="+this.id+"'>";
+							str+="阅读详情";
+							str+="</a>";
+							str+='</div>';
+							str+='</div>';
+							str+='</div>';
+							str+='</div>';
+							$("#newstable").append(str);
+						});
+	} else {
+		if (str == null || str == '') {
+			
+		}
+	}
+	//$("#list_grid").html(str);
+	//$('.liquid').imgLiquid();
+}
+function showNewsLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("#page_split.bulk-actions").show();
+		$("#page_split .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("#page_split .pagination a").click(function() {
+
+			var key=$(":text[name='key']").val();
+			var column = $("select[name='type']").val();
+			var pn = $(this).attr("href");
+
+			//loadTranshipList(tid, key, type, sdate, edate, pn);
+			loadNewsList(key,column,pn);
+			return false;
+		});
+
+		$("#page_split .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var key=$(":text[name='key']").val();
+					var column = $("select[name='type']").val();
+					//loadTranshipList(key, type, sdate, edate, pn);
+					loadNewsList(key,column,pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("#page_split .bulk-actions").hide();
+		$("#page_split .pagination").html("");
+	}
+}
+
+
+function createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount) {
+	var prePage = pageNow - 1;
+	prePage = prePage < 1 ? 1 : prePage;
+	var nextPage = pageNow + 1;
+	nextPage = nextPage > pageCount ? pageCount : nextPage;
+	var info = "共" + rowCount + "条/共" + pageCount + "页&nbsp;";
+	info += "当前第" + pageNow + "页&nbsp;&nbsp;";
+	info += "<a href='1' id='a_first_page'>首页</a>|";
+	info += "<a href='" + prePage + "' id='a_pre_page'>上一页</a>";
+	info += "<input style='width: 30px;border:1px solid #B2CEBA;' type='text' name='pageNow' />";
+	info += "<a href='" + nextPage + "' id='a_next_page'>下一页</a>|";
+	info += "<a href='" + pageCount + "' id='a_last_page'>尾页</a>";
+	return info;
+}
+
+$(document).ready(function(){
+	
+	loadNewsList("","",1);
+
+});
+
+
+
+</script>
+</html>

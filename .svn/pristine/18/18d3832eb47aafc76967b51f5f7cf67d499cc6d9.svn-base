@@ -1,0 +1,398 @@
+package com.weiye.controller;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.CommodityUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.ChannelDao;
+import com.weiye.dao.CommodityDao;
+import com.weiye.dao.SpencialChannelDao;
+import com.weiye.dao.SpencialChannelNameDao;
+import com.weiye.dao.SpencialChannelOrderDao;
+import com.weiye.dao.WarehouseDao;
+import com.weiye.model.Channel;
+import com.weiye.model.Commodity;
+import com.weiye.model.Countrys;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.SpencialChannel;
+import com.weiye.model.SpencialChannelName;
+import com.weiye.model.SpencialChannelOrder;
+import com.weiye.model.Warehouse;
+
+@Controller
+public class SpencialChannelController extends BasicController {
+	private static final long serialVersionUID = 5270532661049625109L;
+	private static final Logger log = Logger.getLogger(SpencialChannelController.class);
+	@Autowired
+	private SpencialChannelDao channelDao;
+	
+	@Autowired
+	private WarehouseDao warehouseDao;
+	
+	@Autowired
+	private SpencialChannelNameDao spencialChannelNameDao;
+	
+	@Autowired
+	private SpencialChannelOrderDao spencialChannelOrderDao;
+	
+
+	@RequestMapping(value = "/spencialchannel/allgoodorstodp", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<SpencialChannel>> getAllChannel(HttpServletRequest request,
+			@RequestParam(value = "wid", required = false) String wid ) {
+		try {
+			List<SpencialChannel> list = new ArrayList<SpencialChannel>();
+			
+			if(wid==null||wid==""){
+				String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+				list = this.channelDao.getByWarhouseId(storeId, null);
+			}else{
+				list = this.channelDao.getByWarhouseId(wid, null);
+			}
+			
+			ResponseObject<List<SpencialChannel>> responseObj = new ResponseObject<List<SpencialChannel>>(ResponseCode.SUCCESS_CODE);
+			if (list != null && !list.isEmpty()) {
+				for(int i=0;i<list.size();i++)
+				{
+					if(list.get(i)!=null)
+					{
+						if(!StringUtil.isEmpty(list.get(i).getSpencialChannelNameId()))
+						{
+							SpencialChannelName nameobj=this.spencialChannelNameDao.getbyid(list.get(i).getSpencialChannelNameId());
+							list.get(i).setSpencialChannelName(nameobj.getName());
+						}
+					}
+					
+				}
+				
+				responseObj.setData(list);
+			} else {
+				responseObj.setMessage("没有渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道列表失败");
+		}
+	}
+	
+	@RequestMapping(value = "/spencialchannel/all", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<SpencialChannel>> getAllgoodChannel(HttpServletRequest request,
+			@RequestParam(value = "wid", required = false) String wid ) {
+		try {
+			List<SpencialChannel> list = new ArrayList<SpencialChannel>();
+			
+			if(wid==null||wid==""){
+				String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+				list = this.channelDao.getByWarhouseId(storeId, "1");
+			}else{
+				list = this.channelDao.getByWarhouseId(wid, "1");
+			}
+			
+			ResponseObject<List<SpencialChannel>> responseObj = new ResponseObject<List<SpencialChannel>>(ResponseCode.SUCCESS_CODE);
+			if (list != null && !list.isEmpty()) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setMessage("没有渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道列表失败");
+		}
+	}
+	
+	
+	//特殊门店
+	@RequestMapping(value = "/spencialchannel/msall", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<SpencialChannel>> getmsall(HttpServletRequest request) {
+		try {
+			List<SpencialChannel> list = new ArrayList<SpencialChannel>();
+			String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+			if(StringUtil.isEmpty(storeId))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+			list = this.channelDao.getByWarhouseId(storeId, "1");
+			if((list==null)||list.size()<1)
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"请检查门店是否已经添加了渠道!");
+			}
+			
+			/*if(wid==null||wid==""){
+				String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+				list = this.channelDao.getByWarhouseId(storeId, "1");
+			}else{
+				list = this.channelDao.getByWarhouseId(wid, "1");
+			}*/
+			
+			ResponseObject<List<SpencialChannel>> responseObj = new ResponseObject<List<SpencialChannel>>(ResponseCode.SUCCESS_CODE);
+			if (list != null && !list.isEmpty()) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setMessage("没有渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道列表失败");
+		}
+	}
+	
+	@RequestMapping(value = "/admin/spencialchannel/modify", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyChannelOfAdmin(HttpServletRequest request, SpencialChannel channel) {
+		
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权修改渠道!");
+			
+		}
+		
+		if (channel == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		
+		if (StringUtil.isEmpty(channel.getId())||StringUtil.isEmpty(channel.getWarehouseId())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效,无法通过参数验证");
+		}
+		if (!channel.getState().equals("1")&&!channel.getState().equals("2")) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道状态错误");
+		}
+		if (StringUtil.isEmpty(channel.getName())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道名不能为空");
+		}
+		if (StringUtil.isEmpty(channel.getAlias())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道别名不能为空");
+		}
+		if (StringUtil.isEmpty(channel.getAdditivePrice())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "附加费不能为空");
+		}
+		try {
+			int nRet = this.channelDao.modifyChannel(channel);
+			if(nRet>0){
+				return generateResponseObject(ResponseCode.SUCCESS_CODE, "");
+			}else{
+				return generateResponseObject(ResponseCode.CHANNEL_UPDATE_FAILURE, "修改渠道信息失败");
+			}
+		} catch (Exception e) {
+			log.error("修改渠道信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改渠道信息失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/admin/spencialchannel/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addChannel(
+			HttpServletRequest request, SpencialChannel channel) {
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权添加渠道!");
+			
+		}
+		
+		if (channel == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		
+		if (StringUtil.isEmpty(channel.getWarehouseId())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效,无法通过参数验证");
+		}
+		if (!channel.getState().equals("1")&&!channel.getState().equals("2")) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道状态错误");
+		}
+		if (StringUtil.isEmpty(channel.getName())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道名不能为空");
+		}
+		if (StringUtil.isEmpty(channel.getAlias())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道别名不能为空");
+		}
+		if (StringUtil.isEmpty(channel.getAdditivePrice())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "附加费不能为空");
+		}
+		if(channel.getWarehouseId().equals("-1")){
+			try {
+				List<Warehouse> warehouses = this.warehouseDao.getAll();
+				if (warehouses != null && !warehouses.isEmpty()) {
+					List<SpencialChannel> channels = new ArrayList<SpencialChannel>();
+					int count = 0;
+					for (Warehouse w : warehouses) {
+						SpencialChannel tmpChannel = new SpencialChannel();
+						tmpChannel.setName(channel.getName());
+						tmpChannel.setAlias(channel.getAlias());
+						tmpChannel.setState(channel.getState());
+						tmpChannel.setWarehouseId(w.getId());
+						
+						channels.add(tmpChannel);
+						count++;
+					}
+					
+					int nRet = channelDao.insertChannelByList(channels);
+					if (count == 0 || nRet != count) {
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加渠道失败");
+					}else{
+						return generateResponseObject(ResponseCode.SUCCESS_CODE, "");
+					}
+					
+				} else{
+					return generateResponseObject(ResponseCode.CHANNEL_INSTER_FAILURE, "没有仓库信息，增加失败");
+				}
+			} catch (Exception e) {
+				log.error("获取仓库列表失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取仓库列表失败");
+			}
+		}
+		
+	
+		try {
+			int nRet =channelDao.insertChannel(channel);
+			if(nRet>0){
+				return generateResponseObject(ResponseCode.SUCCESS_CODE, "");
+			}else{
+				return generateResponseObject(ResponseCode.CHANNEL_INSTER_FAILURE, "添加渠道失败");
+			}
+		} catch (Exception e) {
+			log.error("添加渠道失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加渠道失败");
+		}
+		
+		
+	}
+	
+	@RequestMapping(value = "/spencialchannel/getcannelbyid", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<SpencialChannel> getChannelbyid(HttpServletRequest request,
+			@RequestParam(value = "cid", required = false) String cid ) {
+		try {
+			
+			if(StringUtil.isEmpty(cid))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "获取渠道信息失败，参数出错!");
+			}
+			SpencialChannel list = this.channelDao.getChannelById(cid);
+			
+			
+			
+	
+			ResponseObject<SpencialChannel> responseObj = new ResponseObject<SpencialChannel>(ResponseCode.SUCCESS_CODE);
+			if (list != null) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setCode(ResponseCode.SHOW_EXCEPTION);
+				responseObj.setMessage("没有渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道列表失败");
+		}
+	}
+	
+	@RequestMapping(value = "/spencialchannel/getrealname", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<SpencialChannelName>> getspencialname(HttpServletRequest request) {
+		try {
+	
+			 List<SpencialChannelName> list = this.spencialChannelNameDao.getallgood();
+			
+			
+			
+	
+			 ResponseObject<List<SpencialChannelName>> responseObj = new ResponseObject<List<SpencialChannelName>>(ResponseCode.SUCCESS_CODE);
+			if (list != null) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setCode(ResponseCode.SHOW_EXCEPTION);
+				responseObj.setMessage("没有关联渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取关联渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取关联渠道列表失败");
+		}
+	}
+	
+
+	
+	@RequestMapping(value = "/spencialchannel/ms/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<SpencialChannel> getChannelbyid(HttpServletRequest request,
+			SpencialChannelOrder sorder) {
+		try {
+			
+			if(StringUtil.isEmpty(sorder.getCid()))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "获取渠道信息失败，参数出错!");
+			}
+			SpencialChannel list = this.channelDao.getChannelById(sorder.getCid());
+			this.spencialChannelOrderDao.insertSorder(sorder);
+			
+			
+	
+			ResponseObject<SpencialChannel> responseObj = new ResponseObject<SpencialChannel>(ResponseCode.SUCCESS_CODE);
+			if (list != null) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setCode(ResponseCode.SHOW_EXCEPTION);
+				responseObj.setMessage("没有渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道列表失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/spencialchannel/ms/checkmoneky", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> getChannelbycheckorder(HttpServletRequest request,
+			SpencialChannelOrder sorder) {
+		try {
+			
+			if(StringUtil.isEmpty(sorder.getCid()))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "获取渠道信息失败，参数出错!");
+			}
+			SpencialChannel list = this.channelDao.getChannelById(sorder.getCid());
+			this.spencialChannelOrderDao.insertSorder(sorder);
+			
+			
+	
+			ResponseObject<Object> responseObj = new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			if (list != null) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setCode(ResponseCode.SHOW_EXCEPTION);
+				responseObj.setMessage("没有渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道列表失败");
+		}
+	}
+}

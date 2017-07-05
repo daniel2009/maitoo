@@ -1,0 +1,347 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>全球速递  美国快递公司 专为华人美国购物 海淘 转运</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" href='css/bootstrap.css' type="text/css" media="screen">
+<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/inner.css" type="text/css" media="screen">
+<link rel="stylesheet" href="demo/switcher.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/es-carousel.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/prettyphoto.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/color1.css" type="text/css" id="theme" />
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<!-- CSS STYLE -->
+
+<link rel="stylesheet" href='css/common.css'> 
+<link rel="stylesheet" type="text/css" media="all" href="css/style3.css">
+<link id="main_stylesheet" rel="stylesheet" href='css/indexstyle.css' type="text/css">
+<link rel="stylesheet" type="text/css" href='css/common1.css'>
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css" media="screen" />
+
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css" media="screen" />
+<!-- REVOLUTION BANNER CSS SETTINGS -->
+<link rel="stylesheet" href="css/rs-plugin/settings.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/captions.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/portfolio.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/portfolio-shape.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/elements.css" type="text/css" media="screen">
+<!--[if lt IE 9]>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+  <![endif]-->
+</head>
+<body class="home-page stretched">
+<div id="wrapper">
+   <%@ include file="header.jsp" %>
+		<!--==============================content=================================-->
+
+		<div class="breadcrumb-wrapper">
+			<div class="shadowdrop"></div>
+			<div class="container">
+				<h2>海淘推荐</h2>
+				<ul class="breadcrumb fright">
+					<li><a href="index.jsp">首页</a> <span class="divider">/</span>
+					</li>
+					<li class="active">海淘推荐</li>
+				</ul>
+			</div>
+		</div>
+		<div class="container">
+    <!-- portfolio 2 -->
+    <div class="row">
+    
+        <!-- portfolio starts -->
+        <div class="row clearfix">
+          <ul class="holder">
+            <!-- 1 -->
+            <li class="span3" data-id="id-1" data-type="business">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/1.png" alt=""/>
+                    
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">Amazon(美国亚马逊)</a></h5>
+                  <p class="excerpt">世界上最大的网上商店，致力于成为全球最以客户为中心的公司，使消费者能够在网上找到并发掘任何他们想购买的商品，并力图提供最低的价格。亚马逊及其他销售商为客户提供数千万种独特的全新... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 2 -->
+            <li class="span3" data-id="id-2" data-type="graphics">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/002.png" alt=""/>
+                    
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">Drugstore</a></h5>
+                  <p class="excerpt">美国最大网络医药用品销售网站，同时也是美国领先的健康、美容、视 力产品的网络供应商。提供的产品从药品到美容到健身器材到书籍杂志， 应有尽有。其中药品销售的类别主要... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 3 -->
+            <li class="span3" data-id="id-3" data-type="business">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src='img/003.png' alt=""/>
+                
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">diapers</a></h5>
+                  <p class="excerpt">美国在线专业婴儿用品供应商，其网站上的婴儿产品非常全面——奶瓶、 婴儿食品、洗发水、皮疹软膏、婴儿车、家具等！它的使命：为妈妈（ 和爸爸）提供网上最低价格的婴儿用品... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 4 -->
+            <li class="span3" data-id="id-4" data-type="business">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/004.png" alt=""/>
+                  
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">6pm</a></h5>
+                  <p class="excerpt">美国在线零售商店，有美国最知名的白菜鞋天堂之称，包括UGG、Nine West、Columbia、Nike、Adidas等品牌鞋子，同时它也是一家综合性购物网站，主要提供服装、鞋类和手包产品，汇集了美国众多休闲时... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 5 -->
+            <li class="span3" data-id="id-5" data-type="graphics">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/005.png" alt=""/>
+                   
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">Carter's</a></h5>
+                  <p class="excerpt">美国婴童服装市场上的领先品牌，产品系列包括婴童需要的核心产品， 有婴儿系列、套装、婴童轻便服和睡衣系列。Carter’s系列产品的出发点在于帮助妈妈们解决问题，针对父母和孩子们真...</p>
+                </div>
+                </div>
+            </li>
+            <!-- 6 -->
+            <li class="span3" data-id="id-6" data-type="web">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/006.png" alt=""/>
+                
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">NAUTICA</a></h5>
+                  <p class="excerpt">1983年成立源自美国的时装品牌，NAUTICA的产品系列包括休闲装、比赛服、男女牛仔服系列、男子正装、女子泳装、男女睡衣、男子内衣、童装，以及全系列的配饰品，包括眼镜、手表、香水和家居... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 7 -->
+            <li class="span3" data-id="id-7" data-type="wordpress">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/007.png" alt=""/>
+                
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">LEVI'S</a></h5>
+                  <p class="excerpt">来自美国西部最闻名的名字之一，作为时装和牛仔裤的领导品牌， 百年来不断追求创新，历经130多年风风雨雨，从一个国家流行到全球，其品牌个性始终保持如一，并成为全世界男女老幼... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 8 -->
+            <li class="span3" data-id="id-8" data-type="web">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/008.png" alt=""/>
+                 
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">New Balance</a></h5>
+                  <p class="excerpt">新百伦旗下的outlets折扣网店。New Balance鞋一向是给力的，在 美国及许多国家被誉为“总统慢跑鞋”，“慢跑鞋之王”。 New Balance拥有其独特的文化：坚持出品多宽度、多高度的鞋款、时尚的设计、适合多人群.... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 9 -->
+            <li class="span3" data-id="id-9" data-type="web">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/009.png" alt=""/>
+               
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">Puritan's Pride(普丽普莱)</a></h5>
+                  <p class="excerpt">Puritan's Pride™健康食品公司创立于1960年美国纽约长岛，至今 已有51年的历史，是美国最大最全的保健品公司之一，从事维生素、矿物质、草药及有关健康、美容、减肥等健康食品的开发... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 10 -->
+            <li class="span3" data-id="id-10" data-type="graphics">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/010.png" alt=""/>
+                 
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">GNC</a></h5>
+                  <p class="excerpt">健安喜，美国顶级保健品，GNC是全球闻名的优良营养食品公司， 美国NO.1维他命及健康食品经销商。专业生产各种维生素、矿物质、 植物精华以及其它保健营养食品，产品遍及全球三十多个国家... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 11 -->
+            <li class="span3" data-id="id-11" data-type="wordpress">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/011.png" alt=""/>
+               
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">SIERRA</a></h5>
+                  <p class="excerpt">美国知名户外用品畅销中心，是户外发烧友朋友喜爱的户外产品网 站，提供许多来自世界各地最受欢迎的patagonia、Columbia、THE NORTH FACE、Carhartt、Oakley等众多知名品牌，并且... </p>
+                </div>
+                </div>
+            </li>
+            <!-- 12 -->
+            <li class="span3" data-id="id-12" data-type="business">
+              <div class="featured-thumbnail">
+                  <div class="img-border portfolio-overlay"> <img src="img/012.png" alt=""/>
+                    
+                </div>
+              <div class="carousel-proj-text">
+                  <h5><a href="#">Saks Fifth Avenue</a></h5>
+                  <p class="excerpt">萨克斯第五大道精品百货店 (Saks Fifth Avenue)，世界上顶级的 百货公司之一， 常年都会有一些大品牌打折，包括巴宝莉 (Burbe rry) 、Charles Nolan 、Cynthia Steffe 、波士 (HUGO BOSS... </p>
+                </div>
+                </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+ <%@ include file="footer.jsp" %>
+</div>
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="js/jquery.sliderTabs.js"></script>
+<!-- jQuery Slider  -->
+<script type="text/javascript" src="js/rs-plugin/jquery.themepunch.plugins.min.js"></script>
+<script type="text/javascript" src="js/rs-plugin/jquery.themepunch.revolution.min.js"></script>
+<!-- Elastislider  -->
+<script type="text/javascript" src="js/jquery.elastislide.js"></script>
+<!-- Pretty photo  -->
+<script type="text/javascript" src="js/jquery.prettyphoto.js"></script>
+<!-- Carousel  -->
+<script type="text/javascript" src="js/carousel.js"></script>
+<!-- totop  -->
+<script type="text/javascript" src="js/jquery.ui.totop.js"></script>
+<script type="text/javascript" src="js/prettify.js"></script>
+<script type="text/javascript" src="js/application.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<!-- Quicksand  -->
+<script type="text/javascript" src="js/jquery.quicksand.js"></script>
+<!-- Image animated Style  -->
+<script type="text/javascript" src="js/jquery.gridrotator.js"></script>
+<script type="text/javascript" src="js/jquery.mobile.customized.min.js"></script>
+<!-- Accordion  -->
+<script type="text/javascript" src="js/accordion.js"></script>
+<!-- Tabs  -->
+<script type="text/javascript" src="js/tabs.js"></script>
+<!-- Sitemap  -->
+<script type="text/javascript" src="js/sitemap.js"></script>
+<!-- Navigation  -->
+<script type="text/javascript" src="js/nav-small.js"></script>
+<script type="text/javascript" src="js/jquery.mobilemenu.js"></script>
+<!-- Isotope  -->
+<script type="text/javascript" src="js/jquery.isotope.min.js"></script>
+<!-- Metro Style  -->
+<script type="text/javascript" src="js/boxgrid.js"></script>
+<script type="text/javascript" src="demo/switcher.js"></script>
+<!-- Elastislider  -->
+<script>
+				jQuery("#carousel-blog").elastislide({
+					imageW 		: 270,
+					minItems		: 2,
+					speed			: 600,
+					easing		: "easeOutQuart",
+					margin		: 30,
+					border		: 0,
+					onClick		: function() {}
+				});</script>
+<!-- Image animated Style  -->
+<script type="text/javascript">	
+			$(function() {
+			
+				$( '#ri-grid' ).gridrotator( {
+					rows : 4,
+					columns : 8,
+					maxStep : 2,
+					interval : 2000,
+					w1024 : {
+						rows : 5,
+						columns : 6
+					},
+					w768 : {
+						rows : 5,
+						columns : 5
+					},
+					w480 : {
+						rows : 6,
+						columns : 4
+					},
+					w320 : {
+						rows : 7,
+						columns : 4
+					},
+					w240 : {
+						rows : 7,
+						columns : 3
+					},
+				} );
+			
+			});
+		</script>
+<!-- Metro Style  -->
+<script>
+			$(function() {
+
+				Boxgrid.init();
+				
+
+			});
+		</script>
+<!-- Revolution Slider  -->
+<script>
+			var api;
+			jQuery(document).ready(function() {
+				 api =  jQuery('.fullwidthabnner').revolution(
+								{
+									delay:9000,
+									startheight:370,
+									startwidth:960,
+
+									hideThumbs:10,
+
+									thumbWidth:100,							// Thumb With and Height and Amount (only if navigation Tyope set to thumb !)
+									thumbHeight:50,
+									thumbAmount:5,
+
+									navigationType:"both",					//bullet, thumb, none, both		(No Thumbs In FullWidth Version !)
+									navigationArrows:"verticalcentered",		//nexttobullets, verticalcentered, none
+									navigationStyle:"round",				//round,square,navbar
+
+									touchenabled:"on",						// Enable Swipe Function : on/off
+									onHoverStop:"on",						// Stop Banner Timet at Hover on Slide on/off
+
+									navOffsetHorizontal:0,
+									navOffsetVertical:20,
+
+									stopAtSlide:-1,
+									stopAfterLoops:-1,
+
+									shadow:1,								//0 = no Shadow, 1,2,3 = 3 Different Art of Shadows  (No Shadow in Fullwidth Version !)
+									fullWidth:"on"							// Turns On or Off the Fullwidth Image Centering in FullWidth Modus
+								});
+			});
+			
+			function loadVideo(){
+				jQuery("#video_link").html('iframe src="http://player.vimeo.com/video/32001208?title=0&amp;byline=0&amp;portrait=0" width="460" height="259"></iframe>');
+			}
+		</script>
+</body>
+</html>

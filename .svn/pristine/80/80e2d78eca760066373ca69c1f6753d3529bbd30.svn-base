@@ -1,0 +1,7 @@
+package com.weiye.common.util.calc;
+
+import com.weiye.model.Order;
+
+public interface OrderFreightCalculation {
+	public double calcFreight(Order order);
+}

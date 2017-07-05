@@ -1,0 +1,56 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">添加商品类型
+			<a  href="#" onclick="javascript: navProductTypeClick();">返回列表</a>
+		</p>
+		<div class="box_content">
+			<div class="content_title">添加商品类型</div>
+			<div class="content_text">
+				<div class="tab-content" id="tab2">
+					<form id="form">
+			            <fieldset>
+							<p>
+			            		<label style="display: inline;">名称：</label>
+			            		<input class="text-input small-input" type="text" name="name" />
+								<span class="gl_message">*</span>
+			            	</p>
+				            <p style="margin-left: 50px;">
+				              <input class="button" type="button" value="提交" onclick="javascript: addProductType();" />
+				              <!-- <input id="bt_add_news_reset" class="button" type="reset" value="重置"/> -->
+				            </p>
+			            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	function addProductType(){
+		$.ajax({
+			type: "post",
+			url: "../admin/productType/add",
+			data : new FormData(document.getElementById("form")),
+			processData : false,
+			contentType : false,
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					alert("添加成功");
+					navProductTypeClick();
+				}else{
+					alert("添加失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+</script>
+</html>

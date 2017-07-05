@@ -1,0 +1,429 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">获取商品
+			<a  href="#" onclick="javascript: navProductRecordClick();">返回列表</a>
+		</p>
+		<div class="box_content">
+			<div class="content_title">获取商品</div>
+			<div class="content_text">
+				<div class="tab-content">
+					<input type="hidden" id="globalUsd2Rmb">
+					<form id="form">
+			            <fieldset>
+							<p>
+			            		官网地址：<input type="search" style="width: 80%;" id="url" name="url" onkeyup="javascript: if(event.keyCode==13){searchProduct();};" />
+			            		<input type="button" id="searchButton" value="检测商品" onclick="javascript: searchProduct();">
+			            	</p>
+			            	<section id="productInfoDiv" style="width: 100%; height: 0px; overflow:hidden; transition: all 0.5s ease-in-out">
+								<div style="display: flex;">
+									<div id="imageListDiv" style="min-width: 50px; width: 50px;"></div>
+									<img id="landingImage" style="max-height: 518px; max-width: 412px; min-width: 300px;">
+									<div id="mainInfoDiv" style="min-width: 300px;">
+										来源:<label id="websiteLabel"></label><input type="hidden" id="websiteHidden" name="website"><br/>
+										商品名：<label id="nameLabel" style="font-size: 1.8rem; display: inline;"></label><br/>
+										品牌：<label id="brandLabel" style="font-size: 0.5rem; display: inline;"></label>
+										<hr/>
+										<label style="display: inline;">价格查看：</label>
+					            		<select style="display: inline;" id="currencySelect" onchange="javascript: changeCurrency(this.value);">
+					            			<option value="RMB">RMB</option>
+					            			<option value="USD">USD</option>
+					            		</select>
+					            		 	<label style="display: inline;" id="priceLabel"></label>(价格会因运费等原因有所变动)
+										邮费：<label id="shippingPriceLabel"></label><input type="hidden" id="shippingPriceHidden" name="shippingPrice">
+										<div id="featureHtml"></div>
+									</div>
+								</div>
+								<hr/>
+								<div id="detailHtml"></div>
+							</section>
+							<input type="hidden" id="nameHidden" name="name">
+			            	<input type="hidden" name="typeId" value="-1">
+			            	<input type="hidden" id="currencyHidden" name="currency" value="USD">
+			            	<input type="hidden" id="priceHidden" name="price" value="-999999">
+			            	<input type="hidden" id="pic1Hidden" name="pic1">
+			            	<input type="hidden" id="pic2Hidden" name="pic2">
+			            	<input type="hidden" id="pic3Hidden" name="pic3">
+			            	收件人信息
+			            	
+							<table class="userTable">
+								<tr id="addressheetshow">
+									<td class="align_left" colspan="6">
+										<table id="consigneeTable" class="mtable">
+											<thead>
+												<tr>
+													<td align="center">选择</td>
+													<td>收货人</td>
+													<td>电话</td>
+													<td colspan="4">详细地址</td>
+													<td>身份证</td>
+													<td align="center">身份证正面图</td>
+													<td align="center">身份证反面图</td>
+													<td align="center">身份证合成图</td>
+												</tr>
+											</thead>
+				
+											<tbody>
+											</tbody>
+											
+											<tfoot>
+												<tr>
+													<td colspan="11" align="center">共<span id="trsize">0</span>条
+														<a id="first_page" href="1" name="to_page">首页</a> | 
+														<a id="pre_page" name="to_page">上一页</a> | 
+														<input type="text" class="bor" size="2" style="width:20px;height:10px;" /> /<span id="tpsize">0</span>| 
+														<a id="next_page" name="to_page">下一页</a> | 
+														<a id="last_page" name="to_page">未页</a>
+													</td>
+												</tr>
+											</tfoot>
+				
+										</table>
+				
+									</td>
+								</tr>
+								<tr id="quickwaytr_context1">
+									<td class="align_right"><span class="red">*</span>收件人：</td>
+									<td class="align_left"><input name="cName" type="text" maxlength="10" /></td>
+								</tr>
+								<tr id="quickwaytr_context3">
+									<td class="align_right"><span class="red">*</span>地址:</td>
+									<td class="align_left" colspan="3"><input name="cAddress" type="text" style="width: 95%;"/></td>
+								</tr>
+								<tr id="quickwaytr_context4">
+									<td class="align_right"><span class="red">*</span>手机：</td>
+									<td class="align_left"><input name="cPhone" type="text" maxlength="12" /></td>
+								</tr>
+								<tr id="quickwaytr_context5">
+									<td class="align_right">邮编：</td>
+									<td class="align_left"><input name="cZipCode" type="text" maxlength="10" /></td>
+								</tr>
+								<tr id="quickwaytr_context6">
+									<td class="align_right"><span class="red"></span>身份证号：</td>
+									<td class="align_left"><input name="cCardId" type="text" maxlength="18" /></td>
+								</tr>
+								<tr id="quickwaytr_context7">
+									<td class="align_right"><span class="red">*</span>上传身份证正面图片：</td>
+									<td class="align_left"><input name="idCardPicture" type="file" /> (上传支持JPG，PNG，BMP等图片格式，最大不超过4MB)<img id="idCardImg"></td>
+								</tr>
+								<tr id="quickwaytr_context8">
+									<td class="align_right"><span class="red">*</span>上传身份证反面图片：</td>
+									<td class="align_left"><input name="idCardOtherPicture" type="file" /> (上传支持JPG，PNG，BMP等图片格式，最大不超过4MB)<img id="idCardOtherImg"></td>
+								</tr>
+								<tr style="display:none;">
+									<td><input type="text" name="cIdCardPic" style="width:120px;" /></td>
+									<td><input type="text" name="cIdCardOtherPic" style="width:120px;" /></td>
+									<td><input type="text" name="cIdCardTogetherPic" style="width:120px;" /></td>
+								</tr>
+								<tr style="">
+									<td class="align_right">备注:</td>
+									<td class="align_left" colspan="3"><textarea rows="3" cols="20" class="text-input" name="remark" maxlength="200" style="width:300px"></textarea></td>
+								</tr>
+								</table>
+				
+				
+				
+							<hr/>
+			            	<div>
+			            		<label style="display: inline;">数量：</label>
+			            		<input class="text-input small-input" type="number" id="quantity" name="quantity" step="1" value="1" />
+								<span class="gl_message">*</span>
+			            	</div>
+			            	<!--
+			            	收件人信息
+			            	<table id="consigneeTable" class="table">
+								<thead>
+									<tr>
+										<th style="width:7%"></th><th style="width:15%">收货人</th><th style="width:18%">电话</th><th style="width:25%">国家/地区</th><th style="width:35%">详细地址</th><th style="width:10%">邮编</th>
+									</tr>
+								</thead>
+								<tfoot>
+									<tr>
+										<td colspan="8" align="right"><span>共</span><span id="trsize">0</span><span>条</span> <a id="first_page" href="1" name="to_page">首页</a> <span>|</span> <a id="pre_page" name="to_page">上一页</a><span> |</span> <input type="text" class="bor" size="2" /> <span>/</span><span id="tpsize">0</span><span>|</span> <a id="next_page" name="to_page">下一页</a> <span>|</span> <a id="last_page" name="to_page">未页</a></td>
+									</tr>
+								</tfoot>
+								<tbody>
+								</tbody>
+							</table>
+			            	<label class="center">运单收发用户信息：</label>
+							<div style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+								<div style="flex-basis: 300px;">
+									<label style="display: inline;">寄件人手机号码：</label>
+									<label id="fromUserPhone"></label>
+								</div>
+								<div style="flex-basis: 300px;">
+									<label style="display: inline;">寄件人姓名：</label>
+									<label id="fromUserRealName"></label>
+								</div>
+							</div>
+							<hr/>
+							<div>
+			            		<label style="display: inline;">地址：</label>
+			            		<textarea name="address" style="width: 95%;"></textarea>
+			            	</div>
+			            	<div>
+			            		<label style="display: inline;">备注：</label>
+			            		<textarea name="remark" style="width: 95%;"></textarea>
+			            	</div>
+			            	<div>
+			            		<label style="display: inline;">数量：</label>
+			            		<input class="text-input small-input" type="number" name="quantity" step="1" value="1" />
+								<span class="gl_message">*</span>
+			            	</div>
+			            	  -->
+				            <div style="margin-left: 50px;">
+				              <input class="button" type="button" id="addButton" value="提交" onclick="javascript: addProduct();" />
+				              <!-- <input id="bt_add_news_reset" class="button" type="reset" value="重置"/> -->
+				            </div>
+			            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function(){
+		var url = sessionStorage.getItem("url");
+		if(url == null){
+			url = sessionStorage.getItem("spiderOrderUrlKeep");
+		}
+		$("#url").val(url);
+		window.sessionStorage.clear();
+		searchProduct();
+		showLocation();
+		$("#consigneeTable tfoot a").click(function() {
+			// 跳页
+			var pn = $(this).attr("href");
+			loadConsignee($(":radio[name='userId']:checked").val(), pn);
+			return false;
+		});
+
+		$("#consigneeTable tfoot input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					loadConsignee($(":radio[name='userId']:checked").val(), pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+		loadConsignee(1);
+		$.ajax({
+			type : "get",
+			url : "../user/get_self",
+			success : function(response){
+				if("200" == response.code){
+					$("#userIdHidden").val(response.data.id);
+					$("#fromUserPhone").html(response.data.phone);
+					$("#fromUserRealName").html(response.data.real_name);
+				}else{
+					alert("获取商品失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function searchProduct(){
+		$("#searchButton").val("搜索中。。。");
+		$("#searchButton").attr("disabled", true);
+		$("#addButton").attr("disabled", true);
+		$.ajax({
+			type: "post",
+			url: "../user/spiderOrder/search",
+			data : new FormData(document.getElementById("form")),
+			processData : false,
+			contentType : false,
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					$("#productInfoDiv").css("height", "500px");
+					$("#websiteHidden").val(response.data.website);
+					$("#nameHidden").val(response.data.name);
+					if(removenull(response.data.currency)!=""){
+						$("#currencyHidden").val(response.data.currency);
+					}
+					if(removenull(response.data.price)!=""){
+						$("#priceHidden").val(response.data.price);
+					}
+					$("#shippingPriceHidden").val(response.data.shippingPrice);
+					if(removenull(response.data.pics)!=""){
+						$("#pic1Hidden").val(response.data.pics[0]);
+						$("#pic2Hidden").val(response.data.pics[1]);
+						$("#pic3Hidden").val(response.data.pics[2]);
+						var images = "";
+						for(var i=0, pics=response.data.pics; i<pics.length; i++){
+							images += "<img src='"+pics[i]+"' style='width: 50px;'>";
+						}
+						$("#imageListDiv").html(images);
+						$("#landingImage").attr("src", response.data.pics[0]);
+					}
+					$("#websiteLabel").html($("#websiteHidden").val());
+					$("#nameLabel").html($("#nameHidden").val());
+					$("#brandLabel").html(response.data.brand);
+					$("#priceLabel").html($("#priceHidden").val());
+					$("#shippingPriceLabel").html($("#shippingPriceHidden").val());
+					$("#featureHtml").html(response.data.featureHtml);
+					loadGlobalArgs();
+					$("textarea[name=description]").val(response.data.featureHtml);
+					$("#addButton").attr("disabled", false);
+				}else{
+					alert("查询失败，原因是:" + response.message);
+				}
+				$("#searchButton").val("获取商品");
+				$("#searchButton").attr("disabled", false);
+			}
+		});
+	}
+	function addProduct(){
+		$.ajax({
+			type: "post",
+			url: "../user/product/addProductAndRecordByUser",
+			data : new FormData(document.getElementById("form")),
+			processData : false,
+			contentType : false,
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var remark = ",等待管理员设置运费价格";
+					if($("input[name=price]").val()=="-999999"){
+						remark = ",未检测到合适价格，该商品将由管理员重新设置价格";
+					}
+					alert("添加成功" + remark);
+					navProductRecordClick();
+				}else if(20006 == code){
+					alert("账户余额不足，请充值");
+				}else{
+					alert("添加失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function loadConsignee(pageIndex){
+		$.ajax({
+			type : "get",
+			url : "../consignee/search",
+			data : {pageIndex : pageIndex},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					if (response.data != null) {
+						showConsigneeList(response.data.datas);
+						showConsigneePage(response.data);
+						clearWrongImg();
+					} else {
+						showConsigneeList(null);
+						showConsigneePage(null);
+					}
+				} else {
+					alert("获取会员信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function showConsigneeList(list){
+		$("#consigneeTable tbody").html("");
+		if (list != null && list.length > 0) {
+			$.each(list, function() {
+				var str = "<tr id='" + this.id + "' onclick='chooseConsignee(this);'>";
+				str += "<td>";
+				str += "<input type='radio' name='consigneeId' value='" + this.id + "'/>";
+				str += "<input type='hidden' name='conName' value='"+this.name+"'>";
+				str += "<input type='hidden' name='conPhone' value='"+this.phone+"'>";
+				str += "<input type='hidden' name='conZipCode' value='"+this.zipCode+"'>";
+				str += "<input type='hidden' name='conProvince' value='"+this.province+"'>";
+				str += "<input type='hidden' name='conCity' value='"+this.city+"'>";
+				str += "<input type='hidden' name='conDistrict' value='"+this.district+"'>";
+				str += "<input type='hidden' name='conStreetAddress' value='"+this.streetAddress+"'>";
+				str += "<input type='hidden' name='conCardId' value='"+this.cardId+"'>";
+				str += "<input type='hidden' name='conCardUrl' value='"+this.cardUrl+"'>";
+				str += "<input type='hidden' name='conCardUrlother' value='"+this.cardurlother+"'>";
+				str += "<input type='hidden' name='conCardUrltogether' value='"+this.cardurltogether+"'>";
+				str += "</td>";
+				str += "<td>" + this.name + "</td>";
+				str += "<td>" + this.phone + "</td>";
+				str += "<td colspan='4' name='conAddress'>" + this.province + "/" + this.city + "/" + this.district + " " + this.streetAddress + "</td>";
+				str += "<td>" + this.cardId + "</td>";
+				str += "<td><img src='../" + this.cardUrl + "'></td>";
+				str += "<td><img src='../" + this.cardurlother + "'></td>";
+				str += "<td><img src='../" + this.cardurltogether + "'></td>";
+				str += "</tr>";
+				$("#consigneeTable tbody").append(str);
+			});
+		}
+	}
+	function showConsigneePage(pageSplit) {
+		var rowCount = 0;
+		var pageNow = 0;
+		var pageCount = 0;
+		if (pageSplit != null) {
+			rowCount = pageSplit.rowCount;
+			pageNow = pageSplit.pageNow;
+			pageCount = pageSplit.pageCount;
+		}
+		$("#trsize").html(rowCount);
+		$("#tpsize").html(pageCount);
+		$("#first_page").attr("href", "1");
+		$("#pre_page").attr("href", pageNow - 1);
+		$("#next_page").attr("href", pageNow + 1);
+		$("#last_page").attr("href", pageCount);
+	}
+	function chooseConsignee(element){
+		$(element).find("input[name=consigneeId]").attr("checked", true);
+		$("input[name=cName]").val($(element).find("input[name=conName]").val());
+		$("input[name=cPhone]").val($(element).find("input[name=conPhone]").val());
+		$("input[name=cAddress]").val($(element).find("td[name=conAddress]").html());
+		$("input[name=cZipCode]").val($(element).find("input[name=conZipCode]").val());
+		$("input[name=cCardId]").val($(element).find("input[name=conCardId]").val());
+		$("input[name=cIdCardPic]").val($(element).find("input[name=conCardUrl]").val());
+		$("input[name=cIdCardOtherPic]").val($(element).find("input[name=conCardUrlOther]").val());
+		$("input[name=cIdCardTogetherPic]").val($(element).find("input[name=conCardUrlTogether]").val());
+		$("#idCardImg").attr("src", "../"+$(element).find("input[name=conCardUrl]").val());
+		$("#idCardOtherImg").attr("src", "../"+$(element).find("input[name=conCardUrlOther]").val());
+	}
+	function loadGlobalArgs(){
+		$.ajax({
+   			type: "get",
+   			url: "../globalargs/getcontents",
+   			data : {"flags" : "cur_usa_cn"},
+   			success: function(response){
+   				if("200" == response.code){
+   					$("#globalUsd2Rmb").val(response.data);
+   					$("#currencySelect").val("RMB");
+					changeCurrency("RMB");
+   				}
+   			}
+		});
+    }
+	function changeCurrency(currency){
+		var priceOriginal = $("#priceHidden").val();
+		var currencyOriginal = $("#currencyHidden").val();
+		var rate = 1;
+		if(currency!=currencyOriginal){
+			if("RMB" == currency){
+				if("USD"==currencyOriginal){
+					rate = $("#globalUsd2Rmb").val();
+				}
+			}
+			if("USD" == currency){
+				if("RMB"==currencyOriginal){
+					rate = 1/($("#globalUsd2Rmb").val());
+				}
+			}
+		}
+		if(priceOriginal == -999999){
+			$("#priceLabel").html("未检测到价格");
+		}else{
+			$("#priceLabel").html((priceOriginal * rate).toFixed(2));
+		}
+	}
+</script>
+</html>

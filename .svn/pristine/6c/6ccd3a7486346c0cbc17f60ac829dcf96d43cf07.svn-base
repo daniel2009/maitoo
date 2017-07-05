@@ -1,0 +1,425 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head></head>
+
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">上门取件</p>
+		<div style="width: 100%; overflow: hidden; text-overflow: clip;">
+			<section id="containerSection" style="width: 200%; display: flex; transition: all 0.5s ease-in-out;">
+				<section id="addSection" style="width: 50%;">
+					<div class="jqmDialog jqmdWide"></div>
+					<div class="hint">请填写寄件人信息</div>
+					<form id="form">
+						<input type="hidden" id="id" >
+						<table class="userTable">
+							<tr>
+								<th><span class="red">*</span>寄件人：</th>
+								<td><input type="text" size="30" id="sName" name="sName"/></td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>预约时间：</th>
+								<td><input type="datetime-local" id="appointmentDate" name="appointmentDate" required></td>
+							</tr>
+							<tr id="warehouseTr">
+								<th><span class="red">*</span>上门门店：</th>
+								<td><select id="warehouseSelect" name="warehouseId" onchange="javascript: changeWarehouseSelect();"></select></td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>寄件人国家、州、市：</th>
+								<td><label id="warehouseCountry" style="display: inline-block; min-width: 150px; display:none;"></label><label id="warehouseProvince" style="display:none;"></label>
+								<input type="text"  id="swarehouseCountry" name="swarehouseCountry" readonly="readonly"/>
+								<input type="text"  id="swarehouseProvince" name="swarehouseProvince" readonly="readonly"/>
+								<select id="warehouseCallOrderCity" name="sCity"></select></td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>寄件详细地址：</th>
+								<td><input type="text" size="30" id="sStreetAddress" name="sStreetAddress" /></td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>寄件人邮编：</th>
+								<td><input type="text" size="30" id="sZipCode" name="sZipCode"/>
+								</td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>寄件人手机：</th>
+								<td><input type="text" size="30" id="sPhone" name="sPhone" />
+								</td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>包裹个数：</th>
+								<td><input type="text" id="quantity" name="quantity" value="1" size="30"
+									style="width:100px;" />
+								</td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>货物大概重量(磅)：</th>
+								<td><input type="text" id="weight" name="weight" value="1.0" size="30"
+									style="width:100px;" />
+								</td>
+							</tr>
+							<tr>
+								<th><span class="red">*</span>备注：</th>
+								<td><textarea rows="4"  class="text-input textarea wysiwyg" id="remark" name="remark" style="width:50%;" ></textarea></td>
+							</tr>
+						</table>
+					</form>
+					<div class="center">
+						<input type="button" id="submitButton" value="提交申请" class="button" onclick="savesmqj()" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline"/>
+					</div>
+				</section>
+				<section id="infoSection" style="width: 50%; ">
+					<div class="jqmDialog jqmdWide"></div>
+					<table class="userTable">
+						<tr>
+							<th><span class="red">*</span>寄件人：</th>
+							<td><label id="sNameInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>预约时间：</th>
+							<td><label id="appointmentDateInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>上门门店：</th>
+							<td><label id="warehouseNameInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>寄件人国家、州：</th>
+							<td><label id="sProviceInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>寄件详细地址：</th>
+							<td><label id="sStreetAddressInfo" ></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>寄件人邮编：</th>
+							<td><label id="sZipCodeInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>寄件人手机：</th>
+							<td><label id="sPhoneInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>包裹个数：</th>
+							<td><label id="quantityInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>货物大概重量(磅)：</th>
+							<td><label id="weightInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>备注：</th>
+							<td><label id="remarkInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>创建日期：</th>
+							<td><label id="createDateInfo"></label></td>
+						</tr>
+						<tr>
+							<th><span class="red">*</span>确认时间：</th>
+							<td><label id="confirmDateInfo" style="color: #f00;"></label></td>
+						</tr>
+					</table>
+					<div class="center">
+						<input type="button" value="关闭" class="combtn" onclick="javascript: document.getElementById('containerSection').style.marginLeft = '0';"/>
+					</div>
+				</section>
+			</section>
+		</div>
+		
+		
+	</div>
+	
+	
+	
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">上门取件管理</p>
+		<div class="box_content">
+			<div class="content_title">预报记录</div>
+				<div class="content_text">
+					<div class="tab_box" >
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">门店</th>
+									<th scope="col">预约时间</th>
+									<th scope="col">确认时间</th>
+									<th scope="col">状态</th>
+									<th scope="col">寄件人</th>
+									<th scope="col">包裹数量</th>
+									<th scope="col">备注</th>
+									<th scope="col">操作</th>
+								</tr>
+							</thead>
+							<tbody id="tbody"></tbody>
+							<tfoot>
+								<tr>
+									<td id="pagination" colspan="7" style="text-align: right;">共<label id="trsize">0</label>条
+										<a id="first_page" href="1" name="to_page">首页</a> |
+										<a id="pre_page" name="to_page">上一页</a> |
+										<input type="number" class="bor" style="width: 50px;" min="0" step="1" /> / <label id="tpsize">0</label>|
+										<a id="next_page" name="to_page">下一页</a> |
+										<a id="last_page" name="to_page">未页</a>&nbsp;&nbsp;
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		<div class="blank10"></div>
+	</div>
+</body>
+<script>
+$("#main-content").ready(function(){
+	loadList(new FormData());
+	$("#pagination a[name='to_page']").click(function() {
+		// 跳页
+		var pn = $(this).attr("href");
+		var formData = new FormData();
+		formData.append("pageIndex", pn);
+		loadReturnPackageList(formData);
+		return false;
+	});
+
+	$("#pagination input").keydown(function(event) {
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				var formData = new FormData();
+				formData.append("pageIndex", pn);
+				loadList(formData);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});
+});
+function loadList(formData){
+	$.ajax({
+		type : "get",
+		url : "../user/callOrder/all",
+		data : formData,
+		processData : false,
+		contentType : false,
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data == null) {
+					showList(null);
+					showPage(null);
+				} else {
+					showList(response.data.datas);
+					showPage(response.data);
+				}
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				//alert("获取列表失败");//，原因是" + response.data.message);
+			}
+			return false;
+		}
+	});
+}
+
+function showList(list) {
+	var string = "";
+	$("#tbody").html(string);
+	if (list != null) {
+		$.each(list, function() {
+			string += "<tr>";
+			string += "<td>" + this.warehouseName + "</td>";
+			string += "<td>" + transformInputDatetimeLocal(this.appointmentDate) + "</td>";
+			string += "<td>" + transformInputDatetimeLocal(this.confirmDate) + "</td>";
+			var state = "未处理";
+			if(state==1){
+				state = "已处理";
+			}else if(state==2){
+				state = "有问题";
+			}
+			string += "<td>" + state + "</td>";
+			string += "<td>" + this.sName + "</td>";
+			string += "<td>" + this.quantity + "</td>";
+			string += "<td>" + this.remark + "</td>";
+			if(this.state=="2"){
+				string += "<td><a href='#' onclick='javascript: callOrderModify("+this.id+");'>修改</a>|<a href='#' onclick='javascript: cancelCallOrder("+this.id+");'>取消</a></td>";
+			}else if(this.state=="1"){
+				string += "<td><a href='#' onclick='javascript: callOrderInfo("+this.id+");'>详情</a></td>";
+			}else{
+				string += "<td><a href='#' onclick='javascript: callOrderInfo("+this.id+");'>详情</a>|<a href='#' onclick='javascript: cancelCallOrder("+this.id+");'>取消</a></td>";
+			}
+			string += "</tr>";
+		});
+	} else {
+		if (string == null || string == '') {
+			string = "<tr><td style='text-align: left;' colspan='5'><span>&nbsp;&nbsp;对不起，没有找到对应的信息!</span></td></tr>";
+		}
+	}
+	$("#tbody").html(string);
+}
+
+function showPage(pageSplit) {
+	var rowCount = 0;
+	var pageNow = 0;
+	var pageCount = 0;
+	if (pageSplit != null) {
+		rowCount = pageSplit.rowCount;
+		pageNow = pageSplit.pageNow;
+		pageCount = pageSplit.pageCount;
+	}
+
+	$("#trsize").html(rowCount);
+	$("#tpsize").html(pageCount);
+	$("#first_page").attr("href","1");
+	$("#pre_page").attr("href", pageNow - 1);
+	$("#next_page").attr("href",pageNow + 1);
+	$("#last_page").attr("href", pageCount);
+}
+function callOrderInfo(id){
+	document.getElementById("containerSection").style.marginLeft = "-100%";
+	$.ajax({
+		type : "get",
+		url : "../user/callOrder/findById",
+		data : {
+			id : id
+		},
+		success : function(response) {
+			var code = response.code;
+			var data = response.data;
+			if (code == "200") {
+				$("#sNameInfo").html(data.sName);
+				$("#appointmentDateInfo").html(transformInputDatetimeLocal(data.appointmentDate));
+				$("#warehouseNameInfo").html(data.warehouseName);
+				$("#sProviceInfo").html(data.sProvince + data.sCity);
+				$("#sStreetAddressInfo").html(data.sStreetAddress);
+				$("#sZipCodeInfo").html(data.sZipCode);
+				$("#sPhoneInfo").html(data.sPhone);
+				$("#quantityInfo").html(data.quantity);
+				$("#weightInfo").html(data.weight);
+				$("#remarkInfo").html(data.remark);
+				$("#createDateInfo").html(data.createDate);
+				$("#confirmDateInfo").html(transformInputDatetimeLocal(data.confirmDate));
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+function cancelCallOrder(id){
+	if (confirm("确认取消预约?")) {
+		$.ajax({
+			type : "post",
+			url : "../user/callOrder/cancel",
+			data : {
+				id : id
+			},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					alert("取消成功");
+					nav24Click();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("删除信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	return false;
+}
+function changeWarehouseSelect(){
+	var option = $("#warehouseSelect option:selected"); 
+	 $("#warehouseCountry").html(option.attr("country"));
+	 $("#warehouseProvince").html(option.attr("province"));
+	 
+	 $("#swarehouseCountry").val(option.attr("country"));
+	 $("#swarehouseProvince").val(option.attr("province"));
+
+	 
+	 
+	 
+	 var addOption = "<option>";
+	 if(option.attr("callOrderCity").replace(/\s+/g, "")!=""){
+		 addOption += option.attr("callOrderCity").replace(/[\n\r]+/g, "</option><option>");
+	 }
+	 addOption += "</option>";
+	 var regExp = new RegExp("(<option></option>)+");
+	 addOption = addOption.replace(regExp, "");
+	 $("#warehouseCallOrderCity").html(addOption);
+}
+function callOrderModify(id){
+	$("#id").val(id);
+	document.getElementById("containerSection").style.marginLeft = "0";
+	$.ajax({
+		type : "get",
+		url : "../user/callOrder/findById",
+		data : {
+			id : id
+		},
+		success : function(response) {
+			var code = response.code;
+			var data = response.data;
+			if (code == "200") {
+
+				$("#sName").val(data.sName);
+				$("#appointmentDate").val(data.appointmentDate);
+				$("#warehouseName").val(data.warehouseName);
+				$("#sProvice").val(data.sProvince);
+				$("#sStreetAddress").val(data.sStreetAddress);
+				$("#sZipCode").val(data.sZipCode);
+				$("#sPhone").val(data.sPhone);
+				$("#quantity").val(data.quantity);
+				$("#weight").val(data.weight);
+				$("#remark").val(data.remark);
+				$("#createDate").val(data.createDate);
+				$("#submitButton").val("修改");
+				document.getElementById("submitButton").onclick=function(){submitCallOrderModify();};
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+function submitCallOrderModify(){
+	var formData = new FormData(document.getElementById("form"));
+	formData.append("id", $("#id").val());
+	$.ajax({
+		type : "post",
+		url : "../user/callOrder/modify",
+		data :  formData,
+		processData : false,
+		contentType : false,
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+				alert("修改成功");
+				nav24Click();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("更新失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+</script>
+</html>
+
+

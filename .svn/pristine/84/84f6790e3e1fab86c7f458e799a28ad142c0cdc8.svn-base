@@ -1,0 +1,5812 @@
+package com.weiye.service.impl;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
+import jxl.common.Logger;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.kuaidi.KuaiDi100;
+import com.weiye.common.kuaidi.KuaiDiUtil;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.MD5Util;
+import com.weiye.common.util.OrderUtil;
+import com.weiye.common.util.PageSplitUtil;
+import com.weiye.common.util.PaymentUtil;
+import com.weiye.common.util.PropertiesReader;
+import com.weiye.common.util.StoragePositionUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.TranshipmentUtil;
+import com.weiye.common.util.sms.SmsSendUtil;
+import com.weiye.dao.AccountDao;
+import com.weiye.dao.AccountDetailDao;
+import com.weiye.dao.ChannelDao;
+import com.weiye.dao.CommodityDao;
+import com.weiye.dao.ConsigneeInfoDao;
+import com.weiye.dao.FlyInfoDao;
+import com.weiye.dao.OrderDao;
+import com.weiye.dao.OrderDetailDao;
+import com.weiye.dao.OrderMidfixDao;
+import com.weiye.dao.RouteDao;
+import com.weiye.dao.SendUserDao;
+import com.weiye.dao.TranshipmentBillDao;
+import com.weiye.dao.TranshipmentCommodityDao;
+import com.weiye.dao.TranshipmentRouteDao;
+import com.weiye.dao.UserDao;
+import com.weiye.dao.WarehouseDao;
+import com.weiye.dao.globalargsDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Account;
+import com.weiye.model.AccountDetail;
+import com.weiye.model.Channel;
+import com.weiye.model.Commodity;
+import com.weiye.model.ConsigneeInfo;
+import com.weiye.model.FlyInfo;
+import com.weiye.model.Order;
+import com.weiye.model.OrderDetail;
+import com.weiye.model.OrderMidfix;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.ReturnPackage;
+import com.weiye.model.Route;
+import com.weiye.model.SendUser;
+import com.weiye.model.StoragePosition;
+import com.weiye.model.SumCommodity;
+import com.weiye.model.TranshipmentBill;
+import com.weiye.model.TranshipmentCommodity;
+import com.weiye.model.TranshipmentRoute;
+import com.weiye.model.User;
+import com.weiye.model.Warehouse;
+import com.weiye.model.WayBill;
+import com.weiye.model.temp.ExportOrder;
+import com.weiye.model.temp.ImportOrder;
+import com.weiye.model.temp.ImportthirdOrder;
+import com.weiye.service.AutoSendService;
+import com.weiye.service.OrderService;
+import com.weiye.service.StoragePositionService;
+import com.weiye.service.StorageService;
+
+@Service("orderService")
+public class OrderServiceImpl_bak extends BasicService implements OrderService {
+	private static final Logger log = Logger.getLogger(OrderServiceImpl_bak.class);
+	@Autowired
+	private OrderDao orderDao;
+	@Autowired
+	private OrderDetailDao orderDetailDao;
+	@Autowired
+	private TranshipmentBillDao transhipmentBillDao;
+	@Autowired
+	private TranshipmentCommodityDao transhipmentCommodityDao;
+	@Autowired
+	private ConsigneeInfoDao consigneeInfoDao;
+	@Autowired
+	private RouteDao routeDao;
+	@Autowired
+	private AccountDao accountDao;
+	@Autowired
+	private AccountDetailDao accountDetailDao;
+	@Autowired
+	private UserDao userDao;
+	@Autowired
+	private CommodityDao commodityDao;
+	
+	@Resource(name = "storagePositionService")
+	private StoragePositionService storagePositionService;
+	@Resource(name = "autoSendService")
+	private AutoSendService autoSendService;
+
+	@Autowired
+	private OrderMidfixDao orderMidfixDao;
+	@Autowired
+	private WarehouseDao warehouseDao;
+
+	@Autowired
+	private ChannelDao channelDao;
+	@Autowired
+	private globalargsDao globalargsDao;
+
+	@Autowired
+	private FlyInfoDao flyinfoDao;
+	
+	@Autowired
+	private TranshipmentRouteDao transhipmentRouteDao;
+	
+	@Autowired
+	private SendUserDao sendUserDao;
+
+	public ResponseObject<List<String>> addOrdersOfWayBill(WayBill wayBill)
+			throws ServiceException {
+		if (wayBill == null || wayBill.getOrders() == null
+				|| wayBill.getOrders().isEmpty()) {
+			return new ResponseObject<List<String>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (Constant.ORDER_SUBMIT_TYPE_MUBOX.equals(wayBill.getType())) {
+			// 是合箱子操作
+			return this.muboxSubmit(wayBill);
+		} else if (Constant.ORDER_SUBMIT_TYPE_PREUNBOX
+				.equals(wayBill.getType())) {
+			// 预约拆箱
+			return this.preunboxSubmit(wayBill);
+		} else {
+			return new ResponseObject<List<String>>(
+					ResponseCode.ORDER_INSERT_ERROR, "预拆箱参数为:type="
+							+ Constant.ORDER_SUBMIT_TYPE_PREUNBOX
+							+ ", 合箱参数为:type="
+							+ Constant.ORDER_SUBMIT_TYPE_MUBOX + ",不支持其他参数！");
+		}
+	}
+
+	public ResponseObject<Object> checkOrderNumberOfTranshipments(
+			WayBill wayBill) throws ServiceException {
+		if (wayBill == null || wayBill.getOrders() == null
+				|| wayBill.getOrders().isEmpty()) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+		if (Constant.ORDER_SUBMIT_TYPE_PREUNBOX.equals(wayBill.getType())) {
+			// 只有在预拆箱操作下，才会计算商品数量是否一致
+			try {
+				List<Order> orders = wayBill.getOrders();
+				Set<String> tidSet = new HashSet<String>();
+				Map<String, Integer> tcQuantity = new HashMap<String, Integer>();
+				Map<String, Integer> ocQuantity = new HashMap<String, Integer>();
+
+				for (Order order : orders) {
+					List<OrderDetail> details = Arrays.asList(order
+							.getDetails());
+					for (OrderDetail detail : details) {
+						tidSet.add(detail.getTranshipmentId());
+						String cid = detail.getCommodityId();
+						int quantity = StringUtil.string2Integer(detail
+								.getQuantity());
+						if (ocQuantity.containsKey(cid)) {
+							quantity += ocQuantity.get(cid);
+						}
+						ocQuantity.put(cid, quantity);
+					}
+				}
+
+				for (String id : tidSet) {
+					List<TranshipmentCommodity> tcs = this.transhipmentCommodityDao
+							.getById(id);
+					for (TranshipmentCommodity tc : tcs) {
+						String cid = tc.getCommodityId();
+						int quantity = StringUtil.string2Integer(tc
+								.getQuantity());
+						if (tcQuantity.containsKey(cid)) {
+							quantity += tcQuantity.get(cid);
+						}
+						tcQuantity.put(cid, quantity);
+					}
+				}
+
+				if (tcQuantity.size() != ocQuantity.size()) {
+					return new ResponseObject<Object>(
+							ResponseCode.ORDER_NUMBER_ERROR,
+							"转运单商品数量和运单商品数量不一致");
+				}
+
+				for (Map.Entry<String, Integer> entry : tcQuantity.entrySet()) {
+					if (entry.getValue() != ocQuantity.get(entry.getKey())) {
+						// 数据不对
+						return new ResponseObject<Object>(
+								ResponseCode.ORDER_NUMBER_ERROR,
+								"转运单商品数量和运单商品数量不一致");
+					}
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+	}
+
+	private ResponseObject<List<String>> preunboxSubmit(WayBill wayBill)
+			throws ServiceException {
+		try {
+
+			String userId = wayBill.getUserId();
+			List<String> orderIds = new ArrayList<String>();
+			List<Order> orders = wayBill.getOrders();
+			Map<String, ConsigneeInfo> cInfoMap = new HashMap<String, ConsigneeInfo>();
+
+			for (Order order : orders) {
+				// 设置收货地址
+				String consigneeId = order.getConsigneeId();
+				if (!StringUtil.isEmpty(consigneeId)) {
+					ConsigneeInfo cInfo = cInfoMap.get(consigneeId);
+					if (cInfo == null) {
+						cInfo = this.consigneeInfoDao
+								.retrieveConsigneeInfoById(consigneeId, userId);
+						cInfoMap.put(consigneeId, cInfo);
+					}
+					if (cInfo != null) {
+						// 设置运单的收件地址
+						OrderUtil.setOrderConsignee(order, cInfo);
+					}
+				}
+
+				order.setState(Constant.ORDER_STATE1);
+				order.setType(wayBill.getOrderType());
+				String date = DateUtil.date2String(new Date());
+				order.setCreateDate(date);
+				order.setModifyDate(date);
+				order.setUserId(wayBill.getUserId());
+				order.setPremium(StringUtil.isEmpty(order.getPremium()) ? "0"
+						: order.getPremium());
+				
+				order.setTypeKey(Constant.ORDER_TYPE_KEY_2);//设置为转运类型
+
+				int i = this.orderDao.insertOrder(order);
+				// String orderId = OrderUtil.createOrderId(order.getId(),
+				// Constant.ORDER_ID_PREFIX_WEB);
+				//String orderId = createOrderId(order.getId());
+				String orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+
+				orderIds.add(orderId);
+				if (i > 0) {
+					// 修改运单id
+					this.orderDao.modifyOrderId(order.getId(), orderId);
+					// 插入成功，继续插入对应的运单详情
+					List<OrderDetail> details = Arrays.asList(order
+							.getDetails());
+					int count = 0;
+					for (OrderDetail detail : details) {
+						detail.setOrderId(orderId);
+						count++;
+					}
+					int j = this.orderDetailDao.insertOrderDetail(details);
+					if (count == 0 || j != count) {
+						// 进行事务回滚
+						throw new Exception();
+					}
+
+					// 不进行对应的运单状态的修改
+				} else {
+					// 插入运单失败, 进行事务回滚
+					throw new Exception();
+				}
+
+				// 插入完成后，新建一个Route并插入到数据库中
+				Route route = new Route();
+				route.setOrderId(orderId);
+				route.setName(wayBill.getName());
+				route.setDate(date);
+				route.setState(Constant.ORDER_ROUTE_STATE1);
+				route.setRemark("预报运单拆包，运单生成");
+				this.routeDao.insertRoute(route);
+			}
+
+			ResponseObject<List<String>> responseObj = new ResponseObject<List<String>>(
+					ResponseCode.SUCCESS_CODE);
+			responseObj.setData(orderIds);
+			return responseObj;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	private static String prefix = "WY";
+	private static String lastfix = "US";
+	private String midfixUse = "0";
+	private boolean ini = false;
+
+	private void readConfig() {
+		if (!ini) {
+			Properties prop = PropertiesReader
+					.read(Constant.SYSTEM_PROPERTIES_FILE);
+			midfixUse = prop.getProperty("order.midfix.use");
+			prefix = prop.getProperty("order.prefix");
+			lastfix = prop.getProperty("order.lastfix");
+			ini = true;
+		}
+	}
+
+	private String createOrderId(String id) throws ServiceException {
+		readConfig();
+
+		if (midfixUse == "1" || midfixUse.equals("1")) {
+			OrderMidfix orderMidfix = new OrderMidfix();
+			try {
+				StringBuffer sb = new StringBuffer(10);
+				orderMidfix = this.orderMidfixDao.findOrderMidfixByState("0");
+				orderMidfix.setState("1");
+				this.orderMidfixDao.updateOrderMidfix(orderMidfix);
+				sb.append(prefix);
+				sb.append(orderMidfix.getOrderMidfix());
+				sb.append(lastfix);
+				return sb.toString();
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("运单号创建异常，请重试", e);
+			}
+
+		} else {
+			return OrderUtil.createOrderId(id, "");
+		}
+
+	}
+	//读取全局变量的参数
+	//id-----运单id号
+	//widid--门店id
+	//运单类型标识符
+	private String createOrderIdarg(String id,String widid,String type_no) throws ServiceException {
+		
+			try {
+				
+				String prefix=this.globalargsDao.getcontentbyflag("print_order_first_2code");//获取首两字母
+				
+				int numbercount=Integer.parseInt(this.globalargsDao.getcontentbyflag("print_order_mid_num"));//获取转运单中间数字的个数
+				if(numbercount<5||numbercount>30){
+					numbercount = 8;
+				}
+				
+				
+				
+				
+				StringBuffer sb = new StringBuffer((5+numbercount));//
+				String widflag="";
+				Warehouse house=this.warehouseDao.getById(widid);
+				if(house!=null)
+				{
+				
+					widflag=house.getPrintWidCode();//仓库标识
+				}
+				if(StringUtil.isEmpty(prefix))
+				{
+					prefix="00";
+				}
+				else if(prefix.length()==1)
+				{
+					prefix=prefix+"0";
+				}
+				else if(prefix.length()>2)
+				{
+					prefix.substring(0,2);//获取首两个字符
+				}
+					
+				
+				if(StringUtil.isEmpty(widflag))
+				{
+					widflag="00";
+				}
+				else if(widflag.length()==1)
+				{
+					widflag=widflag+"0";
+				}
+				else if(widflag.length()>2)
+				{
+					widflag.substring(0,2);//获取首两个字符
+				}
+				
+				sb.append(prefix);
+				
+				// 添加前缀和时间缩写
+				sb.append(DateUtil.date2String(new Date(), "yy"));
+				// 添加递增数字，4位
+				sb.append(StringUtil.getTruncationString(id, numbercount-3));
+				// 添加随机数字，1位
+				sb.append(StringUtil.generateRandomInteger(1));
+				
+				sb.append(widflag);
+				
+				if(Constant.ORDER_TYPE_KEY_1.equalsIgnoreCase(type_no))//门市
+				{
+					sb.append("A");
+				}
+				else if(Constant.ORDER_TYPE_KEY_2.equalsIgnoreCase(type_no))//转运运单
+				{
+					sb.append("B");
+				}
+				else if(Constant.ORDER_TYPE_KEY_3.equalsIgnoreCase(type_no))//网上置单
+				{
+					sb.append("C");
+				}
+				else if(Constant.ORDER_TYPE_KEY_4.equalsIgnoreCase(type_no))//第三方运单
+				{
+					sb.append("D");
+				}
+				else if(Constant.ORDER_TYPE_KEY_5.equalsIgnoreCase(type_no))//上门收货
+				{
+					sb.append("E");
+				}
+				else if(Constant.ORDER_TYPE_KEY_6.equalsIgnoreCase(type_no))//手写单，空运单
+				{
+					sb.append("F");
+				}
+				else if(Constant.ORDER_TYPE_KEY_7.equalsIgnoreCase(type_no))//批量生成门市运单
+				{
+					sb.append("G");
+				}
+				else 
+				{
+					sb.append("Z");
+				}
+				
+		
+				return sb.toString().toUpperCase();//一定要大写，否则条形码可能显示不出来
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("运单号创建异常，请重试", e);
+			}
+
+	
+
+	}
+	// 合并箱子操作
+	private ResponseObject<List<String>> muboxSubmit(WayBill wayBill)
+			throws ServiceException {
+		try {
+			String userId = wayBill.getUserId();
+			List<String> orderIds = new ArrayList<String>();
+			List<Order> orders = wayBill.getOrders();
+			if (orders == null || orders.size() != 1) {
+				return new ResponseObject<List<String>>(
+						ResponseCode.PARAMETER_ERROR, "进行合箱操作时候，只能有一个运单");
+			}
+
+			for (Order order : orders) {
+				List<OrderDetail> details = new ArrayList<OrderDetail>();
+
+				// 设置收货地址
+				String consigneeId = order.getConsigneeId();
+				if (!StringUtil.isEmpty(consigneeId)) {
+					ConsigneeInfo cInfo = this.consigneeInfoDao
+							.retrieveConsigneeInfoById(consigneeId, userId);
+
+					if (cInfo != null) {
+						// 设置运单的收件地址
+						OrderUtil.setOrderConsignee(order, cInfo);
+					}
+				}
+
+				order.setState(Constant.ORDER_STATE2);
+				order.setType(wayBill.getOrderType());
+				String date = DateUtil.date2String(new Date());
+				order.setCreateDate(date);
+				order.setModifyDate(date);
+				order.setUserId(wayBill.getUserId());
+				List<String> tids = new ArrayList<String>();
+
+				if (order.getTranshipmentIds() != null
+						&& order.getTranshipmentIds().size() > 0) {
+					for (String str : order.getTranshipmentIds()) {
+						tids.add(str);
+
+					}
+				}
+				if (order.getDetails() != null && order.getDetails().length > 0) {
+					for (OrderDetail detail : order.getDetails()) {
+						tids.add(detail.getTranshipmentId());
+					}
+				}
+
+				List<TranshipmentBill> bills = this.transhipmentBillDao
+						.getByIds(order.getUserId(), tids);
+				double weight = 0;
+				double tariff = 0;
+				double or = 0;
+				double other = 0;
+				String warehouseId = "4";
+				String channelId = null;
+				double length = 0;
+				double width = 0;
+				double height = 0;
+				for (TranshipmentBill bill : bills) {
+					weight += StringUtil.string2Double(bill.getWeight());
+					tariff += StringUtil.string2Double(bill.getTariff());
+					or += StringUtil.string2Double(bill.getOr());
+					other += StringUtil.string2Double(bill.getOther());
+					warehouseId = bill.getWarehouseId();
+					channelId = bill.getChannelId();
+					length += StringUtil.string2Double(bill.getLength());
+					width += StringUtil.string2Double(bill.getWidth());
+					height += StringUtil.string2Double(bill.getHeight());
+
+				}
+				order.setPremium(StringUtil.isEmpty(order.getPremium()) ? "0"
+						: order.getPremium());
+				order.setWeight(String.valueOf(weight));
+				order.setTariff(String.valueOf(tariff));
+				order.setOr(String.valueOf(or));
+				order.setOther(String.valueOf(other));
+				order.setWarehouseId(warehouseId);
+				order.setStoreId(warehouseId);
+				order.setChannelId(channelId);
+				order.setLength(String.valueOf(length));
+				order.setWidth(String.valueOf(width));
+				order.setHeight(String.valueOf(height));
+				
+				order.setTypeKey(Constant.ORDER_TYPE_KEY_2);//设置为转运类型
+
+				int i = this.orderDao.insertOrder(order);
+				// String orderId = OrderUtil.createOrderId(order.getId(),
+				// Constant.ORDER_ID_PREFIX_WEB);
+				//String orderId = createOrderId(order.getId());
+				String orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+				orderIds.add(orderId);
+				if (i > 0) {
+					// 修改运单id
+					this.orderDao.modifyOrderId(order.getId(), orderId);
+
+					// 插入成功，继续插入对应的运单详情
+					Set<String> sets = new HashSet<String>();
+					sets.addAll(tids);
+					int count = 0;
+					// List<String> commodityId = new ArrayList<String>();
+					for (String id : sets) {
+						List<TranshipmentCommodity> tcs = this.transhipmentCommodityDao
+								.getById(id);
+						if (tcs != null) {
+							for (TranshipmentCommodity tc : tcs) {
+								OrderDetail od = new OrderDetail();
+								od.setCommodityId(tc.getCommodityId());
+								od.setOrderId(orderId);
+								od.setQuantity(tc.getQuantity());
+								od.setTranshipmentId(id);
+								od.setXiangqing(tc.getXiangqing());
+								od.setSjweight(tc.getSjweight());
+								// od.setJfweight(tc.getJfweight());
+								details.add(od);
+								count++;
+								// commodityId.add(tc.getCommodityId());
+							}
+						}
+					}
+					// update by chenkanghua
+					final int size = details.size();
+					OrderDetail[] arr = (OrderDetail[]) details
+							.toArray(new OrderDetail[size]);
+					order.setDetails(arr);
+					String totalMoney = String.valueOf(this
+							.calculationOrderFreight(/* commodityId, */order,
+									wayBill.getUserType()));
+					this.orderDao.modifyTotalMoneyByOrderId(order.getId(),
+							totalMoney);
+					int j = this.orderDetailDao.insertOrderDetail(details);
+					if (count == 0 || j != count) {
+						// 进行事务回滚
+						throw new Exception();
+					}
+
+					// 插入运单详情成功，继续操作，修改转运的的状态
+					if (this.transhipmentBillDao.updateTranshipmentBillState(
+							Constant.TRANSHIPMENT_STATE4,
+							new ArrayList<String>(sets)) != sets.size()) {
+						// 更新失败，进行回滚操作
+						throw new Exception();
+					}
+				} else {
+					// 插入运单失败, 进行事务回滚
+					throw new Exception();
+				}
+
+				// 插入完成后，新建一个Route并插入到数据库中
+				Route route = new Route();
+				route.setOrderId(orderId);
+				route.setName(wayBill.getName());
+				route.setDate(date);
+				route.setState(Constant.ORDER_ROUTE_STATE2);
+				route.setAddress("仓库");
+				route.setRemark("运单的生成");
+				this.routeDao.insertRoute(route);
+			}
+
+			ResponseObject<List<String>> responseObj = new ResponseObject<List<String>>(
+					ResponseCode.SUCCESS_CODE);
+			responseObj.setData(orderIds);
+			return responseObj;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Map<String, List<Route>>> getRouteListByGuestOrderId(
+			List<String> ids) throws ServiceException {
+		if (ids == null || ids.isEmpty()) {
+			return new ResponseObject<Map<String, List<Route>>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			ResponseObject<Map<String, List<Route>>> responseObject = new ResponseObject<Map<String, List<Route>>>(
+					ResponseCode.SUCCESS_CODE);
+			Map<String, List<Route>> result = new HashMap<String, List<Route>>();
+			List<Order> orders = this.orderDao.getOrderByOrderIds(ids);
+
+			if (orders != null) {
+				for (Order o : orders) {
+					if (o.getThirdNo() == null || o.getThirdNo().isEmpty()
+							|| o.getThirdPNS() == null
+							|| o.getThirdPNS().isEmpty()) {
+						// 非kuaidi100
+						List<Route> list = this.routeDao.getRouteByOrderId(o
+								.getOrderId());
+						result.put(o.getOrderId(), list);
+					} else {
+						// kuaidi100
+
+						KuaiDi100 kuaidi = new KuaiDi100();
+						String key=this.globalargsDao.getcontentbyflag("kuaidi100_key");
+						String content = kuaidi.SearchkuaiDiInfo(
+								o.getThirdPNS(), o.getThirdNo(),key);
+						log.info("快递公司：" + o.getThirdPNS() + "快递号："
+								+ o.getThirdNo() + "，返回结果：" + content);
+						JSONObject json = JSONObject.fromObject(content);
+
+						// 0：物流单暂无结果，
+						// 1：查询成功，
+						// 2：接口出现异常，
+						if (json.getString("status").equals("1")) {
+							JSONArray ja = json.getJSONArray("data");
+							List<Route> list = new ArrayList<Route>();
+							for (int i = 0; i < ja.size(); i++) {
+								JSONObject jo = (JSONObject) ja.get(i);
+								Route route = new Route();
+								route.setDate(jo.getString("time"));
+								route.setRemark(jo.getString("context"));
+								route.setState("");
+								route.setOrderId(o.getOrderId());
+								list.add(route);
+							}
+							result.put(o.getOrderId(), list);
+						} else if (json.getString("status").equals("0")) {
+							List<Route> list = new ArrayList<Route>();
+							Route route = new Route();
+							SimpleDateFormat df = new SimpleDateFormat(
+									"yyyy-MM-dd HH:mm:ss");// 设置日期格式
+							route.setDate(df.format(new Date()));
+							route.setRemark("");
+							route.setState("暂无第三方物流单结果");
+							route.setOrderId(o.getOrderId());
+							list.add(route);
+							result.put(o.getOrderId(), list);
+						} else if (json.getString("status").equals("2")) {
+							List<Route> list = new ArrayList<Route>();
+							Route route = new Route();
+							SimpleDateFormat df = new SimpleDateFormat(
+									"yyyy-MM-dd HH:mm:ss");// 设置日期格式
+							route.setDate(df.format(new Date()));
+							route.setRemark("第三方快递公司网络异常，请稍后查询.");
+							route.setState("第三方快递公司网络异常，请稍后查询.");
+							route.setOrderId(o.getOrderId());
+							list.add(route);
+							result.put(o.getOrderId(), list);
+						}
+						// return
+						// this.orderService.getRouteListByOrderId(Arrays.asList(orderIds));
+					}
+				}
+			}
+			responseObject.setData(result);
+			return responseObject;
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Map<String, List<Route>>> getRouteListByOrderId(
+			List<String> ids) throws ServiceException {
+		if (ids == null || ids.isEmpty()) {
+			return new ResponseObject<Map<String, List<Route>>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			ResponseObject<Map<String, List<Route>>> responseObject = new ResponseObject<Map<String, List<Route>>>(
+					ResponseCode.SUCCESS_CODE);
+			Map<String, List<Route>> result = new HashMap<String, List<Route>>();
+			for (String orderId : ids) {
+				List<Route> list = this.routeDao.getRouteByOrderId(orderId);
+				result.put(orderId, list);
+			}
+			responseObject.setData(result);
+			return responseObject;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<PageSplit<Order>> searchOrdersByUserId(String userId,
+			int pageSize, int pageNow) throws ServiceException {
+		try {
+			int rowCount = 0;
+			try {
+				rowCount = this.orderDao.countOfUserId(userId);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<Order> orders = this.orderDao.searchByUserId(userId,
+							startIndex, pageSize);
+					if (orders != null && !orders.isEmpty()) {
+						for (Order o : orders) {
+							pageSplit.addData(o);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<Object> checkNoSubmit(WayBill wayBill, String storeid)
+			throws ServiceException {
+		if (wayBill == null || wayBill.getOrders() == null
+				|| wayBill.getOrders().isEmpty()) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+		try {
+			Set<String> transhipIds = new HashSet<String>();
+			List<Order> orders = wayBill.getOrders();
+			// 获取转运单id的set集合
+			for (Order order : orders) {
+				order.setUserId(wayBill.getUserId());
+				List<String> slist = order.getTranshipmentIds();
+				if (slist != null && !slist.isEmpty()) {
+					transhipIds.addAll(slist);
+				}
+				List<OrderDetail> details = Arrays.asList(order.getDetails());
+				if (details != null && !details.isEmpty()) {
+					for (OrderDetail detail : details) {
+						transhipIds.add(detail.getTranshipmentId());
+					}
+				}
+			}
+
+			// 获取所有转运单对应的运单列表，如果返回的list不为空，就表示此次提交的数据中有转运单已经提交过了
+			List<Order> oldOrders = this.orderDao
+					.getByTranshipmentIds(new ArrayList<String>(transhipIds));
+			if (oldOrders != null && !oldOrders.isEmpty()) {
+				return new ResponseObject<Object>(
+						ResponseCode.ORDER_IS_SUBMITED, "该转运单已经被提交过，请联系客服");
+			}
+
+			// 所有的转运单都没有被提交过，则开始获取所有的转运单对象
+			List<TranshipmentBill> bills = this.transhipmentBillDao.getByIds(
+					wayBill.getUserId(), new ArrayList<String>(transhipIds));
+			if (bills != null && !bills.isEmpty()
+					&& bills.size() == transhipIds.size()) {
+				if (Constant.ORDER_SUBMIT_TYPE_MUBOX.equals(wayBill.getType())) {
+					// 合并箱子操作
+					for (TranshipmentBill bill : bills) {
+						// 合并箱子操作只能操作状态为1的箱子
+						if (Constant.TRANSHIPMENT_STATE4.equals(bill
+								.getState())) {
+							return new ResponseObject<Object>(
+									ResponseCode.ORDER_IS_SUBMITED,
+									"该转运单已经被提交过，请联系客服");
+						}
+						else if(StringUtil.isEmpty(bill.getState()))
+						{
+							return new ResponseObject<Object>(
+									ResponseCode.ORDER_IS_SUBMITED,
+									"获取状态出错");
+						}
+						else if(Constant.TRANSHIPMENT_STATE_9.equals(bill
+								.getState())||Constant.TRANSHIPMENT_STATE_8.equals(bill
+										.getState()))
+						{
+							return new ResponseObject<Object>(
+									ResponseCode.ORDER_IS_SUBMITED,
+									"当前状态不能生成运单!");
+						}
+						if(Double.parseDouble(bill.getTotalMoney())<=0)
+						{
+							return new ResponseObject<Object>(
+									ResponseCode.ORDER_IS_SUBMITED,
+									"总价钱必须大于0!");
+						}
+
+						if ((storeid != null)
+								&& (!storeid.equalsIgnoreCase(bill
+										.getWarehouseId()))) {
+							return new ResponseObject<Object>(
+									ResponseCode.ORDER_IS_SUBMITED,
+									"对不起，你不能生成其它门店或仓库的运单!");
+
+						}
+						
+						
+						if((wayBill.getTrantype()!=null)&&(wayBill.getTrantype().equalsIgnoreCase("3")))
+						{
+							if((bill.getSelfgetpackageFlag()==null)||(!bill.getSelfgetpackageFlag().equalsIgnoreCase("1")))
+							{
+								return new ResponseObject<Object>(
+										ResponseCode.PARAMETER_ERROR,
+										"参数错误，支付类型不是自提类型!");
+							}
+						}
+
+					}
+				} else {
+					// 预拆箱操作
+					if (bills.size() != 1) {
+						return new ResponseObject<Object>(
+								ResponseCode.PARAMETER_ERROR,
+								"参数错误，拆箱操作不能对多个转运单同时操作");
+					}
+
+					for (TranshipmentBill bill : bills) {
+						String state = bill.getState();
+						if (Constant.TRANSHIPMENT_STATE4.equals(state)) {
+							wayBill.setType(Constant.ORDER_SUBMIT_TYPE_PREUNBOX); // 只能进行预拆箱
+						} else {
+							return new ResponseObject<Object>(
+									ResponseCode.ORDER_IS_SUBMITED,
+									"该转运单已经被提交过，请联系客服");
+						}
+					}
+				}
+			} else {
+				return new ResponseObject<Object>(
+						ResponseCode.TRANSHIPMENT_ID_NOT_EXISTS, "转运单不存在");
+			}
+			return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<PageSplit<Order>> searchOrdersByKeys(String oid,
+			String userId, String key, String column, String sdate,
+			String edate, String state,String typekey, String storeid, int pageSize,
+			int pageNow) throws ServiceException {
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			if (!StringUtil.isEmpty(oid)) {
+				oid = StringUtil.escapeStringOfSearchKey(oid); // 如果不是用like，那么这句不要
+			}
+
+			int rowCount = 0;
+			try {
+				rowCount = this.orderDao.countOfSearchKeys(oid, key, column,
+						sdate, edate, userId, state,typekey, storeid);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<Order> orders = this.orderDao.searchByKeys(oid, key,
+							column, sdate, edate, userId, startIndex, pageSize,
+							state,typekey, storeid);
+					
+					for(Order o: orders)
+					{
+						if(!StringUtil.isEmpty(o.getUserId()))
+						{
+							o.setUser(this.userDao.getUserById(o.getUserId()));
+						}
+					}
+					pageSplit.setDatas(orders);
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<Object> deleteOrderByOrderIds(List<String> ids,
+			List<String> states) throws ServiceException {
+		if (ids == null || ids.isEmpty() || states == null || states.isEmpty()) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+		try {
+			// 删除运单
+			int i = this.orderDao.deleteByOrderIds(ids, states);
+			if (i == ids.size()) {
+				// 删除运单详情
+				this.orderDetailDao.deleteByOrderIds(ids);
+				// 删除了路由信息
+				this.routeDao.deleteRouteByOrderIds(ids);
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				// 进行事务回滚
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> deleteOrderOfUserByOrderId(String userId,
+			String id, List<String> states) throws ServiceException {
+		if (userId == null || userId.isEmpty()) {
+			return new ResponseObject<Object>(ResponseCode.NEED_LOGIN,
+					"登录已经失效，请重新登录");
+		}
+		if (id == null || id.isEmpty() || states == null || states.isEmpty()) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+		try {
+			Order order = this.orderDao.getByOrderId(id);
+
+			if (!order.getUserId().equals(userId)) {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"该运单不属于您，不能删除！");
+			}
+			// 删除运单
+			int i = this.orderDao.deleteByOrderIds(Arrays.asList(id), states);
+			if (i > 0) {
+				// 删除运单详情
+				this.orderDetailDao.deleteByOrderIds(Arrays.asList(id));
+				// 删除了路由信息
+				this.routeDao.deleteRouteByOrderIds(Arrays.asList(id));
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				// 进行事务回滚
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> modifyOrder(Order order, String empName,
+			String userType) throws ServiceException {
+		if (order == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+		try {
+			// 添加最后修改时间
+			String date = DateUtil.date2String(new Date());
+			order.setModifyDate(date);
+
+			// update by chenkanghua
+			/*
+			 * List<String> commodityId = new ArrayList<String>(); for
+			 * (OrderDetail od : order.getDetails()) {
+			 * commodityId.add(od.getCommodityId()); }
+			 */
+			// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+			// userType)));
+			// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+			// userType)));
+			if ((order.getType() != null)
+					&& (order.getType()
+							.equalsIgnoreCase(Constant.ORDER_TYPE_THIRD))) {
+			} else {
+				order.setTotalMoney(String.valueOf(this
+						.calculationOrderFreight(order, userType)));
+				order.setCommodityCost(String.valueOf(this
+						.calculationOrderCostFreight(order)));
+				order.setBaseMoney("0");
+			}
+			if((order.getBaseMoney()==null)||(order.getBaseMoney().equalsIgnoreCase("")))
+			{
+				order.setBaseMoney("0");
+			}
+
+			int i = this.orderDao.modifyOrder(order);
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			if (i > 0) {
+				if (order.getDetails() != null
+						&& order.getDetails().length != 0) {
+					// add by chenakanghua 运单id
+					for (OrderDetail od : order.getDetails()) {
+						if (Integer.valueOf(od.getQuantity()).intValue() > 0) {
+							od.setOrderId(order.getOrderId());
+							// od.setSjweight(order.getj);
+							// od.getJfweight();
+							list.add(od);
+						}
+					}
+					// 继续修改
+					i = this.orderDetailDao.deleteByOrderIds(Arrays
+							.asList(new String[] { order.getOrderId() }));
+					i = this.orderDetailDao.insertOrderDetail(list);
+				}
+			} else {
+				// 修改失败,进行事务回滚
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"数据库中没有对应id的运单数据");
+			}
+
+			// 进行路由的插入
+			// 插入完成后，新建一个Route并插入到数据库中
+			Route route = new Route();
+			route.setOrderId(order.getOrderId());
+			route.setName(empName);
+			route.setDate(date);
+			route.setState(OrderUtil.transformerState(0, order.getState()));
+			route.setAddress("仓库");
+			this.routeDao.insertRoute(route);
+			return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// kai 50150912 用于当修改网上置单时的修改方式
+	public ResponseObject<Object> modifyOrderonline(Order order,
+			String empName, String userType) throws ServiceException {
+		if (order == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+		try {
+			// 添加最后修改时间
+			String date = DateUtil.date2String(new Date());
+			order.setModifyDate(date);
+
+			// update by chenkanghua
+			/*
+			 * List<String> commodityId = new ArrayList<String>(); for
+			 * (OrderDetail od : order.getDetails()) {
+			 * commodityId.add(od.getCommodityId()); }
+			 */
+			// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+			// userType)));
+			// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+			// userType)));
+			order.setTotalMoney(String.valueOf(this.calculationOrderFreight(
+					order, userType)));
+			order.setCommodityCost(String.valueOf(this
+					.calculationOrderCostFreight(order)));
+			// kai 20150911-1 modify
+			int i;
+
+			i = this.orderDao.modifyOrderonlineadmin(order);
+
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			if (i > 0) {
+				if (order.getDetails() != null
+						&& order.getDetails().length != 0) {
+					// add by chenakanghua 运单id
+					for (OrderDetail od : order.getDetails()) {
+						if (Integer.valueOf(od.getQuantity()).intValue() > 0) {
+							od.setOrderId(order.getOrderId());
+							od.setTranshipmentId("-1");
+							// od.setSjweight(order.getj);
+							// od.getJfweight();
+							list.add(od);
+						}
+					}
+					// 继续修改
+					i = this.orderDetailDao.deleteByOrderIds(Arrays
+							.asList(new String[] { order.getOrderId() }));
+					i = this.orderDetailDao.insertOrderDetail(list);
+				}
+			} else {
+				// 修改失败,进行事务回滚
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"数据库中没有对应id的运单数据");
+			}
+
+			// 进行路由的插入
+			// 插入完成后，新建一个Route并插入到数据库中
+			Route route = new Route();
+			route.setOrderId(order.getOrderId());
+			route.setName(empName);
+			route.setDate(date);
+			route.setState(OrderUtil.transformerState(0, order.getState()));
+			route.setAddress("仓库");
+			this.routeDao.insertRoute(route);
+			return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> modifyEmptyOrder(String phone, Order order,
+			String empName/* ,String empStoreName */) throws ServiceException {
+		if (order == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+		String date = DateUtil.date2String(new Date());
+		String userType = Constant.USER_TYPE_STORE;
+		try {
+			User user = this.userDao.getUserByAccount(phone);
+			if (user != null) {
+				userType = user.getType();
+				order.setUserId(user.getId());
+			} else {
+				User u = new User();
+				//u.setPhone(phone);
+				u.setPhone(StringUtil.isEmpty(phone) ? null : phone);
+				u.setRealName(order.getUserName());
+				u.setType(Constant.USER_TYPE_STORE);
+				u.setRegType(Constant.USER_REG_TYPE_PHONE);//注册类型为手机
+				u.setPhoneState(Constant.USER_PHONE_STATE0);//表示无验证的电话
+				u.setEmailState(Constant.USER_EMAIL_STATE0);//邮箱状态为未验证
+				
+				String password = "111111";
+				
+				u.setPassword(MD5Util.encode(password));
+				int iresult = this.userDao.insertUser(u);
+				if (iresult > 0) {
+					// 创建一个账户
+					Account account = new Account();
+					account.setUserId(u.getId());
+					account.setRmb("0");
+					account.setUsd("0");
+					account.setModifyDate(date);
+					account.setCreateDate(date);
+					this.accountDao.insertOrUpdateAccount(account);
+					this.autoSendService.send(user, Constant.AUTO_SEND_NEW_USER_PASSWORD, password);
+					//SmsSendUtil.sendAdminAddUserMsg(password, u.getPhone());
+					order.setUserId(u.getId());
+				} else {
+					return new ResponseObject<Object>(
+							ResponseCode.SHOW_EXCEPTION, "插入用户失败");
+				}
+			}
+		} catch (Exception e) {
+			return new ResponseObject<Object>(ResponseCode.SHOW_EXCEPTION,
+					"查看用户失败");
+		}
+
+		try {
+
+			order.setModifyDate(date);
+			order.setTotalMoney(String.valueOf(this.calculationOrderFreight(
+					order, userType)));
+			order.setCommodityCost(String.valueOf(this
+					.calculationOrderCostFreight(order)));
+			int i = this.orderDao.modifyEmptyOrder(order);
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			if (i > 0) {
+				if (order.getDetails() != null
+						&& order.getDetails().length != 0) {
+					// add by chenakanghua 运单id
+					for (OrderDetail od : order.getDetails()) {
+						if (Integer.valueOf(od.getQuantity()).intValue() > 0) {
+							od.setOrderId(order.getOrderId());
+							list.add(od);
+						}
+					}
+					// 继续修改
+					i = this.orderDetailDao.insertOrderDetail(list);
+				}
+			} else {
+				// 修改失败,进行事务回滚
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"数据库中没有对应的运单数据");
+			}
+
+			// 提交一个账户更改详情
+			/*
+			 * AccountDetail detail = new AccountDetail();
+			 * detail.setAmount(order.getTotalMoney());
+			 * detail.setCreateDate(date); detail.setModifyDate(date);
+			 * detail.setState(Constant.ACCOUNT_DETAIL_STATE2);
+			 * detail.setCurrency("美元"); detail.setName("支付运费");
+			 * detail.setType(Constant.ACCOUNT_DETAIL_TYPE2);
+			 * detail.setUserId(order.getUserId()); String prefix = "现金支付";
+			 * detail.setRemark(prefix + "；运单id：" + order.getOrderId());
+			 * detail.setEmpId(order.getEmpId()); detail.setEmpName(empName);
+			 * detail.setEmpStore(empStoreName);
+			 * this.accountDetailDao.insertAccountDetail(detail);
+			 */
+
+			// 进行路由的插入
+			// 插入完成后，新建一个Route并插入到数据库中
+			Route route = new Route();
+			route.setOrderId(order.getOrderId());
+			route.setName(empName);
+			route.setDate(date);
+			route.setState(OrderUtil.transformerState(0, order.getState()));
+			route.setAddress("仓库");
+			this.routeDao.insertRoute(route);
+			ResponseObject<Object> obj=new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			obj.setData(order.getId());
+			return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> batchModifyOrderStateAndFlight(
+			List<String> orderIds, String state, String flight, String name,
+			String thridpns, String thridno) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			int i = this.orderDao.modifyMultiOrderStateAndFlight(orderIds,
+					state, flight, date, thridpns, thridno);
+			if (i != new HashSet<String>(orderIds).size()) {
+				// 修改状态失败，进行事务回滚
+				throw new Exception();
+			}
+			
+			for (String orderId : orderIds) {
+				// 进行路由的插入
+				// 插入完成后，新建一个Route并插入到数据库中
+				Route route = new Route();
+				route.setOrderId(orderId);
+				route.setName("修改状态");
+				route.setDate(date);
+				route.setState(OrderUtil.transformerState(0, state));
+				route.setFlight(flight);
+				route.setThrid_no(thridno);
+				route.setThrid_pns(thridpns);
+				//String str = name + "修改运单";
+				String str = "";
+				
+				if (!StringUtil.isEmpty(flight)) {
+					str += "当前航班：" + flight;
+				} else if ((!StringUtil.isEmpty(thridpns))
+						|| (!StringUtil.isEmpty(thridno))) {
+					str = str + "第三方快递公司：" + thridpns + ";快递单号：" + thridno;
+				}
+				route.setRemark(str);
+				this.routeDao.insertRoute(route);
+				//在这里插入storagePosition
+				Order order = this.orderDao.getByOrderId(orderId);
+				this.useStoragePosition(order);
+				
+				if (state.equals(Constant.ORDER_STATE3)
+						|| state.equals(Constant.ORDER_STATE4)
+						|| state.equals(Constant.ORDER_STATE7)
+						|| state.equals(Constant.ORDER_STATE8)
+						|| state.equals(Constant.ORDER_STATE10)) {
+					User user = this.userDao.getUserById(order.getUserId());
+					this.autoSendService.send(user, order);
+//					log.info(SmsSendUtil.sendOrderStateMsg(orderId, state,
+//							user.getPhone()));
+				}
+
+			}
+			return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Order> getOrderById(String id)
+			throws ServiceException {
+		try {
+			Order order = this.orderDao.getById(id);
+			if (order != null) {
+				order.setNewdate(DateUtil.date2String(new Date()));
+				if ((StringUtil.isEmpty(order.getTotalMoney()) || order
+						.getTotalMoney().startsWith("0"))
+						&& order.getUser() != null) {
+					// delete by chenkanghua
+					// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+					// order.getUser()
+					// .getType())));
+
+					/* 未知order 类型 不好计算运单价格 */
+					List<String> commodityId = new ArrayList<String>();
+					for (OrderDetail od : order.getDetails()) {
+						commodityId.add(od.getCommodityId());
+					}
+					// update by chenkanghua
+					// order.setTotalMoney(String.valueOf(this.calculationOrderFreight(commodityId,order,Constant.ORDER_TYPE_WEB)));
+				}
+				ResponseObject<Order> result = new ResponseObject<Order>(
+						ResponseCode.SUCCESS_CODE);
+				result.setData(order);
+				return result;
+			} else {
+				return new ResponseObject<Order>(ResponseCode.PARAMETER_ERROR,
+						"数据库中没有对应的数据记录");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Order> getOrderByOrderId(String oid)
+			throws ServiceException {
+		try {
+			Order order = this.orderDao.getByOrderId(oid);
+			if (order != null) {
+				order.setNewdate(DateUtil.date2String(new Date()));
+				if ((StringUtil.isEmpty(order.getTotalMoney()) || order
+						.getTotalMoney().startsWith("0"))
+						&& order.getUser() != null) {
+					// delete by chenkanghua
+					// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+					// order.getUser()
+					// .getType())));
+					/* 未知order 类型 不好计算运单价格 */
+					List<String> commodityId = new ArrayList<String>();
+					for (OrderDetail od : order.getDetails()) {
+						commodityId.add(od.getCommodityId());
+					}
+					// update by chenkanghua
+					// order.setTotalMoney(String.valueOf(this.calculationOrderFreight(commodityId,order,Constant.ORDER_TYPE_WEB)));
+				}
+				ResponseObject<Order> result = new ResponseObject<Order>(
+						ResponseCode.SUCCESS_CODE);
+				result.setData(order);
+				return result;
+			} else {
+				return new ResponseObject<Order>(ResponseCode.PARAMETER_ERROR,
+						"数据库中没有对应的数据记录");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<List<Order>> getOrderListByTranshipmentId(String id)
+			throws ServiceException {
+		try {
+			List<Order> orders = this.orderDao.getByTranshipmentIds(Arrays
+					.asList(new String[] { id }));
+			ResponseObject<List<Order>> result = new ResponseObject<List<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			result.setData(orders);
+			return result;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Map<String, String>> addOrder(Order order,
+			String userType) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			order.setCreateDate(date);
+			order.setModifyDate(date);
+			String orderId = order.getOrderId();
+			
+			if(!StringUtil.isEmpty(orderId))
+			{
+				Order order1=this.orderDao.getByOrderId(orderId);
+				if(order1!=null)
+				{
+					return new ResponseObject<Map<String, String>>(
+							ResponseCode.ORDER_INSERT_ERROR, "原单号"+orderId+"已存在，插入失败!");
+				}
+			}
+
+			// 计算运费 由上层计算 update by chenkanghua
+			// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+			// userType)));
+			int k = this.orderDao.insertOrder(order);
+			if (k > 0) {
+				// 修改运单id
+				if (orderId == null || orderId.equals("")) {
+					// orderId = OrderUtil.createOrderId(order.getId(),
+					// order.getOrderIdPrefix());
+					//orderId = createOrderId(order.getId());
+					orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+					order.setOrderId(orderId);
+				}
+
+				this.orderDao.modifyOrderId(order.getId(), orderId);
+
+				for (OrderDetail detail : order.getDetails()) {
+					detail.setOrderId(orderId);
+				}
+
+				if (order.getDetails().length == this.orderDetailDao
+						.insertOrderDetail(Arrays.asList(order.getDetails()))) {
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(orderId);
+					route.setDate(date);
+					route.setState(Constant.ORDER_ROUTE_STATE2);
+					route.setAddress("门店");
+					this.routeDao.insertRoute(route);
+
+					ResponseObject<Map<String, String>> result = new ResponseObject<Map<String, String>>(
+							ResponseCode.SUCCESS_CODE);
+					Map<String, String> map = new HashMap<String, String>();
+					map.put("id", order.getId());
+					map.put("orderId", orderId);
+					result.setData(map);
+					//在这里插入storagePosition
+					this.useStoragePosition(order);
+					return result;
+				} else {
+					// throw exception
+					throw new Exception();
+				}
+			} else {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.ORDER_INSERT_ERROR, "插入运单失败");
+			}
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	
+	public ResponseObject<Map<String, String>> addOrderbytranship(Order order,
+			String userType) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			order.setCreateDate(date);
+			order.setModifyDate(date);
+			String orderId = order.getOrderId();
+
+			// 计算运费 由上层计算 update by chenkanghua
+			// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+			// userType)));
+			order.setTypeKey(Constant.ORDER_TYPE_KEY_2);//设置为转运类型
+			int k = this.orderDao.insertOrder(order);
+			if (k > 0) {
+				// 修改运单id
+				if (orderId == null || orderId.equals("")) {
+					// orderId = OrderUtil.createOrderId(order.getId(),
+					// order.getOrderIdPrefix());
+					//orderId = createOrderId(order.getId());
+					orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+					order.setOrderId(orderId);
+				}
+
+				this.orderDao.modifyOrderId(order.getId(), orderId);
+
+				for (OrderDetail detail : order.getDetails()) {
+					detail.setOrderId(orderId);
+				}
+
+				if (order.getDetails().length == this.orderDetailDao
+						.insertOrderDetail(Arrays.asList(order.getDetails()))) {
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(orderId);
+					route.setDate(date);
+					route.setState(Constant.ORDER_ROUTE_STATE2);
+					String transhipid="";
+					int aaa=0;
+					for(String id:order.getTranshipmentIds())
+					{
+						if(aaa==0)
+						{
+							transhipid=transhipid+id;
+						}
+						else
+						{
+							transhipid=transhipid+"|"+id;
+						}
+					}
+					if(transhipid=="")
+					{
+						route.setAddress("用户");
+					}
+					else
+					{
+						route.setAddress("用户操作，转运id:"+transhipid);
+					}
+					this.routeDao.insertRoute(route);
+
+					ResponseObject<Map<String, String>> result = new ResponseObject<Map<String, String>>(
+							ResponseCode.SUCCESS_CODE);
+					Map<String, String> map = new HashMap<String, String>();
+					map.put("id", order.getId());
+					map.put("orderId", orderId);
+					result.setData(map);
+					//在这里插入storagePosition
+					this.useStoragePosition(order);
+					return result;
+				} else {
+					// throw exception
+					throw new Exception();
+				}
+			} else {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.ORDER_INSERT_ERROR, "插入运单失败");
+			}
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+	public ResponseObject<Map<String, String>> addOrderOfOnline(Order order)
+			throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			order.setCreateDate(date);
+			order.setModifyDate(date);
+			order.setTypeKey(Constant.ORDER_TYPE_KEY_3);//设置为网上置单
+			int k = this.orderDao.insertOrder(order);
+			if (k > 0) {
+				// 修改运单id
+				// String orderId = OrderUtil.createOrderId(order.getId(),
+				// order.getOrderIdPrefix());
+				//String orderId = createOrderId(order.getId());
+				String orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+				order.setOrderId(orderId);
+				this.orderDao.modifyOrderId(order.getId(), orderId);
+
+				/*
+				 * for (OrderDetail detail : order.getDetails()) {
+				 * detail.setOrderId(orderId); detail.setTranshipmentId("-1"); }
+				 */
+
+				/*
+				 * if (order.getDetails().length ==
+				 * this.orderDetailDao.insertOrderDetail(Arrays
+				 * .asList(order.getDetails()))) {
+				 */
+				// 插入完成后，新建一个Route并插入到数据库中
+				Route route = new Route();
+				route.setOrderId(orderId);
+				route.setDate(date);
+				route.setState(Constant.ORDER_ROUTE_STATE0);
+				route.setAddress("客户");
+				route.setRemark("录入人：客户");
+				this.routeDao.insertRoute(route);
+
+				Route route1 = new Route();
+				route1.setOrderId(orderId);
+				route1.setState("等待发出");
+				route1.setAddress("客户");
+				route1.setDate("");
+				route1.setRemark("录入人：门市员工");
+				this.routeDao.insertRoute(route1);
+
+				ResponseObject<Map<String, String>> result = new ResponseObject<Map<String, String>>(
+						ResponseCode.SUCCESS_CODE);
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("id", order.getId());
+				map.put("orderId", orderId);
+				result.setData(map);
+
+				return result;
+			} else {
+				// throw exception
+				throw new Exception();
+			}
+			/*
+			 * } else { return new ResponseObject<Map<String,
+			 * String>>(ResponseCode.ORDER_INSERT_ERROR, "插入运单失败"); }
+			 */
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// kai 20150911
+	public ResponseObject<Map<String, String>> addOrderOfOnlinebyuser(
+			Order order) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			order.setCreateDate(date);
+			order.setModifyDate(date);
+			
+			order.setTypeKey(Constant.ORDER_TYPE_KEY_3);//设置为网上置单类型
+			int k = this.orderDao.insertOrder(order);
+			if (k > 0) {
+				// 修改运单id
+				//String orderId = OrderUtil.createOrderId(order.getId(),
+				//		order.getOrderIdPrefix());
+				if((!StringUtil.isEmpty(order.getSenduserName()))&&(!StringUtil.isEmpty(order.getSenduserphone()))&&(!StringUtil.isEmpty(order.getUserId())))
+				{
+					int a=this.sendUserDao.checksenduser(order.getSenduserName(), order.getSenduserphone(),order.getUserId());
+					if(a==0)
+					{
+						SendUser senduser=new SendUser();
+						senduser.setName(order.getSenduserName());
+						senduser.setPhone(order.getSenduserphone());
+						senduser.setModifyDate(date);
+						senduser.setCreateDate(date);
+						senduser.setUserid(order.getUserId());
+						try{
+							this.sendUserDao.insertSendUser(senduser);
+						}
+						catch(Exception e)//如果插入发件人不失败，不影响其它的操作
+						{}
+					}
+				}
+				String orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+				order.setOrderId(orderId);
+				this.orderDao.modifyOrderId(order.getId(), orderId);
+
+				for (OrderDetail detail : order.getDetails()) {
+					detail.setOrderId(orderId);
+					detail.setTranshipmentId("-1");
+				}
+
+				if (order.getDetails().length == this.orderDetailDao
+						.insertOrderDetail(Arrays.asList(order.getDetails()))) {
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(orderId);
+					route.setDate(date);
+					route.setState(Constant.ORDER_ROUTE_STATE0);
+					route.setAddress("客户");
+					route.setRemark("录入人：客户");
+					this.routeDao.insertRoute(route);
+
+					Route route1 = new Route();
+					route1.setOrderId(orderId);
+					route1.setState("等待发出");
+					route1.setAddress("客户");
+					route1.setDate("");
+					route1.setRemark("录入人：门市员工");
+					this.routeDao.insertRoute(route1);
+
+					ResponseObject<Map<String, String>> result = new ResponseObject<Map<String, String>>(
+							ResponseCode.SUCCESS_CODE);
+					Map<String, String> map = new HashMap<String, String>();
+					map.put("id", order.getId());
+					map.put("orderId", orderId);
+					result.setData(map);
+
+					return result;
+				} else {
+					// throw exception
+					throw new Exception();
+				}
+			} else {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.ORDER_INSERT_ERROR, "插入运单失败");
+			}
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Map<String, String>> addOrderOfEmpty(Order order)
+			throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			order.setCreateDate(date);
+			order.setModifyDate(date);
+			order.setTypeKey(Constant.ORDER_TYPE_KEY_6);//设置为空运单
+			int k = this.orderDao.insertOrder(order);
+			if (k > 0) {
+				// 修改运单id
+				// String orderId = OrderUtil.createOrderId(order.getId(),
+				// order.getOrderIdPrefix());
+				
+				//String orderId = createOrderId(order.getId());
+				String orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+				order.setOrderId(orderId);
+				this.orderDao.modifyOrderId(order.getId(), orderId);
+
+				ResponseObject<Map<String, String>> result = new ResponseObject<Map<String, String>>(
+						ResponseCode.SUCCESS_CODE);
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("id", order.getId());
+				map.put("orderId", orderId);
+				result.setData(map);
+
+				return result;
+			} else {
+				// throw exception
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> pay(List<String> ids, List<String> orderIds,
+			String userId, String amount, double newrmb, double newusd,
+			boolean accountPay) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			int i = this.orderDao.modifyOrderPay(ids, date,
+					Constant.ORDER_STATE3);
+			if (i == ids.size()) {
+				// 提交一个账户更改详情
+				AccountDetail detail = new AccountDetail();
+				detail.setAmount(amount);
+				detail.setCreateDate(date);
+				detail.setModifyDate(date);
+				detail.setState(Constant.ACCOUNT_DETAIL_STATE2);
+				detail.setCurrency("美元");
+				detail.setName("支付运费");
+				detail.setType(Constant.ACCOUNT_DETAIL_TYPE2);
+				detail.setUserId(userId);
+				String prefix = "现金支付";
+
+				if (accountPay) {
+					// 账户支付，修改账户余额
+					Account account = new Account();
+					account.setUsd(String.valueOf(newusd));
+					account.setRmb(String.valueOf(newrmb));
+					account.setUserId(userId);
+					account.setModifyDate(date);
+					if (this.accountDao.modifyAccount(account) > 0) {
+						// pass
+					} else {
+						throw new Exception();
+					}
+					prefix = "帐户余额支付";
+				}
+				detail.setRemark(prefix + "；运单id：" + orderIds);
+				this.accountDetailDao.insertAccountDetail(detail);
+
+				for (String orderId : orderIds) {
+					Route route = new Route();
+					route.setDate(date);
+					route.setOrderId(orderId);
+					route.setRemark(prefix);
+					route.setState(Constant.ORDER_ROUTE_STATE3);
+					this.routeDao.insertRoute(route);
+				}
+			} else {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+	}
+
+	public ResponseObject<PageSplit<Order>> searchMsjOrders(String storeId,
+			int pageSize, int pageNow) throws ServiceException {
+		try {
+			int rowCount = 0;
+			try {
+				rowCount = this.orderDao.countOfMsjOrder(storeId,Constant.ORDER_TYPE_KEY_1);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<Order> orders = this.orderDao.searchMsjOrders(storeId,Constant.ORDER_TYPE_KEY_1,
+							startIndex, pageSize);
+					pageSplit.setDatas(orders);
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<PageSplit<Order>> searchEmptyOrders(String storeId,
+			String orderKey, int pageSize, int pageNow) throws ServiceException {
+		orderKey = StringUtil.escapeStringOfSearchKey(orderKey);
+		try {
+			int rowCount = 0;
+			try {
+				rowCount = this.orderDao.countOfEmptyOrder(storeId, orderKey);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<Order> orders = this.orderDao.searchEmptyOrders(
+							storeId, orderKey, startIndex, pageSize);
+					pageSplit.setDatas(orders);
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取空运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有空运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	// kai 20151028 包含仓库信息的搜索
+	public ResponseObject<PageSplit<Order>> searchWebOrdersincludewidcid(
+			String orderId, String key, String column, String sdate,
+			String edate, String state,String typekey, String wid, String cid, int pageSize,
+			int pageNow) throws ServiceException {
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			if (!StringUtil.isEmpty(orderId)) {
+				orderId = StringUtil.escapeStringOfSearchKey(orderId);
+			}
+
+			int rowCount = 0;
+			try {
+				rowCount = this.orderDao.countOfWebOrderincludewidcid(orderId,
+						key, column, sdate, edate, state,typekey, wid, cid);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<Order> orders = this.orderDao
+							.searchWebOrdersincludewidcid(orderId, key, column,
+									sdate, edate, startIndex, pageSize, state,typekey,
+									wid, cid);
+					if (orders != null && !orders.isEmpty()) {
+						for (Order o : orders) {
+							if(!StringUtil.isEmpty(o.getUserId()))
+							{
+								o.setUser(this.userDao.getUserById(o.getUserId()));
+							}
+							pageSplit.addData(o);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<PageSplit<Order>> searchWebOrders(String orderId,
+			String key, String column, String sdate, String edate,
+			String state,String typekey, String storeid, int pageSize, int pageNow)
+			throws ServiceException {
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			if (!StringUtil.isEmpty(orderId)) {
+				orderId = StringUtil.escapeStringOfSearchKey(orderId);
+			}
+
+			int rowCount = 0;
+			try {
+				rowCount = this.orderDao.countOfWebOrder(orderId, key, column,
+						sdate, edate, state, typekey,storeid);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<Order> orders = this.orderDao.searchWebOrders(orderId,
+							key, column, sdate, edate, startIndex, pageSize,
+							state, typekey,storeid);
+					if (orders != null && !orders.isEmpty()) {
+						for (Order o : orders) {
+							if(!StringUtil.isEmpty(o.getUserId()))
+							{
+								User user=this.userDao.getUserById(o.getUserId());
+								o.setUser(user);
+							}
+							
+							
+							pageSplit.addData(o);
+						}
+					}
+					
+					
+					/*select distinct `order`.*,
+					s.name AS storage_position_storage_name, p.col_number AS storage_position_col_number, p.row_number AS storage_position_row_number 
+				from `order`
+				left join `users` as u on u.id=`order`.user_id
+				left join `order_detail` as od on od.order_id=`order`.order_id
+				left join `transhipment_bill` as tb on tb.id=od.transhipment_id
+				LEFT JOIN storage_position_record r ON r.relate_id=`order`.id
+		 		LEFT JOIN storage_position p ON p.id=r.storage_position_id
+		 		LEFT JOIN `storage` s ON s.id=p.storage_id AND s.type='2' AND s.warehouse_id=`order`.warehouse_id AND s.type_relate_id=`order`.channel_id*/
+					
+					
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+
+	public List<ExportOrder> getExportOrders(String sdate, String edate)
+			throws ServiceException {
+		try {
+			return this.orderDao.getExportOrderByCreateData(sdate, edate);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// add by chenkanghua
+	public List<ExportOrder> getExportToMeitaoOrders(String wid,
+			String orderId, String key, String column, String sdate,
+			String edate, String state) throws ServiceException {
+
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			if (!StringUtil.isEmpty(orderId)) {
+				orderId = StringUtil.escapeStringOfSearchKey(orderId);
+			}
+			// return this.orderDao.searchByKeys(oid, key, column, sdate, edate,
+			// userId,state);
+			return this.orderDao.getExportToMeitaoOrder(wid, orderId, key,
+					column, sdate, edate, state);
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// add by chenkanghua
+	public List<SumCommodity> getExportOrdersGather(String flight)
+			throws ServiceException {
+		try {
+			return this.orderDetailDao.getExportOrdersGather(flight);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+
+	}
+
+	/*
+	 * public ResponseObject<Object> importExcelOfOrderState(List<ImportOrder>
+	 * importOrders, String empName) throws ServiceException { try { String date
+	 * = DateUtil.date2String(new Date()); List<Order> orders = new
+	 * ArrayList<Order>();
+	 * 
+	 * for (ImportOrder io : importOrders) { if
+	 * (StringUtil.isEmpty(io.getOrderId()) ||
+	 * StringUtil.isEmpty(io.getState())) { continue; } Order order = new
+	 * Order(); order.setOrderId(io.getOrderId());
+	 * order.setState(io.getState()); order.setModifyDate(date);
+	 * 
+	 * // 插入完成后，新建一个Route并插入到数据库中 Route route = new Route();
+	 * route.setOrderId(io.getOrderId()); route.setName("修改状态");
+	 * route.setDate(date); route.setState(OrderUtil.transformerState(0,
+	 * io.getState())); String str = empName + "修改运单"; if
+	 * (Constant.ORDER_STATE7.equals(io.getState())) { str += ";当前航班：" +
+	 * io.getFlight(); order.setFlight(io.getFlight()); } else if
+	 * (Constant.ORDER_STATE9.equals(io.getState())) { str += ";第三方快递公司：" +
+	 * io.getThirdPNS() + "，快递单号：" + io.getThirdNo();
+	 * order.setThirdPNS(io.getThirdPNS()); order.setThirdNo(io.getThirdNo()); }
+	 * route.setRemark(str); this.routeDao.insertRoute(route);
+	 * orders.add(order); } int k =
+	 * this.orderDao.modifyOrderStateOfExcel(orders); if (k != orders.size()) {
+	 * // 插入失败, 修改的时候返回1，所以此处不能通过这个判断 // throw new Exception(); }
+	 * 
+	 * for (Order o : orders) { if(o.getState().equals(Constant.ORDER_STATE3)
+	 * ||o.getState().equals(Constant.ORDER_STATE4)
+	 * ||o.getState().equals(Constant.ORDER_STATE7)
+	 * ||o.getState().equals(Constant.ORDER_STATE8)
+	 * ||o.getState().equals(Constant.ORDER_STATE10)){ Order order =
+	 * this.orderDao.getByOrderId(o.getOrderId()); User user =
+	 * this.userDao.getUserById(order.getUserId());
+	 * log.info(SmsSendUtil.sendOrderStateMsg(o.getOrderId(), o.getState(),
+	 * user.getPhone())); } }
+	 * 
+	 * } catch (Exception e) { throw ExceptionUtil.handle2ServiceException(e); }
+	 * return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE); }
+	 */
+	/*
+	 * public ResponseObject<Object> importExcelOfOrderState( List<ImportOrder>
+	 * importOrders, String empName) throws ServiceException { try { String date
+	 * = DateUtil.date2String(new Date()); List<Order> orders = new
+	 * ArrayList<Order>();
+	 * 
+	 * for (ImportOrder io : importOrders) { if
+	 * (StringUtil.isEmpty(io.getOrderId()) ||
+	 * StringUtil.isEmpty(io.getState())) { continue; } Order order = new
+	 * Order(); order.setOrderId(io.getOrderId());
+	 * order.setState(io.getState()); order.setModifyDate(date);
+	 * 
+	 * // 插入完成后，新建一个Route并插入到数据库中 Route route = new Route();
+	 * route.setOrderId(io.getOrderId()); route.setName(empName);//kai 20150918
+	 * route.setDate(date); route.setState(OrderUtil.transformerState(0,
+	 * io.getState())); route.setStateRemark(io.getStateremark());//添加状态描述 kai
+	 * String str = empName + "修改运单"; if
+	 * (Constant.ORDER_STATE7.equals(io.getState())) { str += ";当前航班：" +
+	 * io.getFlight(); order.setFlight(io.getFlight()); } else if
+	 * (Constant.ORDER_STATE9.equals(io.getState())) { str += ";第三方快递公司：" +
+	 * io.getThirdPNS() + "，快递单号：" + io.getThirdNo();
+	 * order.setThirdPNS(io.getThirdPNS()); order.setThirdNo(io.getThirdNo()); }
+	 * route.setRemark(str); this.routeDao.insertRoute(route);
+	 * orders.add(order); } int k =
+	 * this.orderDao.modifyOrderStateOfExcel(orders); if (k != orders.size()) {
+	 * // 插入失败, 修改的时候返回1，所以此处不能通过这个判断 // throw new Exception(); }
+	 * 
+	 * for (Order o : orders) { if (o.getState().equals(Constant.ORDER_STATE3)
+	 * || o.getState().equals(Constant.ORDER_STATE4) ||
+	 * o.getState().equals(Constant.ORDER_STATE7) ||
+	 * o.getState().equals(Constant.ORDER_STATE8) ||
+	 * o.getState().equals(Constant.ORDER_STATE10)) { Order order =
+	 * this.orderDao.getByOrderId(o.getOrderId()); User user =
+	 * this.userDao.getUserById(order.getUserId());
+	 * log.info(SmsSendUtil.sendOrderStateMsg(o.getOrderId(), o.getState(),
+	 * user.getPhone())); } }
+	 * 
+	 * } catch (Exception e) { throw ExceptionUtil.handle2ServiceException(e); }
+	 * return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE); }
+	 */
+
+	public ResponseObject<Object> importExcelOfOrderState(
+			List<ImportOrder> importOrders, String empName,String wid)
+			throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			List<Order> orders = new ArrayList<Order>();
+
+		
+			
+			
+			for (ImportOrder io : importOrders) {
+				if (StringUtil.isEmpty(io.getOrderId())) {
+					io.setStateResult("失败:单号为空!");
+					continue;
+				}
+				//过掉不是自己门市的运单
+				//int kk= this.orderDao.countOfordersbyorderidandwin(io.getOrderId(), wid);
+				if(!StringUtil.isEmpty(wid))
+				{
+					//Order order=null;
+					int k;
+					
+					try {
+						//order= this.orderDao.getOrderbyorderidandwid(io.getOrderId(), wid);
+						k= this.orderDao.countOfordersbyorderidandwin(io.getOrderId(), wid);
+					}
+					catch (Exception e) {
+						throw ExceptionUtil.handle2ServiceException("修改数据库出现异常，请检查序号为："+io.getOrderId()+",单号为："+io.getOrderId());
+					}
+					if(k==0)
+					{
+						io.setStateResult("失败:请检查运单号是否存在或是否属于本门店!");
+						continue;
+					}
+					else if(k==1)
+					{
+						
+					}
+					else if(k>1)//如果大于1的，将也更新
+					{
+						
+					}
+				}
+
+				Order order = new Order();
+				order.setOrderId(io.getOrderId());
+				order.setState(io.getState());
+				order.setModifyDate(date);
+
+				order.setThirdPNS(io.getThirdPNS());
+				order.setThirdNo(io.getThirdNo());
+				int iii=0;
+				try {
+					iii=this.orderDao.modifyOrderStateOfExcelbyadmin(order);
+				}
+				catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("修改数据库出现异常，请检查序号为："+io.getOrderId()+",单号为："+order.getOrderId());
+				}
+				
+				if(iii<1)
+				{
+					io.setStateResult("失败：请检查单号是否存在或字符格式!");
+				}
+				else
+				{
+					if(iii>1)
+					{
+						io.setStateResult("成功!但更新多条运单！");
+					}
+					else
+					{
+						io.setStateResult("成功!");
+					}
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(io.getOrderId());
+					route.setName(empName);// kai 20150918
+					route.setDate(date);
+					route.setState(OrderUtil.transformerState(0, io.getState()));
+					route.setStateRemark(io.getStateremark());// 添加状态描述 kai
+					//String str = empName + "修改运单";
+					String str="";
+					if(Constant.ORDER_STATE9.equals(io.getState())||Constant.ORDER_STATE8.equals(io.getState())||Constant.ORDER_STATE10.equals(io.getState()))
+					{	
+						if(!StringUtil.isEmpty(io.getThirdPNS()))
+						{
+							str+="第三方快递公司：" + io.getThirdPNS();
+						}
+						if(!StringUtil.isEmpty(io.getThirdPNS()))
+						{
+							if(str!="")
+							{
+								str+=",快递单号：" + io.getThirdNo();
+							}
+							else
+							{
+								str+="快递单号：" + io.getThirdNo();
+							}
+						}
+					}
+					
+					/*if (Constant.ORDER_STATE7.equals(io.getState())) {
+						str += "当前航班：" + io.getFlight();
+						order.setFlight(io.getFlight());
+					} else if (Constant.ORDER_STATE9.equals(io.getState())) {
+						str += "第三方快递公司：" + io.getThirdPNS() + "，快递单号："
+								+ io.getThirdNo();
+						order.setThirdPNS(io.getThirdPNS());
+						order.setThirdNo(io.getThirdNo());
+					}*/
+					route.setRemark(str);
+					if (!StringUtil.isEmpty(io.getState())) {
+						int aa=0;
+						try {
+						   aa=this.routeDao.insertRoute(route);
+						}
+						catch (Exception e) {
+							throw ExceptionUtil.handle2ServiceException("修改数据库路由现异常，请检查,单号为："+route.getOrderId());
+						}
+						
+						if(aa<1)
+						{
+							io.setStateResult("失败:插入路由失败!");
+							continue;
+						}
+					}
+					orders.add(order);
+				}
+
+				
+				
+			}
+			//int k = this.orderDao.modifyOrderStateOfExcel(orders);
+			//if (k != orders.size()) {
+				// 插入失败, 修改的时候返回1，所以此处不能通过这个判断
+				// throw new Exception();
+			//}
+
+			for (Order o : orders) {
+				if ((o.getState() != null)
+						&& (o.getState().equals(Constant.ORDER_STATE3)
+								|| o.getState().equals(Constant.ORDER_STATE4)
+								|| o.getState().equals(Constant.ORDER_STATE7)
+								|| o.getState().equals(Constant.ORDER_STATE8) || o
+								.getState().equals(Constant.ORDER_STATE10))) {
+
+					
+					Order order = this.orderDao.getByOrderId(o.getOrderId());
+					if (order == null) {
+						
+						continue;
+					}
+				
+					if ((order.getUserId() != null)
+							&& (!order.getUserId().equals(""))) {
+						User user = this.userDao.getUserById(order.getUserId());
+						if (user != null) {
+							try{
+								this.autoSendService.send(user, order);
+							}
+							catch(Exception e)
+							{
+								//在这里捕获的异常不做任何处理
+							}
+//							log.info(SmsSendUtil.sendOrderStateMsg(
+//									o.getOrderId(), o.getState(),
+//									user.getPhone()));
+						}
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		ResponseObject<Object> obj=new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		obj.setData(importOrders);
+		return obj;
+	}
+
+	// add by chenkanghua
+	public ResponseObject<Object> importMeitaoExcel(
+			List<ImportOrder> importOrders, String empName)
+			throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			List<Order> orders = new ArrayList<Order>();
+
+			for (ImportOrder io : importOrders) {
+				if (StringUtil.isEmpty(io.getOrderId())
+						|| StringUtil.isEmpty(io.getState())) {
+					continue;
+				}
+				Order order = new Order();
+				order.setOrderId(io.getOrderId());
+				order.setState(io.getState());
+				order.setModifyDate(date);
+
+				// 插入完成后，新建一个Route并插入到数据库中
+				Route route = new Route();
+				route.setOrderId(io.getOrderId());
+				route.setState("目的地第三方快递");
+				route.setName("修改状态");
+				route.setDate(date);
+				// route.setState(OrderUtil.transformerState(0, io.getState()));
+				//String str = empName + "修改运单";
+				String str="";
+
+				str += "第三方快递公司：" + io.getThirdPNS() + "，快递单号："
+						+ io.getThirdNo();
+				order.setThirdPNS(io.getThirdPNS());
+				order.setThirdNo(io.getThirdNo());
+
+				route.setThrid_no(io.getThirdNo());
+				route.setThrid_pns(io.getThirdPNS());
+
+				route.setRemark(str);
+				this.routeDao.insertRoute(route);
+				orders.add(order);
+			}
+			int k = this.orderDao.modifyOrderStateOfExcel(orders);
+			if (k != orders.size()) {
+				// 插入失败, 修改的时候返回1，所以此处不能通过这个判断
+				// throw new Exception();
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+	}
+
+	public ResponseObject<Object> modifyOrderFlightOfOrderIds(String orderId,
+			String flight, String empName) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			int i = this.orderDao.modifyOrderFlight(orderId, flight, date);
+			if (i > 0) {
+				Route route = new Route();
+				route.setOrderId(orderId);
+				route.setName(empName);
+				route.setDate(date);
+				route.setState(Constant.ORDER_ROUTE_STATE6);
+				route.setRemark("会员" + empName + "设置航班信息为:" + flight);
+				this.routeDao.insertRoute(route);
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"数据库中没有对应的运单");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<List<Order>> getOrderListByStatsAndFlight(
+			String state, String flight) throws ServiceException {
+		try {
+			ResponseObject<List<Order>> result = new ResponseObject<List<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			List<Order> orders = this.orderDao.getOrderByStateAndFlight(state,
+					flight);
+			result.setData(orders);
+			return result;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<List<Order>> getOrderListByIds(List<String> ids)
+			throws ServiceException {
+		try {
+			ResponseObject<List<Order>> result = new ResponseObject<List<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			List<Order> orders = this.orderDao.getOrderByIds(ids);
+			result.setData(orders);
+			return result;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<List<Order>> getOrderListByOrderIds(
+			List<String> orderIds) throws ServiceException {
+		try {
+			ResponseObject<List<Order>> result = new ResponseObject<List<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			List<Order> orders = this.orderDao.getOrderByOrderIds(orderIds);
+			result.setData(orders);
+			return result;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// kai 20150915
+	public ResponseObject<List<ExportOrder>> getExportOrderListByOrderIds(
+			List<String> orderIds) throws ServiceException {
+		try {
+
+			List<ExportOrder> orders = this.orderDao
+					.getExportOrderByOrderIds(orderIds);
+			ResponseObject<List<ExportOrder>> result = new ResponseObject<List<ExportOrder>>(
+					ResponseCode.SUCCESS_CODE);
+			result.setData(orders);
+
+			return result;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// kai 20151028 单独一个订单查找，如果不存在，要标识
+	public ResponseObject<List<ExportOrder>> getExportOrderListByOrderIdsalone(
+			List<String> orderIds,String wid) throws ServiceException {
+		try {
+			ResponseObject<List<ExportOrder>> result = new ResponseObject<List<ExportOrder>>(
+					ResponseCode.SUCCESS_CODE);
+
+			List<ExportOrder> exorders = new ArrayList<ExportOrder>();
+			for (String o : orderIds) {
+				ExportOrder order = this.orderDao.getByExportOrderId(o,wid);
+				if (order == null) {
+					order = new ExportOrder();
+					order.setOrderId(o);
+				}
+				exorders.add(order);
+			}
+
+			result.setData(exorders);
+			return result;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> modifyOrderOfThrid(List<String> orderIds,
+			String state, String remark, String thridpns, String thridno)
+			throws ServiceException {
+		if (orderIds == null || orderIds.isEmpty()) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+		try {
+			// 添加最后修改时间
+			String date = DateUtil.date2String(new Date());
+			int i = this.orderDao.modifyMultiOrderStateAndFlight(orderIds,
+					state, null, date, thridpns, thridno);
+			if (i == orderIds.size()) {
+				for (String oid : orderIds) {
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(oid);
+					route.setName("第三方快递修改");
+					route.setDate(date);
+					route.setState(OrderUtil.transformerState(0, state));
+					route.setRemark(remark);
+					this.routeDao.insertRoute(route);
+				}
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				// 修改失败,进行事务回滚
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"数据库中没有对应id的运单数据");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<List<Map<String, Object>>> createRetailOrder(int size)
+			throws ServiceException {
+		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(
+				size);
+
+		Order order = new Order();
+		order.setState(Constant.ORDER_STATE0);
+		for (int i = 0; i < size; i++) {
+			order.setId(null);
+			try {
+				order.setTypeKey(Constant.ORDER_TYPE_KEY_6);
+				int k = this.orderDao.insertEmptyOrders(order);
+				if (k < 1) {
+					// 进行事务的回滚
+					throw new Exception();
+				} else {
+					String id = order.getId();
+					// String orderId = OrderUtil.createOrderId(order.getId(),
+					// Constant.ORDER_ID_PREFIX_SH);
+					//String orderId = createOrderId(order.getId());
+					String orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+					this.orderDao.modifyOrderId(id, orderId); // 修改运单号
+					Map<String, Object> map = new HashMap<String, Object>();
+					map.put("id", id);
+					map.put("orderId", orderId);
+					result.add(map);
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+
+		return new ResponseObject<List<Map<String, Object>>>(
+				ResponseCode.SUCCESS_CODE, null, result);
+	}
+
+	public ResponseObject<List<Map<String, Object>>> getRetailOrder(
+			String soid, String eoid, int size) throws ServiceException {
+		try {
+			List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(
+					size);
+			List<Order> orders = this.orderDao.getOrderOfOrderId(soid, eoid,
+					Constant.ORDER_STATE0, size);
+			for (Order order : orders) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("id", order.getId());
+				map.put("orderId", order.getOrderId());
+				result.add(map);
+			}
+			return new ResponseObject<List<Map<String, Object>>>(
+					ResponseCode.SUCCESS_CODE, null, result);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Map<String, Object>> getRetailOrderCount()
+			throws ServiceException {
+		try {
+			int count = this.orderDao.getRetailOrderCount();
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("count", count);
+			return new ResponseObject<Map<String, Object>>(
+					ResponseCode.SUCCESS_CODE, null, map);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> deleteRetailOrderByOrderIds(
+			List<String> orderIds) throws ServiceException {
+		if (orderIds == null || orderIds.isEmpty()) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+		try {
+			// 删除运单
+			int i = this.orderDao.deleteByOrderIds(orderIds,
+					Arrays.asList(new String[] { Constant.ORDER_STATE0 }));
+			if (i == orderIds.size()) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				// 进行事务回滚
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> importRetailOrder(List<Order> orders,
+			String empName, String storeId) throws ServiceException {
+		if (orders == null || orders.isEmpty()) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"要添加的运单集合不能为空");
+		}
+		ResponseObject<Object> result = new ResponseObject<Object>(
+				ResponseCode.SHOW_EXCEPTION);
+		Map<String, String> users = new HashMap<String, String>();
+		Map<String, String> commodityMap = null;
+
+		try {
+			List<Commodity> commoditys = null;
+			commoditys = this.commodityDao.getAll(storeId, null);
+			if (commoditys == null || commoditys.isEmpty()) {
+				log.info("数据库中没有商品，即不保存");
+			} else {
+				commodityMap = new HashMap<String, String>();
+				for (Commodity c : commoditys) {
+					commodityMap.put(c.getName(), c.getId());
+				}
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(
+					"获取商品信息出现失败，请查看连接数据库的网络！" + e.getMessage(), e);
+		}
+
+		// 处理userId和创建时间
+		for (Order order : orders) {
+			String userId = order.getUserId();
+			String userName = order.getUserName();
+			if (!users.containsKey(userId)) {
+				// 还没有获取了user编号的会员
+				if (!users.containsKey(userName)) {
+					// 还没有开始获取user会员
+					try {
+						User user = null;
+						if (!StringUtil.isEmpty(userId)) {
+							user = this.userDao.getUserById(userId);
+						}
+						if (user == null) {
+							user = this.userDao.getUserByAccount(userName);
+						}
+						if (user != null) {
+							userId = user.getId();
+							users.put(userId, userId);
+							users.put(user.getNickName(), userId);
+						} else {
+							result.setMessage("数据库中不存在指定会员，会员编号：" + userId
+									+ "，会员账号：" + userName);
+							break;
+						}
+					} catch (Exception e) {
+						result.setMessage("数据库中不存在指定会员，会员编号：" + userId
+								+ "，会员账号：" + userName);
+						break;
+					}
+				} else {
+					userId = users.get(userName);
+				}
+			}
+			order.setUserId(userId);
+			String date = DateUtil.date2String(new Date());
+			order.setCreateDate(date);
+			order.setState(Constant.ORDER_STATE3); // 入库状态
+
+			try {
+				int k = this.orderDao.updateEmptyOrder(order);
+				if (k > 0) {
+					// 插入详情
+					if (commodityMap != null) {
+						OrderDetail[] details = order.getDetails();
+						if (details != null && details.length > 0) {
+							List<OrderDetail> inserod = new ArrayList<OrderDetail>();
+							for (OrderDetail detail : details) {
+								String cid = commodityMap
+										.get(detail.getCtype());
+								if (!StringUtil.isEmpty(cid)) {
+									detail.setCommodityId(cid);
+									detail.setTranshipmentId("-2");
+									detail.setOrderId(order.getOrderId());
+									inserod.add(detail);
+								}
+							}
+							if (!inserod.isEmpty()) {
+								this.orderDetailDao.deleteByOrderIds(Arrays
+										.asList(new String[] { order
+												.getOrderId() }));
+								this.orderDetailDao.insertOrderDetail(inserod);
+							}
+						}
+					}
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(order.getOrderId());
+					route.setDate(date);
+					route.setState(Constant.ORDER_ROUTE_STATE3);
+					route.setRemark("散件包裹导入");
+					this.routeDao.insertRoute(route);
+				} else {
+					result.setMessage("数据库中没有对应id的空运单， 运单号为："
+							+ order.getOrderId());
+					break;
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+
+		if (StringUtil.isEmpty(result.getMessage())) {
+			result.setCode(ResponseCode.SUCCESS_CODE);
+		} else {
+			// 通过抛出异常来进行事务的回滚
+			throw ExceptionUtil.handle2ServiceException(result.getMessage());
+		}
+		return result;
+	}
+
+	public User getOrderUser(String id, String orderId) throws ServiceException {
+		if (StringUtil.isEmpty(id) && StringUtil.isEmpty(orderId)) {
+			return null;
+		}
+
+		try {
+			return this.userDao.getUserByOrderId(id, orderId);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	/*
+	 * //by kevin public ResponseObject<List<Order>> getReceiverByOrderId(
+	 * List<String> orderIds) throws ServiceException { if (orderIds == null ||
+	 * orderIds.isEmpty()) { return new ResponseObject<List<Order>>(
+	 * ResponseCode.PARAMETER_ERROR, "error"); }
+	 * 
+	 * try { ResponseObject<List<Order>> result = new
+	 * ResponseObject<List<Order>>(ResponseCode.SUCCESS_CODE); List<Order>
+	 * orders = this.orderDao.getRecvNameByOrderId(orderIds);
+	 * result.setData(orders); return result;
+	 * 
+	 * } catch (Exception e) { throw ExceptionUtil.handle2ServiceException(e); }
+	 * }
+	 */
+
+	// chenkanghua
+	@Override
+	public List<SumCommodity> exportOrdersGather(String wid, String orderId,
+			String key, String column, String sdate, String edate, String state)
+			throws ServiceException {
+
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			if (!StringUtil.isEmpty(orderId)) {
+				orderId = StringUtil.escapeStringOfSearchKey(orderId);
+			}
+			// return this.orderDao.searchByKeys(oid, key, column, sdate, edate,
+			// userId,state);
+			return this.orderDetailDao.exportOrdersGather(wid, orderId, key,
+					column, sdate, edate, state);
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	//转运的价钱计算方式
+	public double calculationOrderFreight_dhyb(Order order, String type)
+			throws ServiceException {
+		if (order.getStoreId() == null) {
+			throw ExceptionUtil.handle2ServiceException("门店为空，无法计算价格");
+		}
+		
+		double additivePrice=0;
+		try{
+			
+			 Channel addtivePrice1=this.channelDao.getChannelById(order.getChannelId());
+			 if(!StringUtil.isEmpty(addtivePrice1.getAdditivePrice()))
+			 {
+				 additivePrice=StringUtil.string2Double(addtivePrice1.getAdditivePrice());
+			 }
+		}catch (Exception e) {
+			//log.error("计算快递价格失败", e);
+			//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "计算快递价格失败");
+			throw ExceptionUtil.handle2ServiceException("获取后台计算参数失败，获取渠道附加费!");
+		}
+		
+		
+		
+		/* 运费计算 start */
+		
+		
+		String priceType = "price";
+
+		if (order.getType() == Constant.ORDER_TYPE_WEB) {
+			// 转运
+			priceType = "price";
+		} else {
+			// other
+			if (Constant.USER_TYPE_NORMAL.equals(type)) {// 普通会员发件
+				priceType = "price";
+			} else if (Constant.USER_TYPE_STORE.equals(type)) { // 门市会员发件
+				priceType = "ms_price";
+			} else if (Constant.USER_TYPE_VIP.equals(type)) {// vip会员发件
+				priceType = "vip_one_price";
+			} else if (Constant.USER_TYPE_VIP2.equals(type)) {// vip2会员发件
+				priceType = "vip_two_price";
+			} else if (Constant.USER_TYPE_VIP3.equals(type)) {// vip3会员发件
+				priceType = "vip_three_price";
+			} else { // 找不到就按网上发件
+				priceType = "price";
+			}
+		}
+
+		double commodityPrice = 0.0d;
+		List<OrderDetail> details = Arrays.asList(order.getDetails());
+		for (OrderDetail detail : details) {
+			try {
+				String price = this.commodityDao.getPriceById(priceType,
+						detail.getCommodityId());
+				if (price == null) {
+					throw ExceptionUtil
+							.handle2ServiceException("运单中含有系统中没有的商品类型！");
+				}
+
+				commodityPrice = commodityPrice
+						+ StringUtil.string2Double(detail.getSjweight())
+						* StringUtil.string2Double(price);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw ExceptionUtil.handle2ServiceException("计算商品运费时出现异常！");
+			}
+		}
+
+		/*
+		 * try {
+		 * 
+		 * if (Constant.USER_TYPE_NORMAL.equals(type)) {// 普通会员发件 maxMsPrice =
+		 * this
+		 * .commodityDao.selectMaxPriceByCommoditys(order.getStoreId(),commodityId
+		 * ); }else if (Constant.USER_TYPE_STORE.equals(type)){ //门市会员发件
+		 * maxMsPrice =
+		 * this.commodityDao.selectMaxMsPriceByCommoditys(order.getStoreId
+		 * (),commodityId); }else if (Constant.USER_TYPE_VIP.equals(type)) {//
+		 * vip会员发件 maxMsPrice =
+		 * this.commodityDao.selectMaxVipOnePriceByCommoditys
+		 * (order.getStoreId(),commodityId); }else if
+		 * (Constant.USER_TYPE_VIP2.equals(type)) {// vip2会员发件 maxMsPrice =
+		 * this.
+		 * commodityDao.selectMaxVipTwoPriceByCommoditys(order.getStoreId(),
+		 * commodityId); }else if (Constant.USER_TYPE_VIP3.equals(type)) {//
+		 * vip3会员发件 maxMsPrice =
+		 * this.commodityDao.selectMaxVipThreePriceByCommoditys
+		 * (order.getStoreId(),commodityId); }else { //找不到就按网上发件 maxMsPrice =
+		 * this
+		 * .commodityDao.selectMaxPriceByCommoditys(order.getStoreId(),commodityId
+		 * ); }
+		 * 
+		 * } catch (Exception e) { throw
+		 * ExceptionUtil.handle2ServiceException(e); }
+		 */
+
+		// double weight = StringUtil.string2Double(order.getWeight());
+		double tariff = StringUtil.string2Double(order.getTariff());
+		double or = StringUtil.string2Double(order.getOr());
+		double other = StringUtil.string2Double(order.getOther());
+		double premium = StringUtil.string2Double(order.getPremium());
+
+		String strLength = order.getLength();
+		String strWidth = order.getWidth();
+		String strHeight = order.getHeight();
+		if (strLength == null || strLength.isEmpty() || strLength == "") {
+			strLength = "0";
+		}
+		if (strWidth == null || strWidth.isEmpty() || strWidth == "") {
+			strWidth = "0";
+		}
+		if (strHeight == null || strHeight.isEmpty() || strHeight == "") {
+			strHeight = "0";
+		}
+		double length = StringUtil.string2Double(strLength);
+		double width = StringUtil.string2Double(strWidth);
+		double height = StringUtil.string2Double(strHeight);
+		double volumeMoney = length * width * height / 166;
+
+		BigDecimal money = new BigDecimal(premium);
+		money = money.add(BigDecimal.valueOf(additivePrice));
+		money = money.add(BigDecimal.valueOf(other));
+		money = money.add(BigDecimal.valueOf(or));
+		money = money.add(BigDecimal.valueOf(tariff));
+		money = money.add(BigDecimal.valueOf(volumeMoney));
+		money = money.add(BigDecimal.valueOf(commodityPrice));
+
+		return money.setScale(2, BigDecimal.ROUND_UP).doubleValue();
+
+		/* 运费计算 end */
+
+	}
+	
+	//运单的钱计算方式
+	public double calculationOrderFreight(Order order, String type)
+			throws ServiceException {
+		String jw_commodity_rate="";
+		String lowest_weight_value="";
+		String price_carry_flag="";
+		double additivePrice=0;
+		try{
+			 jw_commodity_rate=this.globalargsDao.getcontentbyflag("jw_commodity_rate");
+			 lowest_weight_value=this.globalargsDao.getcontentbyflag("lowest_weight_value_flag");
+			 price_carry_flag=this.globalargsDao.getcontentbyflag("price_carry_flag");
+			 Channel addtivePrice1=this.channelDao.getChannelById(order.getChannelId());
+			 if(!StringUtil.isEmpty(addtivePrice1.getAdditivePrice()))
+			 {
+				 additivePrice=StringUtil.string2Double(addtivePrice1.getAdditivePrice());
+			 }
+		}
+		catch (Exception e) {
+			//log.error("计算快递价格失败", e);
+			//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "计算快递价格失败");
+			throw ExceptionUtil.handle2ServiceException("获取后台计算参数失败，请检查全局变量jw_commodity_rate，lowest_weight_value_flag，price_carry_flag,或渠道附加费!");
+		}
+	
+		
+		if (order.getStoreId() == null) {
+			throw ExceptionUtil.handle2ServiceException("门店为空，无法计算价格");
+		}
+		/* 运费计算 start */
+		String priceType = "price";
+
+		if (order.getType() == Constant.ORDER_TYPE_WEB) {
+			// 转运
+			priceType = "price";
+		} else {
+			// other
+			if (Constant.USER_TYPE_NORMAL.equals(type)) {// 普通会员发件
+				priceType = "ms_price";
+			} else if (Constant.USER_TYPE_STORE.equals(type)) { // 门市会员发件
+				priceType = "ms_price";
+			} else if (Constant.USER_TYPE_VIP.equals(type)) {// vip会员发件
+				priceType = "vip_one_price";
+			} else if (Constant.USER_TYPE_VIP2.equals(type)) {// vip2会员发件
+				priceType = "vip_two_price";
+			} else if (Constant.USER_TYPE_VIP3.equals(type)) {// vip3会员发件
+				priceType = "vip_three_price";
+			} else { // 找不到就按网上发件
+				priceType = "price";
+			}
+		}
+
+		double commodityPrice = 0.0d;
+		double lowestprice=0;
+		double highestprice=0;
+		double commodityweighttotal=0;
+		List<OrderDetail> details = Arrays.asList(order.getDetails());
+		for (OrderDetail detail : details) {
+			try {
+				String price = this.commodityDao.getPriceById(priceType,
+						detail.getCommodityId());
+				if (price == null) {
+					throw ExceptionUtil
+							.handle2ServiceException("运单中含有系统中没有的商品类型！");
+				}
+
+				if(lowestprice==0)
+				{
+					lowestprice=StringUtil.string2Double(price);
+				}
+				else
+				{
+					if(lowestprice>StringUtil.string2Double(price))
+					{
+						lowestprice=StringUtil.string2Double(price);
+					}
+				}
+				
+				if(highestprice==0)
+				{
+					highestprice=StringUtil.string2Double(price);
+				}
+				else
+				{
+					if(highestprice<StringUtil.string2Double(price))
+					{
+						highestprice=StringUtil.string2Double(price);
+					}
+				}
+				commodityweighttotal=commodityweighttotal+StringUtil.string2Double(detail.getSjweight());
+				commodityPrice = commodityPrice
+						+ StringUtil.string2Double(detail.getSjweight())
+						* StringUtil.string2Double(price);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw ExceptionUtil.handle2ServiceException("计算商品运费时出现异常！");
+			}
+		}
+
+		
+		
+		
+		//double commodityweighttotal=StringUtil.string2Double(order.getWeight());
+		double additiveweight=0.00;//附加重量
+		if(commodityweighttotal<StringUtil.string2Double(lowest_weight_value))
+		{
+			if((!price_carry_flag.equalsIgnoreCase("0")))
+			{
+				additiveweight=StringUtil.string2Double(lowest_weight_value)-commodityweighttotal;
+				//commodityweighttotal=StringUtil.string2Double(lowest_weight_value);
+			}
+		}
+		else
+		{
+			//3：表示商品总重量按照jw_commodity_rate进位，进位重量按价格最高的商品计算。
+			//4：表示商品总重量按照jw_commodity_rate进位，进位重量按照商品价格最低的来进行计算。
+			if((price_carry_flag.equalsIgnoreCase("5"))||(price_carry_flag.equalsIgnoreCase("6"))||(price_carry_flag.equalsIgnoreCase("7"))||(price_carry_flag.equalsIgnoreCase("8")))
+			{
+				double sum_jwweight=StringUtil.string2Double(order.getJwweight());//总实际重量
+				
+				if((StringUtil.string2Double(jw_commodity_rate)>0)&&(StringUtil.string2Double(jw_commodity_rate)<1))
+				{
+					
+					
+					if((commodityweighttotal-((int)commodityweighttotal))>StringUtil.string2Double(jw_commodity_rate))
+					{
+						additiveweight=((int)commodityweighttotal)+1-sum_jwweight;
+					}
+					else
+					{
+
+						if((price_carry_flag.equalsIgnoreCase("5"))||(price_carry_flag.equalsIgnoreCase("6")))//退位计算
+						{
+							additiveweight=((int)commodityweighttotal)-commodityweighttotal;//退位计算
+							//commodityweighttotal=j;
+						}
+						else if((price_carry_flag=="7")||(price_carry_flag=="8"))//按实际计算
+						{
+							additiveweight=0;
+						}
+						else
+						{
+
+							additiveweight=0;
+						}
+					}
+					
+					
+				}
+				else
+				{
+					
+					//commodityweighttotal=commodityjwweighttotal;
+					additiveweight=0;
+				}
+				
+			}
+		}
+		
+		if(additiveweight<=-1)
+		{
+			additiveweight=0;
+		}
+		
+		/*
+		 * try {
+		 * 
+		 * if (Constant.USER_TYPE_NORMAL.equals(type)) {// 普通会员发件 maxMsPrice =
+		 * this
+		 * .commodityDao.selectMaxPriceByCommoditys(order.getStoreId(),commodityId
+		 * ); }else if (Constant.USER_TYPE_STORE.equals(type)){ //门市会员发件
+		 * maxMsPrice =
+		 * this.commodityDao.selectMaxMsPriceByCommoditys(order.getStoreId
+		 * (),commodityId); }else if (Constant.USER_TYPE_VIP.equals(type)) {//
+		 * vip会员发件 maxMsPrice =
+		 * this.commodityDao.selectMaxVipOnePriceByCommoditys
+		 * (order.getStoreId(),commodityId); }else if
+		 * (Constant.USER_TYPE_VIP2.equals(type)) {// vip2会员发件 maxMsPrice =
+		 * this.
+		 * commodityDao.selectMaxVipTwoPriceByCommoditys(order.getStoreId(),
+		 * commodityId); }else if (Constant.USER_TYPE_VIP3.equals(type)) {//
+		 * vip3会员发件 maxMsPrice =
+		 * this.commodityDao.selectMaxVipThreePriceByCommoditys
+		 * (order.getStoreId(),commodityId); }else { //找不到就按网上发件 maxMsPrice =
+		 * this
+		 * .commodityDao.selectMaxPriceByCommoditys(order.getStoreId(),commodityId
+		 * ); }
+		 * 
+		 * } catch (Exception e) { throw
+		 * ExceptionUtil.handle2ServiceException(e); }
+		 */
+
+		
+		
+				//1：表示单个商品进位计算，即如果超过jw_commodity_rate设置的值，进位到整数，如果小于将退位到整数。如果低于lowest_weight_value_flag，多的按最高价计算。
+				if(price_carry_flag.equalsIgnoreCase("1")||price_carry_flag.equalsIgnoreCase("3"))
+				{
+					additivePrice=additivePrice+highestprice*additiveweight;
+				}//2：表示单个商品进位计算，即如果超过jw_commodity_rate设置的值，进位到整数，如果小于将退位到整数。如果低于lowest_weight_value_flag，多的按最低价计算。
+				else if(price_carry_flag.equalsIgnoreCase("2")||price_carry_flag.equalsIgnoreCase("4"))
+				{
+					additivePrice=additivePrice+lowestprice*additiveweight;
+				}
+				else if(price_carry_flag.equalsIgnoreCase("5")||price_carry_flag.equalsIgnoreCase("7"))
+				{
+					additivePrice=additivePrice+highestprice*additiveweight;
+				}
+				else if(price_carry_flag.equalsIgnoreCase("6")||price_carry_flag.equalsIgnoreCase("8"))
+				{
+					additivePrice=additivePrice+lowestprice*additiveweight;
+				}
+		
+		
+		// double weight = StringUtil.string2Double(order.getWeight());
+		double tariff = StringUtil.string2Double(order.getTariff());
+		double or = StringUtil.string2Double(order.getOr());
+		double other = StringUtil.string2Double(order.getOther());
+		double premium = StringUtil.string2Double(order.getPremium());
+
+		String strLength = order.getLength();
+		String strWidth = order.getWidth();
+		String strHeight = order.getHeight();
+		if (strLength == null || strLength.isEmpty() || strLength == "") {
+			strLength = "0";
+		}
+		if (strWidth == null || strWidth.isEmpty() || strWidth == "") {
+			strWidth = "0";
+		}
+		if (strHeight == null || strHeight.isEmpty() || strHeight == "") {
+			strHeight = "0";
+		}
+		double length = StringUtil.string2Double(strLength);
+		double width = StringUtil.string2Double(strWidth);
+		double height = StringUtil.string2Double(strHeight);
+		double volumeMoney = length * width * height / 166;
+
+		BigDecimal money = new BigDecimal(premium);
+		money=money.add(BigDecimal.valueOf(additivePrice));//添加附加价格
+		money = money.add(BigDecimal.valueOf(other));
+		money = money.add(BigDecimal.valueOf(or));
+		money = money.add(BigDecimal.valueOf(tariff));
+		money = money.add(BigDecimal.valueOf(volumeMoney));
+		money = money.add(BigDecimal.valueOf(commodityPrice));
+
+		return money.setScale(2, BigDecimal.ROUND_UP).doubleValue();
+
+		/* 运费计算 end */
+
+	}
+	//保存之前的计算方法
+	public double calculationOrderFreight20151226(Order order, String type)
+			throws ServiceException {
+		if (order.getStoreId() == null) {
+			throw ExceptionUtil.handle2ServiceException("门店为空，无法计算价格");
+		}
+		/* 运费计算 start */
+		String priceType = "price";
+
+		if (order.getType() == Constant.ORDER_TYPE_WEB) {
+			// 转运
+			priceType = "price";
+		} else {
+			// other
+			if (Constant.USER_TYPE_NORMAL.equals(type)) {// 普通会员发件
+				priceType = "ms_price";
+			} else if (Constant.USER_TYPE_STORE.equals(type)) { // 门市会员发件
+				priceType = "ms_price";
+			} else if (Constant.USER_TYPE_VIP.equals(type)) {// vip会员发件
+				priceType = "vip_one_price";
+			} else if (Constant.USER_TYPE_VIP2.equals(type)) {// vip2会员发件
+				priceType = "vip_two_price";
+			} else if (Constant.USER_TYPE_VIP3.equals(type)) {// vip3会员发件
+				priceType = "vip_three_price";
+			} else { // 找不到就按网上发件
+				priceType = "price";
+			}
+		}
+
+		double commodityPrice = 0.0d;
+		List<OrderDetail> details = Arrays.asList(order.getDetails());
+		try {
+			for (OrderDetail detail : details) {
+				String price = this.commodityDao.getPriceById(priceType,
+						detail.getCommodityId());
+				if (price == null) {
+					throw ExceptionUtil.handle2ServiceException("运单中含有系统中没有的商品类型！");
+				}
+				String firstFee = this.commodityDao.getPriceById("first_fee", detail.getCommodityId());
+				String sjWeight = PaymentUtil.calcWeightRound(detail.getSjweight(), this.globalargsDao.getcontentbyflag(Constant.GLOBALARGS_FLAG_WEIGHT_ROUND_UP));//妈的，什么是射精重量？
+				commodityPrice = commodityPrice + StringUtil.string2Double(firstFee) + StringUtil.string2Double(sjWeight)	* StringUtil.string2Double(price);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw ExceptionUtil.handle2ServiceException("计算商品运费时出现异常！");
+		}
+
+		/*
+		 * try {
+		 * 
+		 * if (Constant.USER_TYPE_NORMAL.equals(type)) {// 普通会员发件 maxMsPrice =
+		 * this
+		 * .commodityDao.selectMaxPriceByCommoditys(order.getStoreId(),commodityId
+		 * ); }else if (Constant.USER_TYPE_STORE.equals(type)){ //门市会员发件
+		 * maxMsPrice =
+		 * this.commodityDao.selectMaxMsPriceByCommoditys(order.getStoreId
+		 * (),commodityId); }else if (Constant.USER_TYPE_VIP.equals(type)) {//
+		 * vip会员发件 maxMsPrice =
+		 * this.commodityDao.selectMaxVipOnePriceByCommoditys
+		 * (order.getStoreId(),commodityId); }else if
+		 * (Constant.USER_TYPE_VIP2.equals(type)) {// vip2会员发件 maxMsPrice =
+		 * this.
+		 * commodityDao.selectMaxVipTwoPriceByCommoditys(order.getStoreId(),
+		 * commodityId); }else if (Constant.USER_TYPE_VIP3.equals(type)) {//
+		 * vip3会员发件 maxMsPrice =
+		 * this.commodityDao.selectMaxVipThreePriceByCommoditys
+		 * (order.getStoreId(),commodityId); }else { //找不到就按网上发件 maxMsPrice =
+		 * this
+		 * .commodityDao.selectMaxPriceByCommoditys(order.getStoreId(),commodityId
+		 * ); }
+		 * 
+		 * } catch (Exception e) { throw
+		 * ExceptionUtil.handle2ServiceException(e); }
+		 */
+
+		// double weight = StringUtil.string2Double(order.getWeight());
+		double tariff = StringUtil.string2Double(order.getTariff());
+		double or = StringUtil.string2Double(order.getOr());
+		double other = StringUtil.string2Double(order.getOther());
+		double premium = StringUtil.string2Double(order.getPremium());
+
+		String strLength = order.getLength();
+		String strWidth = order.getWidth();
+		String strHeight = order.getHeight();
+		if (strLength == null || strLength.isEmpty() || strLength == "") {
+			strLength = "0";
+		}
+		if (strWidth == null || strWidth.isEmpty() || strWidth == "") {
+			strWidth = "0";
+		}
+		if (strHeight == null || strHeight.isEmpty() || strHeight == "") {
+			strHeight = "0";
+		}
+		double length = StringUtil.string2Double(strLength);
+		double width = StringUtil.string2Double(strWidth);
+		double height = StringUtil.string2Double(strHeight);
+		double volumeMoney = length * width * height / 166;
+		
+		double payChangeWarehouse = StringUtil.string2Double(order.getPayChangeWarehouse());
+		double payToChina = StringUtil.string2Double(order.getPayToChina());
+
+		BigDecimal money = new BigDecimal(premium);
+		money = money.add(BigDecimal.valueOf(other));
+		money = money.add(BigDecimal.valueOf(or));
+		money = money.add(BigDecimal.valueOf(tariff));
+		money = money.add(BigDecimal.valueOf(volumeMoney));
+		money = money.add(BigDecimal.valueOf(commodityPrice));
+		money = money.add(BigDecimal.valueOf(payChangeWarehouse)).add(BigDecimal.valueOf(payToChina));
+
+		return money.setScale(2, BigDecimal.ROUND_UP).doubleValue();
+
+		/* 运费计算 end */
+
+	}
+
+	@Override
+	public ResponseObject<Object> modifyCardIdAndUrl(String orderId,
+			String cid, String cname, String cphone, String fileName,
+			String fileNameother, String filecardtogether)
+			throws ServiceException {
+		// TODO Auto-generated method stub
+		List<Order> orders = null;
+		Order order;
+		try {
+			// cphone="%"+cphone;
+			// cphone="%";
+			// orders=this.orderDao.searchinsertcardurlinfo(orderId,cname,cphone);
+
+			order = this.orderDao.getByOrderId(orderId);
+			if(order==null)
+			{
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"系统中没有对应的运单号。请确认运单号是否正确");
+			}
+			String phone = order.getcPhone();
+			if ((phone != null) && (phone.length() > 5)) {
+				phone = phone.substring(phone.length() - 6, phone.length());
+				if ((order.getcName().equalsIgnoreCase(cname))
+						&& (phone.equalsIgnoreCase(cphone))) {
+
+				} else {
+					return new ResponseObject<Object>(
+							ResponseCode.PARAMETER_ERROR, "参数不正确,请检查!");
+				}
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw ExceptionUtil.handle2ServiceException("查找运单号失败！，请重试", e);
+		}
+		// int k=orders.size();
+
+		if (order == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"系统中没有对应的运单号。请确认运单号是否正确");
+		}
+		try {
+			this.orderDao.modifyCardIdAndUrl(orderId, cid, fileName,
+					fileNameother, filecardtogether);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException("上传失败！，请重试", e);
+		}
+		return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE, "");
+	}
+
+	@Override
+	public ResponseObject<Object> getRouteListByGuest(String kuaidiType,
+			String oids/* , String thirdNo, String thirdPns */,
+			String[] orderIds) throws ServiceException {
+		// TODO Auto-generated method stub
+		if (kuaidiType.equals(Constant.KUAIDI_TYPE_MEITAO)) {
+			if (oids == null || oids == "") {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"系统中没有对应的运单号。请确认运单号是否正确");
+			}
+			ResponseObject<Object> responseObject = new ResponseObject<Object>(
+					ResponseCode.SUCCESS_CODE);
+			String ret;
+			try {
+				ret = KuaiDiUtil.SearchkuaiDiInfo(Constant.KUAIDI_TYPE_MEITAO,
+						oids);
+			} catch (Exception e) {
+				log.error("查询运单异常");
+				return new ResponseObject<Object>(ResponseCode.SHOW_EXCEPTION,
+						"查询运单异常");
+			}
+			ret = KuaiDiUtil
+					.extractValue(
+							ret,
+							"<div class=\"rndRec\" style=\"float: left; padding: 10px; width: 980px;\">",
+							"<div style=\"clear: both; height: 5px;\"></div>");
+			if (ret != "" && ret != null) {
+				int startIndex = ret.indexOf("<div class=\"tipTitle\">");
+				if (startIndex > -1) {
+					ret = ret.substring(startIndex, ret.length()).trim();
+					ret = ret.replace("美淘转运", "全球速递");
+					ret = ret.replace("美淘", "全球速递");
+				}
+			}
+			responseObject.setData(ret);
+			return responseObject;
+		} else if (kuaidiType.equals(Constant.KUAIDI_TYPE_DCS)) {
+			if (oids == null || oids.equals("")) {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"参数无效");
+			}
+			ResponseObject<Object> responseObject = new ResponseObject<Object>(
+					ResponseCode.SUCCESS_CODE);
+			try {
+				List<Route> result = new ArrayList<Route>();
+				String content = KuaiDiUtil.SearchkuaiDiInfo(
+						Constant.KUAIDI_TYPE_DCS, oids);
+				JSONObject json = JSONObject.fromObject(content);
+				System.out.println(content);
+				// 0：物流单暂无结果，
+				// 1：查询成功，
+				if (json.getString("code").equals("1")) {
+					JSONArray ja = json.getJSONArray("data");
+					for (int i = 0; i < ja.size(); i++) {
+						JSONObject jo = (JSONObject) ja.get(i);
+						Route route = new Route();
+						route.setDate(jo.getString("time"));
+						route.setRemark(jo.getString("message"));
+						route.setState("");
+						result.add(route);
+					}
+					responseObject.setData(result);
+					return responseObject;
+				} else {
+					List<Route> list = this.routeDao.getRouteByOrderId(oids);
+					responseObject.setData(list);
+					return responseObject;
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("查询异常！，请重试", e);
+			}
+		} else if (kuaidiType.equals(Constant.KUAIDI_TYPE_KUAIDI100)) {
+			if (oids == null || oids.equals("")) {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"参数无效");
+			}
+			Order order = null;
+			try {
+				//order = this.orderDao.getByOrderId(oids);
+				order = this.orderDao.getByOrderIdonlyfororder(oids,null);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("查询异常！，请重试", e);
+			}
+			if(order==null)
+			{
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"查询失败！没有找到对应的单号!");
+			}
+			
+			if ((order.getThirdNo() == null || order.getThirdNo().equals("")
+					|| order.getThirdPNS() == null || order.getThirdPNS()
+					.equals(""))
+					|| (order.getState() != null)
+					&& (Integer.parseInt(order.getState()) < 7)) {
+				ResponseObject<Object> responseObject = new ResponseObject<Object>(
+						ResponseCode.SUCCESS_CODE);
+
+				List<Route> list;
+				try {
+					list = this.routeDao.getRouteByOrderId(oids);
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("查询异常！，请重试", e);
+				}
+				responseObject.setData(list);
+				return responseObject;
+			}
+
+			try {
+				String key=this.globalargsDao.getcontentbyflag("kuaidi100_key");
+				ResponseObject<Object> responseObject = new ResponseObject<Object>(
+						ResponseCode.SUCCESS_CODE);
+				List<Route> result = new ArrayList<Route>();
+				String content = KuaiDiUtil.SearchkuaiDiInfo(
+						Constant.KUAIDI_TYPE_KUAIDI100, "",
+						order.getThirdPNS(), order.getThirdNo(),key);
+				result = this.routeDao.getRouteByOrderId(oids);// 先导入原有数据
+				
+				//加入所有快递考虑
+				String[] htmllist=null;
+				try {
+					Properties props = PropertiesReader.read(Constant.SYSTEM_PROPERTIES_FILE);
+					//key = props.getProperty("kuaidi.apikey");
+					String htmllist_temp=props.getProperty("kuaidi100.use.url.list");
+					if(!StringUtil.isEmpty(htmllist_temp))
+					{
+						htmllist=htmllist_temp.split(";");
+					}
+				} catch (Exception e) {
+					//key = "1a34d5adddbaf841";
+				}
+				
+				String flag="0";
+				if((htmllist!=null)&&(htmllist.length>0))
+				{
+					if(!StringUtil.isEmpty(order.getThirdPNS()))
+					{
+						for(int i=0;i<htmllist.length;i++)
+						{
+							if(!StringUtil.isEmpty(htmllist[i]))
+							{
+								if(order.getThirdPNS().equalsIgnoreCase(htmllist[i]))
+								{
+									flag="1";
+									break;
+								}
+							}
+						}
+					}
+				}
+				
+				if ((!StringUtil.isEmpty(order.getThirdPNS()))
+						&& (flag.equalsIgnoreCase("1"))) {
+					Route route = new Route();
+					route.setReturnurl(content);
+					route.setOrderId(oids);
+					route.setState("");
+					route.setThrid_no(order.getThirdNo());
+					route.setThrid_pns(order.getThirdPNS());
+
+					route.setStateRemark("中国快递公司：" + order.getThirdPNS()
+							+ "<br>" + "中国快递单号：" + order.getThirdNo());
+					result.add(route);
+					responseObject.setData(result);
+					return responseObject;
+				}
+
+				JSONObject json = JSONObject.fromObject(content);
+
+				// 0：物流单暂无结果，
+				// 1：查询成功，
+				// 2：接口出现异常，
+
+				if (json.getString("status").equals("1")) {
+					JSONArray ja = json.getJSONArray("data");
+					for (int i = 0; i < ja.size(); i++) {
+						JSONObject jo = (JSONObject) ja.get(i);
+						Route route = new Route();
+						route.setOrderId(oids);
+						route.setStateRemark("中国快递公司：" + order.getThirdPNS()
+								+ "<br>" + "中国快递单号：" + order.getThirdNo());
+						route.setDate(oids);
+						route.setDate(jo.getString("time"));
+						route.setRemark(jo.getString("context"));
+						route.setState("");
+						result.add(route);
+
+					}
+				} else if (json.getString("status").equals("0")) {
+					/*
+					 * Route route = new Route(); SimpleDateFormat df = new
+					 * SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+					 * route.setDate(df.format(new Date()));
+					 * route.setDate(oids); route.setRemark("");
+					 * route.setState("暂无第三方物流单结果"); result.add(route);
+					 */
+				} else {
+					// log.error("查询运单失败,第三方快递公司="+order.getThirdPNS()+"，快递号="+order.getThirdNo());
+					// return new
+					// ResponseObject<Object>(ResponseCode.SHOW_EXCEPTION,
+					// "查询失败,请稍后查询");
+				}
+
+				responseObject.setData(result);
+				return responseObject;
+
+			} catch (Exception e) {
+				log.error("查询运单失败", e);
+				return new ResponseObject<Object>(ResponseCode.SHOW_EXCEPTION,
+						"查询失败,请稍后查询");
+			}
+		} else {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+	}
+
+	/*
+	 * @Override public ResponseObject<Map<String, String>>
+	 * addOrderOfOnlinebyuser( Order order) throws ServiceException { // TODO
+	 * Auto-generated method stub return null; }
+	 */
+
+	// kai 20150911
+	public ResponseObject<Map<String, String>> modifyOrderonlinebyuser(
+			Order order) throws ServiceException {
+		if (order == null) {
+			return new ResponseObject<Map<String, String>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+
+		}
+		if (order.getOrderId() == null) {
+			return new ResponseObject<Map<String, String>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+
+		}
+		try {
+			// 添加最后修改时间
+			String date = DateUtil.date2String(new Date());
+			order.setModifyDate(date);
+
+			// update by chenkanghua
+			List<String> commodityId = new ArrayList<String>();
+			for (OrderDetail od : order.getDetails()) {
+				commodityId.add(od.getCommodityId());
+			}
+			// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+			// userType)));
+			// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+			// userType)));
+			// order.setTotalMoney(String.valueOf(this.calculationOrderFreight(commodityId,order,userType)));
+
+			int i = this.orderDao.modifyOrderbyuser(order);
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			if (i > 0) {
+				if (order.getDetails() != null
+						&& order.getDetails().length != 0) {
+					// add by chenakanghua 订单id
+					for (OrderDetail od : order.getDetails()) {
+						if (Integer.valueOf(od.getQuantity()).intValue() > 0) {
+							od.setOrderId(order.getOrderId());
+							od.setSjweight("0");
+							od.setTranshipmentId("-1");
+							// od.getJfweight();
+							list.add(od);
+						}
+					}
+					// 继续修改
+					i = this.orderDetailDao.deleteByOrderIds(Arrays
+							.asList(new String[] { order.getOrderId() }));
+					i = this.orderDetailDao.insertOrderDetail(list);
+				}
+			} else {
+				// 修改失败,进行事务回滚
+				// return new
+				// ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "修改失败");
+				throw new Exception();
+			}
+
+			// 进行路由的插入
+			// 插入完成后，新建一个Route并插入到数据库中
+			/*
+			 * Route route = new Route(); route.setOrderId(order.getOrderId());
+			 * route.setName(empName); route.setDate(date);
+			 * route.setState(OrderUtil.transformerState(0, order.getState()));
+			 * route.setAddress("仓库"); this.routeDao.insertRoute(route);
+			 */
+			return new ResponseObject<Map<String, String>>(
+					ResponseCode.SUCCESS_CODE);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// kai 20150911-1 modify 单独修改图片路径，更新 ord要更新的订单号，url图片的存储路径
+	public ResponseObject<Map<String, String>> modifyOrderonlinebyuserpicurl(
+			Order order) throws ServiceException {
+		if (order == null) {
+			return new ResponseObject<Map<String, String>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			// 添加最后修改时间
+			String date = DateUtil.date2String(new Date());
+			order.setModifyDate(date);
+
+			int i = this.orderDao.modifyOrderurlonly(order);
+			if (i >= 1) {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.PARAMETER_ERROR, "更新失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// public ResponseObject<Object> importRetailOrder(List<Order> orders,
+	// String empName,String storeId) throws ServiceException {
+	// kai 20190916
+	public int check_import_weiyi_orders(List<Order> orders, String wid,
+			String cid) {
+		int row = 2;
+		try {
+			for (Order order : orders) {
+				// 检查用户是否存在
+				User user = this.userDao.getUserById(order.getUserId());
+
+				if (user == null) {
+					throw new RuntimeException("第" + row + "行的用户id("
+							+ order.getUserId() + ")不存在,请重新确认!");
+				} else {
+
+					if ((user.getType() != null)
+							&& (user.getType().equalsIgnoreCase("5")))// 仅仅代理会员可导入数据
+					{
+						// 检查商品是否正确
+						boolean flag = true;
+						OrderDetail[] details = order.getDetails();
+						List<Commodity> commoditys = this.commodityDao.getAll(
+								wid, cid);
+						for (OrderDetail de : details) {
+							flag = false;
+
+							for (Commodity comm : commoditys) {
+								String temp = de.getName();
+								String temp1 = comm.getName();
+								if (de.getName().equalsIgnoreCase(
+										comm.getName()))// 比较商品名是否有相同的，如果不同，表明插入将会出错
+								{
+									de.setCommodityId(comm.getId());
+									flag = true;
+									break;
+								} else {
+									continue;
+								}
+							}
+
+							if (flag == false) {
+								throw new RuntimeException("第" + row
+										+ "行的用户商品类型不存在,请重新确认!");
+							}
+						}
+
+					} else {
+						throw new RuntimeException("第" + row + "行的用户id("
+								+ order.getUserId() + ")无导入权限,请重新确认!");
+					}
+				}
+
+			}
+			return 0;
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+
+	}
+
+	public ResponseObject<Object> addOrder_weiyi_import(Order order, int row)
+			throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			order.setCreateDate(date);
+			order.setModifyDate(date);
+			String orderId = order.getOrderId();
+
+			// 计算运费 由上层计算 update by chenkanghua
+			// order.setTotalMoney(String.valueOf(OrderFreightUtil.calculationOrderFreight(order,
+			// userType)));
+			order.setTypeKey(Constant.ORDER_TYPE_KEY_7);//ORDER_TYPE_KEY_7 批量生成运单
+			int k = this.orderDao.insertOrder(order);
+			if (k > 0) {
+				// 修改运单id
+				// if (orderId == null || orderId.equals("")) {
+				//orderId = OrderUtil.createOrderId(order.getId(),
+				//		order.getOrderIdPrefix());
+				
+				 orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+				order.setOrderId(orderId);
+				// }
+
+				this.orderDao.modifyOrderId(order.getId(), orderId);
+
+				for (OrderDetail detail : order.getDetails()) {
+					detail.setOrderId(orderId);
+					detail.setTranshipmentId("-1");// 设计时不能留空
+				}
+
+				if (order.getDetails().length == this.orderDetailDao
+						.insertOrderDetail(Arrays.asList(order.getDetails()))) {
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(orderId);
+					route.setDate(date);
+					route.setState(Constant.ORDER_ROUTE_STATE3);
+					route.setAddress("代理会员");
+					this.routeDao.insertRoute(route);
+
+					ResponseObject<Object> result = new ResponseObject<Object>(
+							ResponseCode.SUCCESS_CODE);
+					Map<String, String> map = new HashMap<String, String>();
+					map.put("id", order.getId());
+					map.put("orderId", orderId);
+					result.setData(map);
+
+					return result;
+				} else {
+					// throw exception
+					throw new Exception();
+				}
+			} else {
+				return new ResponseObject<Object>(
+						ResponseCode.ORDER_INSERT_ERROR, "第" + row + "条订单"
+								+ "插入运单失败");
+			}
+
+		} catch (Exception e) {
+			return new ResponseObject<Object>(ResponseCode.ORDER_INSERT_ERROR,
+					"第" + row + "条订单" + "插入运单失败");
+
+		}
+	}
+
+	// kai 20151002 组合运单提交时,检查合法性
+	public ResponseObject<Object> check_mux_Submit(WayBill wayBill)
+			throws ServiceException {
+		if (wayBill == null || wayBill.getOrders() == null
+				|| wayBill.getCommodityIdList().length == 0) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+		try {
+
+			Set<String> trancommids = new HashSet<String>();
+
+			List<Order> orders = wayBill.getOrders();
+			String[] commoditylist;
+			commoditylist = wayBill.getCommodityIdList();
+
+			// 先去掉重复的值
+			for (int i = 0; i < commoditylist.length; i++) {
+				trancommids.add(commoditylist[i]);
+			}
+
+			for (String ids : trancommids) {
+				int com_no = 0;// 计算同一行中取多少个商品
+				for (int i = 0; i < commoditylist.length; i++) {
+					if (commoditylist[i].equalsIgnoreCase(ids))//
+					{
+						com_no = com_no + 1;
+					}
+
+				}
+				if (com_no > 0) {
+					TranshipmentCommodity comlist = this.transhipmentCommodityDao.getByIdsn(ids);
+					if (comlist == null) {
+						return new ResponseObject<Object>(
+								ResponseCode.ORDER_IS_SUBMITED,
+								"商品列表已经被更改,请联系客服!");
+					} else {
+
+						if (Integer.parseInt(comlist.getQuantity()) < com_no) {
+							return new ResponseObject<Object>(
+									ResponseCode.ORDER_IS_SUBMITED,
+									"商品列表已经被更改,请联系客服!");
+						} else {
+							TranshipmentBill bill = this.transhipmentBillDao
+									.getById(comlist.getTranshipmentId());
+							if (bill == null) {
+								return new ResponseObject<Object>(
+										ResponseCode.ORDER_IS_SUBMITED,
+										"转运订单异常，请联系客服!");
+							} else {
+								for (Order order : orders) {
+									if ((!order.getWarehouseId()
+											.equalsIgnoreCase(
+													bill.getWarehouseId()))
+											|| (!order
+													.getChannelId()
+													.equalsIgnoreCase(
+															bill.getChannelId()))) {
+										return new ResponseObject<Object>(
+												ResponseCode.ORDER_IS_SUBMITED,
+												"组合包裹必须是同一仓库和同一渠道,请联系客服!");
+									}
+								}
+
+							}
+
+						}
+
+					}
+				}
+			}
+
+			return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// kai 20151002 用户提交转运组合商品时的处理接口
+	public ResponseObject<List<String>> addOrdersOfWayBillbyusermux(
+			WayBill wayBill) throws ServiceException {
+		if (wayBill == null || wayBill.getOrders() == null) {
+			return new ResponseObject<List<String>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		return this.muxboxSubmit(wayBill);
+
+	}
+
+	// kai 20150930 添加极速转运订单
+	public ResponseObject<List<String>> addOrdersOfWayBillquick(WayBill wayBill)
+			throws ServiceException {
+		if (wayBill == null || wayBill.getOrders() == null
+				|| wayBill.getOrders().isEmpty()) {
+			return new ResponseObject<List<String>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		return this.quickboxSubmit(wayBill);
+
+	}
+
+	// kai 20151002 用户提交转运组合商品时的处理接口
+
+	private ResponseObject<List<String>> muxboxSubmit(WayBill wayBill)
+			throws ServiceException {
+		try {
+			String userId = wayBill.getUserId();
+
+			// 初始化新生成的转运单
+			TranshipmentBill bill = new TranshipmentBill();// 新建转运单号
+			bill.setUserId(userId);
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 设置日期格式
+
+			bill.setCreateDate(df.format(new Date()));
+			bill.setModifyDate(df.format(new Date()));
+			bill.setState(Constant.TRANSHIPMENT_STATE2);
+			bill.setAwt(df.format(new Date()));
+			bill.setTransitNo("composed");
+			bill.setTariff("0");
+			bill.setOr("0");
+			bill.setOther("0");
+			bill.setLength("0");
+			bill.setWidth("0");
+			bill.setHeight("0");
+			bill.setTransitType("0");
+
+			TranshipmentUtil.setTranshipConsignee(bill,
+					wayBill.getConsigneeInfo());// 初始化地址
+			for (Order order : wayBill.getOrders()) {
+				bill.setWarehouseId(order.getWarehouseId());
+				bill.setChannelId(order.getChannelId());
+				bill.setRemark(order.getRemark());
+				bill.setParcelValue(order.getParceValue());
+				bill.setPremium(order.getPremium());
+			}
+
+			int k = this.transhipmentBillDao.insertTranshipmentBill(bill);
+			int tranid = this.transhipmentBillDao.getidByOrderId(userId);
+
+			List<String> orderIds = new ArrayList<String>();
+			List<Order> orders = wayBill.getOrders();
+			if (orders == null || orders.size() != 1) {
+				return new ResponseObject<List<String>>(
+						ResponseCode.PARAMETER_ERROR, "提交参数错误");
+			}
+
+			/*
+			 * for (Order order : orders) { List<OrderDetail> details = new
+			 * ArrayList<OrderDetail>();
+			 * 
+			 * // 设置收货地址
+			 * OrderUtil.setOrderConsignee(order,wayBill.getConsigneeInfo());
+			 * 
+			 * order.setState(Constant.ORDER_STATE2);//未付款状态
+			 * order.setType(wayBill.getOrderType()); String date =
+			 * DateUtil.date2String(new Date()); order.setCreateDate(date);
+			 * order.setModifyDate(date); order.setUserId(wayBill.getUserId());
+			 */
+
+			Set<String> trancommids = new HashSet<String>();
+			Set<String> trancids = new HashSet<String>();// 保存包含运单的id
+
+			String[] commoditylist;
+			commoditylist = wayBill.getCommodityIdList();
+
+			for (int i = 0; i < commoditylist.length; i++) {
+				trancommids.add(commoditylist[i]);
+			}
+
+			// 开始取值
+			for (String ids : trancommids) {
+				int com_no = 0;// 计算同一行中取多少个商品
+				for (int i = 0; i < commoditylist.length; i++) {
+					if (commoditylist[i].equalsIgnoreCase(ids))//
+					{
+						com_no = com_no + 1;
+					}
+
+				}
+
+				if (com_no > 0) {
+					// OrderDetail od = new OrderDetail();
+					TranshipmentCommodity tranc = new TranshipmentCommodity();
+					tranc.setTranshipmentId(String.valueOf(tranid));
+
+					TranshipmentCommodity comlist = this.transhipmentCommodityDao
+							.getByIdsn(ids);
+
+					if (comlist != null) {
+
+						if (Integer.parseInt(comlist.getQuantity()) >= com_no)// 更新运单商品订单
+						{
+
+							trancids.add(String.valueOf(comlist
+									.getTranshipmentId()));// 保存商品对应的转运id
+							// 复制公共信息
+							tranc.setCommodityId(comlist.getCommodityId());
+							tranc.setXiangqing(comlist.getXiangqing());
+							tranc.setCommoditySku(comlist.getCommoditySku());
+							tranc.setEachjfweight(comlist.getEachjfweight());
+							tranc.setQuantity(String.valueOf(com_no));
+							// 计算新重量
+							double eachweight1 = 0;// 商品单件重量
+							double newweight = 0;
+							eachweight1 = StringUtil.string2Double(comlist
+									.getEachjfweight());
+							newweight = eachweight1 * com_no;// 计算商品重量
+							tranc.setSjweight(String.valueOf(newweight));
+
+							List<TranshipmentCommodity> tran_temp = new ArrayList<TranshipmentCommodity>();
+							tran_temp.add(tranc);
+							this.transhipmentCommodityDao
+									.insertTranshipmentCommodity(tran_temp);// 插入新行
+
+							if (Integer.parseInt(comlist.getQuantity()) != com_no)// 更新原表
+							{
+								double newquntity = Integer.parseInt(comlist
+										.getQuantity()) - com_no;// 产品新数量
+								// 更新原来数据
+								newweight = newquntity * eachweight1;// 计算商品重的新重量
+								comlist.setQuantity(String.valueOf(newquntity));
+								comlist.setSjweight(String.valueOf(newweight));
+								this.transhipmentCommodityDao
+										.modifyTranshipmentnyIdsn(comlist);
+							} else// 原有商品已经被清空，删除此商品
+							{
+								this.transhipmentCommodityDao
+										.deletesimpleTranshipmentCommodity(comlist
+												.getId());
+							}
+
+						}
+
+					}
+
+				}
+			}
+
+			String TransitNo = "";// 记录合成后的转运包裹号
+			int sizetranid = trancids.size();
+			for (String tid : trancids)// 开始检查调整后，原来的订单是否还有商品
+			{
+
+				// 记录原有的包裹号
+				TranshipmentBill billtemp = this.transhipmentBillDao
+						.getById(tid);
+				int tempii = 0;
+				if ((billtemp.getTransitNo() != null)
+						&& (!billtemp.getTransitNo().equalsIgnoreCase(""))) {
+					tempii++;
+					if (tempii != sizetranid)// 不是最后一个
+					{
+						if (!TransitNo.equalsIgnoreCase(""))// 不为空
+						{
+							TransitNo = TransitNo + " | "
+									+ billtemp.getTransitNo();
+						} else {
+							TransitNo = billtemp.getTransitNo();
+						}
+
+					}
+				}
+
+				int i = this.transhipmentCommodityDao
+						.countTranshipmentCommodity(tid);// 查找此运单的商品是否继续存在
+				if (i > 0) {
+					List<TranshipmentCommodity> trancommlist = this.transhipmentCommodityDao
+							.getById(tid);
+
+					double weight = 0;
+					double weightkg = 0;
+					for (TranshipmentCommodity list : trancommlist) {
+						weight = StringUtil.string2Double(list.getSjweight())
+								+ weight;
+
+					}
+
+					weightkg = 0.4535924 * weight;
+					this.transhipmentBillDao
+							.updateTranshipmentBillremovecommditysnew(
+									df.format(new Date()),
+									String.valueOf(weight),
+									String.valueOf(weightkg), tid);
+				} else {
+					this.transhipmentBillDao.deleteTranshipmentBillbyid(tid);// 已经没有它的商品，删除此运单
+				}
+			}
+
+			// 计算新运单的商品重量
+			List<TranshipmentCommodity> trancommlist = this.transhipmentCommodityDao
+					.getById(String.valueOf(tranid));
+			Set<String> trancno_bg = new HashSet<String>();// 保存包含运单转包裹号，用于插入新生成的运单的转运id
+			double weight = 0;
+			for (TranshipmentCommodity list : trancommlist) {
+				weight = StringUtil.string2Double(list.getSjweight()) + weight;
+			}
+			bill.setWeight(String.valueOf(weight));
+			bill.setId(String.valueOf(tranid));
+			bill.setWeightKg(String.valueOf(0.4535924 * weight));
+			bill.setTransitNo(TransitNo);
+			// this.transhipmentBillDao.updateTranshipmentBill(bill);
+			this.transhipmentBillDao.updateTranshipmentBillcomposed(bill);
+
+			// }
+
+			ResponseObject<List<String>> responseObj = quickboxSubmit_process(
+					wayBill, String.valueOf(tranid));
+
+			// ResponseObject<List<String>> responseObj = new
+			// ResponseObject<List<String>>(
+			// ResponseCode.SUCCESS_CODE);
+			// responseObj.setData(orderIds);
+
+			return responseObj;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// kai 20150930 modify
+	private ResponseObject<List<String>> quickboxSubmit(WayBill wayBill)
+			throws ServiceException {
+		try {
+			String userId = wayBill.getUserId();
+			String wtrantype=wayBill.getTrantype();//记录转运的类型
+			List<String> orderIds = new ArrayList<String>();
+			List<Order> orders = wayBill.getOrders();
+			if (orders == null || orders.size() != 1) {
+				return new ResponseObject<List<String>>(
+						ResponseCode.PARAMETER_ERROR, "进行合箱操作时候，只能有一个运单");
+			}
+
+			for (Order order : orders) {
+				List<OrderDetail> details = new ArrayList<OrderDetail>();
+
+				// 设置收货地址
+				String consigneeId = order.getConsigneeId();
+				if (!StringUtil.isEmpty(consigneeId)) {
+					ConsigneeInfo cInfo = this.consigneeInfoDao
+							.retrieveConsigneeInfoById(consigneeId, userId);
+
+					if (cInfo != null) {
+						// 设置运单的收件地址
+						OrderUtil.setOrderConsignee(order, cInfo);
+					}
+				} else {
+
+				}
+
+				order.setState(Constant.ORDER_STATE2);
+				order.setType(wayBill.getOrderType());
+				String date = DateUtil.date2String(new Date());
+				order.setCreateDate(date);
+				order.setModifyDate(date);
+				order.setUserId(wayBill.getUserId());
+
+				List<String> tids = new ArrayList<String>();
+
+				if (order.getTranshipmentIds() != null
+						&& order.getTranshipmentIds().size() > 0) {
+					for (String str : order.getTranshipmentIds()) {
+						tids.add(str);
+
+					}
+				}
+				if (order.getDetails() != null && order.getDetails().length > 0) {
+					for (OrderDetail detail : order.getDetails()) {
+						tids.add(detail.getTranshipmentId());
+					}
+				}
+				ConsigneeInfo cInfo = new ConsigneeInfo();
+				List<TranshipmentBill> bills = this.transhipmentBillDao
+						.getByIds(order.getUserId(), tids);
+				double weight = 0;
+				double weightkg = 0;
+				double tariff = 0;
+				double or = 0;
+				double other = 0;
+				String warehouseId = "4";
+				String channelId = null;
+				double length = 0;
+				double width = 0;
+				double height = 0;
+				double Premium = 0;
+				double ParcelValue = 0;
+				double totalMoney=0;
+				double commudityCost=0;
+				String selfpaytype="";
+				String self_tranflag="";
+				for (TranshipmentBill bill : bills) {
+					weight += StringUtil.string2Double(bill.getWeight());
+					weightkg += StringUtil.string2Double(bill.getWeightKg());
+					tariff += StringUtil.string2Double(bill.getTariff());
+					or += StringUtil.string2Double(bill.getOr());
+					other += StringUtil.string2Double(bill.getOther());
+					warehouseId = bill.getWarehouseId();
+					channelId = bill.getChannelId();
+					length += StringUtil.string2Double(bill.getLength());
+					width += StringUtil.string2Double(bill.getWidth());
+					height += StringUtil.string2Double(bill.getHeight());
+					Premium += StringUtil.string2Double(bill.getPremium());
+					ParcelValue += StringUtil.string2Double(bill
+							.getParcelValue());
+
+					cInfo.setName(bill.getcName());
+					cInfo.setProvince(bill.getcProvince());
+					cInfo.setCity(bill.getcCity());
+					cInfo.setDistrict(bill.getcDistrict());
+					cInfo.setStreetAddress(bill.getcStreetAddress());
+					cInfo.setPhone(bill.getcPhone());
+					cInfo.setZipCode(bill.getcZipCode());
+					cInfo.setCardId(bill.getCardid());
+					cInfo.setCardUrl(bill.getCardurl());
+					cInfo.setCardurlother(bill.getCardurlother());
+					cInfo.setCardurltogether(bill.getCardurltogether());
+					order.setUserId(bill.getUserId());
+					order.setMail(bill.getMail());
+					
+					String remark="";
+					if(StringUtil.isEmpty(bill.getRemark()))
+					{
+						if((wtrantype!=null)&&(wtrantype.equalsIgnoreCase("3")))
+						{
+							remark="自提转运包裹";
+						}
+						else
+						{
+							remark="转运包裹";
+						}
+					}
+					else
+					{
+						remark=bill.getRemark();
+					}
+					order.setRemark(remark);
+					
+					List list1 = new ArrayList();
+					list1.add(bill.getId());
+					order.setTranshipmentIds(list1);
+					totalMoney=Double.parseDouble(bill.getTotalMoney());
+					
+					
+					self_tranflag=bill.getSelfgetpackageFlag();
+					selfpaytype=bill.getSelfPaytype();
+					if(!StringUtil.isEmpty(bill.getCommodityCost()))
+					{
+						commudityCost=Double.parseDouble(bill.getCommodityCost());
+					}
+
+				}
+				OrderUtil.setOrderConsignee(order, cInfo);
+				/*
+				 * order.setPremium(StringUtil.isEmpty(order.getPremium()) ? "0"
+				 * : order.getPremium());
+				 */
+				order.setPremium(String.valueOf(Premium));
+				order.setParceValue(String.valueOf(ParcelValue));
+				order.setWeightKg(String.valueOf(weightkg));
+
+				order.setWeight(String.valueOf(weight));
+				order.setTariff(String.valueOf(tariff));
+				order.setOr(String.valueOf(or));
+				order.setOther(String.valueOf(other));
+				order.setWarehouseId(warehouseId);
+				order.setStoreId(warehouseId);
+				order.setChannelId(channelId);
+				order.setLength(String.valueOf(length));
+				order.setWidth(String.valueOf(width));
+				order.setHeight(String.valueOf(height));
+
+				
+				order.setTypeKey(Constant.ORDER_TYPE_KEY_2);//标识转运
+				int i = this.orderDao.insertOrder(order);
+				//String orderId = OrderUtil.createOrderId(order.getId(),
+				//		Constant.ORDER_ID_PREFIX_WEB);
+				
+				String orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+				orderIds.add(orderId);
+				if (i > 0) {
+					// 修改运单id
+					this.orderDao.modifyOrderId(order.getId(), orderId);
+
+					// 插入成功，继续插入对应的运单详情
+					Set<String> sets = new HashSet<String>();
+					sets.addAll(tids);
+					int count = 0;
+					// List<String> commodityId = new ArrayList<String>();
+					for (String id : sets) {
+						List<TranshipmentCommodity> tcs = this.transhipmentCommodityDao
+								.getById(id);
+						if (tcs != null) {
+							for (TranshipmentCommodity tc : tcs) {
+								OrderDetail od = new OrderDetail();
+								od.setCommodityId(tc.getCommodityId());
+								od.setOrderId(orderId);
+								od.setQuantity(tc.getQuantity());
+								od.setTranshipmentId(id);
+								od.setXiangqing(tc.getXiangqing());
+								double Sjweight = StringUtil.string2Double(tc
+										.getQuantity())
+										* StringUtil.string2Double(tc
+												.getEachjfweight());
+								if (Sjweight <= 0) {
+									Sjweight = StringUtil.string2Double(tc
+											.getSjweight());
+								}
+								od.setSjweight(String.valueOf(Sjweight));
+								// od.setJfweight(tc.getJfweight());
+								details.add(od);
+								count++;
+								// commodityId.add(tc.getCommodityId());
+							}
+						}
+					}
+					// update by chenkanghua
+					final int size = details.size();
+					OrderDetail[] arr = (OrderDetail[]) details
+							.toArray(new OrderDetail[size]);
+					order.setDetails(arr);
+					
+					//totalMoney = String.valueOf(this.calculationOrderFreight(
+					//		/* commodityId, */order, wayBill.getUserType()));
+					//转运后台不再直接计算
+					//totalMoney = String.valueOf(this.calculationOrderFreight_dhyb(
+					//		/* commodityId, */order, wayBill.getUserType()));
+					commudityCost=this.calculationOrderCostFreight(order)+commudityCost;
+					
+					this.orderDao.modifyComdityCostByOrderId(order.getId(), Double.toString(commudityCost));
+					
+					
+					if(totalMoney<=0)
+					{
+						throw new Exception("订单费用必须大于0");
+					}
+					int o=this.orderDao.modifyTotalMoneyByOrderId(order.getId(),
+							Double.toString(totalMoney));
+					if(o<1)
+					{
+						throw new Exception("修改运单费用失败!");
+					}
+					int j = this.orderDetailDao.insertOrderDetail(details);
+					if (count == 0 || j != count) {
+						// 进行事务回滚
+						throw new Exception();
+					}
+
+					// 插入运单详情成功，继续操作，修改转运的的状态
+					if (this.transhipmentBillDao.updateTranshipmentBillState(
+							Constant.TRANSHIPMENT_STATE4,
+							new ArrayList<String>(sets)) != sets.size()) {
+						// 更新失败，进行回滚操作
+						throw new Exception();
+					}
+					for (TranshipmentBill bill : bills) {
+						int aa=this.transhipmentBillDao.updateorderidbyid(bill.getId(), orderId);
+						if(aa<1)
+						{
+							throw new Exception("修改转运信息失败");
+						}
+					}
+					
+					
+					TranshipmentRoute route = new TranshipmentRoute();
+					
+					route.setDate(DateUtil.date2String(new Date()));
+					if((wtrantype!=null)&&(wtrantype.equalsIgnoreCase("3")))
+					{
+						route.setRemark("转运自提,已经生成运单，运单号为："+orderId);
+					
+					}
+					else
+					{
+						route.setRemark("已经生成运单，运单号为："+orderId);
+					}
+					String temp_str000="";
+					int aaaa=0;
+					for(String tranid00:order.getTranshipmentIds())
+					{
+						if(aaaa==0)
+						{
+							temp_str000=temp_str000+tranid00;
+						}
+						else
+						{
+							temp_str000=";"+temp_str000+tranid00;
+						}
+						aaaa++;
+					}
+					route.setTranshipmentId(temp_str000);
+					route.setState(TranshipmentUtil.transformerState(0, Constant.TRANSHIPMENT_STATE4));
+					
+					
+					this.transhipmentRouteDao.insert(route);
+					
+				
+					
+					
+					
+					
+				} else {
+					// 插入运单失败, 进行事务回滚
+					throw new Exception();
+				}
+
+				// 计算是否有钱，开始扣款等操作
+				order = this.getOrderByOrderId(orderId).getData();
+				userId=order.getUserId();
+				
+				
+				List<String> list = new ArrayList<String>();
+				list.add(order.getId());
+				ResponseObject<Object> obj1;
+				if((wtrantype!=null)&&(wtrantype.equalsIgnoreCase("3"))&&(selfpaytype.equalsIgnoreCase("0")))//现金付款
+				{
+					obj1= this.pay(list, orderIds, userId, Double.toString(totalMoney), 0, 0, false);
+				}
+				else
+				{
+					double[] balances = this.calculatePayment(order.getUser().getUsdBalance(), order.getUser().getRmbBalance(), Double.toString(totalMoney));
+					obj1= this.pay(list, orderIds, userId, Double.toString(totalMoney), balances[1], balances[0], true);
+					
+				}
+				if(!ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj1.getCode()))
+				{
+					throw new Exception("支付失败！");
+				}
+				
+				
+				if((wtrantype!=null)&&(wtrantype.equalsIgnoreCase("3")))//自提的要修改状态和路由
+				{
+					int i22 =this.orderDao.updateState(order.getId(), Constant.ORDER_STATE10, date);
+							
+					if(i22<1)
+					{
+						throw new Exception("修改状态失败!");
+					}
+					Route route = new Route();
+					route.setDate(date);
+					route.setOrderId(orderId);
+					route.setRemark("转运包裹自提!");
+					route.setState(Constant.ORDER_ROUTE_STATE10);
+					i22=this.routeDao.insertRoute(route);
+					
+				}
+				
+				
+				
+				
+				/**
+				 * 这段代码将由上面4行代码替代，并将在2015.12.25之前交货测试，如果过了该时间，则可删之
+				double totalMoney1 = StringUtil.string2Double(totalMoney);
+				double rmb = 0;
+				double usd = 0;
+				order = getOrderByOrderId(orderId).getData();
+				rmb = StringUtil.string2Double(order.getUser().getRmbBalance());
+				usd = StringUtil.string2Double(order.getUser().getUsdBalance());
+				userId = order.getUserId();
+				if (usd < totalMoney1) {
+					throw new Exception("美元帐户余额不足");
+				}
+
+				double newusd = usd - totalMoney1;
+				double newrmb = rmb; // 先用美元支付
+				List<String> array = new ArrayList<String>();
+
+				// rmb =
+				// StringUtil.string2Double(order.getUser().getRmbBalance());
+				// usd =
+				// StringUtil.string2Double(order.getUser().getUsdBalance());
+				array.add(order.getId());
+
+				pay(array, orderIds, userId, String.valueOf(totalMoney),
+						newrmb, newusd, true);
+				**/
+				
+				// 插入完成后，新建一个Route并插入到数据库中
+				Route route = new Route();
+				route.setOrderId(orderId);
+				route.setName(wayBill.getName());
+				route.setDate(date);
+				route.setState(Constant.ORDER_ROUTE_STATE3);
+				route.setAddress("仓库");
+				route.setRemark("运单的生成");
+				this.routeDao.insertRoute(route);
+				
+				
+			}
+
+			ResponseObject<List<String>> responseObj = new ResponseObject<List<String>>(
+					ResponseCode.SUCCESS_CODE);
+			responseObj.setData(orderIds);
+
+			return responseObj;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e.getMessage());
+		}
+	}
+
+	// kai 20151003 用户重新组合运单商品后，并且重新形成不同运单，开始进行收费等一系列操作,tranid表示新形成的单号
+	private ResponseObject<List<String>> quickboxSubmit_process(
+			WayBill wayBill, String tranid) throws ServiceException {
+		try {
+			String removetotalmoney = "";
+			String userId = wayBill.getUserId();
+			List<String> orderIds = new ArrayList<String>();
+			List<Order> orders = new ArrayList<Order>();
+			orders.add(new Order());
+
+			for (Order order : orders) {
+				List<OrderDetail> details = new ArrayList<OrderDetail>();
+
+				OrderUtil.setOrderConsignee(order, wayBill.getConsigneeInfo());
+
+				order.setState(Constant.ORDER_STATE2);
+				order.setType(wayBill.getOrderType());
+				String date = DateUtil.date2String(new Date());
+				order.setCreateDate(date);
+				order.setModifyDate(date);
+				order.setUserId(wayBill.getUserId());
+				order.setTranPro(Constant.TRANSHIPMENT_PRO_STATE0);// 运单代处理状态
+
+				List<String> tids = new ArrayList<String>();
+				tids.add(tranid);
+
+				List<TranshipmentBill> bills = this.transhipmentBillDao
+						.getByIds(order.getUserId(), tids);
+				double weight = 0;
+				double weightkg = 0;
+				double tariff = 0;
+				double or = 0;
+				double other = 0;
+				String warehouseId = "";
+				String channelId = null;
+				double length = 0;
+				double width = 0;
+				double height = 0;
+				double Premium = 0;
+				double ParcelValue = 0;
+				for (TranshipmentBill bill : bills) {
+					weight += StringUtil.string2Double(bill.getWeight());
+					weightkg += StringUtil.string2Double(bill.getWeightKg());
+					tariff += StringUtil.string2Double(bill.getTariff());
+					or += StringUtil.string2Double(bill.getOr());
+					other += StringUtil.string2Double(bill.getOther());
+					warehouseId = bill.getWarehouseId();
+					channelId = bill.getChannelId();
+					length += StringUtil.string2Double(bill.getLength());
+					width += StringUtil.string2Double(bill.getWidth());
+					height += StringUtil.string2Double(bill.getHeight());
+					Premium += StringUtil.string2Double(bill.getPremium());
+					ParcelValue += StringUtil.string2Double(bill
+							.getParcelValue());
+
+					order.setUserId(bill.getUserId());
+					order.setMail(bill.getMail());
+					order.setRemark(bill.getRemark());
+
+				}
+
+				/*
+				 * order.setPremium(StringUtil.isEmpty(order.getPremium()) ? "0"
+				 * : order.getPremium());
+				 */
+				order.setPremium(String.valueOf(Premium));
+				order.setParceValue(String.valueOf(ParcelValue));
+				order.setWeightKg(String.valueOf(weightkg));
+
+				order.setWeight(String.valueOf(weight));
+				order.setTariff(String.valueOf(tariff));
+				order.setOr(String.valueOf(or));
+				order.setOther(String.valueOf(other));
+				order.setWarehouseId(warehouseId);
+				order.setStoreId(warehouseId);
+				order.setChannelId(channelId);
+				order.setLength(String.valueOf(length));
+				order.setWidth(String.valueOf(width));
+				order.setHeight(String.valueOf(height));
+
+				String totalMoney;
+
+				order.setTypeKey(Constant.ORDER_TYPE_KEY_2);//转运订单
+				int i = this.orderDao.insertOrder(order);
+				//String orderId = OrderUtil.createOrderId(order.getId(),
+				//		Constant.ORDER_ID_PREFIX_WEB);
+				
+				String orderId=createOrderIdarg(order.getId(),order.getWarehouseId(),order.getTypeKey());
+				orderIds.add(orderId);
+				if (i > 0) {
+					// 修改运单id
+					this.orderDao.modifyOrderId(order.getId(), orderId);
+
+					// 插入成功，继续插入对应的运单详情
+					Set<String> sets = new HashSet<String>();
+					sets.addAll(tids);
+					int count = 0;
+					// List<String> commodityId = new ArrayList<String>();
+					for (String id : sets) {
+						List<TranshipmentCommodity> tcs = this.transhipmentCommodityDao
+								.getById(id);
+						if (tcs != null) {
+							for (TranshipmentCommodity tc : tcs) {
+								OrderDetail od = new OrderDetail();
+								od.setCommodityId(tc.getCommodityId());
+								od.setOrderId(orderId);
+								od.setQuantity(tc.getQuantity());
+								od.setTranshipmentId(id);
+								od.setXiangqing(tc.getXiangqing());
+								double Sjweight = StringUtil.string2Double(tc
+										.getQuantity())
+										* StringUtil.string2Double(tc
+												.getEachjfweight());
+								if (Sjweight <= 0) {
+									Sjweight = StringUtil.string2Double(tc
+											.getSjweight());
+								}
+								od.setSjweight(String.valueOf(Sjweight));
+								// od.setJfweight(tc.getJfweight());
+								details.add(od);
+								count++;
+								// commodityId.add(tc.getCommodityId());
+							}
+						}
+					}
+					// update by chenkanghua
+					final int size = details.size();
+					OrderDetail[] arr = (OrderDetail[]) details
+							.toArray(new OrderDetail[size]);
+					order.setDetails(arr);
+					//totalMoney = String.valueOf(this.calculationOrderFreight(
+					//		/* commodityId, */order, wayBill.getUserType()));
+					
+					//转运的计算价格要独立计算
+					totalMoney = String.valueOf(this.calculationOrderFreight_dhyb(
+							/* commodityId, */order, wayBill.getUserType()));
+					this.orderDao.modifyTotalMoneyByOrderId(order.getId(),
+							totalMoney);
+					int j = this.orderDetailDao.insertOrderDetail(details);
+					if (count == 0 || j != count) {
+						// 进行事务回滚
+						throw new Exception();
+					}
+
+					// 插入运单详情成功，继续操作，修改转运的的状态
+					if (this.transhipmentBillDao.updateTranshipmentBillState(
+							Constant.TRANSHIPMENT_STATE4,
+							new ArrayList<String>(sets)) != sets.size()) {
+						// 更新失败，进行回滚操作
+						throw new Exception();
+					}
+				} else {
+					// 插入运单失败, 进行事务回滚
+					throw new Exception();
+				}
+
+				// 计算是否有钱，开始扣款等操作
+				order = this.getOrderByOrderId(orderId).getData();
+				double[] balances = this.calculatePayment(order.getUser().getUsdBalance(), order.getUser().getRmbBalance(), totalMoney);
+				List<String> list = new ArrayList<String>();
+				list.add(order.getId());
+				this.pay(list, orderIds, userId, totalMoney, balances[1], balances[0], true);
+				
+				/**
+				 * 这段代码将由上面4行代码替代，并将在2015.12.25之前交货测试，如果过了该时间，则可删之
+				double totalMoney1 = StringUtil.string2Double(totalMoney);
+				double rmb = 0;
+				double usd = 0;
+				order = getOrderByOrderId(orderId).getData();
+				rmb = StringUtil.string2Double(order.getUser().getRmbBalance());
+				usd = StringUtil.string2Double(order.getUser().getUsdBalance());
+				userId = order.getUserId();
+				//发过来的新写的计算rmb+usd余额的代码部分，请对比上面替代代码后在做选择使用，
+				//若替代，请进入上面方法里面替代，其他部分有调用
+
+				double rate0=Double.valueOf(this.globalargsDao.getcontentbyflag("cur_usa_cn"));//获取美元汇率
+				if(totalMoney1<=usd)//重新计算，包含人民币
+				{
+					
+				}
+				else
+				{
+					
+					if((totalMoney1-usd)*rate0<=rmb)//有足够的钱
+					{}
+					else
+					{
+						throw new Exception("美元帐户余额不足");
+					}
+					
+				}
+				//if (usd < totalMoney1) {
+				//	throw new Exception("美元帐户余额不足");
+				//}
+				removetotalmoney = String.valueOf(totalMoney1);
+				double newusd = usd - totalMoney1;
+				double newrmb = rmb; // 先用美元支付
+				if(newusd<0)
+				{
+					newusd=0;
+					newrmb=rmb-(totalMoney1-usd)*rate0;
+				}
+				else
+				{
+					
+				}
+			
+				List<String> array = new ArrayList<String>();
+
+				// rmb =
+				// StringUtil.string2Double(order.getUser().getRmbBalance());
+				// usd =
+				// StringUtil.string2Double(order.getUser().getUsdBalance());
+				array.add(order.getId());
+
+				pay(array, orderIds, userId, String.valueOf(totalMoney),
+						newrmb, newusd, true);
+				*/
+				
+				
+				// 插入完成后，新建一个Route并插入到数据库中
+				Route route = new Route();
+				route.setOrderId(orderId);
+				route.setName(wayBill.getName());
+				route.setDate(date);
+				route.setState(Constant.ORDER_ROUTE_STATE3);
+				route.setAddress("仓库");
+				route.setRemark("运单的生成");
+				this.routeDao.insertRoute(route);
+			}
+
+			ResponseObject<List<String>> responseObj = new ResponseObject<List<String>>(
+					ResponseCode.SUCCESS_CODE);
+
+			// List<String> obj = new ArrayList<String>();
+			// String str1=removetotalmoney;
+			// obj.add(orderIds.get(0));
+			// obj.add(removetotalmoney);
+
+			responseObj.setData(orderIds);
+			// responseObj.setMessage(str1);
+
+			return responseObj;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	/**
+	 * 
+	 * @param usdString usd in account
+	 * @param rmbString rmb in account
+	 * @param paymentString
+	 * @return 0:usdBalance, 1:rmbBalance
+	 * @throws ServiceException if payment fail
+	 */
+	private double[] calculatePayment(String usdString, String rmbString, String paymentString) throws ServiceException{
+		double rate;
+		double usd = StringUtil.string2Double(usdString);
+		double rmb = StringUtil.string2Double(rmbString);
+		double payment = StringUtil.string2Double(paymentString);
+		if(usd >= payment){
+			return new double[]{usd-payment, rmb};
+		}
+		ResponseObject<String> responseObject = this.getCurUsaToCn();
+		if(responseObject != null && ResponseCode.SUCCESS_CODE.equals(responseObject.getCode())){
+			rate = StringUtil.string2Double(responseObject.getData());
+		}else{
+			throw new ServiceException("获取数据库汇率异常");
+		}
+		//double rmbBalance = new BigDecimal(rmb/rate - (payment-usd)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+		
+		double rmbBalance = new BigDecimal(rmb - (payment-usd)*rate).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+		if(rmbBalance > 0){
+			return new double[]{0, rmbBalance};
+		}else{
+			throw new ServiceException("账户余额不足，请充值");
+		}
+	}
+	
+	public ResponseObject<PageSplit<Order>> searchWebOrdersbybelonguser(
+			String orderId, String key, String sdate, String edate,
+			String state,String typekey, String storeid, int pageSize, int pageNow)
+			throws ServiceException {
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+
+			if (!StringUtil.isEmpty(orderId)) {
+				orderId = StringUtil.escapeStringOfSearchKey(orderId);
+			}
+
+			int rowCount = 0;
+			try {
+				// rowCount = this.orderDao.countOfWebOrder(orderId, key,
+				// column, sdate, edate, state);
+				rowCount = this.orderDao.countOfWebOrderbelonguser(orderId,
+						key, sdate, edate, state,typekey, storeid);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					// List<Order> orders =
+					// this.orderDao.searchWebOrders(orderId, key, column,
+					// sdate, edate, startIndex,
+					// pageSize, state);
+
+					List<Order> orders = this.orderDao
+							.searchWebOrdersbelonguser(orderId, key, sdate,
+									edate, startIndex, pageSize, state,typekey, storeid);
+					if (orders != null && !orders.isEmpty()) {
+						for (Order o : orders) {
+							if(!StringUtil.isEmpty(o.getUserId()))
+							{
+								o.setUser(this.userDao.getUserById(o.getUserId()));
+							}
+							
+							pageSplit.addData(o);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	// kai 20151028 包含仓库信息的搜索
+	public ResponseObject<PageSplit<Order>> searchWebOrdersincludewidcidbybelonguser(
+			String orderId, String key, String sdate, String edate,
+			String state,String typekey, String wid, String cid, int pageSize, int pageNow)
+			throws ServiceException {
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			if (!StringUtil.isEmpty(orderId)) {
+				orderId = StringUtil.escapeStringOfSearchKey(orderId);
+			}
+
+			int rowCount = 0;
+			try {
+				// rowCount =
+				// this.orderDao.countOfWebOrderincludewidcid(orderId, key,
+				// column, sdate, edate, state,wid,cid);
+				rowCount = this.orderDao.countOfWebOrderincludewidcidbyownuser(
+						orderId, key, sdate, edate, state,typekey, wid, cid);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					// List<Order> orders =
+					// this.orderDao.searchWebOrdersincludewidcid(orderId, key,
+					// column, sdate, edate, startIndex,
+					// pageSize, state,wid,cid);
+					List<Order> orders = this.orderDao
+							.searchWebOrdersincludewidcidbyownuser(orderId,
+									key, sdate, edate, startIndex, pageSize,
+									state,typekey, wid, cid);
+
+					if (orders != null && !orders.isEmpty()) {
+						for (Order o : orders) {
+							if(!StringUtil.isEmpty(o.getUserId()))
+							{
+								//o.setUser(this.userDao.getUserById(o.getUserId()));
+							}
+							
+							pageSplit.addData(o);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	// 导入第三方数据，直接导入，用于检查数据是否正确
+	public ImportthirdOrder check_thirdimport_weiyi_orders(
+			ImportthirdOrder Iorders, String wid, String cid) {
+
+		List<Order> orders = Iorders.getOrders();
+		String[] Orderflag = new String[orders.size()];
+		String[] Userflag = new String[orders.size()];
+
+		try {
+			int index = 0;
+
+			Warehouse warehouse = this.warehouseDao.getById(wid);
+			if (warehouse == null) {
+				return null;
+			}
+			List<Channel> channel = this.channelDao.getByWarhouseIdandid(wid,
+					cid, "1");
+			if (channel == null) {
+				return null;
+			}
+
+			for (Order order : orders) {
+				// 检查用户是否存在
+
+				//List<User> users = this.userDao.getUserByPhonecheck(order
+				//		.getSenduserphone());
+				int k=this.userDao.countOfuserbyphone(order
+						.getSenduserphone());
+				if (k==1) {
+					
+					Userflag[index] = "0";// 存在用户
+					order.setUserId(this.userDao.getuseridbyphone(order
+							.getSenduserphone()));
+				} else if (k==0) {
+					Userflag[index] = "1";// 用户不存在
+				} else {
+					Userflag[index] = "-1";// 用户异常
+				}
+
+				//Order ord = null;
+				if ((order.getOrderId() != null)
+						&& (!order.getOrderId().equalsIgnoreCase(""))) {
+					int kk=this.orderDao.countOfordersbyorderid(order.getOrderId());
+					//ord = this.orderDao.getByOrderId(order.getOrderId());
+					if (kk>0) {
+						Orderflag[index] = "1";// 订单已经存在
+					} else {
+						Orderflag[index] = "0";// 订单不存在
+					}
+				} else {
+					Orderflag[index] = "2";// 订单号为空
+
+				}
+				index++;
+			}
+			Iorders.setOrderflag(Orderflag);
+			Iorders.setUserflag(Userflag);
+
+			return Iorders;
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+
+	}
+
+	// 导入第三方数据
+	public ResponseObject<Object> addOrder_thirdorder_import(
+			ImportthirdOrder iports, String wid, String cid)
+			throws ServiceException {
+		try {
+
+			int row = 0;
+			for (Order order : iports.getOrders()) {
+				// kai 20150911-1 modify
+				order.setWarehouseId(wid);
+				order.setChannelId(cid);
+
+				String date = DateUtil.date2String(new Date());// 修改时间
+				order.setModifyDate(date);
+				order.setCreateDate(date);
+
+				// order.setState(Constant.ORDER_STATE3);
+				order.setType(Constant.ORDER_TYPE_THIRD);
+				order.setOrderIdPrefix("");
+				int k=0;
+				try{
+					order.setTypeKey(Constant.ORDER_TYPE_KEY_4);
+					k = this.orderDao.insertthirdOrder(order);
+				}
+				catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("插入运单异常，失败序号："+order.getId()+",运单号为："+order.getOrderId());
+				}
+
+				if (k > 0) {
+					
+
+					row++;
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(order.getOrderId());
+					route.setDate(date);
+					route.setState(OrderUtil.transformerState(0,
+							order.getState()));
+					// route.setState(order.getState());
+					route.setStateRemark(order.getStateRemark());
+					route.setAddress("直接导入");
+					try{
+						int aa=this.routeDao.insertRoute(route);
+						if(aa>0)
+						{
+							
+							order.setResult("成功!");
+						}
+						else
+						{
+							order.setResult("插入运单成功，但更新路由状态失败!");
+						}
+					}
+					catch (Exception e) {
+						throw ExceptionUtil.handle2ServiceException("插入路由发生异常，失败序号："+order.getId()+",运单号为："+route.getOrderId());
+					}
+
+
+					/*
+					 * ResponseObject<Object> result = new
+					 * ResponseObject<Object>( ResponseCode.SUCCESS_CODE);
+					 * Map<String, String> map = new HashMap<String, String>();
+					 * map.put("id", order.getId()); map.put("orderId",
+					 * orderId); result.setData(map);
+					 */
+
+				} else {
+					order.setResult("失败，插入运单失败");
+					return new ResponseObject<Object>(
+							ResponseCode.ORDER_INSERT_ERROR, "插入运单失败");
+				}
+
+			}
+			ResponseObject<Object> result = new ResponseObject<Object>(
+					ResponseCode.SUCCESS_CODE);
+			result.setMessage("成功插入" + row + "条数据!");
+			result.setData(iports);//返回结果数据
+			return result;
+
+		} catch (Exception e) {
+			return new ResponseObject<Object>(ResponseCode.ORDER_INSERT_ERROR,
+					"插入运单失败"+e.getMessage());
+
+		}
+	}
+
+	public ResponseObject<String> getCurUsaToCn() throws ServiceException {
+		try {
+
+			String usatoch = this.globalargsDao.getcontentbyflag("cur_usa_cn");
+			ResponseObject<String> result;
+			if ((usatoch != null) && (!usatoch.equalsIgnoreCase(""))) {
+				result = new ResponseObject<String>(ResponseCode.SUCCESS_CODE);
+				result.setData(usatoch);
+			} else {
+				result = new ResponseObject<String>(
+						ResponseCode.PARAMETER_ERROR, "参数无效");
+				result.setData("");
+
+			}
+			return result;
+		} catch (Exception e) {
+			return new ResponseObject<String>(ResponseCode.ORDER_INSERT_ERROR,
+					"插入运单失败");
+
+		}
+	}
+
+	// kai 20151028 包含仓库信息的搜索
+	public ResponseObject<PageSplit<Order>> searchWebOrdersincludpaymoneybyadmin(
+			String orderId, String key, String sdate, String edate,
+			String state, String wid, String cid, int pageSize, int pageNow)
+			throws ServiceException {
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			if (!StringUtil.isEmpty(orderId)) {
+				orderId = StringUtil.escapeStringOfSearchKey(orderId);
+			}
+
+			int rowCount = 0;
+			try {
+				// rowCount =
+				// this.orderDao.countOfWebOrderincludewidcid(orderId, key,
+				// column, sdate, edate, state,wid,cid);
+				if ((state != null) && (state.equalsIgnoreCase("-1")))// 搜索0，1，
+				{
+					// rowCount =
+					// this.orderDao.countOfWebOrderincludewidcidbyownuser(orderId,
+					// key, sdate, edate, state,wid,cid);
+
+					rowCount = this.orderDao.countOfWebOrderincludenopay(
+							orderId, key, sdate, edate, state, wid, cid);
+				} else {
+					rowCount = this.orderDao
+							.countOfWebOrderincludewidcidbyownuser(orderId,
+									key, sdate, edate, state,null, wid, cid);
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					// List<Order> orders =
+					// this.orderDao.searchWebOrdersincludewidcid(orderId, key,
+					// column, sdate, edate, startIndex,
+					// pageSize, state,wid,cid);
+					// rowCount =
+					// this.orderDao.countOfWebOrderincludewidcid(orderId, key,
+					// column, sdate, edate, state,wid,cid);
+					List<Order> orders;
+					if ((state != null) && (state.equalsIgnoreCase("-1")))// 搜索0，1，
+					{
+						orders = this.orderDao
+								.searchcountOfWebOrderincludenopay(orderId,
+										key, sdate, edate, startIndex,
+										pageSize, state, wid, cid);
+					} else {
+						orders = this.orderDao
+								.searchWebOrdersincludewidcidbyownuser(orderId,
+										key, sdate, edate, startIndex,
+										pageSize, state,null, wid, cid);
+					}
+					if (orders != null && !orders.isEmpty()) {
+						for (Order o : orders) {
+							pageSplit.addData(o);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	// kai 20151117 添加成本计算接口,只计算商品的成本价
+	public double calculationOrderCostFreight(Order order)
+			throws ServiceException {
+		if (order.getStoreId() == null) {
+			throw ExceptionUtil.handle2ServiceException("门店为空，无法计算价格");
+		}
+		/* 运费计算 start */
+		String priceType = "cost";
+
+		double commodityPrice = 0.0d;
+		List<OrderDetail> details = Arrays.asList(order.getDetails());
+		for (OrderDetail detail : details) {
+			try {
+				String price = this.commodityDao.getPriceById(priceType,
+						detail.getCommodityId());
+				if (price == null) {
+					throw ExceptionUtil
+							.handle2ServiceException("运单中含有系统中没有的商品类型或参数！");
+				}
+
+				commodityPrice = commodityPrice
+						+ StringUtil.string2Double(detail.getSjweight())
+						* StringUtil.string2Double(price);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw ExceptionUtil.handle2ServiceException("计算商品运费时出现异常！");
+			}
+		}
+		return commodityPrice;
+
+	}
+
+	public ResponseObject<PageSplit<Order>> searchWebOrdersbyflyno(String flyno)
+			throws ServiceException {
+		try {
+
+			ResponseObject<PageSplit<Order>> responseObj = new ResponseObject<PageSplit<Order>>(
+					ResponseCode.SUCCESS_CODE);
+
+			PageSplit<Order> pageSplit = new PageSplit<Order>();
+
+			try {
+				List<Order> orders = this.orderDao.searchbyflyno(flyno);
+				if ((orders == null) || (orders.size() < 1)) {
+					responseObj.setMessage("没有运单");
+				}
+				if (orders != null && !orders.isEmpty()) {
+					for (Order o : orders) {
+						pageSplit.addData(o);
+					}
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单列表失败", e);
+			}
+			responseObj.setData(pageSplit);
+
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<Object> modifyOrderstoflight(String[] orderId,
+			String flight,String state,String empName) throws ServiceException {
+		try {
+
+			FlyInfo flyinfo=this.flyinfoDao.getByflightno(flight);
+			if(flyinfo==null)
+			{
+			
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "没有相应的航班号或航班没有创建");
+			}
+			int ii=this.orderDao.modifyOrderflightnobyorderids( Arrays.asList(orderId), state, flight,  DateUtil.date2String(new Date()));
+			if(ii>0)
+			{
+				List<Order> orders=this.orderDao.getOrderByOrderIds(Arrays.asList(orderId));
+				if((orders!=null)&&(orders.size()>0))
+				{
+					for(Order ord:orders)
+					{
+						Route route = new Route();
+						route.setOrderId(ord.getOrderId());
+						route.setName(empName);
+						route.setDate(DateUtil.date2String(new Date()));
+						route.setState(OrderUtil.transformerState(0, ord.getState()));
+						route.setAddress("航班状态修改!");
+						this.routeDao.insertRoute(route);
+						//在这里插入storagePosition
+						this.useStoragePosition(ord);
+					}
+				}
+			}
+			ResponseObject<Object> result = new ResponseObject<Object>(
+					ResponseCode.SUCCESS_CODE);
+			 result.setMessage("成功修改"+ii+"条运单!");
+			return result;
+
+		} catch (Exception e) {
+			return new ResponseObject<Object>(ResponseCode.ORDER_INSERT_ERROR,
+					"修改运单信息失败");
+
+		}
+	}
+
+	@Override
+	public boolean payByPosition(Order order, String state) throws ServiceException {
+		boolean pay = true;
+		if(StringUtil.isEmpty(order.getWarehouseId())){
+			return false;
+		}
+		int stateInt = Integer.valueOf(state);
+		if(stateInt == 2 || (stateInt > 4 && stateInt != 9)){//收门店费ORDER_STATE3='2',收回国费（飞机）STATE6='5'，并且没被收件人接收='9'
+			String payment = "0";
+			double payToChina = 0;
+			double payChangeWarehouse = 0;
+			try {
+				Warehouse warehouse = warehouseDao.getById(order.getWarehouseId());
+				String routeState = "";
+				if((StringUtil.isEmpty(order.getPayToChina()) || !StringUtil.isMoreZeroInteger(order.getPayToChina())) && stateInt > 4){//进入飞机之后
+					payment = warehouse.getToChinaPrice();
+					payToChina = StringUtil.string2Double(payment);
+					routeState = Constant.ORDER_ROUTE_STATE_PAY_TO_CHINA;
+				}else{
+					payment = warehouse.getChangeWarehousePrice();
+					payChangeWarehouse = StringUtil.string2Double(order.getPayChangeWarehouse()) + StringUtil.string2Double(payment);
+					routeState = Constant.ORDER_ROUTE_STATE_PAY_CHANGE_WAREHOUSE;
+				}
+				if(! this.pay(order, payment, routeState) || 0 >= orderDao.updatePayPosition(order.getId(), String.valueOf(payToChina), String.valueOf(payChangeWarehouse))){//update payment of account and order
+					pay = false;
+				}
+			} catch (Exception e) {
+				log.error("order pay by position fail when admin change state", e);
+				e.printStackTrace();
+				throw ExceptionUtil.handle2ServiceException("更新order交付记录失败", e);
+			}
+		}
+		return pay;
+	}
+
+	private boolean pay(Order order, String payment, String routeState) throws ServiceException {
+		double[] balance = this.calculatePayment(order.getUser().getUsdBalance(), order.getUser().getRmbBalance(), payment);
+		String date = DateUtil.date2String(new Date());
+		AccountDetail detail = new AccountDetail();
+		detail.setAmount(payment);
+		detail.setCreateDate(date);
+		detail.setModifyDate(date);
+		detail.setState(Constant.ACCOUNT_DETAIL_STATE2);
+		detail.setCurrency("美元");
+		detail.setName("支付运费");
+		detail.setType(Constant.ACCOUNT_DETAIL_TYPE2);
+		detail.setUserId(order.getUserId());
+		String prefix = "现金支付";
+		Account account = new Account();
+		account.setUsd(String.valueOf(balance[0]));
+		account.setRmb(String.valueOf(balance[1]));
+		account.setUserId(order.getUserId());
+		account.setModifyDate(date);
+		try {
+			if (this.accountDao.modifyAccount(account) <= 0) {
+				ExceptionUtil.handle2ServiceException("账户更新越失败");
+			}
+			prefix = "帐户余额支付";
+			detail.setRemark(prefix + "；运单id：" + order.getOrderId());
+			this.accountDetailDao.insertAccountDetail(detail);
+			Route route = new Route();
+			route.setDate(date);
+			route.setOrderId(order.getOrderId());
+			route.setRemark(prefix);
+			route.setState(routeState);
+			this.routeDao.insertRoute(route);
+		} catch (Exception e) {
+			log.error("error in pay(order, payment)", e);
+			e.printStackTrace();
+			throw ExceptionUtil.handle2ServiceException("进行账户支付出现异常", e);
+		}
+		return true;
+	}
+
+	@Override
+	public ResponseObject<Object> takeBySelf(String id, String empName) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try {
+			String date = DateUtil.date2String(new Date());
+			int result = this.orderDao.updateState(id, Constant.ORDER_STATE10, date);
+			Order order = this.orderDao.getById(id);
+			if(result > 0 && order != null){
+				Route route = new Route();
+				route.setOrderId(order.getOrderId());
+				route.setName("用户转运自提");
+				route.setDate(date);
+				route.setState(OrderUtil.transformerState(0, Constant.ORDER_STATE10));
+				route.setRemark(empName + "修改运单");
+				this.routeDao.insertRoute(route);
+				//在这里插入storagePosition
+				this.useStoragePosition(order);
+				User user = this.userDao.getUserById(order.getUserId());
+				this.autoSendService.send(user, order);
+//				log.info(SmsSendUtil.sendOrderStateMsg(order.getOrderId(), Constant.ORDER_STATE10, user.getPhone()));
+				responseObject.setCode(ResponseCode.SUCCESS_CODE);
+			}else{
+				responseObject.setCode(ResponseCode.ORDER_UPDATE_STATE_ERROR);
+				responseObject.setMessage("更新order状态发生错误");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	
+	public boolean useStoragePosition(Order order) throws ServiceException{
+		try{
+			StoragePosition storagePosition = null;
+			if(null != order.getStoragePosition() && !StringUtil.isEmpty(order.getStoragePosition().getId())){
+				storagePosition = this.storagePositionService.findById(order.getStoragePosition().getId()).getData();
+			}
+			if(!StringUtil.isEmpty(order.getId())){
+				order = this.orderDao.getById(order.getId());
+			}else if(!StringUtil.isEmpty(order.getOrderId())){
+				order = this.orderDao.getByOrderId(order.getOrderId());
+			}else{
+				return false;
+			}
+			int operation = StoragePositionUtil.getOperation(order);
+			if(-1 != operation){
+				if(null == storagePosition){
+					ResponseObject<StoragePosition> responseObject = this.storagePositionService.findShouldIn(order);
+					if(ResponseCode.SUCCESS_CODE.equals(responseObject.getCode())){
+						storagePosition = responseObject.getData();
+					}
+				}
+				this.storagePositionService.useStorage(storagePosition, order, operation);
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return true;
+	}
+
+	@Override
+	public ResponseObject<PageSplit<Order>> searchAfterOrderState(Order order, int pageSize, int pageIndex) throws ServiceException {
+		ResponseObject<PageSplit<Order>> responseObject = new ResponseObject<PageSplit<Order>>();
+		try{
+			int rowCount = this.orderDao.countByAfterState(order);
+			if(rowCount > 0){
+				PageSplit<Order> pageSplit = new PageSplit<Order>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, rowCount);
+				List<Order> list = this.orderDao.findByAfterState(order, firstResult, pageSize);
+				pageSplit.setDatas(list);
+				responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				responseObject.setData(pageSplit);
+			}else{
+				responseObject.setCode(ResponseCode.ORDER_EMPTY_LIST);
+				responseObject.setMessage("没有退货信息");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			throw ExceptionUtil.handle2ServiceException("find order find by after state fail", e);
+		}
+		return responseObject;
+	}
+	
+	@Override
+	public ResponseObject<String[]> getAllStateCount(String warehouseId) throws ServiceException {
+		ResponseObject<String[]> responseObject = new ResponseObject<String[]>();
+		try {
+			String[] array = new String[22];
+			String[] labelArray = {"-10","0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};//10
+			String[] valueArray = {"-10","0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};//10
+			for(int i = 0; i<labelArray.length; i++){
+				array[i*2] = "countOrderState" + labelArray[i];
+				array[i*2+1] = String.valueOf(this.orderDao.countOfSearchKeys(null, null, null, null, null, null, valueArray[i], null,warehouseId));
+			}
+			responseObject.setCode(ResponseCode.SUCCESS_CODE);
+			responseObject.setData(array);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	
+	
+	public ResponseObject<Object> importExcelOfseanno1(
+			List<ImportOrder> importOrders, String empName,String wid)
+			throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			List<Order> orders = new ArrayList<Order>();
+
+		
+			
+			
+			for (ImportOrder io : importOrders) {
+				if (StringUtil.isEmpty(io.getOrderId())) {
+					io.setStateResult("失败:单号为空!");
+					continue;
+				}
+				//过掉不是自己门市的运单
+				if(!StringUtil.isEmpty(wid))
+				{
+					Order order=null;
+					try {
+						order= this.orderDao.getOrderbyorderidandwid(io.getOrderId(), wid);
+					}
+					catch (Exception e) {
+						throw ExceptionUtil.handle2ServiceException("修改数据库出现异常,单号为："+io.getOrderId());
+					}
+					if(order==null)
+					{
+						io.setStateResult("失败:请检查运单号是否存在或是否属于本门店!");
+						continue;
+					}
+				}
+
+				Order order = new Order();
+				order.setOrderId(io.getOrderId());
+				order.setSeaNo(io.getSeataxno());
+				
+				order.setModifyDate(date);
+
+				
+				int iii=0;
+				try {
+					iii=this.orderDao.modifyOrderSeaNoOfExcelbyadmin(order);
+				}
+				catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("修改数据库出现异常，请检查单号为："+order.getOrderId());
+				}
+				
+				if(iii<1)
+				{
+					io.setStateResult("失败：请检查单号是否存在或字符格式!");
+				}
+				else
+				{
+					io.setStateResult("成功!");
+				}
+			}
+			
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		ResponseObject<Object> obj=new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		obj.setData(importOrders);
+		return obj;
+	}
+	
+	//根据海关号导入订单状态
+	public ResponseObject<Object> importExcelstateOfseanno2(
+			List<ImportOrder> importOrders, String empName,String wid)
+			throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			List<Order> orders = new ArrayList<Order>();
+
+		
+			
+			
+			for (ImportOrder io : importOrders) {
+				if (StringUtil.isEmpty(io.getSeataxno())) {
+					io.setStateResult("失败:海关号为空!");
+					continue;
+				}
+				//过掉不是自己门市的运单
+				String orderid="";
+				if(!StringUtil.isEmpty(wid))
+				{
+					
+					List<Order> orders1=null;
+					
+					try {
+						 orders1= this.orderDao.getOrderbyseanoandwid(io.getSeataxno(), wid);
+					}
+					catch (Exception e) {
+						throw ExceptionUtil.handle2ServiceException("修改数据库出现异常,海关单号为："+io.getSeataxno());
+					}
+					if((orders1==null)||(orders1.size()<1))
+					{
+						io.setStateResult("失败:请检查海关号是否存在或是否属于本门店!");
+						continue;
+					}
+					else if(orders1.size()>1)
+					{
+						String strt="失败:包含"+orders1.size()+"个相同海关号，对应系统运单号分别为：";
+						for(Order order:orders1)
+						{
+							strt=strt+order.getOrderId()+" ; ";
+						}
+						
+						io.setStateResult(strt);
+						continue;
+					}
+					else
+					{
+						for(Order order:orders1)
+						{
+							orderid=order.getOrderId();
+						}
+					}
+				}
+				else 
+				{
+					List<Order> orders1=null;
+					
+					try {
+						 orders1= this.orderDao.getOrderbyseanoandwid(io.getSeataxno(), null);
+					}
+					catch (Exception e) {
+						throw ExceptionUtil.handle2ServiceException("修改数据库出现异常,单号为："+io.getSeataxno());
+					}
+					if((orders1==null)||(orders1.size()<1))
+					{
+						io.setStateResult("失败:请检查海关单号是否存在!");
+						continue;
+					}
+					else if(orders1.size()>1)
+					{
+						String strt="失败:包含"+orders1.size()+"个相同海关号，对应系统运单号分别为：";
+						for(Order order:orders1)
+						{
+							strt=strt+order.getOrderId()+" ; ";
+						}
+						
+						io.setStateResult(strt);
+						continue;
+					}
+					else
+					{
+						for(Order order:orders1)
+						{
+							orderid=order.getOrderId();
+						}
+					}
+				}
+
+				Order order = new Order();
+				order.setOrderId(orderid);
+				io.setOrderId(orderid);
+				order.setSeaNo(io.getSeataxno());
+				
+				order.setState(io.getState());
+				order.setModifyDate(date);
+
+				order.setThirdPNS(io.getThirdPNS());
+				order.setThirdNo(io.getThirdNo());
+				int iii=0;
+				
+			
+				try {
+					iii=this.orderDao.modifyOrderStateOfExcelbyseano(order);
+				}
+				catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("修改数据库出现异常，请检查海关单号为："+io.getSeataxno());
+				}
+				
+				if(iii<1)
+				{
+					io.setStateResult("失败：请检查单号是否存在或字符格式!");
+				}
+				else
+				{
+					io.setStateResult("成功!");
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(io.getOrderId());
+					route.setName(empName);// kai 20150918
+					route.setDate(date);
+					route.setState(OrderUtil.transformerState(0, io.getState()));
+					route.setStateRemark(io.getStateremark());// 添加状态描述 kai
+					//String str = empName + "修改运单";
+					String str="";
+					if(Constant.ORDER_STATE9.equals(io.getState())||Constant.ORDER_STATE8.equals(io.getState())||Constant.ORDER_STATE10.equals(io.getState()))
+					{	
+						if(!StringUtil.isEmpty(io.getThirdPNS()))
+						{
+							str+="第三方快递公司：" + io.getThirdPNS();
+						}
+						if(!StringUtil.isEmpty(io.getThirdPNS()))
+						{
+							if(str!="")
+							{
+								str+=",快递单号：" + io.getThirdNo();
+							}
+							else
+							{
+								str+="快递单号：" + io.getThirdNo();
+							}
+						}
+					}
+					
+					/*if (Constant.ORDER_STATE7.equals(io.getState())) {
+						str += "当前航班：" + io.getFlight();
+						order.setFlight(io.getFlight());
+					} else if (Constant.ORDER_STATE9.equals(io.getState())) {
+						str += "第三方快递公司：" + io.getThirdPNS() + "，快递单号："
+								+ io.getThirdNo();
+						order.setThirdPNS(io.getThirdPNS());
+						order.setThirdNo(io.getThirdNo());
+					}*/
+					route.setRemark(str);
+					if (!StringUtil.isEmpty(io.getState())) {
+						int aa=0;
+						try {
+						   aa=this.routeDao.insertRoute(route);
+						}
+						catch (Exception e) {
+							throw ExceptionUtil.handle2ServiceException("修改数据库路由现异常，请检查海关单号为："+io.getSeataxno());
+						}
+						
+						if(aa<1)
+						{
+							io.setStateResult("失败:插入路由失败!");
+							continue;
+						}
+					}
+					orders.add(order);
+				}
+
+			}
+			for (Order o : orders) {
+				if ((o.getState() != null)
+						&& (o.getState().equals(Constant.ORDER_STATE3)
+								|| o.getState().equals(Constant.ORDER_STATE4)
+								|| o.getState().equals(Constant.ORDER_STATE7)
+								|| o.getState().equals(Constant.ORDER_STATE8) || o
+								.getState().equals(Constant.ORDER_STATE10))) {
+
+					
+					Order order = this.orderDao.getByOrderId(o.getOrderId());
+					if (order == null) {
+						
+						continue;
+					}
+				
+					if ((order.getUserId() != null)
+							&& (!order.getUserId().equals(""))) {
+						User user = this.userDao.getUserById(order.getUserId());
+						if (user != null) {
+							try{
+								this.autoSendService.send(user, order);
+							}
+							catch(Exception e)
+							{
+								//在这里捕获的异常不做任何处理
+							}
+//							log.info(SmsSendUtil.sendOrderStateMsg(
+//									o.getOrderId(), o.getState(),
+//									user.getPhone()));
+						}
+					}
+				}
+			}
+
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		ResponseObject<Object> obj=new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		obj.setData(importOrders);
+		return obj;
+	}
+
+	
+	//kai 20160120 修改空运单操作
+	
+	public ResponseObject<Map<String, String>> modifyemptyOrder(Order order,
+			String userType) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			order.setCreateDate(date);
+			order.setModifyDate(date);
+			String orderId = order.getOrderId();
+			if(StringUtil.isEmpty(orderId))
+			{
+				Order oder=this.orderDao.getById(order.getId());
+				orderId=oder.getOrderId();
+			}
+		
+			int k = this.orderDao.modifyemptyOrder_new(order);//修改空运单
+			
+			if (k > 0) {
+				
+
+				for (OrderDetail detail : order.getDetails()) {
+					
+					detail.setOrderId(order.getOrderId());
+				}
+
+				if (order.getDetails().length == this.orderDetailDao
+						.insertOrderDetail(Arrays.asList(order.getDetails()))) {
+					// 插入完成后，新建一个Route并插入到数据库中
+					Route route = new Route();
+					route.setOrderId(orderId);
+					route.setDate(date);
+					route.setState(Constant.ORDER_ROUTE_STATE2);
+					route.setAddress("门店");
+					this.routeDao.insertRoute(route);
+
+					ResponseObject<Map<String, String>> result = new ResponseObject<Map<String, String>>(
+							ResponseCode.SUCCESS_CODE);
+					Map<String, String> map = new HashMap<String, String>();
+					map.put("id", order.getId());
+					map.put("orderId", orderId);
+					result.setData(map);
+					//在这里插入storagePosition
+					this.useStoragePosition(order);
+					return result;
+				} else {
+					// throw exception
+					throw new Exception();
+				}
+			} else {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.ORDER_INSERT_ERROR, "插入运单失败");
+			}
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	
+
+	public ResponseObject<List<Map<String, Object>>> getroutesbyguestOrderonlinebyuser(
+			String kuaidiType,
+			String[] orderids) throws ServiceException {
+		if (orderids == null) {
+			return new ResponseObject<List<Map<String, Object>>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+
+		}
+		if (orderids.length <1) {
+			return new ResponseObject<List<Map<String, Object>>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+
+		}
+		//ResponseObject<List<Map<String, Object>>> result = new ResponseObject<List<Map<String, Object>>>(
+		//		ResponseCode.SUCCESS_CODE);
+		List<Map<String, Object>> route_result = new  ArrayList<Map<String, Object>>();
+		try {
+			
+			
+			for (int i = 0; i < orderids.length; i++) {
+				if(!StringUtil.isEmpty(orderids[i]))
+				{
+					ResponseObject<Object> obj=this.getRouteListByGuest(kuaidiType, orderids[i], orderids);//调用之前查询接口，之前的参数可能没做为,最后一个参数并没有起到作用.
+					if((obj!=null)&&(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode())))
+					{
+						
+						Map<String, Object> map = new HashMap<String, Object>();
+						
+						map.put("orderId", orderids[i]);
+						map.put("route", obj.getData());
+						route_result.add(map);
+
+						//return result;
+					}
+					else
+					{
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("orderId", orderids[i]);
+						map.put("route", null);
+						route_result.add(map);
+					}
+				}
+			}
+			
+			ResponseObject<List<Map<String, Object>>> result = new ResponseObject<List<Map<String, Object>>>(
+							ResponseCode.SUCCESS_CODE);
+			result.setData(route_result);
+			return result;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+	
+}
+

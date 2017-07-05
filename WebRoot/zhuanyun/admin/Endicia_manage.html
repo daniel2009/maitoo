@@ -1,0 +1,250 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+    
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden;">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">管理平台</a>
+                </li>
+
+                <li>
+                    <a href="#">Endicia管理</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="page-content">
+
+            <form action="" method="post" class="form">
+
+                <table class="table table-bordered  table-striped table-condensed " id="table_endicia_arg">
+                
+                    <thead>
+                        <tr>
+                            <th colspan="4">
+                                Endicial配置管理
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="name">
+                                账号id：
+                            </td>
+                            <td class="value">
+                                <input name="accountId" type="text" placeholder="必选项 AccountID" />
+                                <input type="hidden" name="id">
+                                <input type="hidden" name="authWarehouseId">
+                            </td>
+                       <td class="name">
+                                密码钥id：
+                            </td>
+                            <td class="value">
+                                <input name="passPhrase" type="text" placeholder="必选项 PassPhrase" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="name">
+                                RequesterID：
+                            </td>
+                            <td class="value">
+                                <input name="requesterId" type="text" placeholder="必选项 RequesterID" />
+                            </td>
+                       <td class="name">
+                                比例类型：
+                            </td>
+                            <td class="value">
+                                <input name="labelSize" type="text" placeholder="必选项 LabelSize" />
+                            </td>
+                        </tr>
+                         <tr>
+                            <td class="name">
+                                    图片类型：
+                            </td>
+                            <td class="value">
+                                <input name="imageFormat" type="text" placeholder="必选项 ImageFormat" />
+                        </td>
+                       <td class="name">
+                                是否测试：
+                            </td>
+                            <td class="value">
+                                <input name="test" type="text" placeholder="必选项 test" />
+                            </td>
+                        </tr>
+                        
+                             <tr>
+                            <td class="name">
+                                    API接口：
+                            </td>
+                            <td class="value">
+                                <input name="apiUrl" type="text" placeholder="必选项 API" />
+                        </td>
+                       <td class="name">
+                                
+                            </td>
+                            <td class="value">
+                               
+                            </td>
+                        </tr> 
+
+
+
+<tr>
+                            <td class="name">
+                                   价格比例设置：
+                            </td>
+                            <td class="value" colspan="3">
+                            普通会员:<input name="user_price_0" style="width:60px" type="number"/>&nbsp;&nbsp;
+                            白银VIP会员:<input name="user_price_1" style="width:60px" type="number"/>&nbsp;&nbsp; 
+                            黄金VIP会员:<input name="user_price_2" style="width:60px" type="number"/>&nbsp;&nbsp;
+                            白金VIP会员:<input name="user_price_3" style="width:60px" type="number"/>&nbsp;&nbsp;
+                           钻石VIP会员:<input name="user_price_4" style="width:60px" type="number"/>&nbsp;&nbsp;
+                            至尊VIP1会员:<input name="user_price_5" style="width:60px" type="number"/>&nbsp;&nbsp;
+                            至尊VIP2会员:<input name="user_price_6" style="width:60px" type="number"/>&nbsp;&nbsp;
+                            至尊VIP3会员:<input name="user_price_7" style="width:60px" type="number"/>&nbsp;&nbsp;
+                            至尊VIP4会员:<input name="user_price_8" style="width:60px" type="number"/>&nbsp;&nbsp;
+                                         
+                            
+                              </td>
+                       
+                        </tr> 
+
+  <tr>
+                            <td class="name">
+                                   授权使用的门店：
+                            </td>
+                            <td class="value" colspan="3" id="authwarehouselist">
+                              </td>
+                       
+                        </tr> 
+  <tr>
+                            <td class="name">
+                                   参数说明：
+                            </td>
+                            <td class="value" colspan="3">
+                               <p>1、账号id：Endicia 接口的帐号id。</p>
+                               <p>2、密码钥id：Endicia官方发给的密钥，每个帐号都有一个，但是不是密码。这个每个打印label都必须包含的参数!Endicia Postage Account使用的Pass Phrase。</p>
+                               <p>3、RequesterID：Requester ID（也叫作Partner ID）能够单独识别发出请求的合作商。该项ID由Endicia发放。</p>
+                               <p>4、比例类型：Endicia打印的尺寸比例类型。</p>
+                               <p>5、图片类型：Endicia返回物label的图片类型。</p>
+                               <p>6、是否测试：是否进行打印测试，如果是，打印出来的label 将包含有测试字样，不能实际使用.</p>
+                               <p>7、API接口：Endicia官方的连接打印label的API接品.</p>
+                              <p>8、 授权使用的门店：如果选择，则表示此门店可以使用此功能，否则不能使用.</p>
+                              <p>9、价格比例设置：表示endicia返回的价格乘以此基数就是用户应付的价格,小于等于0或非数值将返回原始价格</p>
+                        </td>
+                       
+                        </tr> 
+                    </tbody>
+                </table>
+             
+                <div class="clearfix form-buttons">
+                    <label class="control-label col-md-5"></label>
+                    <button type="button" class="btn btn-success btn-sm" onclick="submitEndiciaArg()"><i class="glyphicon glyphicon-ok"></i><strong>提交</strong></button>
+                    
+                </div>
+            </form>
+
+
+            <div id="divKehu" style="display:none; position:absolute; border:1px solid #aaa; padding-top:5px; background:#fff">
+                <div>
+                    <label for="receiverphone" class="control-label width60px">客户名称：</label>
+                    <input name="q" id="receiverinfo" placeholder="">
+
+                    <button type="button" class="btn btn-purple btn-sm" id="btnReceiver">
+                        <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                        查询
+                    </button>
+                </div>
+                <table id="receivergrid-table"></table>
+            </div>
+        </div>
+        <!-- 最早引入基本脚本 -->
+        <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+        <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+        <!-- ace 设置 -->
+        <script src="../resources/ace/js/ace.min.js"></script>
+        <script src="../resources/ace/js/ace-elements.min.js"></script>
+        <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+        <!--grid 控件-->
+        <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+        <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+        <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+        <!--[if lte IE 8]>
+        <script src="../resources/js/html5shiv.min.js"></script>
+        <script src="../resources/js/respond.min.js"></script>
+        <![endif]-->
+        <!--日历控件支持-->
+
+        <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+        <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+        <!--表单验证插件-->
+        <script src="../resources/js/jquery.validate.min.js"></script>
+        <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+        <!--开关插件-->
+        <script src="../resources/bootstrap-switch/bootstrap-switch.min.js"></script>
+        <!--弹出框插件-->
+        <script src="../resources/artDialog/dist/dialog-min.js"></script>
+        <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+
+        <script src="../resources/js/jquery.bigautocomplete.js"></script>
+        <script src="../resources/scripts/area.js"></script>
+        <script src="../resources/js/fuelux/fuelux.spinner.min.js"></script>
+        <script src="../resources/scripts/endicia_manage.js"></script>
+        <script src="../resources/scripts/common.js"></script>
+
+</body>
+</html>

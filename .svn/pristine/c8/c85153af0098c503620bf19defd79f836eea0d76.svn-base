@@ -1,0 +1,26 @@
+package com.weiye.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.model.OrderDetail;
+import com.weiye.model.SumCommodity;
+
+
+public interface OrderDetailDao {
+	public int insertOrderDetail(List<OrderDetail> list) throws Exception;
+	
+	public List<OrderDetail> getAllByOrderId(@Param("orderId") String orderId) throws Exception;
+
+	public int deleteByOrderIds(List<String> list) throws Exception;
+	
+	public abstract List<SumCommodity> getExportOrdersGather(@Param("flight") String paramString)
+		    throws Exception;
+
+	public List<SumCommodity> exportOrdersGather(@Param("wid") String wid,@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("column") String column, @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("state") String state) throws Exception;
+	
+	
+}

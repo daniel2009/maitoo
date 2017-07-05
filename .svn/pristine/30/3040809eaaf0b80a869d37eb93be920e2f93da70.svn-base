@@ -1,0 +1,175 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">商品购买管理</p>
+		<div class="box_content">
+			<div style="margin: 0 auto;">
+				官网地址：<input type="search" style="width: 80%;" id="url" name="url" value="http://www.amazon.com/gp/product/B00IA2NYT4/ref=s9_simh_gw_g63_i3_r?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=desktop-2&pf_rd_r=0JX2B34VC108JW2Y79EH&pf_rd_t=36701&pf_rd_p=2091268722&pf_rd_i=desktop" placeholder="请粘贴商品所在地址" >
+				<input type="button" id="searchButton" value="检测商品" onclick="javascript: searchProduct();">
+			</div>
+			<div class="content_title">商品购买&nbsp;&nbsp;</div>
+				<div class="content_text">
+					<form id="searchForm" style="display: flex;">
+						<div>关键字：<input class="text-input" size="20" type="text" name="key" ></div>
+						<div>价格范围:<input type="number" name="priceStart">~<input type="number" name="priceEnd"></div>
+						<input class="button" type="button" value="高级搜索" onclick="javascript: search();" />
+					</form>
+				</div>
+				<div class="content_text">
+					<div class="tab_box" >
+						<table id="datatable" class="table">
+							<thead>
+								<tr>
+									<th style="width: 50px;">编号</th>
+									<th style="width: 100px;">类型</th>
+									<th>商品名</th>
+									<th style="width: 100px;">价格</th>
+									<th style="width: 50px;">库存</th>
+									<th>图1</th>
+									<th style="width: 100px;">日期</th>
+									<th style="width: 100px;">操作</th>
+								</tr>
+							</thead>
+							<tbody id="tbody">
+								<tr><td colspan="8">没有数据</td></tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td id="pagination" colspan="8" style="text-align: right;">共<span id="trsize">0</span>条
+										<a id="first_page" href="1" name="to_page">首页</a> |
+										<a id="pre_page" name="to_page">上一页</a> |
+										<input type="number" class="bor" style="width: 50px;" min="0" step="1" /> / <span id="tpsize">0</span>|
+										<a id="next_page" name="to_page">下一页</a> |
+										<a id="last_page" name="to_page">未页</a>&nbsp;&nbsp;
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+</body>
+<script>
+	$("#main-content").ready(function(){
+		search();
+		$("#datatable tfoot a[name='to_page']").click(function() {
+			var pageIndex = $(this).attr("href");
+			var formData = new FormData(document.getElementById("searchForm"));
+			formData.append("pageIndex", pageIndex);
+			loadList(formData);
+			return false;
+		});
+
+		$("#datatable tfoot input").keydown(function(event) {
+			if (event.which == 13) {
+				var pageIndex = $(this).val();
+				var formData = new FormData(document.getElementById("searchForm"));
+				formData.append("pageIndex", pageIndex);
+				loadList(formData);
+				return false;
+				$(this).blur();
+			}
+		});
+	});
+	function search(){
+		var formData = new FormData(document.getElementById("searchForm"));
+		loadList(formData);
+	}
+	function loadList(formData){
+		$.ajax({
+			type: "post",
+			url: "../user/product/findAllByUser",
+			data : formData,
+			processData : false,
+			contentType : false,
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					showList(response.data.datas);
+					showPage(response.data);
+					clearWrongImg();
+				} else if(36011 == code){
+					$("#tbody").html("<tr><td style='text-align: left;' colspan='6'><span>&nbsp;&nbsp;对不起，没有找到对应的信息!</span></td></tr>");
+					$("#pagination").html("");
+				}else{
+					alert("获取列表失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function showList(list){
+		var string = "";
+		$("#tbody").html(string);
+		if (list != null) {
+			$.each(list, function() {
+				string += "<tr>";
+				string += "<td>" + this.id + "</td>";
+				string += "<td>" + this.typeName + "</td>";
+				string += "<td>" + this.name + "</td>";
+				var price = this.price;
+				if(price == "" || price == -999999){
+					price = "<span style='color: #f00;'>待定</span>";
+				}
+				string += "<td>" + this.currency + "&nbsp;" + price + "</td>";
+				string += "<td>" + this.quantity + "</td>";
+				string += "<td><img src='../" + this.pic1 + "' style='max-width: 50px; max-height: 50px;'></td>";
+				string += "<td>" + this.modifyDate + "</td>";
+				string += "<td><a href='#' onclick='javascript: productInfo(" + this.id + ")'>查看</a>|<a href='#' onclick='javascript: add2Cart(" + this.id + ")'>加入购物车</a>";
+				string += "</tr>";
+			});
+		} else {
+			if (string == null || string == '') {
+				string = "<tr><td style='text-align: left;' colspan='6'><span>&nbsp;&nbsp;对不起，没有找到对应的信息!</span></td></tr>";
+			}
+		}
+		$("#tbody").html(string);
+	}
+	function showPage(pageSplit){
+		var rowCount = pageSplit.rowCount;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("#trsize").html(rowCount);
+		$("#tpsize").html(pageCount);
+		$("#first_page").attr("href","1");
+		$("#pre_page").attr("href", pageNow - 1);
+		$("#next_page").attr("href",pageNow + 1);
+		$("#last_page").attr("href", pageCount);
+	}
+	
+	function productInfo(id){
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("productId", id);
+		$("#main-content").load("../user/productInfo.jsp");
+		return false;
+	}
+	function add2Cart(id){
+		$.ajax({
+			type: "post",
+			url: "../user/cart/add2Cart",
+			data : {productId : id},
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					alert("加入成功");
+				}else{
+					alert("加入失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function searchProduct(){
+		sessionStorage.setItem("url", $("#url").val());
+		$("#main-content").load("../user/productSearch.jsp");
+	}
+</script>
+</html>
+
+

@@ -1,0 +1,218 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="tid"/>
+	<input type="hidden" name="key"/>
+	<input type="hidden" name="type"/>
+	<input type="hidden" name="state"/>
+	<input type="hidden" name="sdate"/>
+	<input type="hidden" name="edate"/>
+	<input type="hidden" name="pn"/>
+
+	
+	
+	
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">包裹认领列表</p>
+
+		<div class="box_content">
+			<div class="content_title">
+				包裹认领信息列表&nbsp;待审核数:<label id="countNeedAudit"></label>
+				<a href="#" onclick="javascript: searchState(0);">未认领<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState0">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(1);">已认领<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState1">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(2);">已失效<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState2">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState('audit');">未审核<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState3">0</label>)</span></a>
+			</div>
+			<div class="content_text">
+	
+		
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u51" style="padding-top: 5px;">
+						<div id="u510">
+						<form action="" >
+							认领单号：<input type="text" class="text-input" size="20" name="tid"maxlength="16"/>
+							<input class="button" type="submit" value="高级搜索" name="searchSub" />
+						</form>
+							<form action=""  style="margin-top: 10px;">
+								<!--预报单号：<input type="text" class="text-input" size="10" name="tid"maxlength="16"/>-->
+								&nbsp;&nbsp;
+								关键字：
+								<input class="text-input" size="20" type="text" name="key" />
+								&nbsp;&nbsp;搜索内容：
+								<select class="text-input" name="type">
+									<option value="0">
+										全部
+									</option>
+									<option value="1">
+										快递公司
+									</option>
+									<option value="2">
+										包裹单号
+									</option>
+									<option value="3">
+										认领标题
+									</option>
+									<option value="4">
+										认领内容
+									</option>
+									<option value="5">
+										已认领者id
+									</option>
+									<option value="6">
+										收件人
+									</option>	
+									<option value="7">
+										收件电话
+									</option>										
+								</select>
+								<select name="renling_state" class="text-input">
+									<option value="-1" selected="selected">请选择状态</option>
+									<option value="0">未认领</option>
+					              	<option value="1">已认领</option>
+					              	<option value="2">已失效</option>
+					              	<option value="audit">未审核</option>
+					            </select>
+					           
+								&nbsp;&nbsp;
+								入库日期：
+								<input type="text" class="text-input Wdate" size="10" name="sdate" id="sd" onClick="WdatePicker()"/>
+								~
+								<input type="text" class="text-input Wdate" size="10" name="edate" id="ed" onClick="WdatePicker()"/>
+								<input class="button" type="submit" value="高级搜索" name="searchSub" />
+							</form>
+							<!-- <div style="margin-left: 280px;margin-top: 5px;margin-bottom: 10px;">
+								按时间获取：
+								<a href="#" id="1" name="a_search_by_time">今天</a>&nbsp;&nbsp;
+								<a href="#" id="2" name="a_search_by_time">昨天</a>&nbsp;&nbsp;
+								<a href="#" id="3" name="a_search_by_time">最近七天</a>&nbsp;&nbsp;
+								<a href="#" id="4" name="a_search_by_time">最近一个月</a>
+							</div> -->
+						</div>
+						
+						
+				
+						
+						
+						<div style="clear: both;"></div>
+						
+					</div>
+<div  style="margin-left: 90%;margin-top: 20px;">
+							<span>
+								<a href="javascript:addRenlingDlg()" style="font-size:14px;">添加包裹认领</a>
+							</span>
+						</div>
+					<table style="width: 100%">
+						<col width="50px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="150px" />
+						<col />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						 
+						<thead>
+							<tr>
+								<th>
+									全选
+								</th>
+								<th>
+									认领单号
+								</th>
+								<th >
+									快递公司
+								</th>
+								<th>
+									包裹单号
+								</th>
+								<th >
+									认领标题
+								</th>
+								<th >
+									认领内容
+								</th>
+								<th >
+									已认领者id
+								</th>
+								<th >
+									预报id
+								</th>
+								<th>
+									收件人
+								</th>
+								<th>
+									收件电话
+								</th>
+								<th>
+									状态
+								</th>							
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="12">
+									<div class="bulk-actions align-left">
+										&nbsp;
+										<label>
+											<input type="checkbox" name="t_del_check_all"
+												id="t_del_check_all" />
+											选择
+										</label>
+										&nbsp;&nbsp;
+										<a href="#" title="只能删除状态为未完成状态" id="a_delete_renling_link">删除</a>
+									</div>
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+							<tr>
+								<td style="text-align: left;" colspan="12">
+									<span>&nbsp;&nbsp;对不起，现在还没有认领信息!</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNavRLData();//包裹认领调用数据接口
+		var state = window.sessionStorage.getItem("searchState");
+		if(null != state){
+			searchState(state);
+		}
+		window.sessionStorage.clear();
+		getAllStateCount("claimPackage");//nav1.js
+	});
+	function searchState(state){
+		$("select[name=renling_state]").val(state);
+		$("input[name=searchSub]").click();
+	}
+</script>
+</html>

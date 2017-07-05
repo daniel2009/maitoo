@@ -1,0 +1,550 @@
+function loadNav61Data() {
+	loadFirstPreAccountList();
+
+	$(":submit[name='searchSub']").click(function() {
+		var userId = $(":text[name='userId']").val();
+		var key = $(":text[name='key']").val();
+		var state = $("select[name='state']").val();
+		if (userId != null && userId != '') {
+			var key = '';
+			var state = '';
+			$(":text[name='key']").val('');
+			$("select[name='state']").val('');
+		}
+		var pn = "1";
+		loadPreAccountList(userId, key, state, pn);
+		return false;
+	});
+}
+
+function loadFirstPreAccountList() {
+	loadPreAccountList("", "", "-1", 1);
+}
+
+function loadPreAccountList(userId, name, state, pn) {
+	$(":hidden[name='userId']").val(userId);
+	$(":hidden[name='key']").val(name);
+	$(":hidden[name='state']").val(state);
+	$(":hidden[name='pn']").val(pn);
+	$.ajax( {
+		type : "get",
+		url : admin_account_list_url,
+		data : {
+			userId : userId,
+			key : name,
+			state : state,
+			pageIndex : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data == null) {
+					showAccount(null);
+					showAccountLink(null);
+				} else {
+					
+					showAccount(response.data.datas);
+					showAccountLink(response.data);
+				}
+				afterLoadAccount();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='6'>"
+						+ "<span>&nbsp;&nbsp;获取预充值列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+	});
+}
+
+function removenull(str)
+{
+	if((str=="")||(str=="null")||(str==null)||(str=="undefined"))	
+    {
+    	return "";
+    }
+    else
+    {
+    	return str;
+    }
+}
+
+function showAccount(list) {
+	var str = "";
+	if (list != null) {
+		$
+				.each(
+						list,
+						function() {
+							str += '<tr id="' + this.id + '">';
+							str += '<td>' + this.id + '</td>';
+							str += '<td>' + this.userId + '</td>';
+							if(removenull(this.user)!="")
+							{
+								if(removenull(this.user.phone)!="")
+								{
+									if(removenull(this.user.realName)!="" )
+									{
+										str += '<td>' + this.user.phone+'/'+this.user.realName + '</td>';
+									}
+									else
+									{
+										str += '<td>' + this.user.phone + '</td>';
+									}
+								}
+								else
+								{
+									if(removenull(this.user.realName)!="" )
+									{
+										str += '<td>' + this.user.email+'/'+this.user.realName + '</td>';
+									}
+									else
+									{
+										str += '<td>' + this.user.email + '</td>';
+									}
+								}
+								//str += '<td>' + this.user.realName + '</td>';
+								str += '<td>￥' + this.user.rmbBalance
+										+ '&nbsp;&nbsp;/&nbsp;&nbsp;$'
+										+ this.user.usdBalance + '</td>';
+							}
+							else
+							{
+								str += '<td>&nbsp;</td>';
+								str += '<td>&nbsp;</td>';
+							}
+							var currency= this.currency=="人民币" ? "￥" : "$";
+							str += '<td>' + currency + this.amount + '</td>';
+							if(this.type=="2"){
+								type = "消费";
+							}else if(this.type=="11"){
+								type = "信用卡充值";
+							}else if(this.type=="12"){
+								type="人民币充值";
+							}else{
+								type="管理员操作充值";
+							}
+							str += '<td>' + type + '</td>';
+							str += '<td>' + this.name + '</td>';
+							if (this.state == "0") {
+								str += '<td>未充值</td>';
+							} else if (this.state == "1") {
+								str += '<td>充值成功</td>';
+							} else if (this.state == "2") {
+								str += '<td>充值失败</td>';
+							} else {
+								str += '<td>&nbsp;</td>';
+							}
+							str += '<td>' + this.createDate + '</td>';
+							if (this.remark == null) {
+								str += '<td>&nbsp;</td>';
+							} else {
+								str += '<td title="' + this.remark + '">'
+										+ this.remark + '</td>';
+							}
+							if (this.state == "0") {
+								//str += '<td><a name="a_recharge_account_link" href="#">充值</a></td>';
+								str += '<td>&nbsp;</td>';
+							} else {
+								str += '<td>&nbsp;</td>';
+							}
+							str += '</tr>';
+						});
+	} else {
+		if (str == null || str == '') {
+			str = "<td style='text-align: left;' colspan='8'>"
+					+ "<span>&nbsp;&nbsp;对不起，现在还没有符合您要求的预充值列表!</span></td>";
+		}
+	}
+	$("#tab1 table tbody").html(str);
+}
+
+function showAccountLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var key = $(":hidden[name='key']").val();
+			var state = $(":hidden[name='state']").val();
+			loadPreAccountList("", key, state, pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var key = $(":hidden[name='key']").val();
+					var state = $(":hidden[name='state']").val();
+					loadPreAccountList("", key, state, pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterLoadAccount() {
+	$("a[name='a_recharge_account_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = admin_account_modify_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+}
+
+function loadNav611Data() {
+	$("#a_back_account_list_link").click(function() {
+		//$("#nav61").click();
+		nav61Click();
+		return false;
+	});
+
+	$("#bt_modify_account_detail").click(function() {
+		var amount = $(":text[name='amount']").val();
+		var realAmount = $(":text[name='realAmount']").val();
+		var remark = $("textarea[name='remark']").val();
+		var state = $("select[name='type']").val();
+		if (!checkPreAccountRealAmount(realAmount)) {
+			alert("实充金额必须为大于或者等于0的数字，请重新输入！");
+		} else if(!checkPreRechargeReamrk(remark)) {
+			alert("备注信息格式错误，备注信息最长长度为200个字符！");
+		} else {
+			$("#bt_modify_account_detail").attr("disabled", true);
+			$.ajax( {
+				type : "post",
+				url : admin_account_modify_url,
+				data : {
+					id : $(":hidden[name='id']").val(),
+					userId : $(":hidden[name='userId']").val(),
+					amount : amount,
+					realAmount : realAmount,
+					remark : remark,
+					state : state,
+					type : "11"
+				},
+				success : function(response) {
+					$("#bt_modify_account_detail").attr("disabled", false);
+					var code = response.code;
+					if ("200" == code) {
+						alert("操作完成");
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("操作失败，原因是:" + response.message);
+					}
+					//$("#nav61").click();
+					nav61Click();
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+
+	$.ajax( {
+		type : "get",
+		url : admin_account_get_one_url,
+		data : {
+			id : $(":hidden[name='id']").val()
+		},
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+				$(":hidden[name='userId']").val(response.data.userId);
+				$(":text[name='u_name']").val(response.data.user.nickName);
+				$(":text[name='balance']").val(
+						"￥" + response.data.user.rmbBalance + "  /  $"
+								+ response.data.user.usdBalance);
+				$(":text[name='c_name']").val(response.data.credit.name);
+				$(":text[name='c_no']").val(response.data.credit.creditNo);
+				$(":text[name='c_code']").val(
+						response.data.credit.creditSecurityCode);
+				$(":text[name='c_type']").val(response.data.credit.type);
+				$(":text[name='amount']").val(response.data.amount);
+				$(":text[name='realAmount']").val(response.data.amount);
+				if (response.data.remark != null) {
+					$("textarea[name='remark']").val(response.data.remark);
+				}
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取详情失败");
+				//$("#nav61").click();
+				nav61Click();
+			}
+			return false;
+		}
+	});
+}
+
+function loadNav62Data() {
+	loadFirstUserAccountList();
+	
+	$(":submit[name='searchSub']").click(function() {
+		var userId = $(":text[name='userId']").val();
+		var key = $(":text[name='key']").val();
+		var type = $("select[name='type']").val();
+		var pn = "1";
+		if (userId != null && userId != '') {
+			$(":text[name='key']").val('');
+			$("select[name='type']").val('');
+			key = '';
+			type = '';
+		}
+		loadUserAccountList(userId, key, type, pn);
+		return false;
+	});
+}
+
+function loadFirstUserAccountList() {
+	loadUserAccountList("", "", "all", 1);
+}
+
+function loadUserAccountList(userId, key, type, pn) {
+	$(":hidden[name='userId']").val(userId);
+	$(":hidden[name='key']").val(key);
+	$(":hidden[name='type']").val(type);
+	$(":hidden[name='pn']").val(pn);
+	$.ajax( {
+		type : "get",
+		url : admin_user_list_url,
+		data : {
+			"userId" : userId,
+			"key" : key,
+			"type" : type,
+			"pageIndex" : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data == null) {
+					showUserAccountList(null);
+					showUserAccountLink(null);
+				} else {
+					showUserAccountList(response.data.datas);
+					showUserAccountLink(response.data);
+				}
+				afterLoadUserAccountList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='10'>"
+						+ "<span>&nbsp;&nbsp;获取会员账户列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+		}
+	});
+}
+
+function showUserAccountList(list) {
+	var str = "";
+	if (list != null) {
+		$.each(list, function() {
+			str += "<tr id='" + this.id + "'>";
+			str += "<td><a href='#' name='a_acount_detail_link'>" + this.id + "</a></td>";
+			str += "<td>" + this.nickName + "</td>";
+			str += "<td>" + this.rmbBalance + "/" + this.usdBalance + "</td>";
+
+			str += "<td><input class='text-input' type='text' name='real_amount' value='0'/></td>";
+			str += '<td><select style="width:100px;" class="text-input" name="currency"><option selected="selected" value="11">美元</option><option  value="12">人民币</option></select></td>';
+			str += "<td><input class='text-input' type='text' name='remark' value=''/></td>";
+			str += "<td><input type='button' class='button' name='bt_user_account_recharge' value='充值'/></td>";
+			str += "</tr>";
+		});
+	} else {
+		if (str == null || str == '') {
+			str = "<td style='text-align: left;' colspan='7'>"
+					+ "<span>&nbsp;&nbsp;没有符合您查找要求的会员账户信息!</span></td>";
+		}
+	}
+	$("#tab1 table tbody").html(str);
+}
+
+function showUserAccountLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var key = $(":hidden[name='key']").val();
+			var type = $(":hidden[name='type']").val();
+			loadUserAccountList("", key, type, pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var key = $(":hidden[name='key']").val();
+					var type = $(":hidden[name='type']").val();
+					loadUserAccountList("", key, type, pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterLoadUserAccountList() {
+	$("a[name='a_acount_detail_link']").click(function(){
+		var el = $(this).parent().parent();
+		var id = el.attr("id");
+		var url = admin_user_account_detail_page_url + "?userId=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+	
+	$(":button[name='bt_user_account_recharge']").click(function(){
+		var el = $(this).parent().parent();
+		var id = el.attr("id");
+		var realAmount = el.find(":text[name='real_amount']").val();
+		var currency = el.find("select[name='currency']").val();
+		var remark = el.find(":text[name='remark']").val();
+		//var empname=
+		if (!checkAccountRealAmount(realAmount)) {
+			alert("充值金额必须为非0数字，精确到分。格式不正确，请重新输入！");
+		} else if (!checkAccountReamrk(remark)) {
+			alert("备注信息最长长度为200个字符");
+		} else {
+			$(this).attr("disabled", true);
+			$.ajax({
+				type:"post",
+				url:admin_manager_ms_recharge,
+				data:{
+					"userId":id,
+					"realAmount":realAmount,
+					"currency":currency,
+					"remark":remark
+			    },
+				success : function(response) {
+			    	$(":button[name='bt_user_account_recharge']").attr("disabled", false);
+					var code = response.code;
+					if ("200" == code) {
+						alert("充值成功");
+						var userId = $(":hidden[name='userId']").val();
+						var pn = $(":hidden[name='pn']").val();;
+						var key = $(":hidden[name='key']").val();
+						var type = $(":hidden[name='type']").val();
+						loadUserAccountList(userId, key, type, pn);
+					} else if ("607" == code) {
+						alert("您没有权限进行此操作，请重新登录！");
+						logout();
+					} else {
+						alert("充值失败，失败原因是:" + response.message);
+					}
+				}
+			});
+		}
+	});
+}
+
+function loadNav621Data() {
+	$("#a_back_user_account_list_link").click(function(){
+		//$("#nav62").click();
+		nav62Click();
+		return false;
+	});
+	
+	var id = $(":hidden[name='userId']").val();
+	$.ajax({
+		type:"get",
+		url :admin_user_account_detail_url,
+		data:{
+			userId:id
+		},
+		success: function(response) {
+			var code = response.code;
+			if (code == '200') {
+				// success
+				var str = '';
+				var data = response.data;
+				str = '￥'+data.rmb + '&nbsp;&nbsp;/&nbsp;&nbsp;$' + data.usd;
+				$("#u_d_banlcen").html(str);
+				showAccountDetail(data.details);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取会员账户详情失败，失败原因是:" + response.message);
+				//$("#nav62").click();
+				nav62Click();
+			}
+		}
+	});
+}
+
+function showAccountDetail(list) {
+	if (list == null || list.length == 0) {
+		str = "没有账户操作记录";
+	} else {
+		var str = "<table name='account_detail_table'>" +
+				"<col width='160px'/><col width='70px'/><col width='70px'/><col width='70px'/><col width='70px'/><col width='150px'/><col width='70px'/><col width='150px'/><col/>" + 
+				"<tr><th>名称</th><th>操作人</th><th>操作店面</th><th>金额</th><th>货币类型</th><th>操作类型</th><th>状态</th><th>最近更新时间</th><th>备注</th></tr></table>";
+		$("#account_detail_info").html(str);
+		var el = $("#account_detail_info table[name='account_detail_table']");
+		$.each(list, function(){
+			str ="<tr>";
+			str += "<td>" + this.name + "</td>";
+			str +="<td>"+this.empName+"</td>";
+			str +="<td>"+this.empStore+"</td>";
+			str += "<td>" + this.amount + "</td>";
+			str += "<td>" + this.currency + "</td>";
+			if (this.type=='13') {
+				str+="<td>后台管理员账户操作</td>";
+			} else if (this.type == '11') {
+				str+="<td>信用卡充值</td>";
+			} else if (this.type == '12') {
+				str+="<td>人民币充值</td>";
+			} else if (this.type == '2') {
+				str+="<td>消费</td>";
+			} else {
+				str+="<td>" + this.type + "</td>";
+			}
+			
+			if (this.state == '0') {
+				str+="<td>未处理</td>";
+			} else if (this.state == '1') {
+				str+="<td>处理完成</td>";
+			} else if (this.state == '2') {
+				str+="<td>处理失败</td>";
+			} else {
+				str+="<td>" + this.state + "</td>";
+			}
+			str+="<td>" + this.modifyDate + "</td>";
+			str+="<td>" + this.remark + "</td>";
+			str+="</tr>";
+			el.append(str);
+		});
+	}	
+}

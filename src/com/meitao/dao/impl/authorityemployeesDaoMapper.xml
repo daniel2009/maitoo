@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.AuthorityemployeesDao">
+	<resultMap id="basic_result_map" type="com.meitao.model.Authority">
+		<id column="authority_id" property="authority_id" javaType="String" />
+		<result column="employees_id" property="employees_id" javaType="String" />
+	</resultMap>
+				
+	<insert id="insertAuthority">
+	insert into authority_employees(authority_id, employees_id)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(${item.authority_id},${item.employees_id})
+    	</foreach>
+	</insert>
+	
+	<delete id="dellAuthorityEmployeeById" parameterType="java.lang.String">
+		delete from authority_employees
+		where employees_id=#{id}
+	</delete>
+</mapper>

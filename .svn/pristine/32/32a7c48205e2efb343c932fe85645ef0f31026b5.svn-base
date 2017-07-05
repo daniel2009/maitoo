@@ -1,0 +1,204 @@
+package com.weiye.service.impl;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.TranPriceDao;
+import com.weiye.dao.WarehouseDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.TranPrice;
+import com.weiye.model.Warehouse;
+import com.weiye.service.WarehouseService;
+
+@Service("warehouseService")
+public class WarehouseServiceImpl implements WarehouseService {
+	@Autowired
+	private WarehouseDao warehouseDao;
+
+	@Autowired
+	private TranPriceDao tranPriceDao;
+	public ResponseObject<Object> addWarehouse(Warehouse warehouse) throws ServiceException {
+		if (warehouse == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			if (StringUtil.isEmpty(warehouse.getSerialNo())) {
+				warehouse.setSerialNo(String.valueOf(Integer.MAX_VALUE));
+			}
+			warehouse.setCreateDate(DateUtil.date2String(new Date()));
+			int i = this.warehouseDao.insertWarehouse(warehouse);
+			if (i > 0) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.WAREHOUSE_INSERT_FAILURE, "插入失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<List<Warehouse>> getAll() throws ServiceException {
+		try {
+			List<Warehouse> list = this.warehouseDao.getAll();
+			ResponseObject<List<Warehouse>> responseObj = new ResponseObject<List<Warehouse>>(ResponseCode.SUCCESS_CODE);
+			if (list != null && !list.isEmpty()) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setData(new ArrayList<Warehouse>());
+				responseObj.setMessage("没有仓库数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<PageSplit<Warehouse>> searchPageSplit(int pageSize, int pageNow, String groupid) throws ServiceException {
+		try {
+			int rowCount = 0;
+			try {
+				rowCount = this.warehouseDao.count();
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取仓库个数失败", e);
+			}
+
+			ResponseObject<PageSplit<Warehouse>> responseObj = new ResponseObject<PageSplit<Warehouse>>(
+			        ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<Warehouse> pageSplit = new PageSplit<Warehouse>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<Warehouse> warehouses = this.warehouseDao.searchWarehouse(startIndex, pageSize, groupid);
+					if (warehouses != null && !warehouses.isEmpty()) {
+						for (Warehouse w : warehouses) {
+							pageSplit.addData(w);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取仓库列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有仓库");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<Warehouse> getWarehouseById(String id) throws ServiceException {
+		if (StringUtil.isEmpty(id)) {
+			return new ResponseObject<Warehouse>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		} else {
+			try {
+				Warehouse house = this.warehouseDao.getById(id);
+				
+				if (house != null) {
+					List<TranPrice> list=this.tranPriceDao.getAllbyWarehouseId(id);
+					if((list!=null)&&(list.size()>0))
+					{
+						house.setTranprice(list.toArray(new TranPrice[list.size()]));
+					}
+					
+					ResponseObject<Warehouse> result = new ResponseObject<Warehouse>(ResponseCode.SUCCESS_CODE);
+					result.setData(house);
+					return result;
+				} else {
+					return new ResponseObject<Warehouse>(ResponseCode.WAREHOUSE_ID_ERROR, "没有对应的仓库记录");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+	}
+
+	public ResponseObject<Object> modifyWarehouse(Warehouse warehouse) throws ServiceException {
+		if (warehouse == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			if (StringUtil.isEmpty(warehouse.getSerialNo())) {
+				warehouse.setSerialNo(String.valueOf(Integer.MAX_VALUE));
+			}else if(!StringUtil.isEmpty(warehouse.getCallOrderCity())){
+				Pattern pattern = Pattern.compile(",");
+				Matcher matcher = pattern.matcher(warehouse.getCallOrderCity());
+				warehouse.setCallOrderCity(matcher.replaceAll("\r\n"));
+			}
+			int i = this.warehouseDao.updateWarehouse(warehouse);
+			if (i > 0) {
+				TranPrice[] trd1=warehouse.getTranprice();
+				if((trd1!=null)&&(trd1.length>0))
+				{
+					for(int ii=0;ii<trd1.length;ii++)
+					{
+						if((!StringUtil.isEmpty(trd1[ii].getWarehouseId()))&&(!StringUtil.isEmpty(trd1[ii].getTranwarehouseId())))
+						{
+							TranPrice trd=this.tranPriceDao.getby2id(trd1[ii].getWarehouseId(), trd1[ii].getTranwarehouseId());
+							if(trd!=null)
+							{
+								int aa=this.tranPriceDao.modifytranpricebi2id(trd1[ii]);
+								if(aa<1)
+								{
+									throw new Exception("修改转运价格失败!");
+								}
+							}
+							else//原来没有，重新创建
+							{
+								int aa=this.tranPriceDao.inserttranprice(trd1[ii]);
+								if(aa<1)
+								{
+									throw new Exception("插入转运价格失败!");
+								}
+								
+							}
+						}
+					}
+				}
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.WAREHOUSE_MODIFY_FAILURE, "修改失败，数据库中没有对应的数据");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> deleteWarehouseByIds(String[] ids) throws ServiceException {
+		if (ids == null || ids.length == 0) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			int i = this.warehouseDao.deleteWarehouseByIds(Arrays.asList(ids));
+			if (i == ids.length) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+}

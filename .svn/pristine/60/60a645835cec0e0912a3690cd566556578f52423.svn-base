@@ -1,0 +1,380 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+		<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">转运单路由管理</p>
+
+		<div class="box_content">
+			<div class="content_title">转运单路由列表</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u55" style="padding-top: 5px;">
+						<div id="u550">
+						<form id="searchIdForm">
+						&nbsp;&nbsp;&nbsp;转运单号：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" class="text-input" size="15" name="id"/>
+						<input class="button" type="button" value="搜索" onclick="javascript: searchId();" />
+						</form><br/>
+							<form id="searchForm">
+								&nbsp;&nbsp;
+								创建日期：
+								<input  type="text" class="text-input Wdate" size="10" name="createDateStart" id="sd" onClick="WdatePicker()"/>
+								~
+								<input  type="text" class="text-input Wdate" size="10" name="createDateEnd" id="ed" onClick="WdatePicker()"/>
+								&nbsp;&nbsp;&nbsp;&nbsp;
+								关键字：
+								<input class="text-input" size="10" type="text" name="key" maxlength="16"/>
+								<select class="text-input" name="type">
+									<option value="-1">请选择搜索方式</option>
+									<option value="0">包裹单号</option>
+									<option value="1">所属用户</option>
+								</select>
+								<select class="text-input" name="state">
+									<option value="-1" selected="selected">请选择状态</option>
+									<option value="0">未入库</option>
+									<option value="-7">转运入库</option>
+									<option value="-6">转运出库</option>
+									<option value="-5">待检入库</option>
+					              	<option value="1">已入库</option>
+					              	<option value="2">等待审核</option>
+					              	<option value="3">等待付款</option>
+					              	<option value="4">已付款</option>
+					              	<option value="5">分拣完成</option>
+					              	<option value="-9">退货中</option>
+									<option value="-8">已退货</option>
+									<option value="-10">包裹异常</option>
+								</select>
+								<input class="button" type="button" value="高级搜索" onclick="javascript: search();"/>
+							</form>
+						</div>
+						<div id="u551">
+							<span>
+								
+								<a href="#" id="a_tran_route_export_in_link">导入运单状态</a>
+							
+							</span>
+						</div>
+						<div style="clear: both;"></div>
+						<div style="clear: both;"></div>
+					</div>
+
+					<table style="width: 100%">
+					<colgroup>
+						<col width="10%"/>
+						<col width="10%" />
+						<col width="15%" />
+						<col width="15%" />
+						<col width="15%" />
+						<col width="15%"/>
+						<col width="15%" />
+						<col width="15%"/>
+						</colgroup>
+						<thead>
+							<tr>
+							<!--	<th>
+									&nbsp;
+								</th>  -->
+								<th id="u_id">
+									转运单号
+								</th>
+								<th id="u_nick_name">
+									所属用户
+								</th>
+								<th id="u_phone">
+									包裹运单号
+								</th>
+								<th id="u_qq">
+									门店
+								</th>
+								<th>
+									当前状态
+								</th>
+								<th id="u_type">
+									创建时间
+								</th>
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="7">
+									<!-- <div class="bulk-actions align-left">
+										&nbsp;
+										<label>
+											<input type="checkbox" name="o_del_check_all"
+												id="o_del_check_all" />
+											全选
+										</label>
+										&nbsp;&nbsp;
+										<a href="#" title="您必须确认你要删除的数据是否已经无效，否则删除后再也找不回数据" id="a_delete_route_order_link">删除</a>
+									</div> -->
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function(){
+		search();
+		$("#o_del_check_all").click(function() {
+			if ($(this).is(':checked')) {
+				$('input[name="del_id"]').attr("checked", 'true');
+			} else {
+				$('input[name="del_id"]').removeAttr("checked");
+			}
+		});
+		
+		$("#a_tran_route_export_in_link").click(function() {
+			$("#main-content").load(admin_tran_route_export_in_page_url);
+			return false;
+		});
+	});
+
+	function loadTranshipmentRouteList(formData) {
+		$.ajax({
+			type : "post",
+			url : "../admin/transhipmentBill/searchWithRoute",
+			data : formData,
+			processData : false,
+			contentType : false,
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if (response.data == null) {
+						showRouteList(null);
+						showRouteLink(null);
+					} else {
+						showRouteList(response.data.datas);
+						showRouteLink(response.data);
+					}
+					afterLoadRouteList();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					var info = "<td style='text-align: left;' colspan='12'><span>&nbsp;&nbsp;获取运单列表信息失败!</span></td>";
+					$("#tab1 table tbody").html(info);
+				}
+				return false;
+			}
+		});
+	}
+
+	function showRouteList(list) {
+		var str = "";
+		$("#tab1 table tbody").html(str);
+		if (list != null) {
+			$.each(list, function() {
+			/*	var stateStr='<select name="newstate">';// = '<select name="newstate"><option value="0">订单创建</option>' + '<option value="1">入库</option><option value="2">出库</option><option value="3">自提</option>' + '<option value="4">成为订单</option></select>';
+				stateStr+='<option value="0">未入库</option>';
+				stateStr+='<option value="-7">转运入库</option>';
+				stateStr+='<option value="-6">转运出库</option>';
+				stateStr+='<option value="-5">待检入库</option>';
+				stateStr+='<option value="1">已入库</option>';
+				stateStr+='<option value="2">等待审核</option>';
+				stateStr+='<option value="3">等待付款</option>';
+				stateStr+='<option value="4">已付款</option>';
+				stateStr+='<option value="5">分拣完成</option>';
+				stateStr+='<option value="-9">退货中</option>';
+				stateStr+='<option value="-8">已退货</option>';
+				stateStr+='<option value="-10">包裹异常</option>';
+				stateStr+='</select>';*/
+				var stateStr='<select name="newstate">';// = '<select name="newstate"><option value="0">订单创建</option>' + '<option value="1">入库</option><option value="2">出库</option><option value="3">自提</option>' + '<option value="4">成为订单</option></select>';
+				stateStr+='<option value="4">已付款</option>';
+				stateStr+='<option value="5">分拣完成</option>';
+				stateStr+='</select>';
+				
+				str = "<tr id='" + this.id + "' name='" + this.id + "'>";
+				/*if (this.state == "0" || this.state == "4"|| this.state == "-8"|| this.state == "-10") {
+					
+					str += "<td><input type='checkbox' name='del_id' value='" + this.id + "'/></td>";
+				} else {
+					str += "<td>&nbsp;</td>";
+				}*/
+				str += "<td>"+this.id+"</td>";
+				str += "<td>"+this.userId+"</td>";
+				str += "<td>"+this.transitNo+"</td>";
+				str += "<td>"+this.warehouseName+"</td>";
+			
+				//str += "<td>"+stateStr+"</td>";
+				if (this.state == "0") {
+								str += "<td>未入库</td>";
+							} else if (this.state == "1") {
+								str += "<td>已入库</td>";
+							} else if (this.state == "2") {
+								str += "<td>等待审核</td>";
+							} else if (this.state == "3") {
+								str += "<td>等待付款</td>";
+							}  else if (this.state == "4") {
+								str += "<td>"+stateStr+"&nbsp;<input type='button' class='button' value='修改' name='modify_state_bt'/>"+"</td>";
+							}else if (this.state == "5") {
+								str += "<td>"+stateStr+"&nbsp;<input type='button' class='button' value='修改' name='modify_state_bt'/>"+"</td>";
+							} else if (this.state == "-10") {
+								str += "<td>包裹异常</td>";
+							} else if (this.state == "-7") {
+								str += "<td>转运入库</td>";
+							} else if (this.state == "-6") {
+								str += "<td>转运出库</td>";
+							}else if (this.state == "-5") {
+								str += "<td>待检入库</td>";
+							}
+							else if (this.state == "-9") {
+								str += "<td>退货中</td>";
+							} else if (this.state == "-8") {
+								str += "<td>已退货</td>";
+							}else {
+								str += "<td>" + this.state + "</td>";
+							}
+				
+				str += "<td>"+this.createDate+"</td>";
+				//str += "<td><input type='button' class='button' value='修改' name='modify_state_bt'/></td>";
+				if(((this.state=="4")||(this.state=="5"))&&(removenull(this.orderId)!=""))
+				{
+					str +='<td id="'+this.orderId+'"><a href="'+this.orderId+'" name="a_order_print_a4_link">A4打印('+this.orderId+')</a><br/>';
+					str +='<a href="'+this.orderId+'" name="a_order_print_link">热敏(4x6)('+this.orderId+')</a></td><br/>';
+				}
+				else
+				{
+					
+					str +='<td ></td>';
+				}
+				str += "</tr>";
+				$("#tab1 table tbody").append(str);
+				$("#" + this.id).find("select[name='newstate']").val(this.state);
+				$("#" + this.id).find(":button[name='modify_state_bt']").click(function() {
+					var element = $(this).parent().parent();
+					var state = element.find("select[name='newstate']").first().val();
+					var id = element.attr("name");
+					$.ajax({
+						type : "post",
+						//url : "../admin/transhipmentRoute/add",
+						url : "../admin/transhipmentRoute/modifystate",
+						data : {
+							id : id,
+							state : state,
+						},
+						success : function(response) {
+							var code = response.code;
+							if (code == "200") {
+								alert("修改转运单状态成功");
+								navTranshipmentRouteClick();
+							} else {
+								alert("修改转运单状态失败，失败原因是：" + response.message);
+							}
+							navTranshipmentRouteClick();
+						}
+					});
+					
+					
+					
+					return false;
+				});
+			});
+			$("a[name='a_order_print_link']").click(function() {
+
+				
+				var id = "";
+				var orderId = $(this).parent().attr("id");
+
+				var url = admin_print_page_url + "?id=" + id + "&orderId=" + orderId;
+
+				$("#my_print_div").load(url);
+				return false;
+			});
+			
+			$("a[name='a_order_print_a4_link']").click(function() {
+
+				
+				var id = "";
+				var orderId = $(this).parent().attr("id");
+
+				var url = admin_print_A4_page_url + "?id=" + id + "&orderId=" + orderId;
+
+				$("#my_print_div").load(url);
+				return false;
+			});
+		} else {
+			if (str == null || str == '') {
+				str = "<td style='text-align: left;' colspan='12'><span>&nbsp;&nbsp;没有符合您查找要求的运单信息!</span></td>";
+			}
+			$("#tab1 table tbody").html(str);
+		}
+	}
+
+	function showRouteLink(pageSplit) {
+		if (pageSplit != null) {
+			var rowCount = pageSplit.rowCount;
+			var pageSize = pageSplit.pageSize;
+			var pageNow = pageSplit.pageNow;
+			var pageCount = pageSplit.pageCount;
+			$("tfoot .bulk-actions").show();
+			$("tfoot .pagination").html(createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount));
+
+			$("tfoot .pagination a").click(function() {
+				var pn = $(this).attr("href");
+				var formData = new FormData(document.getElementById("searchForm"));
+				formData.append("pageIndex", pn);
+				loadTranshipmentRouteList(formData);
+				return false;
+			});
+
+			$("tfoot .pagination input").keydown(function(event) {
+				if (event.which == 13) {
+					var pn = $(this).val();
+					if (/^\d*$/.test(pn)) {
+						var formData = new FormData(document.getElementById("searchForm"));
+						formData.append("pageIndex", pn);
+						loadTranshipmentRouteList(formData);
+					} else {
+						alert("只能输入数字");
+					}
+					$(this).blur();
+				}
+			});
+		} else {
+			$("tfoot .bulk-actions").hide();
+			$("tfoot .pagination").html("");
+		}
+	}
+
+	function afterLoadRouteList() {
+		$("a[name='a_order_route_detail_link']").click(function() {
+			var oid = $(this).attr("href");
+			var url = admin_route_order_detail_page_url + "?oid=" + oid;
+			$("#main-content").load(url);
+			return false;
+		});
+	}
+	function searchId(){
+		var formData = new FormData(document.getElementById("searchIdForm"));
+		loadTranshipmentRouteList(formData);
+	}
+	function search(){
+		var formData = new FormData(document.getElementById("searchForm"));
+		loadTranshipmentRouteList(formData);
+	}
+</script>
+</html>

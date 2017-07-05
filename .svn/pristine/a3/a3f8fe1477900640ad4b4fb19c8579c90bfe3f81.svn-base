@@ -1,0 +1,9 @@
+// JavaScript Document
+$(function()
+{
+	//实例化轮播 
+	$('.flexslider').flexslider({
+        directionNav: true,
+        pauseOnAction: false
+    });
+})

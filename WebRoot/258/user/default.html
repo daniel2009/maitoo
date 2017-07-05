@@ -1,0 +1,353 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>用户中心</title>
+    <link rel="icon" href="/images/logo_io.jpg" type="image/x-icon"/>
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <link href="css/usercenter.css" rel="stylesheet" />
+    <style type="text/css">
+        #userinfo .profile-info-name, #userinfo .profile-info-value {
+            padding: 10px;
+        }
+
+        .infotitle {
+            width: 100%;
+            height: 40px;
+            padding: 10px;
+        }
+
+        .usadress .name {
+            text-align: right;
+            width: 100px;
+            color: #666;
+        }
+
+        .usadress .value {
+            text-align: left;
+            color: #333;
+            padding-left: 20px;
+        }
+
+        .page-content thead tr {
+            height: 25px;
+            line-height: 25px;
+            font: bold 14px large,400;
+        }
+
+        .page-content tbody tr {
+            height: 25px;
+        }
+
+        .page-content tbody td {
+            font-size: 14px;
+            line-height: 25px;
+        }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            vertical-align: middle;
+            padding: 0 5px;
+        }
+
+        .btn {
+            font-size: 12px;
+        }
+
+        .btn {
+            border: 0px;
+            padding: 4px 8px;
+        }
+
+        .btn-info .badge {
+            color: #fff;
+        }
+
+        .addressbox {
+            margin: 10px 0px;
+            padding: 10px;
+            border: 2px solid #B2DBA1;
+        }
+
+        .addresstitle {
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon blue"></i>
+                    <a href="#">用户中心</a>
+                </li>
+
+                <li>
+                    <a href="#">首页</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content">
+
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12">
+
+
+                    <div class=" col-xs-12 col-sm-6 col-md-6" id="userinfo">
+                        <div class="pull-left alert alert-success no-margin infotitle">
+
+                            <i class="icon-umbrella bigger-120 blue"></i>
+                            用户信息
+                        </div>
+                        <div class="profile-user-info profile-user-info-striped" style="width:100%">
+                          
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 用户名 </div>
+
+                                <div class="profile-info-value">
+                                    <i class="fa fa-user light-orange bigger-110"></i>
+                                    <span ><span name="realName"></span></span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 用户等级 </div>
+
+                                <div class="profile-info-value">
+                                    <i class="fa fa-graduation-cap light-orange bigger-110"></i>
+                                    <span name="usertype"></span>
+
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 收件标识 /代码 </div>
+
+                                <div class="profile-info-value">
+                                	<i class="icon-map-marker light-orange bigger-110"></i>
+                                    <span name="useralias"></span>
+                                    <i class="icon-map-marker light-orange bigger-110"></i>
+                                    <span name="usercode"></span>,
+                                    
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 我的余额 </div>
+                               
+                                <div class="profile-info-value">
+                                    <i class="fa fa-dollar light-orange bigger-110"></i><span name="usdBalance"></span>
+                                    <i class="fa fa-cny light-orange bigger-110"></i><span name="rmbBalance"></span>
+									<span id="rmb_usa_rate" name="rmb_usa_rate" style="display:none;">00</span>
+
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 充值 </div>
+
+                                <div class="profile-info-value">
+
+                                    <span class="editable editable-click"><a href="chongzhizhongxin.html" >【在线充值】</a></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class=" col-xs-12 col-sm-6 col-md-6" style="padding-left:2px;" id="orderQuantity">
+                        <div class="pull-left alert alert-success no-margin infotitle">
+
+                            <i class="fa fa-comment-o bigger-120 blue"></i>
+                            运单信息
+                        </div>
+                        <div class="profile-user-info profile-user-info-striped" style="width:100%">
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 总运单数 </div>
+
+                                <div class="profile-info-value">
+
+                                    <a href="yundanlist.html" class="btn btn-yellow">
+                                        <i class="fa fa-check-square-o"></i>
+                                       件数
+                                        <span class="badge badge-warning badge-right" name="totalQ">0</span>
+                                    </a>
+<!--  
+                                    <a href="#" class="btn btn-yellow">
+                                        <i class=" icon-check-empty"></i>
+                                        待支付
+                                        <span class="badge badge-warning badge-right">5</span>
+                                    </a>
+
+-->
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 在线置单 </div>
+
+                                <div class="profile-info-value">
+                                    <a href="zaixianzhidanlist.html" class="btn btn-yellow">
+                                        <i class="icon-info-sign"></i>
+                                        件数
+                                        <span class="badge badge-warning badge-right" name="onlineQ">0</span>
+                                    </a>
+                                    <button type="button" class="btn btn-primary btn-sm" style="width:80px;" id="btnAdd" onclick="addonlineorder()">
+                            <span class="fa fa-plus-square bigger-110"></span>
+                            制 单
+                        </button>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 作废运单 </div>
+
+                                <div class="profile-info-value">
+                                    <a href="#" class="btn btn-yellow">
+                                        <i class="icon-info-sign"></i>
+                                        件数
+                                        <span class="badge badge-warning badge-right" name="abandonQ">0</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 异常运单 </div>
+
+                                <div class="profile-info-value">
+                                    <a href="yundanlist.html" class="btn btn-yellow">
+                                        <i class="icon-info-sign"></i>
+                                        件数
+                                        <span class="badge badge-warning badge-right" name="questionQ">0</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 揽收未付款 </div>
+
+                                <div class="profile-info-value">
+                                    <a href="yundanlist.html" class="btn btn-yellow">
+                                        <i class="icon-check-empty"></i>
+                                       件数
+                                        <span class="badge badge-warning badge-right" name="nopayQ">0</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div style="height:20px;color:#fff">1</div>
+                <div class=" col-xs-12 col-sm-12 col-md-12">
+                    <div class="pull-left alert alert-success no-margin infotitle">
+
+                        <i class="icon-book bigger-120 blue"></i>
+                        美淘门店
+                    </div>
+                    <div class="profile-user-info profile-user-info-striped" style="width:100%">
+                        <div class="profile-info-row">
+                            
+
+                            <div class="profile-info-value" style="color:#F89406;font-weight:bold;">
+                              欢迎来到美淘，我们竭诚为你服务!              </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row usadress" id="storelist_0">
+
+
+
+               
+            </div>
+
+
+        </div>
+    </div>
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+    <!--开关插件-->
+    <script src="../resources/bootstrap-switch/bootstrap-switch.min.js"></script>
+
+    <script src="../resources/js/fuelux/fuelux.spinner.min.js"></script>
+    <script src="../resources/scripts/common.js"></script>
+    <script src="scripts/default.js"></script>
+  
+</body>
+</html>

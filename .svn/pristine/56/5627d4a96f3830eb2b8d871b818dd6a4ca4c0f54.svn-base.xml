@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.OrderBatchDao">
+	<insert id="inserBatch" parameterType="com.weiye.model.OrderBatch"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		`batch`(create_date)
+		values(#{createDate})
+	</insert>
+</mapper>

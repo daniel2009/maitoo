@@ -1,0 +1,187 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+<div class="block">
+	<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">储藏间信息列表<a href="#" onclick="javascript:navStorageClick();">返回</a></p>
+	<div class="box_content">
+		<div class="content_title">储藏间信息列表</div>
+		<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u51" style="padding-top: 5px;">
+						<div id="u510" >
+							<form id="searchIdForm">
+								&nbsp;&nbsp;&nbsp;用户编号：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" class="text-input" size="15" name="id"/>
+								<input class="button" type="button" value="搜索" onclick="javascript: searchId();" />
+							</form><br/>
+							<form id="searchForm">
+								用户关键字： <input class="text-input" size="10" type="text" name="realName" maxlength="16"/>
+								<input class="button" type="button" value="高级搜索" onclick="javascript: search();"/>
+							</form>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+					<table style="width: 100%">
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col />
+						<thead>
+							<tr>
+								<th>用户编号</th>
+								<th>所在储藏间</th>
+								<th>仓位编号</th>
+								<th>仓位位置</th>
+								<th>更新日期</th>
+								<th>储藏包裹</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td id="pagination" colspan="4" style="text-align: right;">共<span id="trsize">0</span>条
+									<a id="first_page" href="1" name="to_page">首页</a> |
+									<a id="pre_page" name="to_page">上一页</a> |
+									<input type="number" class="bor" style="width: 50px;" min="0" step="1" /> / <span id="tpsize">0</span>|
+									<a id="next_page" name="to_page">下一页</a> |
+									<a id="last_page" name="to_page">未页</a>&nbsp;&nbsp;
+								</td>
+							</tr>
+						</tfoot>
+						<tbody id="tbody">
+							<tr>
+								<td style="text-align: left;" colspan="4">
+									<span>&nbsp;&nbsp;对不起，没有找到对应的退货信息!</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		var sessionStorage = window.sessionStorage;
+		var userId = sessionStorage.getItem("userId");
+		var userRealName = sessionStorage.getItem("userRealName");
+		sessionStorage.clear();
+		var formData = new FormData();
+		if(userId!=null && userId != ""){
+			formData.append("id", userId);
+		}else{
+			formData.append("realName", userRealName);
+		}
+		loadList(formData);
+		$("#pagination a[name='to_page']").click(function() {
+			// 跳页
+			var pn = $(this).attr("href");
+			var formData = new FormData(document.getElementById("searchForm"));
+			formData.append("pageIndex", pn);
+			loadList(formData);
+			return false;
+		});
+
+		$("#pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var formData = new FormData(document.getElementById("searchForm"));
+					formData.append("pageIndex", pn);
+					loadList(formData);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	});
+	function loadList(formData){
+		$.ajax({
+			type : "post",
+			url : "../admin/storagePosition/findStoragePositionByUser",
+			data : formData,
+			processData : false,
+			contentType : false,
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if (response.data == null) {
+						showList(null);
+						showPage(null);
+					} else {
+						showList(response.data.datas);
+						showPage(response.data);
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					var info = "<td style='text-align: left;' colspan='4'><span>&nbsp;&nbsp;获取列表信息失败!</span></td>";
+					$("#tab1 table tbody").html(info);
+				}
+				return false;
+			}
+		});
+	}
+	function showList(list) {
+		var string = "";
+		$("#tbody").html(string);
+		if (list != null) {
+			$.each(list, function() {
+				string += "<tr>";
+				string += "<td>" + this.userId + "</td>";
+				string += "<td>" + this.storageName + "</td>";
+				string += "<td>" + this.id + "</td>";
+				string += "<td>" + this.position + "</td>";
+				string += "<td>" + this.modifyDate + "</td>";
+				var relateIds = "&nbsp;";
+				for(var i=0; i<this.recordList.length; i++){
+					relateIds += this.recordList[i].relateId + ",";
+				}
+				string += "<td>" + relateIds + "</td>";
+				string += "</tr>";
+			});
+			
+		} else {
+			if (string == null || string == '') {
+				string = "<tr><td style='text-align: left;' colspan='6'><span>&nbsp;&nbsp;对不起，没有找到对应的信息!</span></td></tr>";
+			}
+		}
+		$("#tbody").html(string);
+	}
+
+	function showPage(pageSplit) {
+		var rowCount = 0;
+		var pageNow = 0;
+		var pageCount = 0;
+		if (pageSplit != null) {
+			rowCount = pageSplit.rowCount;
+			pageNow = pageSplit.pageNow;
+			pageCount = pageSplit.pageCount;
+		}
+
+		$("#trsize").html(rowCount);
+		$("#tpsize").html(pageCount);
+		$("#first_page").attr("href","1");
+		$("#pre_page").attr("href", pageNow - 1);
+		$("#next_page").attr("href",pageNow + 1);
+		$("#last_page").attr("href", pageCount);
+		
+	}
+	function searchId(){
+		var formData = new FormData(document.getElementById("searchIdForm"));
+		loadList(formData);
+	}
+	function search(){
+		var formData = new FormData(document.getElementById("searchForm"));
+		loadList(formData);
+	}
+</script>
+</html>

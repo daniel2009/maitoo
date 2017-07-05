@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.ShelvesDao">
+	<resultMap id="basic_result_map" type="com.meitao.model.Shelves">
+		<id column="id" property="id" javaType="String" />
+		<result column="storeId" property="storeId" javaType="String" />
+		<result column="wNo" property="wNo" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="shelvesNo" property="shelvesNo" javaType="String" />
+		<result column="unused_wNo" property="unused_wNo" javaType="String" />
+		<result column="used_wNo" property="used_wNo" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="nickName" property="nickName" javaType="String" />
+		
+		
+		
+		
+	</resultMap>
+
+	<insert id="insert" parameterType="com.meitao.model.Shelves" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		shelves_index(storeId,wNo,create_date,modify_date,shelvesNo,remark,nickName)
+		values(#{storeId},#{wNo},#{createDate},#{modifyDate},#{shelvesNo},#{remark},#{nickName})
+	</insert>
+
+	
+	<select id="getone" resultMap="basic_result_map">
+		select shelves_index.* from shelves_index 
+		<where>
+			id=#{id}
+			<if test="storeId!=null and storeId!=''">
+				and `shelves_index`.`storeId` = #{storeId}
+			</if>
+		</where>
+	</select>
+	<update id="updateRemark">
+		update `shelves_index`
+		set `remark`=#{remark},
+		`modify_date`=#{modifyDate},
+		`nickName`=#{nickName}
+		where id=#{id}
+	</update>
+	
+	<select id="countOfsearchShelves" resultType="java.lang.Integer">
+		select count(distinct `shelves_index`.id) from `shelves_index`
+		<where>
+			<if test="storeId!=null and storeId!=''">
+				and `shelves_index`.`storeId` = #{storeId}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and `shelves_index`.`remark` like #{wordkey}
+			</if>
+		</where>
+	</select>
+	<select id="searchShelves" resultMap="basic_result_map">
+		select shelves_index.* from `shelves_index`
+		<where>
+			<if test="storeId!=null and storeId!=''">
+				and `shelves_index`.`storeId` = #{storeId}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and `shelves_index`.`remark` like #{wordkey}
+			</if>
+		</where>
+		order by `shelves_index`.create_date desc
+		limit
+		#{index},#{size}
+	</select>
+	<delete id="deleteone" parameterType="java.lang.String">
+		delete from shelves_index
+		where id=#{id}
+	</delete>
+	<select id="existShelves" resultType="java.lang.Integer">
+		select count(distinct `shelves_index`.id) from shelves_index where storeId=#{storeId} and shelvesNo=#{shelvesNo}
+	</select>
+	
+	
+	<select id="getbytstoreId" resultMap="basic_result_map">
+		select shelves_index.* from `shelves_index`
+		<where>
+			<if test="storeId!=null and storeId!=''">
+				and `shelves_index`.`storeId` = #{storeId}
+			</if>
+		</where>
+	</select>
+	
+</mapper>

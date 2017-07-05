@@ -1,0 +1,118 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="userId" value=""/>
+	<input type="hidden" name="key" value=""/>
+	<input type="hidden" name="state" value=""/>
+	<input type="hidden" name="pn" value="1"/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">预充值列表</p>
+
+		<div class="box_content">
+			<div class="content_title">预充值列表</div>
+			<div class="content_text">
+	
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u31" style="padding-top: 5px;">
+						<div id="u310">
+							<form action="">
+							           会员编号：<input class="text-input small-input" type="text" name="userId"/>
+							    &nbsp;&nbsp;&nbsp;&nbsp;
+								用户名：<input class="text-input small-input" type="text" name="key" />
+								<select name="state" class="text-input">
+									<option value="-1">全部</option>
+									<option value="0">未充值</option>
+									<option value="1">充值成功</option>
+									<option value="2">充值失败</option>
+								</select>
+								<input class="button" type="submit" value="搜索" name="searchSub" />
+							</form>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+
+					<table style="width: 100%">
+						<col width="50px" />
+						<col width="80px"/>
+						<col width="130px"/>
+						<col width="150px" />
+						<col width="120px" />
+						<col width="80px" />
+						<col width="80px" />
+						<col width="80px" />
+						<col width="150px" />
+						<col/>
+						<col width="50px" />
+						<thead>
+							<tr>
+								<th>
+									编号
+								</th>
+								<th>
+									用户编号
+								</th>
+								<th id="u_nick_name">
+									用户名
+								</th>
+								<th>
+									账户余额
+								</th>
+								<th id="u_sign_date">
+									预充值金额
+								</th>
+								<th>
+									充值名称
+								</th>
+								<th>
+									类型
+								</th>
+								<th id="u_balance">
+									状态
+								</th>
+								<th>
+									创建时间
+								</th>
+								<th>
+									备注
+								</th>
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="6">
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav61Data();
+	});
+</script>
+</html>

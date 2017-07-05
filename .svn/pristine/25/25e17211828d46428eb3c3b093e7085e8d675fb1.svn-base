@@ -1,0 +1,456 @@
+package com.weiye.service.impl;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import org.springframework.aop.ThrowsAdvice;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.PaymentUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.AccountDao;
+import com.weiye.dao.AccountDetailDao;
+import com.weiye.dao.UserDao;
+import com.weiye.dao.globalargsDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Account;
+import com.weiye.model.AccountDetail;
+import com.weiye.model.Credit;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.Route;
+import com.weiye.model.TranshipmentRoute;
+import com.weiye.model.User;
+import com.weiye.service.AccountService;
+
+@Service("accountService")
+public class AccountServiceImpl implements AccountService {
+	@Autowired
+	private AccountDao accountDao;
+	@Autowired
+	private AccountDetailDao accountDetailDao;
+	
+	@Autowired
+	private UserDao userDao;
+	@Autowired
+	private globalargsDao globalargsDao;
+
+	public ResponseObject<Object> addAccountDetail(AccountDetail detail) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			detail.setCreateDate(date);
+			detail.setModifyDate(date);
+			int i = this.accountDetailDao.insertAccountDetail(detail);
+			if (i > 0) {
+				ResponseObject<Object> result = new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("id", detail.getId());
+				result.setData(map);
+				return result;
+			} else {
+				return new ResponseObject<Object>(ResponseCode.ACCOUNT_INSERT_FAILURE, "插入数据库失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> addCredit(Credit credit) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			credit.setModifyDate(date);
+			int i = -1;
+			if (StringUtil.isEmpty(credit.getId())) {
+				i = this.accountDao.insertCredit(credit);
+			} else {
+				i = this.accountDao.updateCredit(credit);
+			}
+			if (i > 0) {
+				ResponseObject<Object> result = new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("id", credit.getId());
+				map.put("name", credit.getName());
+				result.setData(map);
+				return result;
+			} else {
+				return new ResponseObject<Object>(ResponseCode.ACCOUNT_INSERT_FAILURE, "插入数据库失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<PageSplit<AccountDetail>> search(String userId, String key, int pageSize, int pageNow,
+	        String state, String type, String groupid) throws ServiceException {
+		try {
+			key = StringUtil.isEmpty(key) ? null : StringUtil.escapeStringOfSearchKey(key);
+			state = StringUtil.isEmpty(state) ? null : state.trim();
+			type = StringUtil.isEmpty(type) ? null : type.trim();
+			userId = StringUtil.isEmpty(userId) ? null : userId.trim();
+			int rowCount = 0;
+			try {
+				rowCount = this.accountDetailDao.countByKey(userId, key, state, type, groupid);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取消费详情记录数量失败", e);
+			}
+
+			ResponseObject<PageSplit<AccountDetail>> responseObj = new ResponseObject<PageSplit<AccountDetail>>(
+			        ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<AccountDetail> pageSplit = new PageSplit<AccountDetail>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<AccountDetail> details = this.accountDetailDao.searchByKey(userId, key, state, type,
+					        startIndex, pageSize);
+					
+					if (details != null && !details.isEmpty()) {
+						for (AccountDetail detail : details) {
+							
+							if((detail.getUser()==null)&&(!StringUtil.isEmpty(detail.getUserId())))
+							{
+								detail.setUser(this.userDao.getUserById(detail.getUserId()));
+							}
+								
+			
+							
+							pageSplit.addData(detail);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取消费详情列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有消费记录");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<AccountDetail> getAccountDetailById(String id) throws ServiceException {
+		if (StringUtil.isEmpty(id)) {
+			return new ResponseObject<AccountDetail>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			AccountDetail detail = this.accountDetailDao.getById(id);
+			if (detail != null) {
+				detail.getUser().setPassword(null);
+				ResponseObject<AccountDetail> result = new ResponseObject<AccountDetail>(ResponseCode.SUCCESS_CODE);
+				result.setData(detail);
+				return result;
+			} else {
+				return new ResponseObject<AccountDetail>(ResponseCode.PARAMETER_ERROR, "数据库中没有对应id的详情记录");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> modifyAccountDetail(AccountDetail detail) throws ServiceException {
+		if (Constant.ACCOUNT_DETAIL_STATE1.equals(detail.getState())) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			String date = DateUtil.date2String(new Date());
+			detail.setModifyDate(date);
+			// modify the account detail state
+			int i = this.accountDetailDao.modifyAccountDetail(detail);
+			if (StringUtil.isEmpty(detail.getRealAmount())) {
+				detail.setRealAmount(detail.getAmount());
+			}
+			if (i > 0) {
+				if (Constant.ACCOUNT_DETAIL_STATE2.equals(detail.getState())) {
+					String userId = detail.getUserId();
+					Account account = new Account();
+					account.setUserId(userId);
+					if (Constant.ACCOUNT_DETAIL_TYPE11.equals(detail.getType())) {
+						// 信用卡充值
+						account.setUsd(detail.getRealAmount());
+						account.setRmb("0");
+					} else if (Constant.ACCOUNT_DETAIL_TYPE12.equals(detail.getType())) {
+						// 人民币充值
+						account.setUsd("0");
+						account.setRmb(detail.getRealAmount());
+					} else {
+						throw new Exception();
+					}
+					account.setModifyDate(date);
+					int k = this.accountDao.insertOrUpdateAccount(account);
+					if (k > 0) {
+						// pass
+					} else {
+						throw new Exception();
+					}
+				}
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "没有对应的消费详情或者是该操作以及执行过了");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+	
+	public ResponseObject<Object> procedure(AccountDetail detail) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			Account a = accountDao.getAccountByUserId(detail.getUserId());
+			double usd= StringUtil.string2Double(a.getUsd());
+			double newusd = usd - StringUtil.string2Double(detail.getAmount());
+			// 账户支付，修改账户余额
+			Account account = new Account();
+			account.setUsd(String.valueOf(newusd));
+			account.setRmb(a.getRmb());
+			account.setUserId(a.getUserId());
+			account.setModifyDate(date);
+			if (this.accountDao.modifyAccount(account) > 0) {
+				// pass
+			} else {
+				throw new Exception();
+			}
+			this.accountDetailDao.insertAccountDetail(detail);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+	}
+	
+	
+	public ResponseObject<Object> insertAccountDetail(AccountDetail detail) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			detail.setModifyDate(date);
+			// modify the account detail state
+			int i = this.accountDetailDao.insertAccountDetail(detail);
+			if (StringUtil.isEmpty(detail.getRealAmount())) {
+				detail.setRealAmount(detail.getAmount());
+			}
+			if (i > 0) {
+				if (Constant.ACCOUNT_DETAIL_STATE2.equals(detail.getState())) {
+					String userId = detail.getUserId();
+					Account account = new Account();
+					account.setUserId(userId);
+					if (Constant.ACCOUNT_DETAIL_TYPE11.equals(detail.getType())) {
+						// 信用卡充值
+						account.setUsd(detail.getRealAmount());
+						account.setRmb("0");
+					} else if (Constant.ACCOUNT_DETAIL_TYPE12.equals(detail.getType())) {
+						// 人民币充值
+						account.setUsd("0");
+						account.setRmb(detail.getRealAmount());
+					} else {
+						throw new Exception();
+					}
+					account.setModifyDate(date);
+					int k = this.accountDao.insertOrUpdateAccount(account);
+					if (k > 0) {
+						// pass
+					} else {
+						throw new Exception();
+					}
+				}
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.SHOW_EXCEPTION, "已经充值成功，但记录写入数据库失败，请联系客服，修改充值记录!");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> modifyAccountOfAdmin(AccountDetail detail, Account newAccount)
+	        throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			detail.setCreateDate(date);
+			detail.setModifyDate(date);
+			newAccount.setModifyDate(date);
+			if (Constant.ACCOUNT_DETAIL_TYPE11.equals(detail.getCurrency())) {
+				// 美元
+				detail.setCurrency("美元");
+			} else if (Constant.ACCOUNT_DETAIL_TYPE12.equals(detail.getCurrency())) {
+				// 人民币
+				detail.setCurrency("人民币");
+			} else {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "充值的货币类型必须是美元或者人民币");
+			}
+
+			int i = this.accountDetailDao.insertAccountDetail(detail);
+			if (i > 0) {
+				int k = this.accountDao.insertOrUpdateAccount(newAccount);
+				if (k > 0) {
+					return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+				} else {
+					throw new Exception();
+				}
+			} else {
+				return new ResponseObject<Object>(ResponseCode.ACCOUNT_INSERT_FAILURE, "插入账户消费详情记录失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Account> getAccountByUserId(String userId) throws ServiceException {
+		ResponseObject<Account> result = new ResponseObject<Account>();
+		if (StringUtil.isEmpty(userId)) {
+			result.setCode(ResponseCode.PARAMETER_ERROR);
+			result.setMessage("会员编号不能为空");
+		} else {
+			try {
+				Account account = this.accountDao.getAccountByUserId(userId);
+				if (account != null) {
+					result.setCode(ResponseCode.SUCCESS_CODE);
+					result.setData(account);
+				} else {
+					result.setCode(ResponseCode.PARAMETER_ERROR);
+					result.setMessage("数据库中没有对应用户id的账户记录");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return result;
+	}
+
+	public ResponseObject<List<Credit>> getCreditsByUserId(String userId) throws ServiceException {
+		if (StringUtil.isEmpty(userId)) {
+			return new ResponseObject<List<Credit>>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+	        List<Credit> credits = this.accountDao.getCreditsByUserId(userId);
+	        ResponseObject<List<Credit>> result = new ResponseObject<List<Credit>>(ResponseCode.SUCCESS_CODE);
+	        result.setData(credits);
+	        return result;
+        } catch (Exception e) {
+        	throw ExceptionUtil.handle2ServiceException(e);
+        }
+    }
+
+	public ResponseObject<Credit> getCreditById(String id, String userId) throws ServiceException {
+		if (StringUtil.isEmpty(id)) {
+			return new ResponseObject<Credit>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+	        Credit credit = this.accountDao.getCreditById(id);
+	        if (credit != null && userId.equals(credit.getUserId())) {
+	        	ResponseObject<Credit> result = new ResponseObject<Credit>(ResponseCode.SUCCESS_CODE);
+	        	result.setData(credit);
+	        	return result;
+	        } else {
+	        	// 没有数据
+	        	return new ResponseObject<Credit>(ResponseCode.PARAMETER_ERROR, "数据库中没有对应的信用卡记录");
+	        }
+        } catch (Exception e) {
+        	throw ExceptionUtil.handle2ServiceException(e);
+        }
+    }
+
+	@Override
+	public ResponseObject<Object> rechargeRmb(String userId, double amount, String modifyDate) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(StringUtil.isEmpty(userId) || amount <= 0){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setCode("参数错误");
+		}else{
+			try {
+				int result = this.accountDao.rechargeRmb(userId, String.valueOf(amount), modifyDate);
+				if(result > 0){
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				}else{
+					responseObject.setCode(ResponseCode.ACCOUNT_RECHARGE_RMB_FAILURE);
+					responseObject.setMessage("账户人民币充值失败，请联系客服");
+				}
+	        } catch (Exception e) {
+	        	throw ExceptionUtil.handle2ServiceException(e);
+	        }
+		}
+		
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> addPayment(User user, String paymentString, String currency, String detail) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<>();
+		String rateString = null;
+		try {
+			user = userDao.getUserById(user.getId());
+			rateString = this.globalargsDao.getcontentbyflag("cur_usa_cn");
+			if("RMB".equals(currency)){
+				double rate = StringUtil.string2Double(rateString);
+				rate = new BigDecimal(1 / rate).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+			}
+			if(PaymentUtil.calculatePayment(user.getUsdBalance(), user.getRmbBalance(), paymentString, rateString)==null){
+				throw new ServiceException("账户余额不足");
+			}else{
+				AccountDetail accountDetail = new AccountDetail();
+				Account account = new Account();
+				PaymentUtil.setAccountAndAccountDetailByPayment(account, accountDetail, user, paymentString, rateString, false, detail);
+				accountDetailDao.insertAccountDetail(accountDetail);
+				this.accountDao.modifyAccount(account);
+			}
+			responseObject.setCode(ResponseCode.SUCCESS_CODE);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new ServiceException(e);
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> checkBalanceEnough(User user, String paymentString, String currency) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<>();
+		String rateString = null;
+		try {
+			user = userDao.getUserById(user.getId());
+			rateString = this.globalargsDao.getcontentbyflag("cur_usa_cn");
+			if("RMB".equals(currency)){
+				double rate = StringUtil.string2Double(rateString);
+				rate = new BigDecimal(1 / rate).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+			}
+			if(PaymentUtil.calculatePayment(user.getUsdBalance(), user.getRmbBalance(), paymentString, rateString)==null){
+				responseObject.setCode(ResponseCode.ACCOUNT_BALANCE_NOT_ENOUGH);
+				responseObject.setMessage("账户余额不足");
+			}else{
+				responseObject.setCode(ResponseCode.SUCCESS_CODE);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new ServiceException(e);
+		}
+		return responseObject;
+	}
+}

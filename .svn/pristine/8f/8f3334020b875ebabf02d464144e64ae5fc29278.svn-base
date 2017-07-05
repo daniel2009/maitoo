@@ -1,0 +1,15 @@
+var _kuaidi_map = [["youzhengguonei","包裹/平邮/挂号信"],
+                 ["ems","EMS"],
+                 ["emsen","EMS"],
+                 ["youzhengguonei","挂号信"],
+                 ["youzhengguonei","国内邮件"],
+                 ["youzhengguoji","国际邮件"],
+                 ["shentong","申通"],
+                 ["shunfeng","顺丰速递"],
+                 ["shunfengen","顺丰"],
+                 ["yuantong","圆通速递"],
+                 ["yunda","韵达快运"],
+                 ["youzhengguonei","邮政小包（国内），邮政包裹（国内）、邮政国内给据（国内）"],
+                 ["youzhengguoji","邮政小包（国际），邮政包裹（国际）、邮政国内给据（国际）"],
+                 ["zhongtong","中通速递"]];
+

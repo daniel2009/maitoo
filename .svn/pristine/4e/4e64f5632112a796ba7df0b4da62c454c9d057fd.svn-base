@@ -1,0 +1,28 @@
+.QQbox {
+	Z-INDEX: 99999999999;
+	RIGHT: 0px;
+	WIDTH: 118px;
+	POSITION: absolute;
+	left: 5px;
+}
+.QQbox .press {
+	CURSOR: pointer;
+	BORDER:0px;
+}
+.QQbox .Qlist {
+	WIDTH: 118px;
+	POSITION: absolute   
+}
+.QQbox .Qlist .t {
+	FONT-SIZE: 1px;
+	WIDTH: 118px;
+	BACKGROUND: url(qq_listbg.gif) no-repeat left 50%
+}
+.QQbox .Qlist .b {
+	FONT-SIZE: 1px;
+	WIDTH: 118px;BACKGROUND:#ccc url(qq_listbg.gif) no-repeat right 50%
+}
+
+.QQbox .Qlist .con { clear:both; BACKGROUND: url(middle.gif) repeat-y 0px 0px; padding-left:5px; padding-right:5px; clear:both;}
+.QQbox .Qlist .con td { padding-top:5px; padding-bottom:5px;}
+

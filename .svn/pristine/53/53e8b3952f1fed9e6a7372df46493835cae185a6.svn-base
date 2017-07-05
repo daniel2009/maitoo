@@ -1,0 +1,55 @@
+package com.weiye.controller;
+
+import java.net.URLDecoder;
+import java.util.Date;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.NewsUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.News;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.NewsService;
+import com.weiye.service.TranPriceService;
+@Controller
+public class TranPriceController extends BasicController {
+
+	private static final long serialVersionUID = 6582185005680513923L;
+	private static final Logger log = Logger.getLogger(TranPriceController.class);
+	@Resource(name = "tranPriceService")
+	private TranPriceService tranPriceService;
+	
+
+	@RequestMapping(value = "/tranprice/get_all", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Object> getalltranprice(HttpServletRequest request
+	        ) {
+		
+		try {
+			return this.tranPriceService.getalltranprice();
+		} catch (Exception e) {
+			log.error("获取转运价格失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取转运价格失败");
+		}
+	}
+
+	
+}

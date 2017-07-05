@@ -1,0 +1,134 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>修改密码-快递中美专线</title>
+<link rel="shortcut icon" href="img/favicon.ico" /> 
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+	$(function(){
+		$(".menu ul li").hover(function(){
+			$(this).find("ul").show();
+			$(this).find("div").addClass("active");
+		},function(){
+			$(this).find("ul").hide();
+			$(this).find("div").removeClass("active");
+		});
+		// 设置点击退出链接时候进行的操作
+		$("a[name='a_exit_link']").click(function(){
+			$.ajax({
+				type:"get",
+				url:"user/logout",
+				success:function(response) {
+					var code = response.code;
+					if (code == "200") {
+						window.location.href = "index.jsp";
+					} else {
+						alert("退出失败，失败原因是:" + response.message);
+					}
+				}
+			});
+		});
+	})
+	
+	function resetpwd() {
+		var oldpwd = $(":password[name='oldpwd']").val();
+		var newpwd = $(":password[name='newpwd']").val();
+		$.ajax({
+			type:"post",
+			url:"user/reset_pwd2",
+			data:{
+				"password":newpwd,
+				"oldpwd":oldpwd,
+				"vcode":"1234"
+			},
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					alert("修改成功");
+					window.location.href = "denglushouye.jsp";
+				} else if (code == "607") {
+					window.location.href = "login.jsp";
+				} else {
+					alert("修改密码失败，原因是:" + response.message);
+				}
+				return false;
+			}
+		});
+		return false;
+	}
+</script>
+</head>
+
+<body>
+
+
+<div class="main">
+	<div class="crumbs">
+		<ul>
+			<li>当前位置</li>
+			<li><a href="index.jsp">首页</a></li>
+			<li>&gt;</li>
+			<li>修改密码</li>
+		</ul>
+	</div>
+	
+	<div class="main_box">
+		<!--<div class="box_title">本地时间: 2014年09月24日星期三 0时0分</div>-->
+		<ul class="box_menu">
+			<div class="bt"><a href="denglushouye.jsp">我的首页</a></div>
+			<li>
+			<div class="m1">运单管理</div>
+			<ul class="m2">
+				<li><a href="daohuoyubao.jsp">到货预报</a></li>
+				<li><a href="dahuoyubaocaxun.jsp">包裹查询</a></li>
+				<li><a href="wangshangzhijian.jsp">网上置单</a></li>
+				<li><a href="daokubaoguocaihe.jsp">包裹操作</a></li>
+				<li><a href="tijiaoyundan.jsp">提交运单</a></li>
+				<li><a href="lishiyundan.jsp">历史运单</a></li>
+			</ul>
+			</li>
+			<li>
+			<div class="m1"><a href="denglushouye.jsp">用户中心</a></div>
+			<ul class="m2">
+				<li><a href="yonghuxinxi.jsp">用户信息</a></li>
+				<li><a href="shouhuodizi.jsp">收货地址</a></li>
+				<li><a href="caiwujilu.jsp">财务记录</a></li>
+				<li><a href="zaixianchongzi.jsp">现在充值</a></li>
+				<li><a href="liuyanguanli.jsp">留言管理</a></li>
+				<li><a href="tuijianlianjie.jsp">推荐链接</a></li>
+			</ul>
+			</li>
+			<div class="exit"><a name="a_exit_link" href="#">退出</a></div>
+		</ul>
+
+		
+		<div class="box_content"style="heigh:500px">
+			<div class="content_title">修改密码</div>
+			<div class="content_text">
+				<div class="d_tr">
+					<label>原密码：</label>
+					<input name="oldpwd" type="password" maxlength="16"style="width:155px;height:25px"/><span class="red">*</span>
+				</div>
+				<div class="d_tr">
+					<label>新密码：</label>
+					<input name="newpwd" type="password" maxlength="16"style="width:155px;height:25px"/><span class="red">*</span>
+				</div>
+				
+				<div class="d_tr">
+					<label>确认密码：</label>
+					<input name="confirmpwd" type="password" maxlength="16"style="width:155px;height:25px"/><span class="red">*</span>
+				</div>
+				<a class="btn" onclick="resetpwd()" href="#" style="margin-left:105px;">提交</a>
+				</br></br></br></br></br></br></br></br>
+			</div>
+		</div>
+	</div>
+</div>
+<!--end main-->
+
+
+</body>
+</html>

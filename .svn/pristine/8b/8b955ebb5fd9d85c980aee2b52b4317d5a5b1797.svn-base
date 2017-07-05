@@ -1,0 +1,158 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>运单查询-快递中美专线</title>
+<link rel="shortcut icon" href="img/favicon.ico" /> 
+
+
+<style type="text/css">
+
+.main {
+	width: 900px;
+	margin: 0 auto;
+	padding-top: 20px;
+	overflow: hidden;
+}
+
+.main_box {
+	margin-top: 10px;
+}
+.main_box_right .login {
+	width: 231px;
+	height: 250px;
+	margin: 50px 335px;
+	border: 1px #ccc solid;
+}
+.main_box .box_title {
+	text-align: center;
+	line-height: 22px;
+}
+
+.yun {
+	height: 80px;
+	width: 460px;
+	border: #CCCCCC 1px solid;
+	line-height: 80px;
+	margin: 20px 250px;
+	padding: 0 20px;
+}
+.yun input {
+	margin: 0 10px;
+	height: 30px;
+	width: 200px;
+}
+
+
+.rndRec {
+    clear: none;
+    border: 1px solid #cccccc;
+    border-radius: 0px;
+}
+
+.tipTitle {
+    color: #003173;
+    font-size: 14px;
+    text-align: left;
+    padding-left: 15px;
+    padding-top: 10px;
+    clear: both;
+}
+
+.commnTxt {
+    font-size: 12px;
+    padding-left: 15px;
+    text-align: left;
+    margin-top: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 0px #cccccc solid;
+    line-height: 20px;
+    border-radius: 5px;
+}
+
+    table tr td {
+        border-top: 1px #cccccc solid;
+        border-left: 1px #cccccc solid;
+        border-right: 1px #cccccc solid;
+        border-bottom: 1px #cccccc solid;
+        padding-bottom: 2px;
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 2px;
+    }
+
+</style>
+
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+	$(function(){ 
+		// 开始获取数据
+		//update by chenkanghua  订单号为 WY+8位+US
+		var value = $(":hidden[name='s_oid']").val();
+		var arrs =value.replace(/;/g,"+%0d");
+		if (arrs!=null) {
+			search(arrs);
+		}
+		
+		$("a[name='a_search_route_link']").click(function(){
+			var value = $(":text[name='orderId']").val();
+			var arrs =value.replace(/;/g,"+%0d");
+			if (arrs!=null) {
+				search(arrs);
+			}
+			
+			return false;
+		});
+	});
+	
+	function search(arrs) {
+		$.ajax({
+			type:"get",
+			url:"route/guest",
+			data : $.param({
+				"oids" : arrs,
+				"kuaidi_type" : "1"
+			}, true),
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					$("#route").html(response.data);
+				} else {
+					alert("获取运单路由状态失败，原因是:" + response.message);
+				}
+				return false;
+			}
+		});
+	}
+</script>
+
+</head>
+
+<body>
+<input type="hidden" name="s_oid" value="${param.oid }"/>
+
+<div class="main">
+
+	<div class="main_box">
+		<div class="yun">
+			快递查询：<input name="orderId" type="text" maxlength="16" value="${param.oid }"/><a class="btn" name="a_search_route_link" href="#">查询</a>
+		</div>
+		<div id="route">
+		
+		</div>
+	</div>
+</div>
+<!--end main-->
+<br/>
+<br/>
+<br/>
+<br/>
+
+</body>
+</html>

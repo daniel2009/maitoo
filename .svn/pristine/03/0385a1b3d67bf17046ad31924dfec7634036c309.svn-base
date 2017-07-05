@@ -1,0 +1,352 @@
+package com.weiye.controller;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.OrderUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.UserUtil;
+import com.weiye.model.Order;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.OrderService;
+
+@Controller
+public class WebOrderController extends BasicController {
+
+	private static final long serialVersionUID = -7483583832857530911L;
+	private static final Logger log = Logger.getLogger(WebOrderController.class);
+	@Resource(name = "orderService")
+	private OrderService orderService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+
+	@RequestMapping(value = "/admin/weborder/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Order>> searchByKeyOfAdmin(
+			HttpServletRequest request,
+	        @RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String key,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPEKEY, required = false, defaultValue = "") String typekey,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false) String state,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			
+
+			String storeid=null;
+			String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+			{
+				storeid=null;//表示可以查找所有门店
+				
+			}else
+			{
+				storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+				if((storeid==null)||(storeid.equalsIgnoreCase("")))
+				{
+					return generateResponseObject(ResponseCode.NEED_LOGIN,
+							"你没有登陆!");
+				}
+			}
+			
+			
+			
+			key =  new String(key.getBytes("ISO-8859-1"), "utf-8");
+			
+			if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+				sdate = "";
+			} else {
+				sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+			}
+
+			if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+				edate = "";
+			} else {
+				edate = UserUtil.transformerDateString(edate, " 23:59:59");
+			}
+
+			oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+			if((type!=null)&&(type.equalsIgnoreCase("2")))//所属用户查询
+			{
+				state = OrderUtil.dealState(state);
+				pageIndex = Math.max(pageIndex, 1);
+				return this.orderService.searchWebOrdersbybelonguser(oid, key, sdate, edate, state,typekey,storeid, defaultPageSize, pageIndex);
+			}
+			else
+			{
+				String column = OrderUtil.getSearchColumnByType(type);
+				state = OrderUtil.dealState(state);
+				pageIndex = Math.max(pageIndex, 1);
+				return this.orderService.searchWebOrders(oid, key, column, sdate, edate, state, typekey,storeid,defaultPageSize, pageIndex);
+			}
+		} catch (Exception e) {
+			log.error("查询运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+		}
+	}
+	
+	//kai 20150914 modify
+	@RequestMapping(value = "/admin/weborder/searchall", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Order>> searchByKeyOfAdminallpage(
+			HttpServletRequest request,
+	        @RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String key,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false) String state,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPEKEY, required = false) String typekey,
+	        @RequestParam(value = ParameterConstants.COMMON_WID, required = false) String wid,
+	        @RequestParam(value = ParameterConstants.COMMON_CID, required = false) String cid,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			
+			String storeid=null;
+			String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+			{
+				storeid=null;//表示可以查找所有门店
+				
+			}else
+			{
+				storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+				if((storeid==null)||(storeid.equalsIgnoreCase("")))
+				{
+					return generateResponseObject(ResponseCode.NEED_LOGIN,
+							"你没有登陆!");
+				}
+			}
+			
+			if(storeid!=null)
+			{
+				if(!StringUtil.isEmpty(wid))
+				{
+					if(!storeid.equalsIgnoreCase(wid))
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "对不起，你不能下载其它门店的运单!");
+					}
+				}
+				else
+				{
+					wid=storeid;
+				}
+				
+			}
+			
+			key =  new String(key.getBytes("ISO-8859-1"), "utf-8");
+			
+			if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+				sdate = "";
+			} else {
+				sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+			}
+
+			if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+				edate = "";
+			} else {
+				edate = UserUtil.transformerDateString(edate, " 23:59:59");
+			}
+			
+			if((wid!=null)&&(wid.equalsIgnoreCase("-1")))
+			{
+				wid=null;
+			}
+			if((cid!=null)&&(cid.equalsIgnoreCase("-1")))
+			{
+				cid=null;
+			}
+
+			oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+			
+			if((type!=null)&&(type.equalsIgnoreCase("2")))
+			{
+				
+				//String column = OrderUtil.getSearchColumnByType(type);
+				state = OrderUtil.dealState(state);
+				pageIndex = Math.max(pageIndex, 1);
+				int pagesize=0x7fffffff;//设置数量为最大值
+				//return this.orderService.searchWebOrders(oid, key, column, sdate, edate, state, pagesize, pageIndex);
+				//return this.orderService.searchWebOrdersincludewidcid(oid, key, column, sdate, edate, state,wid,cid, pagesize, pageIndex);
+				return this.orderService.searchWebOrdersincludewidcidbybelonguser(oid, key, sdate, edate, state,typekey,wid,cid, pagesize, pageIndex);
+			}
+			else
+			{
+				String column = OrderUtil.getSearchColumnByType(type);
+				state = OrderUtil.dealState(state);
+				pageIndex = Math.max(pageIndex, 1);
+				int pagesize=0x7fffffff;//设置数量为最大值
+				//return this.orderService.searchWebOrders(oid, key, column, sdate, edate, state, pagesize, pageIndex);
+				return this.orderService.searchWebOrdersincludewidcid(oid, key, column, sdate, edate, state,typekey,wid,cid, pagesize, pageIndex);
+			}
+		} catch (Exception e) {
+			log.error("查询运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+		}
+	}
+	
+	//kai 20150914 modify
+	@RequestMapping(value = "/admin/weborder/searchnopay", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Order>> searchByKeyOfAdminnopaypage(
+			HttpServletRequest request,
+	        @RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false) String key,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false) String sdate,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false) String edate,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false) String state,
+	        @RequestParam(value = ParameterConstants.COMMON_WID, required = false) String wid,
+	        @RequestParam(value = ParameterConstants.COMMON_CID, required = false) String cid,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			
+			
+			
+			String storeid=null;
+			String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+			{
+				storeid=null;//表示可以查找所有门店
+				
+			}else
+			{
+				storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+				if((storeid==null)||(storeid.equalsIgnoreCase("")))
+				{
+					return generateResponseObject(ResponseCode.NEED_LOGIN,
+							"你没有登陆!");
+				}
+			}
+			
+			wid=storeid;
+			
+			key =  new String(key.getBytes("ISO-8859-1"), "utf-8");
+			
+			if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+				sdate = "";
+			} else {
+				sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+			}
+
+			if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+				edate = "";
+			} else {
+				edate = UserUtil.transformerDateString(edate, " 23:59:59");
+			}
+			
+			if((wid!=null)&&(wid.equalsIgnoreCase("-1")))
+			{
+				wid=null;
+			}
+			if((cid!=null)&&(cid.equalsIgnoreCase("-1")))
+			{
+				cid=null;
+			}
+
+			oid = StringUtil.isEmpty(oid) ? null : oid.trim().toUpperCase();
+			
+			if((type!=null)&&(type.equalsIgnoreCase("2")))
+			{
+				
+				//String column = OrderUtil.getSearchColumnByType(type);
+				state = OrderUtil.dealState(state);
+				if(state==null)
+				{
+					state="-1";
+				}
+				pageIndex = Math.max(pageIndex, 1);
+				int pagesize=0x7fffffff;//设置数量为最大值
+				//return this.orderService.searchWebOrders(oid, key, column, sdate, edate, state, pagesize, pageIndex);
+				//return this.orderService.searchWebOrdersincludewidcid(oid, key, column, sdate, edate, state,wid,cid, pagesize, pageIndex);
+				//return this.orderService.searchWebOrdersincludewidcidbybelonguser(oid, key, sdate, edate, state,wid,cid, pagesize, pageIndex);
+				if((state!=null)&&(state.equalsIgnoreCase("-1")))
+				{
+				return this.orderService.searchWebOrdersincludpaymoneybyadmin(oid, key, sdate, edate, state,wid,cid, pagesize, pageIndex);
+				}
+				else
+				{
+					return this.orderService.searchWebOrdersincludewidcidbybelonguser(oid, key, sdate, edate, state,null,wid,cid, pagesize, pageIndex);
+				}
+			}
+			else
+			{
+				String column = OrderUtil.getSearchColumnByType(type);
+				state = OrderUtil.dealState(state);
+				pageIndex = Math.max(pageIndex, 1);
+				int pagesize=0x7fffffff;//设置数量为最大值
+				//return this.orderService.searchWebOrders(oid, key, column, sdate, edate, state, pagesize, pageIndex);
+				return this.orderService.searchWebOrdersincludewidcid(oid, key, column, sdate, edate, state,null,wid,cid, pagesize, pageIndex);
+			}
+		} catch (Exception e) {
+			log.error("查询运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+		}
+	}
+	
+	
+	//kai 20150914 modify
+		@RequestMapping(value = "/admin/weborder/flyno", method = { RequestMethod.GET })
+		@ResponseBody
+		public ResponseObject<PageSplit<Order>> searchByflynoOfAdminallpage(
+				HttpServletRequest request,
+		        @RequestParam(value = "flyno", required = false, defaultValue = "") String flyno) {
+			try {
+				
+				String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+				if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+				{
+					return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你没有此操作权限!");
+					
+				}
+				
+				if((flyno==null)||(flyno.equalsIgnoreCase("")))
+				{
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "航班号不能为空!");
+				}
+				
+				
+				/*if((type!=null)&&(type.equalsIgnoreCase("2")))
+				{
+					
+					//String column = OrderUtil.getSearchColumnByType(type);
+					state = OrderUtil.dealState(state);
+					pageIndex = Math.max(pageIndex, 1);
+					int pagesize=0x7fffffff;//设置数量为最大值
+					//return this.orderService.searchWebOrders(oid, key, column, sdate, edate, state, pagesize, pageIndex);
+					//return this.orderService.searchWebOrdersincludewidcid(oid, key, column, sdate, edate, state,wid,cid, pagesize, pageIndex);
+					return this.orderService.searchWebOrdersincludewidcidbybelonguser(oid, key, sdate, edate, state,wid,cid, pagesize, pageIndex);
+				}
+				else
+				{
+					String column = OrderUtil.getSearchColumnByType(type);
+					state = OrderUtil.dealState(state);
+					pageIndex = Math.max(pageIndex, 1);
+					int pagesize=0x7fffffff;//设置数量为最大值
+					//return this.orderService.searchWebOrders(oid, key, column, sdate, edate, state, pagesize, pageIndex);
+					return this.orderService.searchWebOrdersincludewidcid(oid, key, column, sdate, edate, state,wid,cid, pagesize, pageIndex);
+				}*/
+				return this.orderService.searchWebOrdersbyflyno(flyno);
+				
+			} catch (Exception e) {
+				log.error("查询运单失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询失败");
+			}
+		}
+	
+}

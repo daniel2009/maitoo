@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.PorderDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.Porder">
+		<id column="id" property="id" javaType="String" />
+		<result column="orderId" property="orderId" javaType="String" />
+		<result column="divideOrderId" property="divideOrderId" javaType="String" />
+		<result column="commuditylists" property="commuditylists" javaType="String" />
+		<result column="taxCommuditylists" property="taxCommuditylists" javaType="String" />
+		<result column="brands" property="brands" javaType="String" />
+		
+		<result column="guiguo" property="guiguo" javaType="String" />
+		<result column="numbers" property="numbers" javaType="String" />
+		<result column="weight" property="weight" javaType="String" />
+		<result column="sendname" property="sendname" javaType="String" />
+		<result column="sendaddress" property="sendaddress" javaType="String" />
+		
+		<result column="value" property="value" javaType="String" />
+		<result column="sendcompany" property="sendcompany" javaType="String" />
+		<result column="revcompany" property="revcompany" javaType="String" />
+		<result column="cprovince" property="cprovince" javaType="String" />
+		<result column="ccity" property="ccity" javaType="String" />
+		
+		<result column="cdist" property="cdist" javaType="String" />
+		<result column="caddress" property="caddress" javaType="String" />
+		<result column="cname" property="cname" javaType="String" />
+		<result column="cphone" property="cphone" javaType="String" />
+		<result column="boxno" property="boxno" javaType="String" />
+		
+		<result column="card_id" property="cardId" javaType="String" />
+		<result column="printflag" property="printflag" javaType="String" />
+		
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="seaprintId" property="seaprintId" javaType="String" />
+		
+		
+	
+		
+	</resultMap>
+<!-- 
+	<insert id="insertPorder" parameterType="com.weiye.model.Porder"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		porder(orderId,divideOrderId,commuditylists,taxCommuditylists,brands,guiguo,numbers,weight,sendname,sendaddress,
+		value,sendcompany,revcompany,cprovince,ccity,cdist,caddress,cname,
+		cphone,boxno,card_id,printflag,create_date,modify_date,seaprintId
+		)
+		values(#{orderId},#{divideOrderId},#{commuditylists},#{taxCommuditylists},#{brands},#{guiguo},#{numbers},#{weight},#{sendname},#{sendaddress}
+		,#{value},#{sendcompany},#{revcompany},#{cprovince},#{ccity},#{cdist},#{caddress},#{cname}
+		,#{cphone},#{boxno},#{cardId},#{printflag},#{createDate},#{modifyDate},#{seaprintId}
+		)
+	</insert> -->
+	
+	<insert id="insertPorder" parameterType="com.weiye.model.Porder"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		porder(orderId,divideOrderId,commuditylists,taxCommuditylists,brands,guiguo,numbers,weight,sendname,sendaddress,
+		value,sendcompany,revcompany,cprovince,ccity,cdist,caddress,cname,
+		cphone,boxno,card_id,printflag,create_date,modify_date,seaprintId
+		)
+		values(#{orderId},#{divideOrderId},#{commuditylists},#{taxCommuditylists},#{brands},#{guiguo},#{numbers},#{weight},#{sendname},#{sendaddress},
+		#{value},#{sendcompany},#{revcompany},#{cprovince},#{ccity},#{cdist},#{caddress},#{cname},
+		#{cphone},#{boxno},#{cardId},#{printflag},#{createDate},#{modifyDate},#{seaprintId}
+		)
+	</insert>
+	
+	<select id="countbyorderId" resultType="java.lang.Integer">
+		select count(distinct `porder`.id) 
+		from `porder`
+		<where>
+		`porder`.orderId=#{orderId}
+		<if test="storeId!=null and storeId!=''">
+			and `warehouse_Id`=#{storeId}	
+		</if>	
+		</where>
+	</select>
+
+	
+	<select id="countOfSearchKeys" resultType="java.lang.Integer">
+		select count(distinct `porder`.id) 
+		from `porder`
+		<where>
+		`porder`.seaprintId=#{seaprintno}
+			<if test="orders!=null and orders!=''">
+			 and (`porder`.orderId like #{orders} or `porder`.divideOrderId like #{orders})		
+			</if>
+			<if test="state!=null and state!=''">
+				and `porder`.printflag=#{state}	
+			</if>
+			<if test="content!=null and content!=''">
+				 and (`porder`.orderId like #{content} or `porder`.divideOrderId like #{content} 
+				 or `porder`.commuditylists like #{content} or `porder`.taxCommuditylists like #{content}
+				 or `porder`.brands like #{content} or `porder`.sendname like #{content}
+				 or `porder`.sendaddress like #{content} or `porder`.sendcompany like #{content}
+				 or `porder`.revcompany like #{content} or `porder`.cprovince like #{content}
+				 or `porder`.ccity like #{content} or `porder`.cdist like #{content}
+				 or `porder`.caddress like #{content} or `porder`.cname like #{content}
+				 or `porder`.cphone like #{content})		
+			</if>		
+			
+			<if test="storeId!=null and storeId!=''">
+			and `porder`.warehouse_Id=#{storeId}	
+		</if>	
+		</where>
+	</select>
+	
+	<select id="searchByKeys" resultMap="basic_result_map">
+		select distinct `porder`.* 
+		from `porder`
+		<where>
+		`porder`.seaprintId=#{seaprintno}
+			<if test="orders!=null and orders!=''">
+			 and (`porder`.orderId like #{orders} or `porder`.divideOrderId like #{orders})		
+			</if>
+			<if test="state!=null and state!=''">
+				and `porder`.printflag=#{state}	
+			</if>
+			<if test="content!=null and content!=''">
+				 and (`porder`.orderId like #{content} or `porder`.divideOrderId like #{content} 
+				 or `porder`.commuditylists like #{content} or `porder`.taxCommuditylists like #{content}
+				 or `porder`.brands like #{content} or `porder`.sendname like #{content}
+				 or `porder`.sendaddress like #{content} or `porder`.sendcompany like #{content}
+				 or `porder`.revcompany like #{content} or `porder`.cprovince like #{content}
+				 or `porder`.ccity like #{content} or `porder`.cdist like #{content}
+				 or `porder`.caddress like #{content} or `porder`.cname like #{content}
+				 or `porder`.cphone like #{content})		
+			</if>		
+			
+			<if test="storeId!=null and storeId!=''">
+			and `porder`.warehouse_Id=#{storeId}	
+		</if>	
+		</where>
+		order by `porder`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+	
+	
+	<select id="getbyid" resultMap="basic_result_map">
+		select `porder`.* 
+		from `porder`
+		where `id`=#{id}
+	</select>
+	
+	<update id="modifystate"> update 
+		porder set printflag=#{state},modify_date=#{modifyDate}
+		 where id=#{id} </update>
+		 
+		 
+	<delete id="deletebyid">
+		delete from `porder`
+		 where id=#{id}	
+	</delete>
+	<delete id="deletebyseaprintid">
+		delete from `porder`
+		 where seaprintId=#{seaprintId}	
+	</delete>
+</mapper>

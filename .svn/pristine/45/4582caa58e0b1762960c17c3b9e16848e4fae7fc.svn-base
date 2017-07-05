@@ -1,0 +1,158 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+		<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">修改职工信息</p>
+
+		<div class="box_content">
+			<div class="content_title">修改职工信息</div>
+			<div class="content_text">
+				<div class="tab-content" id="tab2">
+		          <form id="modify_form" action=""  method="post" enctype="multipart/form-data">
+		          	<input type="hidden" name="id" value="${param.id }"/>
+		            <fieldset>
+			            <p>
+			              <label style="display: inline;">&nbsp;&nbsp;&nbsp;员工编号：</label>
+			              <label style="display: inline;">${param.id }</label>
+			            </p>
+			            <hr/>
+			            <p>
+			              <label style="display: inline;">&nbsp;&nbsp;&nbsp;用户名：</label>
+			              <label style="display: inline;" id="e_d_account">&nbsp;</label>
+			            </p>
+			            <hr/>
+			            
+			            <p>
+			              <label style="display: inline;">&nbsp;&nbsp;&nbsp;门&nbsp;&nbsp;&nbsp;市：</label>
+			              <select name="wid" style="width:200px"></select>
+			            </p>
+			            <hr/>
+			            <p style="display: none;">
+			              <label style="display: inline;">门市编号：</label>
+			              <input class="text-input small-input" type="text" name="sid" maxlength="6"/>
+			            </p>
+			            <p style="display: none;">
+			              <label style="display: inline;">门市名称：</label>
+			              <input class="text-input small-input" type="text" name="sname" maxlength="16"/>
+			            </p>
+			            <p>
+			              <label style="display: inline;">手机号码：</label>
+			              <input class="text-input small-input" type="text" name="phone" maxlength="18"/>
+			            </p>
+			            <hr/>
+			            <p>
+			              <label style="display: inline;">登录密码</label>
+			              <input class="text-input small-input" type="text" name="password" maxlength="20" placeholder="留空即不修改(6-20位)"/>
+			            </p>
+			            <hr/>
+			            <p>
+			            	<label style="display: inline;">&nbsp;&nbsp;&nbsp;照&nbsp;&nbsp;&nbsp;片：</label>
+			            	<input class="text-input small-input" type="file" name="pic"/>
+			            	<label style="display: inline;" id="e_d_pic">&nbsp;</label>
+			            </p>
+			            <hr/>
+			            <p id="power">
+			            
+			            <label style="display: inline;font-size:18px;"><strong>员工权限清单：</strong></label><br/>
+			            
+			             <label style="display: inline;"><strong>转运管理：</strong></label><br/>
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="100">预报列表
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="101">转运路由管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="102">包裹认领
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="103">退货管理
+
+							
+			       <br/>
+			            
+			          <!--  <label style="display: inline;font-size:18px;"><strong>运单管理：</strong></label><br/>
+			             --> 
+			             <label style="display: inline;"><strong>运单管理：</strong></label><br/>
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="151">门市打单
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="152">运单列表
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="153">运单路由管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="153">价格计算<br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="154">空运单管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="155">上门取件
+
+							
+			       <br/>
+			            <!-- <label style="display: inline;"><strong>自助打单管理</strong></label><br/>
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="200">usps打单
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="201">usps打单列表
+							
+							
+							<br/> --> 
+							
+							<label style="display: inline;"><strong>店面员工管理</strong></label><br/>
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="251">员工管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="252">仓库门店管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="253">储藏间管理
+							
+							<br/>
+			             
+			             <label style="display: inline;"><strong>会员管理</strong></label><br/>
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="300">会员管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="301">导出会员信息
+							
+							<br/>
+			           
+			             <label style="display: inline;"><strong>账户管理</strong></label><br/>
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="400">账户管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="401">预充值管理
+							
+							<br/>
+			            
+			             <label style="display: inline;"><strong>客服管理</strong></label><br/>
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="500">留言管理
+							<!-- &nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="501">异常运单管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="502">异常预订单管理
+							 -->
+			           <br/>
+			             <label style="display: inline;"><strong>新闻公告</strong></label><br/>
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="600">新闻管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="601">公告管理
+	
+							<!-- <br/>
+			             
+			             <label style="display: inline;"><strong>统计报表</strong></label><br/>
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="700">统计报表
+	 -->
+							<br/>
+			             
+			             <label style="display: inline;"><strong>系统设置</strong></label><br/>
+			             &nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="804">合作伙伴管理
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="800">渠道管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="801">商品类型价格管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="806">发送邮件
+			             	&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="807">自动发送管理
+							&nbsp;&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="803">全局参数配置
+							
+			             
+							
+			            </p>
+			             <hr/>
+			            <p style="margin-left: 50px;">
+			              <input id="bt_modify_emp" class="button" type="button" value="提交" />
+			            </p>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+	</div>
+	<div id="tmpmsgdiv" style="display:none;"></div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav24Data();
+	});
+</script>
+</html>

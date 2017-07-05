@@ -1,0 +1,419 @@
+package com.weiye.controller;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.CommodityUtil;
+import com.weiye.common.util.SpencialCommodityUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.CommodityDao;
+import com.weiye.dao.CountrysDao;
+import com.weiye.dao.SpencialCommodityDao;
+import com.weiye.dao.WarehouseDao;
+import com.weiye.model.Commodity;
+import com.weiye.model.Countrys;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.SpencialCommodity;
+import com.weiye.model.Warehouse;
+
+@Controller
+public class SpencialCommodityController extends BasicController {
+	private static final long serialVersionUID = 6102269932986791708L;
+	private static final Logger log = Logger.getLogger(CommodityController.class);
+	@Autowired
+	private SpencialCommodityDao commodityDao;
+	
+	@Autowired
+	private WarehouseDao warehouseDao;
+	
+	@Autowired
+	private CountrysDao countryDao;
+	
+
+	@RequestMapping(value = "/spencialcommodity/all", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<SpencialCommodity>> getAllCommodity(HttpServletRequest request,
+			@RequestParam(value = "wid", required = false) String wid,
+			@RequestParam(value = "cid") String cid,
+			@RequestParam(value = "countryid") String countryid
+			) {
+		try {
+			/*if(StringUtil.isEmpty(wid)||StringUtil.isEmpty(cid))
+			{
+				return generateResponseObject(
+						ResponseCode.PARAMETER_ERROR, "必须选择仓库/门店和渠道!");
+			}*/
+			String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+			{
+				String empId = StringUtil.obj2String(request.getSession().getAttribute(
+						Constant.EMP_STORE_ID_SESSION_KEY));
+				if(!StringUtil.isEmpty(empId)&&(empId.equalsIgnoreCase(wid)))
+				{
+					
+				}
+				else if(!StringUtil.isEmpty(empId)&&(StringUtil.isEmpty(wid)))
+				{
+					//wid=empId;
+				}
+				else
+				{
+					return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作或没登陆!");
+				}
+				
+			}
+			
+			List<SpencialCommodity> list = new ArrayList<SpencialCommodity>();
+			
+			if(wid==null||wid==""){
+				String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+				list = this.commodityDao.getCommoditys(storeId,cid,countryid);
+				
+			}else{
+				list = this.commodityDao.getCommoditys(wid,cid,countryid);
+			}
+			
+			ResponseObject<List<SpencialCommodity>> responseObj = new ResponseObject<List<SpencialCommodity>>(ResponseCode.SUCCESS_CODE);
+			if (list != null && !list.isEmpty()) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setMessage("没有商品数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取商品列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取商品列表失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/spencialcommodity/user_all", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<SpencialCommodity>> getAllCommoditybyuser(HttpServletRequest request,
+			@RequestParam(value = "wid", required = false) String wid,
+			@RequestParam(value = "cid") String cid,
+			@RequestParam(value = "countryid") String countryid) {
+		try {
+			/*if(StringUtil.isEmpty(wid)||StringUtil.isEmpty(cid))
+			{
+				return generateResponseObject(
+						ResponseCode.PARAMETER_ERROR, "必须选择仓库/门店和渠道!");
+			}*/
+			/*String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+			{
+				String empId = StringUtil.obj2String(request.getSession().getAttribute(
+						Constant.EMP_STORE_ID_SESSION_KEY));
+				if(!StringUtil.isEmpty(empId)&&(empId.equalsIgnoreCase(wid)))
+				{
+					
+				}
+				else if(!StringUtil.isEmpty(empId)&&(StringUtil.isEmpty(wid)))
+				{
+					//wid=empId;
+				}
+				else
+				{
+					return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作或没登陆!");
+				}
+				
+			}*/
+			
+			String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+			if(StringUtil.isEmpty(userId))
+			{
+				return new ResponseObject<List<SpencialCommodity>>(ResponseCode.NEED_LOGIN, "请登录后操作!");
+			}
+			
+			List<SpencialCommodity> list = new ArrayList<SpencialCommodity>();
+			
+			if(wid==null||wid==""){
+				String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+				list = this.commodityDao.getCommoditys(storeId,cid,countryid);
+				
+			}else{
+				list = this.commodityDao.getCommoditys(wid,cid,countryid);
+			}
+			
+			ResponseObject<List<SpencialCommodity>> responseObj = new ResponseObject<List<SpencialCommodity>>(ResponseCode.SUCCESS_CODE);
+			if (list != null && !list.isEmpty()) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setMessage("没有商品数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取商品列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取商品列表失败");
+		}
+	}
+	
+	@RequestMapping(value = "/admin/spencialcommodity/modify", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyCommodityOfAdmin(HttpServletRequest request, SpencialCommodity commodity) {
+		
+		/*String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权修改商品信息!");
+			
+		}*/
+		if (commodity == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		if(StringUtil.isEmpty(commodity.getChannelId())||StringUtil.isEmpty(commodity.getStoreId()))
+		{
+			return generateResponseObject(
+					ResponseCode.PARAMETER_ERROR, "必须选择仓库/门店和渠道!");
+		}
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(
+					Constant.EMP_STORE_ID_SESSION_KEY));
+			if(!StringUtil.isEmpty(empId)&&(empId.equalsIgnoreCase(commodity.getStoreId())))
+			{
+				
+			}
+			else
+			{
+				return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作或没登陆!");
+			}
+			
+		}
+		
+		
+
+		if (!SpencialCommodityUtil.validateModifyCommodity(commodity)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效,无法通过参数验证");
+		}
+		try {
+			int nRet = this.commodityDao.modifyCommodity(commodity);
+			if(nRet>0){
+				return generateResponseObject(ResponseCode.SUCCESS_CODE, "");
+			}else{
+				return generateResponseObject(ResponseCode.COMMODITY_UPDATE_FAILURE, "修改商品类型失败");
+			}
+		} catch (Exception e) {
+			log.error("修改订单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改商品类型失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/admin/spencialcommodity/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addCommodity(
+			HttpServletRequest request,
+	        @RequestParam(value = ParameterConstants.COMMODITY_NAME, required = true) String name,
+	        @RequestParam(value = ParameterConstants.COMMODITY_COST, required = true) String cost,
+	        @RequestParam(value = ParameterConstants.COMMODITY_PRICE, required = true) String price,
+	        @RequestParam(value = ParameterConstants.COMMODITY_MSPRICE, required = true) String msPrice,
+	        @RequestParam(value = ParameterConstants.COMMODITY_VIP_ONE_PRICE, required = true) String vipOnePrice,
+	        @RequestParam(value = ParameterConstants.COMMODITY_VIP_TWO_PRICE, required = true) String vipTwoPrice,
+	        @RequestParam(value = ParameterConstants.COMMODITY_VIP_THREE_PRICE, required = true) String vipThreePrice,
+	        @RequestParam(value = ParameterConstants.COMMODITY_STORE_ID, required = true) String storeId,
+	        @RequestParam(value = ParameterConstants.COMMODITY_CHANNEL_ID, required = true) String channelId,
+	        @RequestParam(value = "countryId", required = true) String countryId,
+	        @RequestParam(value = "firstFee", required = true) String firstFee) {
+		
+		/*String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权添加商品!");
+			
+		}*/
+		
+		if(StringUtil.isEmpty(storeId)||StringUtil.isEmpty(channelId))
+		{
+			return generateResponseObject(
+					ResponseCode.PARAMETER_ERROR, "必须选择仓库/门店和渠道!");
+		}
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(
+					Constant.EMP_STORE_ID_SESSION_KEY));
+			if(!StringUtil.isEmpty(empId)&&(empId.equalsIgnoreCase(storeId)))
+			{
+				
+			}
+			else
+			{
+				return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作,请选择自己的门店!!");
+			}
+			
+		}
+		
+		
+		
+		
+	/*	if(storeId.equals("-1")){
+			try {
+				List<Warehouse> warehouses = this.warehouseDao.getAll();
+				if (warehouses != null && !warehouses.isEmpty()) {
+					List<SpencialCommodity> commoditys = new ArrayList<SpencialCommodity>();
+					int count = 0;
+					for (Warehouse w : warehouses) {
+						SpencialCommodity commodity = new SpencialCommodity();
+						commodity.setName(name);
+						commodity.setCost(cost);
+						commodity.setMsPrice(msPrice);
+						commodity.setPrice(price);
+						commodity.setVipOnePrice(vipOnePrice);
+						commodity.setVipTwoPrice(vipTwoPrice);
+						commodity.setVipThreePrice(vipThreePrice);
+						commodity.setStoreId(w.getId());
+						commodity.setChannelId(channelId);
+						commoditys.add(commodity);
+						count++;
+					}
+					
+					int nRet = commodityDao.insertCommodityByList(commoditys);
+					if (count == 0 || nRet != count) {
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加商品类型失败");
+					}else{
+						return generateResponseObject(ResponseCode.SUCCESS_CODE, "");
+					}
+					
+				} else{
+					return generateResponseObject(ResponseCode.COMMODITY_INSTER_FAILURE, "没有仓库信息，增加失败");
+				}
+			} catch (Exception e) {
+				log.error("获取仓库列表失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取仓库列表失败");
+			}
+		}
+		*/
+
+		SpencialCommodity commodity = new SpencialCommodity();
+		commodity.setName(name);
+		commodity.setMsPrice(msPrice);
+		commodity.setPrice(price);
+		commodity.setVipOnePrice(vipOnePrice);
+		commodity.setVipTwoPrice(vipTwoPrice);
+		commodity.setVipThreePrice(vipThreePrice);
+		commodity.setStoreId(storeId);
+		commodity.setChannelId(channelId);
+		commodity.setCost(cost);
+		commodity.setFirstFee(firstFee);
+		commodity.setCountryId(countryId);
+		
+		try {
+			int nRet =commodityDao.insertCommodity(commodity);
+			if(nRet>0){
+				return generateResponseObject(ResponseCode.SUCCESS_CODE, "");
+			}else{
+				return generateResponseObject(ResponseCode.COMMODITY_INSTER_FAILURE, "添加商品类型失败");
+			}
+		} catch (Exception e) {
+			log.error("添加商品类型失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加商品类型失败");
+		}
+		
+		
+	}
+	
+	//特殊门店,根据渠道获取国家
+			@RequestMapping(value = "/admin/spencialcommodity/msallandcid", method = { RequestMethod.GET })
+			@ResponseBody
+			public ResponseObject<List<Countrys>> getmsallandcid(HttpServletRequest request,
+					@RequestParam(value = "cid", required = false) String cid 
+					) {
+				try {
+					
+					if(StringUtil.isEmpty(cid))
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "获取渠道信息失败，参数出错!");
+					}
+					
+					List<String> list = new ArrayList<String>();
+					String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+					if(StringUtil.isEmpty(storeId))
+					{
+						return generateResponseObject(ResponseCode.NEED_LOGIN,
+								"你没有登陆!");
+					}
+					
+					list=this.commodityDao.getChannelCountrysById(storeId, cid);
+					 HashSet h  =   new HashSet(list); //去掉重复数据
+					 list.clear(); 
+					 list.addAll(h); 
+					
+					if((list==null)||list.size()<1)
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+								"请检查门店的渠道是否已经添加了商品类型!");
+					}
+					
+					List<Countrys> list1=this.countryDao.selectCountrysbyIds(list);
+				
+					
+					ResponseObject<List<Countrys>> responseObj = new ResponseObject<List<Countrys>>(ResponseCode.SUCCESS_CODE);
+					if (list1 != null && !list1.isEmpty()) {
+						responseObj.setData(list1);
+					} else {
+						responseObj.setMessage("渠道中没有对应国家信息！");
+					}
+					return responseObj;
+				} catch (Exception e) {
+					log.error("获取渠道对应的国家失败", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道对应的国家失败");
+				}
+			}
+			
+			
+			//特殊门店,国家获取商品类型
+			@RequestMapping(value = "/admin/spencialcommodity/msallandcidandcountry", method = { RequestMethod.GET })
+			@ResponseBody
+			public ResponseObject<List<SpencialCommodity>> getmsallandcidandcountry(HttpServletRequest request,
+					@RequestParam(value = "cid", required = false) String cid, 
+					@RequestParam(value = "countryId", required = false) String countryId
+					) {
+				try {
+					
+					if(StringUtil.isEmpty(cid))
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "获取渠道信息失败，参数出错!");
+					}
+					
+					List<SpencialCommodity> list = new ArrayList<SpencialCommodity>();
+					String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+					if(StringUtil.isEmpty(storeId))
+					{
+						return generateResponseObject(ResponseCode.NEED_LOGIN,
+								"你没有登陆!");
+					}
+					
+					list=this.commodityDao.getCommoditys(storeId, cid, countryId);
+					
+				
+					
+					ResponseObject<List<SpencialCommodity>> responseObj = new ResponseObject<List<SpencialCommodity>>(ResponseCode.SUCCESS_CODE);
+					if (list != null && !list.isEmpty()) {
+						responseObj.setData(list);
+					} else {
+						responseObj.setMessage("渠道中没有对应国家信息！");
+					}
+					return responseObj;
+				} catch (Exception e) {
+					log.error("获取渠道对应的国家失败", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道对应的国家失败");
+				}
+			}
+}

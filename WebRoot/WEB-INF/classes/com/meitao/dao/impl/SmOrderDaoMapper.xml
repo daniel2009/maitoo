@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.SmOrderDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.SmOrder">
+		<id column="id" property="id" javaType="String" />
+		<result column="user_id" property="userId" javaType="String"/>
+		<result column="name" property="name" javaType="String"/>
+		<result column="province" property="province" javaType="String"/>
+		<result column="city" property="city" javaType="String" />
+		<result column="dist" property="dist" javaType="String"/>
+		<result column="address" property="address" javaType="String" />
+		<result column="zipCode" property="zipCode" javaType="String" />
+		<result column="phone" property="phone" javaType="String" />
+		<result column="weight" property="weight" javaType="String" />
+		<result column="quantity" property="quantity" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="emp_id" property="empId" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="appointment_date" property="appointmentDate" javaType="String" />
+		<result column="confirm_date" property="confirmDate" javaType="String" />
+		<result column="storeId" property="storeId" javaType="String" />
+		<result column="storeName" property="storeName" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+	</resultMap>
+	
+
+
+	<insert id="insert" parameterType="com.meitao.model.SmOrder"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		`sm_order`(user_id,name,province,city,dist,address,
+		zipCode,phone,weight,quantity,state,emp_id,create_date,modify_date, appointment_date, storeId, remark)
+		values(#{userId},#{name},#{province},#{city},#{dist},#{address},
+		#{zipCode},#{phone},#{weight},#{quantity},#{state},#{empId},#{createDate},#{modifyDate},#{appointmentDate}, #{storeId}, #{remark})
+	</insert>
+
+	<update id="update" parameterType="com.meitao.model.SmOrder">
+		UPDATE sm_order SET
+			name=#{name}, province=#{province}, city=#{city}, dist=#{dist}, address=#{address}, zipCode=#{zipCode}, phone=#{phone},
+			remark=#{remark}, quantity=#{quantity}, weight=#{weight}, storeId=#{storeId}, state=#{state},
+			modify_date=#{modifyDate}
+		WHERE id=#{id} AND user_id=#{userId}
+	</update>
+	
+	<update id="updateInfo" parameterType="java.lang.String">
+		update sm_order
+		set state=#{state}, emp_id=#{empId}
+		, modify_date=#{modifyDate}, confirm_date=#{confirmDate}, remark=#{remark}
+		where id=#{id}
+	</update>
+	
+	<delete id="deletebyuser" parameterType="java.lang.String">
+		delete from
+		sm_order where id=#{id} and user_id=#{userId}
+	</delete>
+	<select id="countByKeys" resultType="java.lang.Integer">
+		select count(distinct `sm_order`.id)
+		from sm_order
+		<where>
+			<if test="userId!=null and userId!=''">
+				and `sm_order`.user_id =#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				and `sm_order`.state =#{state}
+			</if>
+			<if test="storeId!=null and storeId!=''">
+				and `sm_order`.storeId =#{storeId}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (`sm_order`.name like #{wordkey} or `sm_order`.phone like #{wordkey} or `sm_order`.province like #{wordkey} or `sm_order`.city like #{wordkey} 
+				or `sm_order`.dist like #{wordkey} or `sm_order`.address like #{wordkey} or `sm_order`.zipCode like #{wordkey} or `sm_order`.remark like #{wordkey})
+			</if>
+		</where>
+	</select>
+
+	<select id="searchByKeys" resultMap="basic_result_map">
+		select distinct `sm_order`.* 
+			from sm_order
+		<where>
+			<if test="userId!=null and userId!=''">
+				and `sm_order`.user_id =#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				and `sm_order`.state =#{state}
+			</if>
+			<if test="storeId!=null and storeId!=''">
+				and `sm_order`.storeId =#{storeId}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (`sm_order`.name like #{wordkey} or `sm_order`.phone like #{wordkey} or `sm_order`.province like #{wordkey} or `sm_order`.city like #{wordkey} 
+				or `sm_order`.dist like #{wordkey} or `sm_order`.address like #{wordkey} or `sm_order`.zipCode like #{wordkey} or `sm_order`.remark like #{wordkey})
+			</if>
+		</where>
+		order by `sm_order`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+	
+	
+	
+	
+	<select id="countKeysbyadmin" resultType="java.lang.Integer">
+		select count(distinct `sm_order`.id)
+		from sm_order
+		<where>
+			<if test="userId!=null and userId!=''">
+				and `sm_order`.user_id =#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				and `sm_order`.state =#{state}
+			</if>
+			<if test="storeId!=null and storeId!=''">
+				and `sm_order`.storeId =#{storeId}
+			</if>
+			<if test="city!=null and city!=''">
+				and `sm_order`.city =#{city}
+			</if>
+			
+			<if test="csdate!=null and csdate!=''">
+				and `sm_order`.`create_date` <![CDATA[>=]]>
+				#{csdate}
+			</if>
+			<if test="cedate!=null and cedate!=''">
+				and `sm_order`.`create_date` <![CDATA[<=]]>
+				#{cedate}
+			</if>
+			<if test="cosdate!=null and cosdate!=''">
+				and `sm_order`.`confirm_date` <![CDATA[>=]]>
+				#{cosdate}
+			</if>
+			<if test="coedate!=null and coedate!=''">
+				and `sm_order`.`confirm_date` <![CDATA[<=]]>
+				#{coedate}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (`sm_order`.name like #{wordkey} or `sm_order`.phone like #{wordkey} or `sm_order`.province like #{wordkey} or `sm_order`.city like #{wordkey} 
+				or `sm_order`.dist like #{wordkey} or `sm_order`.address like #{wordkey} or `sm_order`.zipCode like #{wordkey} or `sm_order`.remark like #{wordkey})
+			</if>
+		</where>
+	</select>
+
+	<select id="searchKeysByadmin" resultMap="basic_result_map">
+		select distinct `sm_order`.* 
+			from sm_order
+		<where>
+			<if test="userId!=null and userId!=''">
+				and `sm_order`.user_id =#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				and `sm_order`.state =#{state}
+			</if>
+			<if test="storeId!=null and storeId!=''">
+				and `sm_order`.storeId =#{storeId}
+			</if>
+			<if test="city!=null and city!=''">
+				and `sm_order`.city =#{city}
+			</if>
+			
+			<if test="csdate!=null and csdate!=''">
+				and `sm_order`.`create_date` <![CDATA[>=]]>
+				#{csdate}
+			</if>
+			<if test="cedate!=null and cedate!=''">
+				and `sm_order`.`create_date` <![CDATA[<=]]>
+				#{cedate}
+			</if>
+			<if test="cosdate!=null and cosdate!=''">
+				and `sm_order`.`confirm_date` <![CDATA[>=]]>
+				#{cosdate}
+			</if>
+			<if test="coedate!=null and coedate!=''">
+				and `sm_order`.`confirm_date` <![CDATA[<=]]>
+				#{coedate}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (`sm_order`.name like #{wordkey} or `sm_order`.phone like #{wordkey} or `sm_order`.province like #{wordkey} or `sm_order`.city like #{wordkey} 
+				or `sm_order`.dist like #{wordkey} or `sm_order`.address like #{wordkey} or `sm_order`.zipCode like #{wordkey} or `sm_order`.remark like #{wordkey})
+			</if>
+		</where>
+		
+		<choose>
+			<when test="(coedate!=null and coedate!='') or (cosdate!=null and cosdate!='')">
+				order by `sm_order`.`confirm_date` desc
+			</when>
+			<otherwise>
+				order by `sm_order`.`create_date` desc
+			</otherwise>
+		</choose>
+		limit
+		#{index},#{size}
+	</select>
+	
+	
+	<select id="selectlistbyids" resultMap="basic_result_map">
+		select `sm_order`.* from `sm_order`
+		where `id` in
+		<foreach collection="ids" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+	</select>
+</mapper>

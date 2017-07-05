@@ -1,0 +1,76 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+	<body>
+	
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">异常订单</p>
+
+		<div class="box_content">
+			<div class="content_title">异常订单</div>
+			<div class="content_text">
+				<div class="tab-content" id="tab2">
+					<div class="notification information png_bg">
+	      				<div>
+	      				密码格式必须是由非空格字符组成，长度为6到20位。比如：password。
+	      				</div>
+	    			</div>
+					<form action="#" method="post" >
+						<fieldset>
+							<p>
+								<label>
+									&nbsp;新&nbsp;密&nbsp;码：
+									<input class="text-input small-input" type="password"
+										id="password" name="password" maxlength="16"/>
+									<span style="color: red">*</span>
+								</label>
+							</p>
+							<p>
+								<label>
+									确认密码：
+									<input class="text-input small-input" type="password"
+										id="confirmpwd" name="confirmpwd" maxlength="16"/>
+									<span style="color: red">*</span>
+								</label>
+							</p>
+							<p>
+								<label>
+									&nbsp;旧&nbsp;密&nbsp;码：
+									<input class="text-input small-input" type="password"
+										id="oldpwd" name="oldpwd" maxlength="16"/>
+									<span style="color: red">*</span>
+								</label>
+							</p>
+							<p>
+								<label>
+									&nbsp;验&nbsp;证&nbsp;码：
+									<input class="text-input" type="text" size="4" id="vcode"
+										name="vcode" maxlength="6"/>
+									<span style="color: red">*</span>
+									<img src="${pageContext.request.contextPath }/code/generate"
+										id="code" style="cursor: hand; position: relative; top: 8px;" alt="看不清，换一张" />
+								</label>
+							</p>
+							<p style="margin-left: 50px;">
+								<input id="bt_reset_pwd" class="button" type="submit" value="提交" />
+								<input id="reset" class="button" type="reset" value="重置">
+							</p>
+						</fieldset>
+						<div class="clear"></div>
+					</form>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav11Data();
+	});
+</script>
+</html>

@@ -1,0 +1,86 @@
+package com.weiye.model;
+
+import java.io.Serializable;
+
+public class SpencialChannel implements Serializable {
+	private static final long serialVersionUID = 7838550354788740448L;
+	private String id;
+	private String name;   		//渠道名称
+	private String alias;  		//渠道别名
+	private String warehouseId; //所属仓库
+	private String state;
+	private String additivePrice;//渠道包裹的附加价格，即原来的价格基础上加上此价格
+	private String carry;//进位值
+	private String premiumRate;//保险的比例值
+	private String premiumMax;//保险最大额度
+	private String spencialChannelNameId;
+	private String spencialChannelName;
+	
+	public String getSpencialChannelName() {
+		return spencialChannelName;
+	}
+	public void setSpencialChannelName(String spencialChannelName) {
+		this.spencialChannelName = spencialChannelName;
+	}
+	public String getSpencialChannelNameId() {
+		return spencialChannelNameId;
+	}
+	public void setSpencialChannelNameId(String spencialChannelNameId) {
+		this.spencialChannelNameId = spencialChannelNameId;
+	}
+	public String getPremiumMax() {
+		return premiumMax;
+	}
+	public void setPremiumMax(String premiumMax) {
+		this.premiumMax = premiumMax;
+	}
+	public String getPremiumRate() {
+		return premiumRate;
+	}
+	public void setPremiumRate(String premiumRate) {
+		this.premiumRate = premiumRate;
+	}
+	public String getCarry() {
+		return carry;
+	}
+	public void setCarry(String carry) {
+		this.carry = carry;
+	}
+	public String getAdditivePrice() {
+		return additivePrice;
+	}
+	public void setAdditivePrice(String additivePrice) {
+		this.additivePrice = additivePrice;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getAlias() {
+		return alias;
+	}
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+	public String getWarehouseId() {
+		return warehouseId;
+	}
+	public void setWarehouseId(String warehouseId) {
+		this.warehouseId = warehouseId; 
+	}
+	public String getState() {
+		return state;
+	}
+	public void setState(String state) {
+		this.state = state;
+	}
+	
+}

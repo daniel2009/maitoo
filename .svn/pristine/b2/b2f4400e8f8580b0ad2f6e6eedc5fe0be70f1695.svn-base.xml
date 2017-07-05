@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.SpencialChannelOrderDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.SpencialChannelOrder">
+		<result column="id" property="id" javaType="String" />
+		<result column="userId" property="userId" javaType="String" />
+		<result column="fromUserName" property="fromUserName" javaType="String"/>
+		<result column="fromUserRealName" property="fromUserRealName" javaType="String"/>
+		<result column="from_user_address" property="from_user_address" javaType="String" />
+		<result column="from_user_city" property="from_user_city" javaType="String" />
+		<result column="from_user_state" property="from_user_state" javaType="String" />
+		<result column="from_user_zipcode" property="from_user_zipcode" javaType="String" />
+		<result column="cid" property="cid" javaType="String" />
+		<result column="countryid" property="countryid" javaType="String" />
+		
+		<result column="commudityid" property="commudityid" javaType="String" />
+		<result column="rev_user_phone" property="rev_user_phone" javaType="String" />
+		<result column="rev_user_real_name" property="rev_user_real_name" javaType="String"/>
+		<result column="rev_user_company" property="rev_user_company" javaType="String"/>
+		<result column="rev_user_address" property="rev_user_address" javaType="String" />
+		<result column="rev_user_dist" property="rev_user_dist" javaType="String" />
+		<result column="rev_user_city" property="rev_user_city" javaType="String" />
+		<result column="rev_user_state" property="rev_user_state" javaType="String" />
+		<result column="rev_user_zipcode" property="rev_user_zipcode" javaType="String" />
+		<result column="commoditydescription" property="commoditydescription" javaType="String" />	
+		
+		<result column="commodifyWeight" property="commodifyWeight" javaType="String" />	
+		<result column="commodifyQuantitys" property="commodifyQuantitys" javaType="String" />	
+		<result column="commodifyValue" property="commodifyValue" javaType="String" />	
+		<result column="premium" property="premium" javaType="String" />	
+		<result column="other" property="other" javaType="String" />	
+		<result column="totalMoney" property="totalMoney" javaType="String" />	
+		<result column="paystyles" property="paystyles" javaType="String" />	
+		<result column="state" property="state" javaType="String" />	
+		<result column="createDate" property="create_date" javaType="String" />
+		
+		<result column="createDate" property="create_date" javaType="String" />	
+		<result column="modifyDate" property="modify_date" javaType="String" />	
+		<result column="remark" property="remark" javaType="String" />			
+	</resultMap>
+
+	<select id="getSorderById" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from spencialChannelOrder where id=#{id}
+	</select>
+	
+	<select id="getBySorderbyuserId" resultMap="basic_result_map">
+		select * from spencialChannelOrder where userId = #{userId} 
+		<if test="state!=null and state!=''">
+					and state= #{state}
+		</if>
+	</select>
+	
+	<select id="getAll" resultMap="basic_result_map">
+		select * from spencialChannelOrder
+	</select>
+
+	<insert id="insertSorder" parameterType="com.weiye.model.SpencialChannelOrder"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into spencialChannelOrder(userId,fromUserName,fromUserRealName,from_user_address,from_user_city,from_user_state,
+		                                from_user_zipcode,cid,countryid,commudityid,rev_user_phone,rev_user_real_name,rev_user_company,rev_user_address,rev_user_dist,rev_user_city
+		                                ,rev_user_state,rev_user_zipcode,commoditydescription,commodifyWeight,commodifyQuantitys,
+		                                commodifyValue,premium,other,totalMoney,paystyles,
+		                                state,create_date,modify_date,remark
+		                                ) values(#{userId},#{fromUserName},#{fromUserRealName},#{from_user_address},#{from_user_city},#{from_user_state},
+		                                #{from_user_zipcode},#{cid},#{countryid},#{commudityid},#{rev_user_phone},#{rev_user_real_name},#{rev_user_company},#{rev_user_address},#{rev_user_dist},#{rev_user_city},
+		                                #{rev_user_state},#{rev_user_zipcode},#{commoditydescription},#{commodifyWeight},#{commodifyQuantitys},
+		                                #{commodifyValue},#{premium},#{other},#{totalMoney},#{paystyles},
+		                                 #{state},#{createDate},#{modifyDate},#{remark})
+	</insert>
+	
+	
+	
+	<update id="modifyState">
+		update `spencialChannelOrder`
+		set `state`=#{state},
+		`modify_date`=#{modifyDate}
+		where id = #{id} 
+	</update>
+
+		
+</mapper>

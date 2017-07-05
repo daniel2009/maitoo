@@ -1,0 +1,408 @@
+(function($) {
+	/*----------------------
+		LIQUID IMAGES
+	----------------------*/
+	//$('.liquid').imgLiquid();
+
+	/*-----------------
+		ACCORDION
+	-----------------*/
+	$('.accordion').xmaccordion({
+		startOpen: 2,
+		easing: 'swing',
+		speed: 600
+	});
+
+	/*-------------------------
+		BLOG VIEW SELECT
+	-------------------------*/
+	var $display = $('.display'),
+		$previews = $display.children();
+
+	$previews.bind('click', selectView);
+
+	function selectView() {
+		if($(this).hasClass('selected')) return;
+
+		var me = $(this),
+			view = 'blog-post-preview';
+
+		view += ' ' + me.attr('class');
+		// remove 'selected' class on all items	
+		clearSelection(me.parent().children());
+		me.addClass('selected');
+		me.parents().eq(3).find('.blog-post-preview').removeClass().addClass(view);
+	}
+
+	function clearSelection(items) {
+		items.each(function() {
+			$(this).removeClass('selected');
+		});
+	}
+
+	/*---------------------
+		SIDEBAR CONTROL
+	---------------------*/
+	var $sidebarControl = $('.sidebar-control'),
+		$shopSidebar = $('.shop-sidebar');
+
+	$sidebarControl.bind('click', toggleShopSidebar);
+
+	function toggleShopSidebar() {
+		if($shopSidebar.hasClass('open')) {
+			// Desktop enable scroll
+			$('body').removeClass('no-scroll');
+
+			// Mobile enable scroll
+			$('body').unbind('touchmove');
+			
+			// Close shop sidebar
+			$shopSidebar.removeClass('open');
+		} else {
+			// Desktop disable scroll
+			$('body').addClass('no-scroll');
+
+			// Mobile disable scroll
+			$('body').bind('touchmove', function(e){e.preventDefault()});
+
+			// Open shop sidebar
+			$shopSidebar.addClass('open');
+		}
+	}
+	
+	loadNewsList("","",1);
+	
+	
+	
+})(jQuery);
+
+
+
+function onclick_button_news()
+{
+	$("#type_title").html("新闻");
+	loadNewsList("","",1);
+}
+
+
+
+function loadNewsList(key,column,pageNow) {
+	key = encodeURI(key);
+	$.ajax( {
+		post : "get",
+		url : "../../news/search_size",
+		data : {
+			"key" : key,
+			"column" : column,
+			"size":9,
+			"pageIndex" : pageNow
+		},
+		success : function(response) {
+			var code = response.code;
+			//alert(code);
+			if ("200" == code) {
+				
+				if((response.data==null)||(response.data.datas==null))
+				{
+					showNewsList(null);
+					showNewsLink(null);
+				}
+				else
+				{
+					showNewsList(response.data.datas);
+					showNewsLink(response.data);
+				}
+				afterLoadNewsList();
+				//afterLoadNewsList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+
+
+function showNewsList(list) {
+	var str = "";
+	$("#list_grid").html("");
+	if (list != null) {
+		$
+				.each(
+						list,
+						function() {
+							
+							
+							str +='<li class="list-item" style="margin-bottom:0px;margin-top:20px">';
+							str+="<a href='post.html?type=0&id="+this.id+"'>";
+							str +='<figure class="liquid">';
+							
+							if((this.pic1==null)||(this.pic1=="null")||(this.pic1=="")||(this.pic1=="undefined"))
+							{
+								str+='<img src="images/logo.png" alt="post1">';
+							}
+							else
+							{
+								str+='<img src="'+"../.."+this.pic1+'" alt="post1">';
+							}
+							
+							//str+='<img src="'+"../.."+this.pic1+'" alt="post1">';
+							str+='</figure>';
+							str+='</a>';
+							str+='<div class="content">';
+							str+='<p class="highlighted">'+this.releasetime+'</p>';
+							
+							str+="<a href='post.html?type=0&id="+this.id+"'>";
+							str+='<h6>'+this.title+'</h6></a>';
+							
+							str+='<p>';
+							str+="<a href='post.html?type=0&id="+this.id+"'>";
+							str+=this.content;
+							str+="</a>";
+							str+='</p>';
+						
+							str+='</div>';
+							str+='</li>';
+							
+							
+						
+						});
+	} else {
+		if (str == null || str == '') {
+			
+		}
+	}
+	$("#list_grid").html(str);
+	$('.liquid').imgLiquid();
+}
+
+function showNewsLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("#page_split.bulk-actions").show();
+		$("#page_split .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("#page_split .pagination a").click(function() {
+
+			var key=$(":text[name='key']").val();
+			var column = $("select[name='type']").val();
+			var pn = $(this).attr("href");
+
+			//loadTranshipList(tid, key, type, sdate, edate, pn);
+			loadNewsList(key,column,pn);
+			return false;
+		});
+
+		$("#page_split .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var key=$(":text[name='key']").val();
+					var column = $("select[name='type']").val();
+					//loadTranshipList(key, type, sdate, edate, pn);
+					loadNewsList(key,column,pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("#page_split .bulk-actions").hide();
+		$("#page_split .pagination").html("");
+	}
+}
+
+function createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount) {
+	var prePage = pageNow - 1;
+	prePage = prePage < 1 ? 1 : prePage;
+	var nextPage = pageNow + 1;
+	nextPage = nextPage > pageCount ? pageCount : nextPage;
+	var info = "共" + rowCount + "条/共" + pageCount + "页&nbsp;";
+	info += "当前第" + pageNow + "页&nbsp;&nbsp;";
+	info += "<a href='1' id='a_first_page'>首页</a>|";
+	info += "<a href='" + prePage + "' id='a_pre_page'>上一页</a>";
+	info += "<input style='width: 30px;border:1px solid #B2CEBA;' type='text' name='pageNow' />";
+	info += "<a href='" + nextPage + "' id='a_next_page'>下一页</a>|";
+	info += "<a href='" + pageCount + "' id='a_last_page'>尾页</a>";
+	return info;
+}
+
+function afterLoadNewsList() {
+
+	
+	$("a[name='a_news_get_link']").click(function() {
+		var id = $(this).attr("href");
+		var url = "newshow.jsp" + "?newsid=" + id;
+		window.location=url;
+		return false;
+	});
+
+}
+
+
+
+
+function onclick_button_gonggao()
+{
+	$("#type_title").html("公告");
+	loadGonggaoList("","",1);
+}
+
+function loadGonggaoList(key,column,pageNow) {
+	key = encodeURI(key);
+	$.ajax( {
+		post : "get",
+		url : "../../gonggao/search_size",
+		data : {
+			"key" : key,
+			"column" : column,
+			"size":9,
+			"pageIndex" : pageNow
+		},
+		success : function(response) {
+			var code = response.code;
+			//alert(code);
+			if ("200" == code) {
+				
+				if((response.data==null)||(response.data.datas==null))
+				{
+					showGonggaoList(null);
+					showGonggaoLink(null);
+				}
+				else
+				{
+					showGonggaoList(response.data.datas);
+					showGonggaoLink(response.data);
+				}
+				afterLoadGonggaoList();
+				//afterLoadNewsList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+
+
+function showGonggaoList(list) {
+	var str = "";
+	$("#list_grid").html("");
+	if (list != null) {
+		$
+				.each(
+						list,
+						function() {
+							//str += "<tr id='" + this.id + "'>";
+							//str += "<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis;'>" + this.modifytime + "</td>";
+							//str += "<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis;'><a name='a_gonggao_get_link' href='"+this.id+"'>" + this.title + "</a></td>";							
+							//str += "<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis; max-width:400px'><a name='a_gonggao_get_link' href='"+this.id+"'>" + this.viewcontent + "</a></td>";								
+							//str += "</tr>";
+							
+							
+							
+							str +='<li class="list-item" style="margin-bottom:0px;">';
+							
+							str+='<div class="content">';
+							
+							
+							str+="<a href='post.html?type=1&id="+this.id+"'>";
+							str+='<h6>'+this.title+'</h6></a>';
+							str+='<p class="highlighted">时间:'+this.releasetime+'</p>';
+							
+							str+='<p>';
+							str+="<a href='post.html?type=1&id="+this.id+"'>";
+							str+=this.viewcontent;
+							str+="</a>";
+							str+='</p>';
+							
+							str+='</div>';
+							str+='</li>';
+						});
+	} else {
+		if (str == null || str == '') {
+			
+		}
+	}
+	$("#list_grid").html(str);
+	//$("#gonggaotable tbody").html(str);
+}
+
+function showGonggaoLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("#page_split .bulk-actions").show();
+		$("#page_split .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("#page_split .pagination a").click(function() {
+
+			var key=$(":text[name='key']").val();
+			var column = $("select[name='type']").val();
+			var pn = $(this).attr("href");
+
+			//loadTranshipList(tid, key, type, sdate, edate, pn);
+			loadGonggaoList("","",pn);
+			return false;
+		});
+
+		$("#page_split .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var key=$(":text[name='key']").val();
+					var column = $("select[name='type']").val();
+					//loadTranshipList(key, type, sdate, edate, pn);
+					loadGonggaoList("","",pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("#page_split .bulk-actions").hide();
+		$("#page_split .pagination").html("");
+	}
+}
+
+function createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount) {
+	var prePage = pageNow - 1;
+	prePage = prePage < 1 ? 1 : prePage;
+	var nextPage = pageNow + 1;
+	nextPage = nextPage > pageCount ? pageCount : nextPage;
+	var info = "共" + rowCount + "条/共" + pageCount + "页&nbsp;";
+	info += "当前第" + pageNow + "页&nbsp;&nbsp;";
+	info += "<a href='1' id='a_first_page'>首页</a>|";
+	info += "<a href='" + prePage + "' id='a_pre_page'>上一页</a>";
+	info += "<input style='width: 30px;border:1px solid #B2CEBA;' type='text' name='pageNow' />";
+	info += "<a href='" + nextPage + "' id='a_next_page'>下一页</a>|";
+	info += "<a href='" + pageCount + "' id='a_last_page'>尾页</a>";
+	return info;
+}
+
+function afterLoadGonggaoList() {
+
+	
+	$("a[name='a_gonggao_get_link']").click(function() {
+		var id = $(this).attr("href");
+		var url = "gonggaoshow.jsp" + "?gonggaoid=" + id;
+		window.location=url;
+		return false;
+	});
+
+}

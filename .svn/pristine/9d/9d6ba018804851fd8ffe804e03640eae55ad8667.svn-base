@@ -1,0 +1,44 @@
+package com.weiye.controller;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.SpiderOrder;
+import com.weiye.service.SpiderOrderService;
+
+@Controller
+public class SpiderOrderController extends BasicController{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4082140452026930414L;
+	private static final Logger log = Logger.getLogger(SpiderOrderController.class);
+	@Resource(name = "spiderOrderService")
+	private SpiderOrderService spiderOrderService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+	
+	@RequestMapping(value = {"/user/spiderOrder/search", "/admin/spiderOrder/search", "/spiderOrder/search"}, method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<SpiderOrder> find(HttpServletRequest request,
+			@RequestParam(value = "url") String url){
+		try{
+			return spiderOrderService.search(url);
+		}catch(Exception e){
+			String error = "查询外网商品异常";
+			log.error(error, e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, error);
+		}
+	}
+}

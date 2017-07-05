@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+  <context:annotation-config />
+  <!--  <context:component-scan base-package="com.meitao.controller" />-->
+  <context:component-scan base-package="com.meitao.controller" />
+  <!--  <context:component-scan base-package="com.meitao.cardid.manage" />-->
+  <mvc:annotation-driven>
+  </mvc:annotation-driven>
+  <context:property-placeholder location="classpath:*.properties" />
+
+
+
+  <mvc:resources location="/*.html" mapping="/*.html"/>
+  <mvc:resources location="/*.jsp" mapping="/*.jsp"/>
+
+  <!-- 字体文件 -->
+  <mvc:resources location="/*.eot" mapping="/*.eot"/>
+  <mvc:resources location="/*.svg" mapping="/*.svg"/>
+  <mvc:resources location="/*.ttf" mapping="/*.ttf"/>
+  <mvc:resources location="/*.woff" mapping="/*.woff"/>
+  <mvc:resources location="/*.otf" mapping="/*.otf"/>
+  <mvc:resources location="/*.woff2" mapping="/*.woff2"/>
+
+  <mvc:resources location="/images/*" mapping="/images/**"/>
+
+
+
+
+
+  <!-- <mvc:resources location="/258/*" mapping="/258/**"/> -->
+  <mvc:resources location="/resources/*" mapping="/resources/**"/>
+  <mvc:resources location="/258/resources/*" mapping="/258/resources/**"/>
+  <mvc:resources location="/258/resources/*.css" mapping="/258/resources/*.css"/>
+
+  <mvc:resources location="/258/admin/*" mapping="/258/admin/**"/>
+  <mvc:resources location="/258/frontpage/*" mapping="/258/frontpage/**"/>
+
+
+<mvc:resources location="/cards_lib/*" mapping="/cards_lib/**"/>
+<mvc:resources location="/258/user/*" mapping="/258/user/**"/>
+
+  <!--转运网站-->
+  <mvc:resources location="/zhuanyun/user/*" mapping="/zhuanyun/user/**"/>
+
+  <mvc:resources location="/zhuanyun/resources/*" mapping="/zhuanyun/resources/**"/>
+  <mvc:resources location="/zhuanyun/resources/*.css" mapping="/zhuanyun/resources/*.css"/>
+  <mvc:resources location="/zhuanyun/admin/*" mapping="/zhuanyun/admin/**"/>
+  <mvc:resources location="/zhuanyun/frontpage/*" mapping="/zhuanyun/frontpage/**"/>
+  <mvc:resources location="/zhuanyun/user/*" mapping="/zhuanyun/user/**"/>
+  
+  
+  <mvc:interceptors>
+    <mvc:interceptor>
+      <mvc:mapping path="/**" />
+      <bean class="com.meitao.common.interceptor.UserLoginInterceptor">
+        <property name="needLoginUrlPrefix">
+          <list>
+            <value>/user/get_self</value>
+            <value>/user/save_info</value>
+            <value>/account</value>
+            <value>/credit</value>
+            <value>/message</value>
+            <value>/consignee</value>
+            <value>/order</value>
+            <value>/alipay/recharge</value>
+            <value>/user/warehouse</value>
+            <value>/transh</value>
+            <value>/consignee_sendperson</value>
+            <value>/sm_order</value>
+
+          </list>
+        </property>
+        <property name="notNeedLoginUrl">
+          <list>
+
+            <value>/user/reset_email_pwd</value>
+            <value>/user/reset_pwd</value>
+            <value>/user/reset_pwd2</value>
+            <value>/route/search</value>
+            <value>/route/kuaidi100</value>
+            <value>/route/guest</value>
+            <value>/route/get_by_guest</value>
+            <value>/route/get_by_guest_from_meitao</value>
+            <value>/route/get_by_guest_from_dcs</value>
+            <value>/alipay/rechargeSuccessNotifyUrl</value>
+            <value>/order/modify_cardid</value>
+            <value>/message/guest</value>
+            <value>/route/orders</value>
+
+            <value>/258/admin/*</value>
+            <value>/258/resources/*</value>
+            <value>/258/frontpage/*</value>
+
+            <value>/zhuanyun/admin/*</value>
+            <value>/zhuanyun/resources/*</value>
+            <value>/zhuanyun/frontpage/*</value>
+            
+            <value>/trunk/*</value>
+          </list>
+        </property>
+      </bean>
+    </mvc:interceptor>
+
+    <mvc:interceptor>
+      <mvc:mapping path="/**" />
+      <bean class="com.meitao.common.interceptor.EmployeeLoginInterceptor">
+        <property name="needLoginUrlPrefix">
+          <list>
+            <value>/admin</value>
+            <value>/cards_lib/pics</value>
+            <value>/cards_lib</value>
+            <value>/258/admin</value>
+            <value>/zhuanyun/admin</value>
+          </list>
+        </property>
+        <property name="notNeedLoginUrl">
+          <list>
+            <value>/admin/emp/login</value>
+            <value>/258/admin/emp/login</value>
+            <value>/admin/emp/logout</value>
+          </list>
+        </property>
+      </bean>
+    </mvc:interceptor>
+
+    <mvc:interceptor>
+      <mvc:mapping path="/**" />
+      <bean class="com.meitao.common.interceptor.AuthorityInterceptor">
+        <property name="needLoginUrl">
+          <list>
+            <!-- <value>/add</value> -->
+          </list>
+        </property>
+        <property name="adminNeedLoginUrl">
+          <list>
+            <!-- <value>/del</value> -->
+          </list>
+        </property>
+      </bean>
+    </mvc:interceptor>
+  </mvc:interceptors>
+
+  <bean id="messageAdapter"
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+    <property name="messageConverters">
+      <list>
+        <!-- Support JSON -->
+        <bean
+					class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+      </list>
+    </property>
+  </bean>
+  <bean id="exceptionMessageAdapter"
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver">
+    <property name="messageConverters">
+      <list>
+        <!-- Support JSON -->
+        <bean
+					class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+      </list>
+    </property>
+  </bean>
+
+  <bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+    <property name="messageConverters">
+      <list>
+        <bean
+					class="org.springframework.http.converter.StringHttpMessageConverter">
+          <property name="supportedMediaTypes">
+            <list>
+              <value>application/json;charset=UTF-8</value>
+              <value>text/plain;charset=UTF-8</value>
+              <value>text/html;charset=UTF-8</value>
+              <value>
+                application/xml;charset=UTF-8
+              </value>
+            </list>
+          </property>
+        </bean>
+      </list>
+    </property>
+  </bean>
+  
+  <!-- 定时器配置，具体参看http://hj198703.iteye.com/blog/1320574 -->
+  <bean id="reportTimerTask" class="com.meitao.common.timer.M_Timer"></bean>
+  <bean id="scheduleReportTask" class="org.springframework.scheduling.timer.ScheduledTimerTask"> 
+	<property name="timerTask" ref="reportTimerTask"></property> 
+	<property name="period"><value>1000</value></property> <!-- 每一秒执行一次 -->
+	<property name="delay"><value>10000</value></property> <!-- 延时10秒执行 -->
+   </bean> 
+   
+   <bean id="scheduleReportFactory" class="org.springframework.scheduling.timer.TimerFactoryBean"> 
+		<property name="scheduledTimerTasks"> 
+		<list><ref bean="scheduleReportTask" /></list> 
+		</property> 
+	</bean> 
+</beans>

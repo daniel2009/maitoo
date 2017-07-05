@@ -1,0 +1,112 @@
+function loadNav24Data() {
+	loadWarehouse();
+};
+
+function loadWarehouse(){
+	$.ajax({
+		type:"get",
+		async:false,
+		url:"../user/warehouse/all",
+		success:function(response){
+			var code = response.code;
+			if (code == '200') {
+				if(response.data != null) {
+					var str = "";
+					$.each(response.data,function(){
+						if(this.callOrderAvailable==1){
+							str += "<option value='" + this.id + "' country='"+this.country+"' province='"+this.province+"' callOrderCity='"+this.callOrderCity+"'>" + this.name + "</option>";
+						}
+					});
+					$("select[name='warehouseId']").html(str);
+				}
+			}
+		}
+	});
+	changeWarehouseSelect();
+}
+function savesmqj() {
+	var name = $(":text[name='sName']").val();
+	var sadd = $(":text[name='sStreetAddress']").val();
+	var phone = $(":text[name='sPhone']").val();
+	var zipCode = $(":text[name='sZipCode']").val();
+	var weight = $(":text[name='weight']").val();
+	var quantity = $(":text[name='quantity']").val();
+	var validate = true;
+	if(name==null||name==""){
+		$(":text[name='sName']").css({ "border-color": "red" });
+		$(":text[name='sName']").change(function(){
+			if($(":text[name='sName']").val()!=null)
+				$(":text[name='sName']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	if(sadd==null||sadd==""){
+		$(":text[name='sStreetAddress']").css({ "border-color": "red" });
+		$(":text[name='sStreetAddress']").change(function(){
+			if($(":text[name='sStreetAddress']").val()!=null)
+				$(":text[name='sStreetAddress']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	if(phone==null||phone==""){
+		$(":text[name='sPhone']").css({ "border-color": "red" });
+		$(":text[name='sPhone']").change(function(){
+			if($(":text[name='sPhone']").val()!=null)
+				$(":text[name='sPhone']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	if(zipCode==null||zipCode==""){
+		$(":text[name='sZipCode']").css({ "border-color": "red" });
+		$(":text[name='sZipCode']").change(function(){
+			if($(":text[name='sZipCode']").val()!=null)
+				$(":text[name='sZipCode']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	if(weight==""||weight==null||isNaN(weight)||weight=="0"){
+		$(":text[name='weight']").css({ "border-color": "red" });
+		$(":text[name='weight']").change(function(){
+			if($(":text[name='weight']").val()!=null&&!isNaN($(":text[name='weight']").val())&&$(":text[name='weight']").val()>0)
+				$(":text[name='weight']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	
+	if(quantity==""||quantity==null||isNaN(quantity)||quantity=="0"){
+		$(":text[name='quantity']").css({ "border-color": "red" });
+		$(":text[name='quantity']").change(function(){
+			if($(":text[name='quantity']").val()!=null&&!isNaN($(":text[name='quantity']").val())&&$(":text[name='quantity']").val()>0)
+				$(":text[name='quantity']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	
+	if(!validate){
+		alert("红色框中的信息必须正确填写，才可以提交！");
+		return;
+	}
+	var formData = new FormData(document.getElementById("form"));
+	formData.append("sProvince", document.getElementById("warehouseProvince").innerHTML);
+	$.ajax({
+		type:"post",
+		url:call_order_add_url,
+		data: formData,
+		processData : false,
+		contentType : false,
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				alert("添加成功");
+				nav24Click();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("添加失败，原因是:" + response.message);
+			}
+		}
+	});
+	return false;
+}

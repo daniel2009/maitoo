@@ -1,0 +1,81 @@
+package com.meitao.model;
+
+import java.io.Serializable;
+import java.util.List;
+
+public class Account implements Serializable {
+
+	private static final long serialVersionUID = -7715776590686348690L;
+	private String userId;
+	private String rmb;
+	private String usd;
+	private String createDate;
+	private String modifyDate;
+	private String groupId; //add by chenkanghua
+	private User user;
+	private List<AccountDetail> details ;
+	
+	public String getGroupId()
+	  {
+	    return this.groupId;
+	  }
+
+	  public void setGroupId(String groupId) {
+	    this.groupId = groupId;
+	  }
+	public List<AccountDetail> getDetails() {
+    	return details;
+    }
+
+	public void setDetails(List<AccountDetail> details) {
+    	this.details = details;
+    }
+
+	public User getUser() {
+    	return user;
+    }
+
+	public void setUser(User user) {
+    	this.user = user;
+    }
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getRmb() {
+		return rmb;
+	}
+
+	public void setRmb(String rmb) {
+		this.rmb = rmb;
+	}
+
+	public String getUsd() {
+		return usd;
+	}
+
+	public void setUsd(String usd) {
+		this.usd = usd;
+	}
+
+	public String getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+
+	public String getModifyDate() {
+		return modifyDate;
+	}
+
+	public void setModifyDate(String modifyDate) {
+		this.modifyDate = modifyDate;
+	}
+}

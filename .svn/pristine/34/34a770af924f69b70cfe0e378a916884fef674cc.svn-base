@@ -1,0 +1,190 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://ckeditor.com" prefix="ckeditor"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">修改商品
+			<a  href="#" onclick="javascript: navProductClick();">返回列表</a>
+		</p>
+		<div class="box_content">
+			<div class="content_title">修改商品</div>
+			<div class="content_text">
+				<div class="tab-content">
+					<form id="form">
+			            <fieldset>
+			            	<p>
+			            		<label style="display: inline;">商品编号：</label>
+			            		<input type="text" name="id" readonly>
+			            	</p>
+							<p>
+			            		<label style="display: inline;">官网地址：</label>
+			            		<input class="text-input small-input" type="text" name="url" onkeyup="javascript: if(event.keyCode==13){searchWebSite();};" />
+			            		<input id="searchButton" type="button" value="获取商品" onclick="javascript: searchWebSite();">
+			            	</p>
+			            	<p>
+			            		<label style="display: inline;">类型：</label>
+			            		<select id="typeSelect" name="typeId"></select>
+								<span class="gl_message">*</span>
+			            	</p>
+			            	<p>
+			            		<label style="display: inline;">名称：</label>
+			            		<input class="text-input small-input" type="text" name="name" />
+								<span class="gl_message">*</span>
+			            	</p>
+			            	<p>
+			            		<label style="display: inline;">详情：</label>
+			            		<textarea name="description" id="descriptionTextarea"></textarea>
+			            		<ckeditor:replace replace="descriptionTextarea" basePath="../ckeditor/" />
+			            	</p>
+			            	<p>
+			            		<label style="display: inline;">价格：</label>
+			            		<select name="currency">
+			            			<option value="USD">USD</option>
+			            			<option value="RMB">RMB</option>
+			            		</select>
+			            		<input class="text-input small-input" type="number" name="price" />
+								<span class="gl_message">*</span>
+			            	</p>
+			            	<p>
+			            		<label style="display: inline;">库存：</label>
+			            		<input class="text-input small-input" type="date" name="expireDate" />
+								<span class="gl_message">*</span>
+			            	</p>
+			            	<p>
+			            		<label style="display: inline;">库存：</label>
+			            		<input class="text-input small-input" type="number" name="quantity" />
+								<span class="gl_message">*</span>
+			            	</p>
+			            	<figure>
+			            		<figcaption>图片：</figcaption>
+			            		<div style="display: flex;">
+			            			<figure>
+			            				<img id="picture1"><br/><input type="hidden" name="pic1">
+			            				<input type="file" name="picture1">
+			            			</figure>
+			            			<figure>
+			            				<img id="picture2"><br/><input type="hidden" name="pic2">
+			            				<input type="file" name="picture2">
+			            			</figure>
+			            			<figure>
+			            				<img id="picture3"><br/><input type="hidden" name="pic3">
+			            				<input type="file" name="picture3">
+			            			</figure>
+			            		</div>
+			            	</figure>
+				            <p style="margin-left: 50px;">
+				              <input class="button" type="button" value="提交" onclick="javascript: modifyProduct();" />
+				              <!-- <input id="bt_add_news_reset" class="button" type="reset" value="重置"/> -->
+				            </p>
+			            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function(){
+		$("input[name=id]").val(window.sessionStorage.getItem("productId"));
+		window.sessionStorage.clear();
+		$.ajax({
+			type : "post",
+			url : "../admin/productType/findAll",
+			success : function(response){
+				if("200" == response.code){
+					$("#typeSelect").html();
+					$("#typeSelect").append("<option value='-1'>用户自定义</option>");
+					for(var i=0; i< response.data.datas.length;i++){
+						var productType = response.data.datas[i];
+						$("#typeSelect").append("<option value='" + productType.id + "'>" + productType.name +"</option>");
+					}
+				}else{
+					alert("获取商品类型失败，原因是:" + response.message);
+				}
+			}
+		});
+		$.ajax({
+			type : "post",
+			url : "../admin/product/findById",
+			data : {id : $("input[name=id]").val()},
+			success : function(response){
+				if("200" == response.code){
+					var product = response.data;
+					$("input[name=url]").val(product.url);
+					$("input[name=name]").val(product.name);
+					$("#typeSelect").val(product.typeId);
+					$("textarea[name=description]").val(product.description);
+					CKEDITOR.instances.descriptionTextarea.setData(product.description);
+					$("select[name=currency]").val(product.currency);
+					$("input[name=price]").val(product.price);
+					$("input[name=expireDate]").val(product.expireDate);
+					$("input[name=quantity]").val(product.quantity);
+					$("#picture1").attr("src", "../" + product.pic1);
+					$("#picture2").attr("src", "../" + product.pic2);
+					$("#picture3").attr("src", "../" + product.pic3);
+					$("input[name=pic1]").val(product.pic1);
+					$("input[name=pic2]").val(product.pic2);
+					$("input[name=pic3]").val(product.pic3);
+					clearWrongImg();
+				}else{
+					alert("获取商品失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function searchWebSite(){
+		$("#searchButton").val("搜索中。。。");
+		$("#searchButton").attr("disabled", true);
+		$.ajax({
+			type: "post",
+			url: "../admin/spiderOrder/search",
+			data : new FormData(document.getElementById("form")),
+			processData : false,
+			contentType : false,
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					$("#searchButton").val("获取商品");
+					$("#searchButton").attr("disabled", false);
+					var spiderOrder = response.data;
+					$("input[name=name]").val(spiderOrder.name);
+					$("select[name=currency]").val(spiderOrder.currency);
+					$("input[name=price]").val(spiderOrder.price);
+					$("textarea[name=description]").val(spiderOrder.featureHtml);
+					CKEDITOR.instances.descriptionTextarea.setData(spiderOrder.featureHtml);
+					for(var i=0; i<3 && i<spiderOrder.pics.length; i++){
+						$("input[name=pic"+i+"]").val(spiderOrder.pics[i]);
+					}
+				}else{
+					alert("添加失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function modifyProduct(){
+		$("#descriptionTextarea").val(CKEDITOR.instances.descriptionTextarea.getData());
+		$.ajax({
+			type: "post",
+			url: "../admin/product/update",
+			data : new FormData(document.getElementById("form")),
+			processData : false,
+			contentType : false,
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					alert("修改成功");
+					navProductClick();
+				}else{
+					alert("添加失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+</script>
+</html>

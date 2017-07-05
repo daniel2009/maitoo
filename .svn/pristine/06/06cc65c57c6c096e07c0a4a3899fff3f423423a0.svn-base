@@ -1,0 +1,283 @@
+package com.weiye.service.impl;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.AutoSendUtil;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.UserUtil;
+import com.weiye.common.util.sms.MailSendUtil;
+import com.weiye.common.util.sms.SimpleSmsSender;
+import com.weiye.dao.AutoSendDao;
+import com.weiye.dao.SpencialChannelDao;
+import com.weiye.dao.SpencialCommodityDao;
+import com.weiye.dao.UserDao;
+import com.weiye.dao.globalargsDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.AutoSend;
+import com.weiye.model.Channel;
+import com.weiye.model.Order;
+import com.weiye.model.OrderDetail;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.SendEmail;
+import com.weiye.model.SpencialChannel;
+import com.weiye.model.SpencialChannelOrder;
+import com.weiye.model.SpencialCommodity;
+import com.weiye.model.User;
+import com.weiye.service.AutoSendService;
+import com.weiye.service.SendEmailService;
+import com.weiye.service.SpencialChannelOrderService;
+
+@Service("spencialChannelOrderService")
+public class SpencialChannelOrderServiceImpl implements SpencialChannelOrderService{
+	private static final Logger log = Logger.getLogger(SpencialChannelOrderServiceImpl.class);
+	@Autowired
+	private UserDao userDao;
+	
+	
+	@Autowired
+	private globalargsDao globalargsDao;
+	@Resource(name = "sendEmailService")
+	private SendEmailService sendEmailService;
+	
+	@Autowired
+	private SpencialCommodityDao spencialCommodityDao;
+	
+	
+	@Autowired
+	private SpencialChannelDao spencialChannelDao;
+	
+	@Override
+	//运单的钱计算方式
+	//返回值:-10000,表示没有找到对应的商品类型
+	public double calculationSOrderFreight(SpencialChannelOrder Sorder) throws ServiceException {
+		
+		SpencialCommodity commodity=null;
+		try{
+			commodity=this.spencialCommodityDao.getByOnlyId(Sorder.getCommudityid());
+		}
+		catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException("获取商品类型出现异常！");
+		}
+		if(commodity==null)
+		{
+			throw ExceptionUtil
+			.handle2ServiceException("运单中的商品类型查找失败!");
+		}
+		SpencialChannel channel=null;
+		try{
+			 channel=this.spencialChannelDao.getChannelById(Sorder.getCid());
+		}
+		catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException("获取渠道出现异常！");
+		}
+		if(channel==null)
+		{
+			throw ExceptionUtil
+			.handle2ServiceException("运单中的渠道查找失败!");
+		}
+		
+		String priceType = "price";
+		
+		
+		if(!StringUtil.isEmpty(Sorder.getUserId()))
+		{
+			User user=null;
+			try{
+			    user=this.userDao.getUserById(Sorder.getUserId());
+			}
+			catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取用户信息出现异常！");
+			}
+			if(user!=null)
+			{
+				if (Constant.USER_TYPE_NORMAL.equals(user.getType())) {// 普通会员发件
+					priceType = "ms_price";
+					
+				} else if (Constant.USER_TYPE_STORE.equals(user.getType())) { // 门市会员发件
+					priceType = "ms_price";
+				} else if (Constant.USER_TYPE_VIP.equals(user.getType())) {// vip会员发件
+					priceType = "vip_one_price";
+				} else if (Constant.USER_TYPE_VIP2.equals(user.getType())) {// vip2会员发件
+					priceType = "vip_two_price";
+				} else if (Constant.USER_TYPE_VIP3.equals(user.getType())) {// vip3会员发件
+					priceType = "vip_three_price";
+				} else { // 找不到就按网上发件
+					priceType = "price";
+				}
+			}
+		}
+		String price="";
+		String firstfee="";
+		if (priceType.equalsIgnoreCase("price")) {// 普通会员发件
+			price = commodity.getPrice();
+			
+		} else if (priceType.equalsIgnoreCase("ms_price")) { // 门市会员发件
+			price = commodity.getMsPrice();
+		} else if (priceType.equalsIgnoreCase("vip_one_price")) {// vip会员发件
+			price = commodity.getVipOnePrice();
+		} else if (priceType.equalsIgnoreCase("vip_two_price")) {// vip2会员发件
+			price = commodity.getVipTwoPrice();
+		} else if (Constant.USER_TYPE_VIP3.equals("vip_three_price")) {// vip3会员发件
+			price = commodity.getVipThreePrice();
+		} else { // 找不到就按网上发件
+			price = commodity.getMsPrice();
+		}
+		if (StringUtil.isEmpty(price)) {
+			throw ExceptionUtil
+					.handle2ServiceException("运单中含有的商品类型价格设置不正确!");
+		}
+		
+		firstfee=commodity.getFirstFee();
+		if (StringUtil.isEmpty(firstfee)) {
+			throw ExceptionUtil
+					.handle2ServiceException("运单中含有的商品类型的首磅价格设置不正确!");
+		}
+		
+		
+		String carry=channel.getCarry();//获取进位值
+		if (StringUtil.isEmpty(carry)) {
+			throw ExceptionUtil
+			.handle2ServiceException("运单中含有的渠道进位价格设置不正确!");
+		}
+		
+		String addtiveprice=channel.getAdditivePrice();//渠道附加价格
+		if (StringUtil.isEmpty(addtiveprice)) {
+			throw ExceptionUtil
+			.handle2ServiceException("运单中含有的渠道附加价格设置不正确!");
+		}
+		String weight=Sorder.getCommodifyWeight();
+		if(StringUtil.isEmpty(weight))
+		{
+			throw ExceptionUtil
+			.handle2ServiceException("商品重量设置不正确!");
+		}
+		
+		String other=Sorder.getOther();
+		if(StringUtil.isEmpty(other))
+		{
+			throw ExceptionUtil
+			.handle2ServiceException("商品其它价格设置不正确!");
+		}
+		
+		String premium=Sorder.getPremium();
+		if(StringUtil.isEmpty(premium))
+		{
+			throw ExceptionUtil
+			.handle2ServiceException("商品保险设置不正确!");
+		}
+		String premiummax=channel.getPremiumMax();
+		if(StringUtil.isEmpty(premiummax))
+		{
+			throw ExceptionUtil
+			.handle2ServiceException("商品包含的渠道的保险设置不设置不正确!");
+		}
+		String premiumRate=channel.getPremiumRate();
+		if(StringUtil.isEmpty(premiumRate))
+		{
+			throw ExceptionUtil
+			.handle2ServiceException("商品包含的渠道的保险比例设置不正确!");
+		}
+		double s_carry=0.0d;//进位值
+		double s_weight=0.0d;//重量
+		double s_price=0.0d;//商品价格
+		double s_firstfee=0.0d;//商品首磅礴费用
+		double s_addtiveprice=0.0d;//渠道的附加价格
+		double s_premium=0.0d;//渠道的保险
+		double s_premiummax=0.0d;//保险最大值设置
+		double s_premiumRate=0.0d;//保险比例设置
+		double s_other=0.0d;//其他费用
+		try{
+			s_carry=StringUtil.string2Double(carry);
+			s_weight=StringUtil.string2Double(weight);
+			s_price=StringUtil.string2Double(price);
+			s_firstfee=StringUtil.string2Double(firstfee);
+			s_addtiveprice=StringUtil.string2Double(addtiveprice);
+			s_premium=StringUtil.string2Double(premium);
+			s_premiummax=StringUtil.string2Double(premiummax);
+			s_premiumRate=StringUtil.string2Double(premiumRate);
+			s_other=StringUtil.string2Double(other);
+		}
+		catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException("计算商品运费时出现异常，请检查是否正确！");
+		}
+		
+		
+		if((s_premiumRate<=0)||(s_premiumRate>=1))
+		{
+			if(s_premium!=0)
+			{
+				throw ExceptionUtil.handle2ServiceException("保险设置不能起作用于，只能设置为0");
+			}
+		}
+		else
+		{
+			if((s_premiumRate*s_premiummax)<s_premium)
+			{
+				throw ExceptionUtil.handle2ServiceException("保险值超过了最大允许范围!最大值为："+Double.toString(s_premiumRate*s_premiummax));
+			}
+		}
+		
+		if(s_carry<0||s_carry>=1)
+		{
+			throw ExceptionUtil.handle2ServiceException("渠道的进位值设置出错，请检查!");
+		}
+		double totalMoney=0.0d;
+		try{		
+			if(s_carry==0)//不进行进位值设置
+			{	
+			}
+			else
+			{
+				int intw=(int)(s_weight);
+	
+				if(s_carry>(s_weight-intw))//小于进位值,重量按退位计算
+				{
+					//weight=intw;
+				}
+				else
+				{
+					s_weight=intw+1;
+				}
+			}
+	
+			
+			if(s_weight<=1)
+			{
+				totalMoney = s_firstfee*s_weight + s_addtiveprice + s_other + s_premium;
+			}
+			else
+			{
+				totalMoney = s_firstfee+s_price*(s_weight-1) + s_addtiveprice + s_other + s_premium;
+			}
+	
+			
+	
+		}
+		catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException("计算商品运费时出现异常，请检查是否正确！");
+		}
+		BigDecimal money = new BigDecimal(totalMoney);
+		return money.setScale(2, BigDecimal.ROUND_UP).doubleValue();
+		
+	
+		/* 运费计算 end */
+
+	}
+	
+	
+	
+}

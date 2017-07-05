@@ -1,0 +1,200 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html >
+<head>
+
+</head>
+<body>
+
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">库存列表</p>
+
+
+		<table class="optable">
+			<tr>
+				<td>
+					<label>货运单号：</label>
+					<input type="text" size="30" style="width:120px;" />
+				</td>
+				<td>
+					<label>提交时间：</label> 
+					<input type="text" size="30" style="width:100px;" />
+					<input id="selectdate" style="background-color: #ccc; background-image: url('/images/btn_calendar.gif'); border: none; width: 25px; height: 22px; vertical-align: middle" type="button" value="" />
+					<label>至</label> 
+					<input type="text" size="30" style="width:100px;" />
+					<input id="selectdate2"
+					style="background-color: #ccc; background-image: url('/images/btn_calendar.gif'); border: none; width: 25px; height: 22px; vertical-align: middle"
+					type="button" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>订单状态：</label>
+					<select  style="width:100px;">
+						<option selected="selected" value="0">全部</option>
+						<option value="1">未到货</option>
+						<option value="2">已入库</option>
+						<option value="3">等待发出</option>
+						<option value="4">已发出（历史预报）</option>
+
+					</select>
+				</td>
+				<td>
+				<label>所在仓库：&nbsp;&nbsp;</label> <select
+					name="ctl00$MainHolder$warehousedpl"
+					id="ctl00_MainHolder_warehousedpl" class="normaldpl">
+						<option selected="selected" value="0">请选择</option>
+						<option value="1">本站主仓库</option>
+						<option value="3">日本仓库</option>
+						<option value="2">欧洲仓库</option>
+
+				</select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><label>商品名称：&nbsp;&nbsp;</label><input
+					name="ctl00$MainHolder$goodsNametb" type="text"
+					id="ctl00_MainHolder_goodsNametb" class="normaltb"
+					onfocus="this.className='focustb';"
+					onblur="this.className='normaltb';" size="30" style="width:300px;" />
+					<input type="submit" name="ctl00$MainHolder$searchbtn" value="搜索"
+					id="ctl00_MainHolder_searchbtn" class="combtn" /> &nbsp;<input
+					type="submit" name="ctl00$MainHolder$allbtn" value="全部预报"
+					id="ctl00_MainHolder_allbtn" class="combtn" />
+				</td>
+			</tr>
+		</table>
+		<div id="LogTab">
+			<span class="current"><a href="forecast_list.aspx">所有记录</a> </span><span><a
+				href="forecast_list.aspx?status=1">未到货</a> </span><span><a
+				href="forecast_list.aspx?status=2">已入库</a> </span><span><a
+				href="forecast_list.aspx?status=3">等待发出</a> </span><span><a
+				href="forecast_list.aspx?status=4">历史预报</a> </span><span><a
+				href="forecast_list.aspx?status=5">问题件</a> </span>
+		</div>
+		<div>
+			<table class="datav" cellspacing="0" rules="all" border="1"
+				id="ctl00_MainHolder_cgv" style="border-collapse:collapse;">
+				<tr>
+					<th align="center" scope="col" style="width:30px;"><input
+						id="CheckAll" type="checkbox" />
+					</th>
+					<th scope="col">预报单号</th>
+					<th scope="col">货运单号</th>
+					<th scope="col">包裹重量</th>
+					<th scope="col">仓库名称</th>
+					<th scope="col">备注</th>
+					<th scope="col">登记时间</th>
+					<th scope="col">库存天数</th>
+					<th scope="col">仓储费</th>
+					<th scope="col">状态</th>
+					<th scope="col">商品详细</th>
+				</tr>
+				<tr>
+					<td align="center"><input id='check15' rel='15'
+						type="checkbox" />
+					</td>
+					<td><a href="purchase_detail.aspx?id=15">DG20150804001</a></td>
+					<td>Express- 1231</td>
+					<td>23.00</td>
+					<td>本站主仓库</td>
+					<td class="tit"></td>
+					<td>2015-08-04</td>
+					<td>N/A</td>
+					<td>$0.00</td>
+					<td>未到货</td>
+					<td><a id='item_15' class="items"
+						href="purchase_detail.aspx?id=15&tid=116" rel="15"> <img
+							src="/images/item.png" /> </a>
+					</td>
+				</tr>
+				<tr>
+					<td align="center"><input id='dis10' rel='10' type="checkbox"
+						disabled="disabled" />
+					</td>
+					<td><a href="purchase_detail.aspx?id=10">F-150713001</a>
+					</td>
+					<td>DHL- 79879887</td>
+					<td>0.20</td>
+					<td>本站主仓库</td>
+					<td class="tit">874</td>
+					<td>2015-07-13</td>
+					<td>--</td>
+					<td>$0.00</td>
+					<td>已入库</td>
+					<td><a id='item_10' class="items"
+						href="purchase_detail.aspx?id=10&tid=116" rel="10"> <img
+							src="/images/item.png" /> </a>
+					</td>
+				</tr>
+				<tr>
+					<td align="center"><input id='check8' rel='8' type="checkbox" />
+					</td>
+					<td><a href="purchase_detail.aspx?id=8">F-150711001</a>
+					</td>
+					<td>DHL- 235235235</td>
+					<td>0.50</td>
+					<td>本站主仓库</td>
+					<td class="tit">124125</td>
+					<td>2015-07-11</td>
+					<td>N/A</td>
+					<td>$0.00</td>
+					<td>未到货</td>
+					<td><a id='item_8' class="items"
+						href="purchase_detail.aspx?id=8&tid=116" rel="8"> <img
+							src="/images/item.png" /> </a>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="itemR">
+			<ul id="ctl00_MainHolder_Pager1" class="Pager">
+
+			</ul>
+		</div>
+		<div class="blank"></div>
+		<input type="hidden" name="ctl00$MainHolder$idstb"
+			id="ctl00_MainHolder_idstb" />
+		<div id="ctl00_MainHolder_delDIV" class="itemR">
+			<input type="submit" name="ctl00$MainHolder$delbtn" value="删除"
+				onclick="javascript:delClick();" id="ctl00_MainHolder_delbtn"
+				class="combtn" />
+		</div>
+
+	</div>
+
+
+
+</body>
+
+<script type="text/javascript">
+	function nav11Click() {
+
+	}
+	function nav21Click() {
+		$("#main-content").load(user_baoguoyubao_url);
+	}
+	function nav31Click() {
+	}
+	function nav41Click() {
+	}
+	function nav51Click() {
+	}
+	function nav61Click() {
+	}
+	function nav71Click() {
+	}
+
+	function isMaxLen(o) {
+		var nMaxLen = o.getAttribute ? parseInt(o.getAttribute("maxlength"))
+				: "";
+		if (o.getAttribute && o.value.length > nMaxLen) {
+			o.value = o.value.substring(0, nMaxLen);
+		}
+	}
+</script>
+</html>
+
+

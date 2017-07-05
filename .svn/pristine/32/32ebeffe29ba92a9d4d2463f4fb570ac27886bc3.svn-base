@@ -1,0 +1,35 @@
+<%@page language="java" import="java.util.*" pageEncoding="UTF-8" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <link rel="shortcut icon" href="../img/favicon.ico" /> 
+  </head>
+  
+  <body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">发送短信</p>
+
+		<div class="box_content">
+			<div class="content_title">发送短信</div>
+			<div class="content_text">
+				<div class="span6">
+					<span>请输入要发送的内容：</span>
+					<textarea name="content" style="width:90%;height:200px"></textarea>
+				</div>
+				<div class="span6">
+					<span>请输入要发送的手机号码，提示：可批量查询，多个手机号码以换行分开：</span>
+					<textarea name="phone" style="width:90%;height:200px"></textarea>
+					<a name="a_send_sms_link" class="btn btn-warning" data-type="submit">提交</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+  <script type="text/javascript">
+  	$("#main-content").ready(function(){
+  		loadNav92Data();
+  	});
+  </script>
+</html>

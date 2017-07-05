@@ -1,0 +1,150 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="userId" value=""/>
+	<input type="hidden" name="key" value=""/>
+	<input type="hidden" name="type" value=""/>
+	<input type="hidden" name="pn" value="1"/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">会员列表</p>
+
+		<div class="box_content">
+			<div class="content_title">会员列表</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div style="margin-top: 10px; margin-bottom: 10px;">
+						<span>类别：全部|0-普通会员|1-门市会员|2-VIP客户|3-VIP2客户|4-VIP3客户</span>
+					</div>
+					<div id="u31" style="padding-top: 5px;">
+						<div id="u310">
+							<form action="" >
+							          会员编号：<input class="text-input small-input" type="text" name="userId"/>
+							    &nbsp;&nbsp;&nbsp;&nbsp;
+								关键字：<input class="text-input small-input" type="text" name="key" />
+								<select class="text-input" name="type">
+									<option value="all" selected="selected">
+										请选择搜索方式
+									</option>
+									<option value="name">
+										按妮称
+									</option>									
+									<option value="real_name">
+										按真实姓名
+									</option>									
+									<option value="phone">
+										按电话号码
+									</option>
+									<option value="email">
+										按Eamil
+									</option>
+									<option value="qq">
+										按QQ
+									</option>
+								</select>
+								<input class="button" type="submit" value="搜索" name="searchSub" />
+							</form>
+						</div>
+						<div id="u320">
+							<span>
+								<a href="#" id="a_add_user_link">添加会员</a>
+							</span>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+
+					<table style="width: 100%">
+						<col width="25"/>
+						<col width="60px" />
+						<col width="110px" />
+						<col width="110px" />
+						<!-- <col width="90px" /> -->
+						<col width="110px" />
+						<col/>
+						<col width="120px" />
+						<col width="155px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="100px" />
+						<thead>
+							<tr>
+								<th>
+									&nbsp;
+								</th>
+								<th id="u_id">
+									编号
+								</th>
+								 <th id="u_nick_name">
+									妮称
+								</th>
+								<th id="u_real_name">
+									真实姓名
+								</th>
+								<th id="u_phone">
+									联系电话
+								</th>
+								<th id="u_email">
+									邮箱
+								</th>
+								<th id="u_qq">
+									QQ
+								</th>
+								<th id="u_sign_date">
+									注册时间
+								</th>
+								<th id="u_balance">
+									预存款
+								</th>
+								<th id="u_type">
+									用户类型
+								</th>
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="8">
+									<div class="bulk-actions align-left">
+										&nbsp;
+										<label>
+											<input type="checkbox" name="u_del_check_all"
+												id="u_del_check_all" />
+											全选
+										</label>
+										&nbsp;&nbsp;
+										<a href="#" id="a_delete_user_link">删除</a>
+									</div>
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav31Data();
+	});
+</script>
+</html>

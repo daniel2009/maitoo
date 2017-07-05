@@ -1,0 +1,119 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="userId"/>
+	<input type="hidden" name="state"/>
+	<input type="hidden" name="pn" value="1"/>
+		<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">留言列表</p>
+
+		<div class="box_content">
+			<div class="content_title">
+				留言列表
+				待回复留言：<span style="margin: 0 3px; color: #f00;">(<label id="totalReplayMessage">0</label>)</span>
+			</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u31" style="padding-top: 5px;">
+						<div id="u310">
+							<form action="">
+								会员编号：<input class="text-input small-input" type="text" name="userId" />
+								留言状态：<select class="small-input"  name="state">
+									<option value="-1">
+										全部
+									</option>
+									<option value="0">
+										未读
+									</option>
+									<option value="1">
+										已读
+									</option>
+								</select>
+								<input class="button" type="submit" value="搜索" name="searchSub" />
+							</form>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+
+					<table id="msgtable" style="width: 100%">
+						<col width="60"/>
+						<col width="80px" />
+						<col/>
+						<col width="50px"/>
+						<col width="150px" />
+						<col width="150px" />
+						<thead>
+							<tr>
+								<th>
+									&nbsp;
+								</th>
+								<th id="m_id">
+									编号
+								</th>
+								<th id="m_content">
+									留言
+								</th>
+								<th id="m_state">
+									状态
+								</th>
+								<th id="m_create_date">
+									创建时间
+								</th>
+								<th id="m_modify_date">
+									更新时间
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="5">
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav71Data();
+		$.ajax({
+			type:"get",
+			url : "../admin/message/getcount",
+			success:function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					$("#totalReplayMessage").html(response.data.count);
+				} else if ("607" == code) {
+					alert("您没有权限进行此操作，请登录！");
+					logout();
+				} else {
+					alert("获取失败，原因是:" + responsn.message);
+				}
+				return false;
+			}
+		});
+		
+	});
+</script>
+</html>

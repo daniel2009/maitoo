@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.TranshipmentCommodityDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.TranshipmentCommodity">
+		<result column="transhipment_id" property="transhipmentId"
+			javaType="String" />
+		<result column="commodity_id" property="commodityId" javaType="String" />
+		<result column="quantity" property="quantity" javaType="String" />
+		<result column="commodity_name" property="commodityName"
+			javaType="String" />
+		<result column="sjweight" property="sjweight" javaType="String" />
+		<result column="tariff" property="tariff" javaType="String" />
+		<!-- <result column="jfweight" property="jfweight" javaType="String"/> -->
+		<result column="xiangqing" property="xiangqing" javaType="String" />
+		<result column="id" property="id" javaType="String" />
+		<result column="commodity_sku" property="commoditySku"
+			javaType="String" />
+		<result column="eachjfweight" property="eachjfweight" javaType="String" />
+		<result column="transit_no" property="transitNo" javaType="String" />
+		<result column="tran_warehouse_id" property="tranWarehouseId" javaType="String"/>
+		
+		<association property="commodity" column="commodity_id" select="com.weiye.dao.CommodityDao.getByOnlyId"/>
+	</resultMap>
+
+	<select id="getById" parameterType="java.lang.String" resultMap="basic_result_map">
+		select transhipment_commodity.*,c.name as commodity_name from
+		transhipment_commodity left join commodity as c on c.id= commodity_id
+		where transhipment_id=#{id} ORDER BY commodity_id
+	</select>
+
+
+
+	<insert id="insertTranshipmentCommodity">
+		insert into
+		transhipment_commodity(transhipment_id,commodity_id,quantity,sjweight,tariff,xiangqing,commodity_sku,eachjfweight,transit_no,tran_warehouse_id)
+		values
+		<foreach collection="list" item="tc" separator=",">
+			(#{tc.transhipmentId},#{tc.commodityId},#{tc.quantity},#{tc.sjweight},#{tc.tariff},#{tc.xiangqing},#{tc.commoditySku},#{tc.eachjfweight},#{tc.transitNo},#{tc.tranWarehouseId})
+		</foreach>
+	</insert>
+
+	<delete id="deleteMultiTranshipmentCommodity">
+		delete from transhipment_commodity
+		where transhipment_id in
+		<foreach collection="list" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+	</delete>
+	<!-- 查找指定id的一条信息 -->
+	<select id="getByIdsn" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select transhipment_commodity.*,c.name as commodity_name
+		from transhipment_commodity left join commodity as c on c.id=
+		commodity_id where transhipment_commodity.id=#{idsn}
+	</select>
+
+	<!-- 修改指定商品列表的内容 -->
+	<update id="modifyTranshipmentnyIdsn">
+		update`transhipment_commodity`
+		set `quantity`=#{quantity},
+		`sjweight`=#{sjweight}
+		where id=#{id}
+	</update>
+	<delete id="deletesimpleTranshipmentCommodity">
+		delete from transhipment_commodity
+		where id=#{idsn}		
+	</delete>
+	
+	<select id="countTranshipmentCommodity" resultType="java.lang.Integer">
+		select count(*) from `transhipment_commodity`
+		where transhipment_id=#{id}
+</select>
+
+<update id="updatetranidandpackageidbyid">
+		update transhipment_commodity
+		set 
+		transit_no=#{transitNo}
+		<if test="tranWarehouseId!=null and tranWarehouseId!=''">
+		,tran_warehouse_id=#{tranWarehouseId}
+		</if>
+		where transhipment_id=#{transhipmentId}
+	</update>
+</mapper>

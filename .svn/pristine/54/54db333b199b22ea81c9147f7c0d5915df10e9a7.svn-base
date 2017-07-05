@@ -1,0 +1,188 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>  
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">修改仓库信息
+			<a href="#" id="a_back_warehouse_list_link">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">修改仓库信息</div>
+			<div class="content_text">
+				
+				<div class="tab-content" id="tab2">
+		         
+		           <form action="#" id="modify_warehouse" method="post" enctype="multipart/form-data">
+		            <fieldset>
+		            <input type="hidden" name="id" value="${param.id }"/>
+		            <input type="hidden" name="widtype1" value="0"/>
+		            <input type="hidden" name="callOrderAvailable1" value="0"/>
+		             <input type="hidden" name="tran_wid_number"/>
+			            <p>
+			              <label class="cllabel">仓库名称：</label>
+			              <input class="text-input small-input" type="text" name="name" /><b class="gl_message">*</b>
+			            </p>
+			            <p>
+			              <label class="cllabel">所属公司：</label>
+			              <input class="text-input small-input" type="text" name="company" />
+			            </p>
+			            <p>
+			              <label class="cllabel">国家/省(州)/市：</label>
+			              <input class="text-input" size="5" type="text" name="country" />
+			              /&nbsp;<input class="text-input" size="5" type="text" name="province" />
+			              /&nbsp;<input class="text-input" size="5" type="text" name="city" /><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label class="cllabel">详细仓库地址：</label>
+			              <input class="text-input medium-input" type="text" name="address" /><span class="gl_message">*</span><small>(区/街道/楼盘/室)</small>
+			            </p>
+			            <p>
+			              <label class="cllabel">邮政编码：</label>
+			              <input class="text-input small-input" type="text" name="zipCode" /><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label class="cllabel">仓库排序：</label>
+			              <input class="text-input" size="5" type="text" name="serialNo" /><small>只允许填写数字，数字越小排列越靠前。</small>
+			            </p>
+			            <p>
+							<label class="cllabel">是否接收转运：</label><input type="checkbox" name="wid_type" id="wid_type" value="1" readonly>
+			            </p>
+			            <p>
+			              <span >是否上门收货：</span>
+			              <input type="checkbox" name="callOrderAvailable" id="callOrderAvailable" value="1">
+			            </p>
+			             <label class="cllabel">上门收货服务城市(门市所在州的城市)：</label>
+			              <textarea  name="callOrderCity" id="callOrderCity"></textarea>
+			            <p>
+			            
+			            <p style="display:none;">
+
+			     			<label class="cllabel">从这里回国的费用：$</label><input type="number" name="toChinaPrice" id="toChinaPrice" min="0" step="0.001">
+			            </p>
+			            <p style="display:none;">
+			              <label class="cllabel">转运到其他州的费用：$</label><input type="number" name="changeWarehousePrice" id="changeWarehousePrice" min="0" step="0.001">
+			            </p>
+			            <p>
+			              <label class="cllabel">联系人：</label>
+			              <input class="text-input small-input" type="text" name="contactName" />
+			            </p>
+			            <p>
+			              <label class="cllabel">联系方式：</label>
+			              <input class="text-input small-input" type="text" name="telephone" />
+			            </p>
+			            
+			             <p>
+			              <label class="cllabel">门店标识：</label>
+			           		 <input class="text-input" size="2" type="text" name="wid_code_char2" maxlength="2" value="00"/>(运单的倒数第2、3位)
+			            <span class="gl_message">*</span>
+			            </p>
+			            
+			            <p>
+			              <label class="cllabel">打印网址：</label>
+			              <input class="text-input small-input" type="text" name="printwidurl" />
+			            </p>
+			            
+			            <p>
+			              <label class="cllabel">打印美国手机：</label>
+			              <input class="text-input small-input" type="text" name="telephoneofusa" maxlength="16"/><small>(应用于打印运单)</small>
+			            </p>
+			             <p>
+			              <label class="cllabel">打印中国手机：</label>
+			              <input class="text-input small-input" type="text" name="telephoneofcn" maxlength="16"/><small>(应用于打印运单)</small>
+			            </p>
+			             <p id="logoshowpiccontent">
+			              <label class="cllabel">logo图片预览：</label>
+			               <input class="text-input small-input" type="text" name="printlogopic" style="display:none;"/>
+			              <a href=""
+									target="_blank" id="logoimgurllink"><img width="150px"
+										height="150px" src=""></a>
+			            </p>
+			            
+			             <p>
+			              <label class="cllabel">logo图片：</label>
+							<input id="cardpicidlogo" name="filelogo" type="file" /><small>(logo图片高75px,宽会根据此比例变化，否则打印运单可能变形)</small>
+			            </p>	
+			            
+			             <p id="showpiccontent">
+			              <label class="cllabel">二维码图片预览：</label>
+			               <input class="text-input small-input" type="text" name="print2codepic" style="display:none;"/>
+			              <a href=""
+									target="_blank" id="imgurllink"><img width="150px"
+										height="150px" src=""></a>
+			            </p>
+			            
+			             <p>
+			              <label class="cllabel">二维码图片：</label>
+
+			              <input id="cardpicid" name="file" type="file" /><small>(应用于打印运单，可以是微信、网站等的二维码,大小只能是75px*75px,否则打印运单可能变形)</small>
+			            </p>	
+			               <p>
+			              <label class="cllabel">转运价格表：</label>
+			              <!-- <select id="tran_price_table"	style="width:150px"></select> -->
+			              <table style="width: 90%" id="wid_price_table">
+						
+						<col width="30%" />
+						<col width="25%" />
+						<col width="25%" />
+						
+						<thead>
+							<tr>
+								<th>
+									仓库/门店
+								</th>
+								<th>
+									成本价格
+								</th>
+								<th >
+									海外计费价格
+								</th>
+								<th >
+									自提计费价格
+								</th>
+								
+							
+							</tr>
+						</thead>
+					
+						<tbody>
+							<tr>
+								<td colspan="4">
+									<span>你没有其它仓库或没有数据!</span>
+								</td>
+								
+								
+							</tr>
+						</tbody>
+					</table>
+			            </p>
+			            
+			            <p>
+			              <label class="cllabel">备注：</label>
+			              <textarea rows="3" cols="10" class="text-input textarea wysiwyg" name="remark"></textarea>
+			            </p>
+			            <p style="margin-left: 50px;">
+			              <input id="bt_modify_warehouse" class="button" type="button" value="提交" />
+			              <input class="button" type="reset" value="重置" onclick="clearwarehousepic()">
+			            </p>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+		</div>
+		<div id="tmpmsgdiv1" style="display:none;"></div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav532Data();
+	});
+</script>
+</html>

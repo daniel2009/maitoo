@@ -1,0 +1,268 @@
+﻿@charset "utf-8";
+/* CSS Document */
+@media only screen and (min-width:768px) and (max-width:991px) {
+    .navbar-toggle {
+        display: block;
+    }
+}
+
+@media only screen and (max-width: 480px){
+    .page-content {
+        padding: 8px 1px 20px;
+    }
+
+    .profile-user-info-striped .profile-info-value {
+        border-top: 1px dotted #DCEBF7;
+        padding-left: 2px;
+        margin-left: 1px;
+    }
+   
+
+    .floatblock [name=address], .floatblock [name=remark] {
+        width: 260px;
+    }
+    #btnSearch{margin-left:4px;}
+    #btnAdd{margin-top:3px;}
+}
+
+
+
+input {
+    border: 1px solid #ccc;
+}
+
+    input[type=file] {
+        display: inline-block;
+    }
+
+select {
+    padding: 0px 4px;
+}
+
+label {
+    font-size: 13px;
+}
+
+.floatleft {
+    float: left;
+}
+
+.toolrow {
+    padding: 5px 0px;
+}
+
+.content_title {
+    font-weight: bold;
+}
+/*按钮*/
+.btn-group-sm > .btn, .btn-sm {
+    padding: 0px 5px 0px 5px;
+    margin-top: -2px;
+}
+
+.form-control {
+    height: 25px;
+}
+
+.row {
+    margin: 0px;
+}
+
+.panel-footer {
+    padding: 6px 0px;
+}
+
+.table {
+    margin-bottom: 10px;
+}
+/*表格行高*/
+.ui-jqgrid tr.ui-row-ltr td, .ui-jqgrid tr.ui-row-rtl td {
+    padding: 2px 2px;
+}
+
+.ui-jqgrid-view > .ui-jqgrid-titlebar {
+    display: none;
+}
+
+.ui-state-default ui-jqgrid-hdiv {
+    height: 25px;
+}
+/*分页条高度*/
+.ui-jqgrid .ui-jqgrid-pager {
+    height: 35px;
+}
+
+.ui-jqgrid .ui-pager-control {
+    height: 30px;
+}
+/*表头高度*/
+.ui-jqgrid .ui-jqgrid-hdiv {
+    height: 28px;
+    overflow: hidden;
+}
+
+.ui-jqgrid .ui-jqgrid-htable th div {
+    padding-top: 6px;
+}
+
+
+/*表头复选框*/
+.ui-jqgrid .ui-jqgrid-htable th div {
+    height: 25px;
+}
+
+.ui-jqgrid-labels th input[type=checkbox] {
+    margin-top: -8px;
+}
+
+
+.table-selectheight {
+    height: 25px;
+    margin-bottom: 2px;
+}
+
+.table-button {
+    padding: 0px 8px;
+    margin-top: -2px;
+}
+/**/
+.width80p {
+    width: 85%;
+}
+
+.width60px {
+    min-width: 60px;
+    text-align: right;
+}
+
+
+/*一般表格*/
+.table-condensed > tbody > tr > td, .table-condensed > tbody > tr > th, .table-condensed > tfoot > tr > td, .table-condensed > tfoot > tr > th, .table-condensed > thead > tr > td, .table-condensed > thead > tr > th {
+    padding: 2px 5px;
+}
+
+.table-condensed > tbody > tr .name {
+    background-color: #F1F1F1;
+}
+
+.table-condensed > tbody > tr .value {
+    background-color: #fff;
+}
+
+.col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
+    position: relative;
+    min-height: 1px;
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+
+/*==============================新增编辑页面===========================*/
+
+/*表格*/
+.form .table-condensed > tbody > tr > td, .table-condensed > tbody > tr > th, .form .table-condensed > tfoot > tr > td, .form .table-condensed > tfoot > tr > th, .form .table-condensed > thead > tr > td, .form .table-condensed > thead > tr > th {
+    padding: 3px 5px;
+}
+
+.form .table-condensed > thead > tr > th {
+    padding: 8px 5px;
+    font-size: 14px;
+}
+
+.form textarea, .form input[type=text], .form input[type=password], .form input[type=datetime], .form input[type=datetime-local], .form input[type=date], .form input[type=month], .form input[type=time], .form input[type=week], .form input[type=number], .form input[type=email], .form input[type=url], .form input[type=search], .form input[type=tel], .form input[type=color], .form select {
+    padding: 3px 5px;
+    width: 260px;
+}
+
+/*新增编辑页面按钮*/
+.form-buttons {
+    display: block;
+    background-color: #F5F5F5;
+    border-top: 1px solid #E5E5E5;
+    padding: 14px 15px 15px;
+}
+
+.form select {
+    padding: 2px;
+}
+
+.form input[type=datetime], .form input[type=datetime-local], .form input[type=date], .form input[type=month], .form input[type=time] {
+    width: 244px;
+}
+/*新增编辑页面按钮*/
+.form-buttons .btn-group-sm > .btn, .form-buttons .btn-sm {
+    padding: 3px 5px;
+}
+
+.form .name {
+    text-align: right;
+}
+
+.from-require {
+    color: red;
+}
+
+/*验证提示框提示*/
+.error {
+    color: red;
+}
+
+/*查询栏 row */
+.searchrow {
+    margin-bottom: 5px;
+    padding: 3px 0px;
+    border-bottom: 1px solid #ccc;
+}
+
+.searchrownoborder {
+    margin-bottom: 5px;
+    padding: 3px 0px;
+}
+
+
+
+.ui-dialog-header {
+    background: rgba(14, 9, 236, 0.67);
+    border: 1px solid #eee;
+}
+
+
+
+/*==================================自动完成========================================*/
+.bigautocomplete-layout {
+    display: none;
+    background-color: #FFFFFF;
+    border: 1px solid #BCBCBC;
+    position: absolute;
+    max-height: 200px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 99999;
+}
+
+    .bigautocomplete-layout table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        background: none repeat scroll 0 0 #FFFFFF;
+        width: 100%;
+        cursor: default;
+        font-size: 14px;
+    }
+
+        .bigautocomplete-layout table tr {
+            background: none repeat scroll 0 0 #FFFFFF;
+            height: 25px;
+            line-height: 25px;
+            overflow: hidden;
+        }
+
+    .bigautocomplete-layout .ct {
+        background: none repeat scroll 0 0 #EBEBEB !important;
+        color: #4B4B4B;
+    }
+
+    .bigautocomplete-layout div {
+        word-wrap: break-word;
+        word-break: break-all;
+        padding: 1px 5px;
+    }

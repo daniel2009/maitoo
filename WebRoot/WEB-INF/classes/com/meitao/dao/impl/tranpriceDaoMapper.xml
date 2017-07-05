@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.TranPriceDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.TranPrice">
+		<id column="id" property="id" javaType="String" />
+
+		<result column="warehouse_id" property="warehouseId" javaType="String" />
+		<result column="tran_warehouse_id" property="tranwarehouseId" javaType="String"/>
+		<result column="cost" property="cost" javaType="String"/>
+		<result column="price" property="price" javaType="String" />
+		<result column="self_price" property="selfPrice" javaType="String" />
+		
+	</resultMap>
+
+	<select id="getAll" resultMap="basic_result_map">
+		select * from tran_price_table
+	</select>
+
+	<select id="getById" parameterType="java.lang.String" resultMap="basic_result_map">
+		select * from tran_price_table where id=#{id}
+	</select><!-- WTF -->
+	<select id="getAllbyWarehouseId" resultMap="basic_result_map">
+		SELECT * FROM tran_price_table WHERE warehouse_id=#{storeid}
+	</select>
+
+	<insert id="inserttranprice" parameterType="com.meitao.model.TranPrice"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into tran_price_table(warehouse_id,tran_warehouse_id,cost,price,self_price) values(#{warehouseId},#{tranwarehouseId},#{cost},#{price},#{selfPrice})
+	</insert>
+	
+
+	
+	<select id="getby2id" resultMap="basic_result_map">
+		SELECT * FROM tran_price_table WHERE warehouse_id=#{warehouseId} and tran_warehouse_id=#{tranwarehouseId} limit 1
+	</select>
+	<update id="modifytranpricebi2id">
+		update`tran_price_table`
+		set `cost`=#{cost},
+		`price`=#{price},
+		`self_price`=#{selfPrice}	
+		where warehouse_id=#{warehouseId} and tran_warehouse_id=#{tranwarehouseId}
+	</update>
+	<update id="modifytranpricebyid">
+		update`tran_price_table`
+		set `cost`=#{cost},
+		`price`=#{price},
+		`self_price`=#{selfPrice}
+		warehouse_id=#{warehouseId},
+		tran_warehouse_id=#{tranwarehouseId}	
+		where id=#{id}
+	</update>
+</mapper>

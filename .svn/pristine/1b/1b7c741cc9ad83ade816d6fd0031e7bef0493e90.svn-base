@@ -1,0 +1,275 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="tid"/>
+	<input type="hidden" name="key"/>
+	<input type="hidden" name="type"/>
+	<input type="hidden" name="sdate"/>
+	<input type="hidden" name="edate"/>
+	<input type="hidden" name="pn"/>
+	<input type="hidden" name="tran_state"/>
+	<input type="hidden" name="tran_type"/>
+	<input type="hidden" name="s_tran_wid"/>
+	<input type="hidden" name="s_to_wid"/>
+	
+	
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">包裹信息列表</p>
+
+		<div class="box_content">
+			<div class="content_title">
+				包裹信息列表
+				<a href="#" onclick="javascript: searchState(0);">未入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState0">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(-7);">转运入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN7">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(-6);">转运出库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN6">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(-5);">待检入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN5">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(1);">已入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState1">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(2);">等待审核<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState2">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(3);">等待付款<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState3">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(4);">已付款<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState4">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(5);">分拣完成<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState5">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(-9);">退货中<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN9">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(-8);">已退货<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN8">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(-10);">包裹异常<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN10">0</label>)</span></a>
+			</div>
+			<div class="content_text">
+	
+		
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u51" style="padding-top: 5px;">
+						<div id="u510">
+						<form action="" >
+							包裹运单号：<!--  <input type="text" class="text-input" size="20" name="tid" maxlength="16" onkeypress="baoguosearchonkey(event)"/>
+							--><input type="text" class="text-input" size="20" name="tid" maxlength="16" />
+							<input class="button" type="submit" value="高级搜索" name="searchSub" />
+						</form>
+							<!-- <form action="" id="search_tran_list_and_download" style="margin-top: 10px;"> -->
+							<form id="search_tran_list_and_download" action="${pageContext.request.contextPath }/admin/transh/downlist"  method="post" enctype="multipart/form-data">
+								<!--预报单号：<input type="text" class="text-input" size="10" name="tid"maxlength="16"/>-->
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								关键字：
+								<input class="text-input" size="20" type="text" name="key" />
+								<select class="text-input" name="type">
+									<option value="0">
+										请选择搜索方式
+									</option>
+									<option value="1">
+										按用户名
+									</option>
+									<option value="2">
+										按电话号码
+									</option>
+									<option value="3">
+										按Eamil
+									</option>
+									<option value="4">
+										按QQ
+									</option>
+									<option value="5">
+										包裹运单号
+									</option>
+									<option value="6">
+										用户唯一标识
+									</option>
+								</select>
+								&nbsp;&nbsp;
+								状态：
+								<select name="tran_state" class="text-input">
+									
+									<option value="-1" selected="selected">请选择状态</option>
+									<option value="0">未入库</option>
+									<option value="-7">转运入库</option>
+									<option value="-6">转运出库</option>
+									<option value="-5">待检入库</option>
+					              	<option value="1">已入库</option>
+					              	<option value="2">等待审核</option>
+					              	<option value="3">等待付款</option>
+					              	<option value="4">已付款</option>
+					              	<option value="5">分拣完成</option>
+					              	<option value="-9">退货中</option>
+									<option value="-8">已退货</option>
+									<option value="-10">包裹异常</option>
+					              	
+					              	
+					              	
+					             
+					              	
+					            </select>
+					            &nbsp;&nbsp;
+								类型：
+					            <select name="tran_type" class="text-input">
+									<option value="-1" selected="selected">请选择转运类型</option>
+									<option value="0">普通转运</option>
+					              	<option value="1">极速转运</option>
+					              	
+					            </select><br/>
+					             
+								&nbsp;&nbsp;转运仓库：
+					            <select name="tran_wid_search" class="text-input">
+									
+									<option value="-1" selected="selected">请选转运仓库</option>
+				
+					            </select>
+					             &nbsp;&nbsp;
+								所属仓库：
+					               <select name="self_wid_search" class="text-input">
+									
+									<option value="-1" selected="selected">请选目的仓库</option>
+				
+					            </select>
+					            
+					            
+					            
+								&nbsp;&nbsp;
+								预报日期：
+								<input type="text" class="text-input Wdate" size="10" name="sdate" id="sd" onClick="WdatePicker()"/>
+								~
+								<input type="text" class="text-input Wdate" size="10" name="edate" id="ed" onClick="WdatePicker()"/>
+								<input class="button" type="submit" value="高级搜索" name="searchSub" />
+								<input class="button" type="submit" value="下载转运清单" name="downtranlist" id="downtranlist_search"/>
+							</form>
+							<div style="margin-left: 280px;margin-top: 5px;margin-bottom: 10px;">
+								按时间获取：
+								<a href="#" id="1" name="a_search_by_time">今天</a>&nbsp;&nbsp;
+								<a href="#" id="2" name="a_search_by_time">昨天</a>&nbsp;&nbsp;
+								<a href="#" id="3" name="a_search_by_time">最近七天</a>&nbsp;&nbsp;
+								<a href="#" id="4" name="a_search_by_time">最近一个月</a>
+							</div>
+						</div>
+						<div style="clear: both;"></div>
+						<div id="u31" style="margin: 0px;height: auto;">
+							<div id="u320" style="margin-top: 0px;">
+								<span>
+									<a href="#" onclick="javascript: addTranshipment();">帮用户预报</a>
+								</span>
+							</div>
+							<div style="clear: both;"></div>
+						</div>
+					</div>
+
+					<table style="width: 100%">
+						<col width="25" />
+						<col width="70px" />
+						<col width="90px" />
+						<col />
+						<col />
+						<col />
+						<col width="120px" />
+						<col width="70px" />
+						<col width="80px" />
+						<col width="60px" />
+						  <col width="60px" />
+						<col width="150px" />
+						<col width="200px" />
+						<thead>
+							<tr>
+								<th>
+									&nbsp;
+								</th>
+								<th id="t_id">
+									预报单号
+								</th>
+								<th id="t_id">
+									包裹运单号
+								</th>
+								<th id="t_usa_no">
+									包裹明细
+								</th>
+								<th >
+									转运仓库
+								</th>
+								<th >
+									所属仓库
+								</th>
+								<th id="t_user_name">
+									所属用户
+								</th>
+								<th id="t_user_id">
+									用户编号
+								</th>
+								<th id="t_weight">
+									重量(lb)
+								</th>
+								<th id="t_sign_date">
+									状态
+								</th>
+								<th>
+									仓位
+								</th>
+								 <th>
+									类型
+								</th> 
+								<th id="t_sign_date">
+									预报时间
+								</th>
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="13">
+									<div class="bulk-actions align-left">
+										&nbsp;
+										<label>
+											<input type="checkbox" name="t_del_check_all"
+												id="t_del_check_all" />
+											全选
+										</label>
+										&nbsp;&nbsp;
+										<a href="#" title="只能删除状态为完成状态的转运单" id="a_delete_tranship_link">删除</a>
+									</div>
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+							<tr>
+								<td style="text-align: left;" colspan="13">
+									<span>&nbsp;&nbsp;对不起，现在还没有预报信息!</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav51Data();
+		var state = window.sessionStorage.getItem("searchState");
+		if(null != state){
+			searchState(state);
+		}
+		window.sessionStorage.clear();
+		getAllStateCount("transhipmentBill");//nav1.js
+	});
+	function searchState(state){
+		$("select[name=tran_state]").val(state);
+		$("input[name=searchSub]").click();
+	}
+	function addTranshipment(){
+		$("#main-content").load("../admin/transhipmentAdd.jsp");
+	}
+</script>
+</html>

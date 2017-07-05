@@ -1,0 +1,34 @@
+package com.weiye.service;
+
+import java.util.List;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.PageSplit;
+import com.weiye.model.RenlingBaoguo;
+import com.weiye.model.RenlingPersons;
+import com.weiye.model.ResponseObject;
+
+public interface ClaimPackageService {
+
+	ResponseObject<PageSplit<RenlingBaoguo>> findByUser(String userId,
+			String nameCondition, int pageIndex, int pageSize) throws ServiceException;
+
+	ResponseObject<PageSplit<RenlingBaoguo>> findByNotClaimed(String nameCondition, int pageIndex,
+			int pageSize) throws ServiceException;
+
+	ResponseObject<RenlingBaoguo> getByIdWithClaimPerson(String id) throws ServiceException;
+
+	ResponseObject<Object> updateByAudit(String id, String state,
+			String claimPersonId, String auditRemark) throws ServiceException;
+
+	ResponseObject<PageSplit<RenlingPersons>> getByClaimPackageId(
+			String claimPackageId, int pageIndex, int pageSize) throws ServiceException;
+
+	ResponseObject<PageSplit<RenlingBaoguo>> findByNotClaimedAndUser(
+			String userId, String nameCondition, int pageIndex, int defaultPageSize) throws ServiceException;
+
+	ResponseObject<PageSplit<RenlingPersons>> findAllByClaimPackageId(String claimPackageId, int pageIndex, int pageSize) throws ServiceException;
+
+	ResponseObject<String[]> getAllStateCount() throws ServiceException;
+
+}

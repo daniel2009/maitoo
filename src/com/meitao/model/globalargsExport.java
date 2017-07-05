@@ -1,0 +1,40 @@
+/*
+ * 用途：按分类导出全局变量
+ * 建议人：kai
+ * 创建时间：20160203
+ * 修改时间1:
+ * 修改原因1：
+ * */
+
+package com.meitao.model;
+
+import java.io.Serializable;
+
+import java.util.List;
+
+
+public class globalargsExport implements Serializable {
+	private static final long serialVersionUID = -6310205612352440060L;
+	private String id;//全局变量分类标志
+	private String name;//分类名称
+	private List<globalargs> args;//获取索引对应的全局变量
+	public List<globalargs> getArgs() {
+		return args;
+	}
+	public void setArgs(List<globalargs> args) {
+		this.args = args;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+
+}

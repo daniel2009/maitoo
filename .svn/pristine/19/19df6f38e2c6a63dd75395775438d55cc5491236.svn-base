@@ -1,0 +1,45 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">导出会员信息</p>
+
+		<div class="box_content">
+			<div class="content_title">导出会员信息</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<form action="${pageContext.request.contextPath }/admin/user/export" method="get">
+			            <fieldset>
+				            <p>
+				              <label style="display: inline;">开始时间：</label>
+				              <input class="text-input Wdate" size="20" type="text" name="sd" id="sd" onClick="WdatePicker()"/>
+				              <label style="display: inline;">结束时间：</label>
+				              <input class="text-input Wdate" size="20" type="text" name="ed" id="ed" onClick="WdatePicker()"/>
+				              <input class="button" type="submit" value="导出数据" />
+				            </p>
+				         </fieldset>
+				         <div class="clear"></div>
+			         </form>
+					<div class="notification information png_bg">
+	      				<div>
+	      				导出会员的时间格式必须是yyyy-MM-dd这种形式。比如：2014-02-05。如果输入格式错误，那么会获取默认时间。如果开始时间晚于结束时间，那么不会导出任何数据。
+	      				如果时间为空，那么默认为当前时间。即如果什么都不输入，就只会导出今天的会员数据！
+	      				</div>
+	    			</div>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		$("#main-content").ready(function() {
+			loadNav36Data();
+		});
+	</script>
+</html>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.ErrorTranshipmentBillDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.ErrorTranshipmentBillInfo">
+		<id column="id" property="id" javaType="String" />
+		<result column="transh_id" property="transhId" javaType="String" />
+		<result column="emp_name" property="empName" javaType="String" />
+		<result column="content" property="content" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="parent_id" property="parentId" javaType="String" />
+		<collection column="id" property="replyInfos" select="getInfosByParentId"></collection>
+	</resultMap>
+
+	<insert id="insertErrorTranshInfo" parameterType="com.meitao.model.ErrorTranshipmentBillInfo"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		`e_t_info`(`transh_id`,`emp_name`,`content`,`create_date`,`modify_date`,`parent_id`)
+		values(#{transhId},#{empName},#{content},#{createDate},#{modifyDate},#{parentId})
+	</insert>
+	
+	<delete id="deleteErrorTranshInfoByIds">
+		delete from `e_t_info`
+		where `id` in
+		<foreach collection="list" item="id" close=")" open="(" separator=",">
+			#{id}
+		</foreach>
+		or `parent_id` in
+		<foreach collection="list" item="id" close=")" open="(" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+
+	<update id="updateState" parameterType="com.meitao.model.ErrorTranshipmentBillInfo">
+		update `e_t_info`
+		set `modify_date`=#{modifyDate},
+		`state`=#{state}
+		<where>
+			<choose>
+				<when test="(id!=null and id!='') or (transhId!=null and transhId!='')">
+					<if test="transhId!=null and transhId!=''">
+						`transh_id`=#{transhId}
+					</if>
+					<if test="id!=null and id!=''">
+						or `id`=#{id} or `parent_id`=#{id}
+					</if>
+				</when>
+				<otherwise>
+					`id`=-1314520 and `transh_id`='-123'
+				</otherwise>
+			</choose>
+		</where>
+	</update>
+	
+	<select id="getInfosByParentId" resultMap="basic_result_map">
+		select *
+		from `e_t_info`
+		where `parent_id`=#{id}
+		order by `e_t_info`.`modify_date` desc
+	</select>
+
+	<select id="searchByTranshId" resultMap="basic_result_map">
+		select *
+		from `e_t_info` 
+		where `e_t_info`.`parent_id`='-1'
+		<if test="transhId!=null and transhId!=''">
+			and `e_t_info`.`transh_id` like #{transhId}
+		</if>
+		order by `e_t_info`.`modify_date` desc
+		limit
+		#{index},#{size}
+	</select>
+
+	<select id="countSearchOfTranshId" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(*)
+		from `e_t_info` 
+		where `e_t_info`.`parent_id`='-1'
+		<if test="transhId!=null and transhId!=''">
+			and `e_t_info`.`transh_id` like #{transhId}
+		</if>
+	</select>
+
+</mapper>

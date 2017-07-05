@@ -1,0 +1,21 @@
+//替换所有可能为分割符号的---->英文,
+function separateAll(string){
+	string = string.replace("\r\n", ",");
+	string = string.replace("\r", ",");
+	string = string.replace("\n", ",");
+	string = string.replace(/，/ig, ",");
+	string = string.replace(/；/ig, ",");
+	string = string.replace(";", ",");
+	string = string.replace(/\s+/g, ",");
+	string = string.replace(/,+/g, ",");
+	return string;
+}
+
+function removenull(str) {
+	if ((str == "") || (str == null) || (str == "null")
+			|| (str == "undefined")) {
+		return "";
+	} else {
+		return str;
+	}
+}

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<context:annotation-config />
+	<context:component-scan base-package="com.weiye.controller" />
+	<mvc:annotation-driven>
+	</mvc:annotation-driven>
+	<context:property-placeholder location="classpath:*.properties" />
+	<mvc:resources location="/resources/*" mapping="/resources/**"/>
+	<mvc:resources location="/css/*" mapping="/css/**"/>
+	<mvc:resources location="/js/*" mapping="/js/**"/>
+	<mvc:resources location="/ckeditor/*" mapping="/ckeditor/**"/>
+	<mvc:resources location="/img/*" mapping="/img/**"/>
+	<mvc:resources location="/*.html" mapping="/*.html"/>
+	<mvc:resources location="/*.jsp" mapping="/*.jsp"/>
+	
+	
+	<mvc:resources location="/stylesheets/*" mapping="/stylesheets/**"/>
+	<mvc:resources location="/javascripts/*" mapping="/javascripts/**"/>
+	<mvc:resources location="/images/*" mapping="/images/**"/>
+	<mvc:resources location="/lib/*" mapping="/lib/**"/>
+	
+	<mvc:resources location="/demo/*" mapping="/demo/**"/>
+	<mvc:resources location="/font/*" mapping="/font/**"/>
+	<mvc:resources location="/r/*" mapping="/r/**"/>
+	<mvc:resources location="/r1/*" mapping="/r1/**"/>
+	
+	<mvc:resources location="/fleet/*" mapping="/fleet/**"/>
+	<mvc:resources location="/91gou/*" mapping="/91gou/**"/>
+	<mvc:resources location="/frontpage/*" mapping="/frontpage/**"/>
+	
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.weiye.common.interceptor.UserLoginInterceptor">
+				<property name="needLoginUrlPrefix">
+					<list>
+						<value>/user/get_self</value>
+						<value>/user/save_info</value>
+						<value>/account</value>
+						<value>/credit</value>
+						<value>/message</value>
+						<value>/consignee</value>
+						<value>/order</value>
+						<value>/alipay/recharge</value>
+						<value>/user/warehouse</value>
+						<value>/transh</value>
+					</list>
+				</property>
+				<property name="notNeedLoginUrl">
+					<list>
+					
+						<value>/user/reset_email_pwd</value>
+						<value>/user/reset_pwd</value>
+						<value>/user/reset_pwd2</value>
+						<value>/route/search</value>
+						<value>/route/kuaidi100</value>
+						<value>/route/guest</value>
+						<value>/route/get_by_guest</value>
+						<value>/route/get_by_guest_from_meitao</value>
+						<value>/route/get_by_guest_from_dcs</value>
+						<value>/alipay/rechargeSuccessNotifyUrl</value>
+						<value>/call_order/add</value>
+						<value>/order/modify_cardid</value>
+						<value>/message/guest</value>
+						<value>/route/orders</value>
+						
+					</list>
+				</property>
+			</bean>
+		</mvc:interceptor>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.weiye.common.interceptor.EmployeeLoginInterceptor">
+				<property name="needLoginUrlPrefix">
+					<list>
+						<value>/admin</value>
+					</list>
+				</property>
+				<property name="notNeedLoginUrl">
+					<list>
+						<value>/admin/emp/login</value>
+						<value>/admin/emp/logout</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:interceptor>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.weiye.common.interceptor.AuthorityInterceptor">
+				<property name="needLoginUrl">
+					<list>
+						<!-- <value>/add</value> -->
+					</list>
+				</property>
+				<property name="adminNeedLoginUrl">
+					<list>
+						<!-- <value>/del</value> -->
+					</list>
+				</property>
+			</bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<bean id="messageAdapter"
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<!-- Support JSON -->
+				<bean
+					class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+	<bean id="exceptionMessageAdapter"
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver">
+		<property name="messageConverters">
+			<list>
+				<!-- Support JSON -->
+				<bean
+					class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="org.springframework.http.converter.StringHttpMessageConverter">
+					<property name="supportedMediaTypes">
+						<list>
+							<value>application/json;charset=UTF-8
+							</value>
+							<value>text/plain;charset=UTF-8</value>
+							<value>text/html;charset=UTF-8</value>
+							<value>application/xml;charset=UTF-8
+							</value>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+</beans>

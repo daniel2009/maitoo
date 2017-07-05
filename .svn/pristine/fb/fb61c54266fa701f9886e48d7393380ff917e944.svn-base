@@ -1,0 +1,33 @@
+﻿$('#cnBtn').click(function () {
+
+    changeLanguageToCn();
+});
+$('#enBtn').click(function () {
+
+    changeLanguageToEn();
+
+
+});
+
+function changeLanguageToCn() {
+    $.ajax({
+        url: "/api/changelanguageapi/ChangeLanguageToCn",
+        type: 'post',
+
+        contentType: 'application/json',
+        success: function (result) {
+            location.reload();
+        }
+    });
+}
+function changeLanguageToEn() {
+    $.ajax({
+        url: "/api/changelanguageapi/ChangeLanguageToEn",
+        type: 'post',
+
+        contentType: 'application/json',
+        success: function (result) {
+            location.reload();
+        }
+    });
+}

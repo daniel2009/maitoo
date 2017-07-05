@@ -1,0 +1,202 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <style type="text/css">
+        .ui-jqgrid-view > .ui-jqgrid-titlebar {
+            display: block;
+        }
+
+        .ui-jqgrid tr.ui-row-ltr td, .ui-jqgrid tr.ui-row-rtl td {
+            border-bottom: 1px solid #E1E1E1;
+            padding: 6px 4px;
+            border-color: #E1E1E1;
+        }
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">自助打单管理</a>
+                </li>
+
+                <li>
+                    <a href="#">海关单号</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content" id="divGrid">
+            <div class="row">
+                <div style="margin-top: 10px; margin-bottom:0px; color:blue" class="well well-sm">
+                    <span>导入汇通单号</span>
+                </div>
+            </div>
+            <div class="row toolrow" style="border:1px solid #ccc; border-bottom:0px;  padding-top:15px; background:#fafafa">
+                <div class="col-xs-12">
+                    <form id="import_seanumber_ex_form" action="/admin/huitong_number/import_huitongnumber" method="post" enctype="multipart/form-data">
+                        <fieldset>
+                            <p>
+                                <label style="display: inline;">汇通文件表格：</label>
+                                <input type="file" name="file" class="text-input">
+
+                                <button type="submit" class="btn btn-primary btn-sm"  onclick="importExcel()">
+                                    <span class=" icon-cloud-upload" ></span>
+                                    导入汇通单号
+                                </button>
+                                &nbsp;&nbsp;<span style="color:red"> 第一列即为要导入的单号</span>
+                            </p>
+
+
+                        </fieldset>
+                        <div class="clear"></div>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="row toolrow" id="divAdvanceSearch" style="border:1px solid #ccc">
+                <div class="col-xs-12" style="padding:10px 5px 0px;">
+                    <div style="float:left;margin-top:-5px">
+                        <a href="#" class="btn btn-yellow" style="padding:0px 3px;">
+                            <i class=" icon-check-empty"></i>
+                            未用单号
+                            <span class="badge badge-warning badge-right" id="unUsedOrderIdNum">0</span>
+                        </a>
+                        <a href="#" class="btn btn-yellow" style="padding:0px 3px;">
+                            <i class=" icon-check"></i>
+                            已用单号
+                            <span class="badge badge-warning badge-right" id="usedOrderIdNum">0</span>
+                        </a>
+                    </div>
+
+                    <div style="float:right">
+                        <label for="orderid" class="control-label width60px">汇通单号:</label>
+                        <input name="orderid" id="orderid" placeholder="关键字">
+
+                        &nbsp; 类型：
+                        <select id="stateSelect" class="table-selectheight" name="state" onchange="javascript: $('#btnAdvanceSearch').click();" style="width:120px">
+
+                            <option value=""> 请选择状态 </option>
+                            <option value="0">未用单号</option>
+                            <option value="1">已用单号</option>
+
+                        </select>
+                        <button type="button" class="btn btn-purple btn-sm" id="btnAdvanceSearch">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            搜索
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div style="clear:both">
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-xs-12">
+
+                    <!-- PAGE CONTENT BEGINS -->
+                    <table id="yundangrid-table"></table>
+                    <div id="yundangrid-pager"></div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+
+    <!--开关插件-->
+
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <!--表单验证插件-->
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+    <script src="../resources/js/jquery.form.js"></script>
+
+    <script src="../resources/scripts/common.js"></script>
+    <script src="../resources/scripts/huitongguanli.js"></script>
+</body>
+</html>

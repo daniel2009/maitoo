@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.FlyInfoDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.FlyInfo">
+		<id column="id" property="id" javaType="String" />
+		<result column="flightno" property="flightno" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="warehouse_Id" property="warehouseId" javaType="String" />
+		
+	</resultMap>
+
+	<insert id="insertFlyInfo" parameterType="com.meitao.model.FlyInfo"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		flyinfo(flightno,state,create_date,modify_date,remark,warehouse_Id)
+		values(#{flightno},#{state},#{createDate},#{modifyDate},#{remark},#{warehouseId})
+	</insert>
+	<select id="getAll" resultMap="basic_result_map">
+		select * from flyinfo
+	</select>
+	<select id="getById" parameterType="java.lang.String" resultMap="basic_result_map">
+		select * from flyinfo where id=#{id}
+	</select>
+
+	<select id="getByflightno" parameterType="java.lang.String" resultMap="basic_result_map">
+		select * from flyinfo where flightno=#{flightno}
+	</select>
+	
+	<select id="countOfSearchKeys" resultType="java.lang.Integer">
+		select count(distinct `flyinfo`.id) 
+		from `flyinfo`
+		<where>
+			<if test="flightno!=null and flightno!=''">
+				`flyinfo`.flightno like #{flightno}		
+			</if>
+			<if test="key!=null and key!=''">
+				and (`flyinfo`.flightno like #{key} or `flyinfo`.remark like #{key}) 
+			</if>
+			<if test="sdate!=null and sdate!=''">
+				and `flyinfo`.`create_date` <![CDATA[>=]]>
+				#{sdate}
+			</if>
+			<if test="edate!=null and edate!=''">
+				and `flyinfo`.`create_date` <![CDATA[<=]]>
+				#{edate}
+			</if>
+			<if test="state!=null and state!=''">
+				and `flyinfo`.`state`=#{state}
+			</if>
+			<if test="storeId!=null and storeId!=''">
+			and `warehouse_Id`=#{storeId}	
+		</if>	
+		</where>
+	</select>
+	<select id="searchByKeys" resultMap="basic_result_map">
+		select distinct `flyinfo`.* 
+		from `flyinfo`
+		<where>
+			<if test="flightno!=null and flightno!=''">
+				`flyinfo`.flightno like #{flightno}		
+			</if>
+			<if test="key!=null and key!=''">
+				and (`flyinfo`.flightno like #{key} or `flyinfo`.remark like #{key})
+			</if>
+			<if test="sdate!=null and sdate!=''">
+				and `flyinfo`.`create_date` <![CDATA[>=]]>
+				#{sdate}
+			</if>
+			<if test="edate!=null and edate!=''">
+				and `flyinfo`.`create_date` <![CDATA[<=]]>
+				#{edate}
+			</if>
+			<if test="state!=null and state!=''">
+				and `flyinfo`.`state`=#{state}
+			</if>
+			<if test="storeId!=null and storeId!=''">
+			and `warehouse_Id`=#{storeId}	
+		</if>	
+		</where>
+		order by `flyinfo`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+	
+	<update id="updateFlyInfo" parameterType="com.meitao.model.FlyInfo">
+		update flyinfo
+		set
+		remark=#{remark}, modify_date=#{modifyDate}
+		<if test="state!=null and state!=''">
+				,state=#{state}
+	    </if>
+		where flightno=#{flightno}
+	</update>
+	
+
+	
+	<delete id="deleteFlyInfoById">
+		delete from flyinfo
+		where id =#{id}
+	</delete>
+	
+</mapper>

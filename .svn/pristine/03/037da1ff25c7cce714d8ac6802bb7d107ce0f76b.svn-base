@@ -1,0 +1,188 @@
+package com.weiye.common.util;
+
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.MemoryCacheImageInputStream;
+
+import jxl.common.Logger;
+
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+public class UploadUtil {
+	private static final Logger log = Logger.getLogger(UploadUtil.class);
+	private static final String SMALL_FLAG = "small";
+	/**
+	 * 
+	 * @param file
+	 * @param savePackage
+	 * @param realPath
+	 * @param maxSize
+	 * @param type multiple type separate by ";"
+	 * @param compress if larger than maxWidth compress a new small picture?
+	 * @param maxWidth the size length of the picture
+	 * @return 
+	 * 	String of fileName which can save in database when success
+	 * 	Chinese message which without "." when fail and exception
+	 * 	String of "noFile." when no file
+	 */
+	public static String uploadFile(MultipartFile file, String savePackage, String realPath, long maxSize, String type, boolean compress, int maxWidth){
+		String fileName = ".noFile";
+		String smallFileName = "";
+		long size = file.getSize();
+		if(file != null && size > 0){
+			if(size > maxSize){
+				return "文件过大，请更换";
+			}
+			String originalName = file.getOriginalFilename();
+			if(!StringUtil.boolpicisgoodornot(originalName, type)){
+				return "上传图片文件格式不对,请重新尝试";
+			}
+			String random1 = StringUtil.generateRandomString(5);
+			String random2 = StringUtil.generateRandomInteger(5);
+			if(compress){
+				smallFileName = savePackage + SMALL_FLAG+ random1 + random2 + originalName;
+			}
+			fileName = savePackage + random1 + random2 + originalName;
+			boolean compressed = false;
+			try{
+				if(compress){
+					compressed = compressImage(file, realPath + smallFileName, maxWidth);
+				}
+				File newFile = new File(realPath + fileName);
+				file.transferTo(newFile);
+				if(compressed){
+					return smallFileName;
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+				log.error("file transfer fail", e);
+				return "保存上传图片文件出错";
+			}
+		}
+		return fileName;
+	}
+	public static boolean compressImage(MultipartFile file, String realFileName, int max) throws IOException{
+		boolean compressed = false;
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(file.getBytes());
+		MemoryCacheImageInputStream memoryCacheImageInputStream = new MemoryCacheImageInputStream(byteArrayInputStream);
+		Image image = ImageIO.read(memoryCacheImageInputStream);
+		int width = image.getWidth(null);
+		int height = image.getHeight(null);
+		if(width > max || height > max){
+			if(width > height){
+				height = (int) (height * max/width);
+				width = max;
+			}else{
+				width = (int) (width * max/height);
+				height = max;
+			}
+			BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+			bufferedImage.getGraphics().drawImage(image, 0, 0, width, height, null);
+			File newFile = new File(realFileName);
+			ImageIO.write(bufferedImage, "png", newFile);
+			compressed = true;
+		}
+		return compressed;
+		
+	}
+	/**
+	 * if picture compressed, the file name save in database will be the small one, this method will get the original size picture url
+	 * @param smallImageName the file name with "small" in database
+	 * @return the url of original picture
+	 */
+	public static String getOriginalImageName(String smallImageName){
+		int flagIndex = smallImageName.lastIndexOf(SMALL_FLAG);
+		if(flagIndex > -1){
+			StringBuffer stringBuffer = new StringBuffer(smallImageName);
+			stringBuffer.delete(flagIndex, flagIndex + SMALL_FLAG.length());
+			return stringBuffer.toString();
+		}else{
+			return null;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * @param files
+	 * @return if one of files has file
+	 */
+	public static boolean hasFile(MultipartFile ...files){
+		for(MultipartFile file : files){
+			if(file != null && file.getSize() > 0){
+				return true;
+			}
+		}
+		return false;
+	}
+	/**
+	 * is the fileUrl has text or comes from
+	 * @param fileUrls
+	 * @return
+	 */
+	public static boolean isFileUrl(String ...fileUrls){
+		for(String fileUrl : fileUrls){
+			if(null != fileUrl && StringUtils.hasText(fileUrl) && fileUrl.indexOf(".")>0){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * sort files, put real file in front, instead of null
+	 * @param files
+	 */
+	public static void sortFile(MultipartFile ...files){
+		int j = files.length -1;
+		for(int i = 0; i < files.length; i++){
+			if(j > i){
+				if(files[i] == null || files[i].getSize() <= 0){
+					for(; j > i; j--){
+						if(files[j] != null && files[j].getSize() > 0){
+							MultipartFile temp = files[i];
+							files[i] = files[j];
+							files[j] = temp;
+						}
+					}
+				}
+			}else{
+				break;
+			}
+		}
+	}
+	/**
+	 * if upload has exception , the exception message will save in first
+	 * @param savePackage
+	 * @param realPath
+	 * @param maxSize
+	 * @param type
+	 * @param compress
+	 * @param maxWidth
+	 * @param files
+	 * @return
+	 */
+	public static String[] uploadFile(String savePackage, String realPath, long maxSize, String type, boolean compress, int maxWidth, MultipartFile ...files){
+		UploadUtil.sortFile(files);
+		return UploadUtil.uploadFileWithoutSort(savePackage, realPath, maxSize, type, compress, maxWidth, files);
+	}
+	public static String[] uploadFileWithoutSort(String savePackage, String realPath, long maxSize, String type, boolean compress, int maxWidth, MultipartFile ...files){
+		String[] fileNames = new String[files.length];
+		for(int i = 0; i< files.length; i++){
+			String fileName = UploadUtil.uploadFile(files[i], savePackage, realPath, maxSize, type, compress, maxWidth);
+			if(fileName.indexOf(".") < 0){//if exception
+				fileNames[0] = fileName;
+				break;
+			}else{
+				fileNames[i] = fileName;
+			}
+		}
+		return fileNames;
+	}
+}

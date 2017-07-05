@@ -1,0 +1,77 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">门店运单支付
+			<!-- <a  href="#" id="a_back_msj_order_list_link">返回列表</a> -->
+				
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">门店运单支付</div>
+			<div class="content_text">
+			
+		
+				<div class="tab-content" id="tab2">
+					<input type="hidden" name="id" value="${param.id }"/>
+					<input type="hidden" name="oid" value="${param.oid }"/>
+					<input type="hidden" name="type" value="${param.type }"/>
+					<input type="hidden" name="printtype" value="${param.printtype }"/>
+					
+		            <fieldset >
+		            	<p>
+			              <label style="display: inline;">运单编号：</label>
+			              <label style="display: inline;" id="oid">${param.oid }</label>
+			            </p>
+			            <p>
+			              <label style="display: inline;">用户名：</label>
+			              <label style="display: inline;" id="pay_nick_name"></label>
+			              <label style="display: none;" id="real_name"></label>
+			            </p>
+			            <p id="p_pay_balance">
+			              <label style="display: inline;">帐户余额：</label>
+			              <label style="display: inline;" id="pay_balance"></label>
+			            </p>
+			            <p id="p_pay_total">
+			              <label style="display: inline;">订单总额：</label>
+			              <label style="display: inline;" id="pay_total_money"></label>
+			            </p>
+			            <p id="p_pay_way">
+			            	<label style="display: inline;">支付方式：</label>
+			            	<select name="type">
+			            		<option value="0" selected="selected">帐户余额扣款</option>
+			            		<option value="1">现金支付</option>
+			            	</select>
+			            </p>
+			            <p style="margin-left: 50px;" id="p_pay_submit">
+			              <input id="pay_submit" class="button" type="submit" value="支付" />
+			              
+			            </p>
+		            </fieldset>
+		            <p id="p_print_order" style="display:none">
+		             <input id="print_a4_order" class="button" type="submit" value="A4打印" />
+		             <input id="print_order" class="button" type="submit" value="热敏(4x6)打印" />
+			         <input id="bt_back_msj_order_list" class="button" type="submit" value="返回列表" />
+			         <input id="bt_back_add_msj_order_list" class="button" type="submit" value="继续添加运单" />
+		            </p>
+		             <p id="p_print_empty_order" style="display:none">
+		             <input id="print_empty_order" class="button" type="submit" value="打印" />
+			         <input id="bt_back_empty_order_list" class="button" type="submit" value="返回空运单列表" />
+		            </p>
+		            <div class="clear"></div>
+		        </div>
+			</div>
+		</div>
+		</div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav543Data();
+	});
+</script>
+</html>

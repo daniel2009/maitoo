@@ -1,0 +1,243 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="renling_id" value="${param.id }" />
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">修改认领包裹
+			<a href="#" id="a_back_renling_list_link" class="button">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">修改认领包裹</div>
+			<div class="content_text">
+		
+				<div class="tab-content" id="tab2">
+		          
+		          <form action="" id="modify_form_renling" method="post" enctype="multipart/form-data">
+		          <input type="hidden" name="modifyid" value="" />
+		            <fieldset>
+		            <p>
+								<label class="cllabel" style="padding: 0px">认领单号：</label> <label
+									class="vallabel" style="padding: 0px;color:red;" id="t_id">${param.id }</label>
+								 <label class="cllabel" style="padding: 0px">录入员工：</label>
+								<label class="vallabel" style="padding: 0px;color:red;" id="u_name">&nbsp;</label>
+								<label class="cllabel" style="padding: 0px">所属仓库：</label> <label
+									class="vallabel" style="padding: 0px;color:red;" id="u_warehouse">&nbsp;</label>
+									
+								<br />
+						</p>
+						<p>		
+								<label class="cllabel" style="padding: 0px">当前状态：</label> <label
+									class="vallabel" style="padding: 0px;color:red;" id="u_state">&nbsp;</label>
+								<label class="cllabel" style="padding: 0px">认领人：</label> <label
+									class="vallabel" style="padding: 0px;color:red;" id="u_user_no">&nbsp;</label>
+								<label class="cllabel" style="padding: 0px">认领转运号：</label> <label
+									class="vallabel" style="padding: 0px;color:red;" id="u_tran_no">&nbsp;</label>
+									<br />
+							</p>
+		             
+			            <p>
+			            <hr />
+			              <label class="cllabel">认领状态：</label>			            
+			          <select name="renling_state" class="text-input" onclick="state_click()">
+									<option value="-1" selected="selected" >请选择状态</option>
+									<option value="0">未认领</option>
+					              	<option value="1">已认领</option>
+					              	<option value="2">已失效</option>
+					            </select>
+					            </p>
+			            <div id="show_renlinginfo" style="display:none;">
+			            <hr />
+			            <input type="hidden" name="renlingPersonId" value="" />
+			            <h4 style="color:red;">认领人信息(只有"已认领"状态需要填写)：</h4>
+			           <p id="showphone">
+			              <label class="cllabel"><span style="color:blue;">认领人电话：</span></label>
+			              <input class="text-input small-input" type="text" name="phone" maxlength="16"/><span class="gl_message">*</span>
+			            </p>
+			            <p id="showusername">
+			              <label class="cllabel"><span style="color:blue;">认领人姓名：</span></label>
+			              <input class="text-input small-input" type="text" name="username" maxlength="16"/><span class="gl_message">*</span>
+			            </p>
+			             <p id="showuserremark">
+			              <label class="cllabel"><span style="color:blue;">认领备注：</span></label>
+			              <textarea rows="2" cols="10" class="text-input textarea wysiwyg" name="userremark"></textarea>
+			            </p>
+			            <p>
+			              <label class="cllabel"><span style="color:blue;">证据图1预览：</span></label>
+			              <a href="" target="_blank" id="p_showpic1"><img width="150px"
+										height="150px" src=""></a>
+										
+								
+
+								<label style="display: inline;"> <span style="color:blue;">上传新图片1：</span> </label> 
+							
+			              
+			              <input id="p_file1" name="p_file1" type="file" />
+			              <input type="hidden" name="p_file_1" value="" />
+			              <input type="button" name="p_file_1_clean" value="清除图1" onclick="p_clear_pic1()" />
+			              
+			             </p>
+			             <p>
+			              <label class="cllabel"><span style="color:blue;">证据图2预览：</span></label>
+			              <a href="" target="_blank" id="p_showpic2"><img width="150px"
+										height="150px" src=""></a>
+										
+								
+
+								<label style="display: inline;"> <span style="color:blue;">上传新图片2：</span> </label> 
+							
+			              
+			              <input id="p_file2" name="p_file2" type="file" />
+			              <input type="hidden" name="p_file_2" value="" />
+			              <input type="button" name="p_file_2_clean" value="清除图2" onclick="p_clear_pic2()" />
+			              
+			             </p>
+			             <p>
+			              <label class="cllabel"><span style="color:blue;">证据图3预览：</span></label>
+			              <a href="" target="_blank" id="p_showpic3"><img width="150px"
+										height="150px" src=""></a>
+										
+								
+
+								<label style="display: inline;"> <span style="color:blue;">上传新图片3：</span> </label> 
+							
+			              
+			              <input id="p_file3" name="p_file3" type="file" />
+			              <input type="hidden" name="p_file_3" value="" />
+			              <input type="button" name="p_file_3_clean" value="清除图3" onclick="p_clear_pic3()" />
+			              
+			             </p>
+			             <p>
+			              <label class="cllabel"><span style="color:blue;">证据图4预览：</span></label>
+			              <a href="" target="_blank" id="p_showpic4"><img width="150px"
+										height="150px" src=""></a>
+										
+								
+
+								<label style="display: inline;"> <span style="color:blue;">上传新图片4：</span> </label> 
+							
+			              
+			              <input id="p_file4" name="p_file4" type="file" />
+			              <input type="hidden" name="p_file_4" value="" />
+			              <input type="button" name="p_file_4_clean" value="清除图4" onclick="p_clear_pic4()" />
+			              
+			             </p>
+			             <p>
+			              <label class="cllabel"><span style="color:blue;">证据图5预览：</span></label>
+			              <a href="" target="_blank" id="p_showpic5"><img width="150px"
+										height="150px" src=""></a>
+										
+								
+
+								<label style="display: inline;"> <span style="color:blue;">上传新图片5：</span> </label> 
+							
+			              
+			              <input id="p_file5" name="p_file5" type="file" />
+			              <input type="hidden" name="p_file_5" value="" />
+			              <input type="button" name="p_file_5_clean" value="清除图5" onclick="p_clear_pic5()" />
+			              
+			             </p>	
+			             <hr />
+			            </div>
+			            
+			           
+			            <p>
+			              <label class="cllabel">包裹单号：</label>
+			              <input class="text-input small-input" type="text" name="baoguoId" maxlength="16"/><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label class="cllabel">快递公司：</label>
+			              <input class="text-input small-input" type="text" name="company" maxlength="36"/>
+			            </p>
+			           <p>
+			              <label class="cllabel">接收人姓名：</label>
+			              <input class="text-input small-input" type="text" name="revName" maxlength="36"/>
+			            </p>
+			         
+			          
+			           
+			           
+			            <p>
+			              <label class="cllabel">接收人电话：</label>
+			              <input class="text-input small-input" type="text" name="baoguoPhone"maxlength="16" />
+			            </p>
+			            <p>
+			             <label class="cllabel">认领标题：</label>
+			              <input class="text-input medium-input" type="text" name="title" maxlength="46"/><span class="gl_message">*</span>
+			            </p>         			            
+			            <p>
+			              <label class="cllabel">认领内容描述：</label>
+			              <textarea rows="4" cols="10" class="text-input textarea wysiwyg" name="content"></textarea>
+			              <span class="gl_message">*</span>
+			            </p>
+			            
+			             <p>
+			              <label class="cllabel">图片1预览：</label>
+			              <a href="" target="_blank" id="showpic1"><img width="150px"
+										height="150px" src=""></a>
+										
+								
+
+								<label style="display: inline;"> 上传新图片1： </label> 
+							
+			              
+			              <input id="file1" name="file1" type="file" />
+			              <input type="hidden" name="file_1" value="" />
+			              <input type="button" name="file_1_clean" value="清除图1" onclick="clear_pic1()" />
+			              
+			             </p>	
+			                 <p>
+			              <label class="cllabel">图片2预览：</label>
+			              <a href="" target="_blank" id="showpic2"><img width="150px"
+										height="150px" src=""></a>
+										
+								
+
+								<label style="display: inline;"> 上传新图片2： </label> 							
+			              <input id="file2" name="file2" type="file" />
+			              <input type="hidden" name="file_2" value="" />
+			              <input type="button" name="file_2_clean" value="清除图2" onclick="clear_pic2()" />
+			            </p>	
+			                 <p>
+			              <label class="cllabel">图片3预览：</label>
+			              <a href="" target="_blank" id="showpic3"><img width="150px"
+										height="150px" src=""></a>
+										
+								
+
+								<label style="display: inline;"> 上传新图片3： </label> 
+							
+			     
+			              <input id="file3" name="file3" type="file" /> 
+			           <input type="hidden" name="file_3" value="" />
+			           <input type="button" name="file_3_clean" value="清除图3" onclick="clear_pic3()" />
+			           <br><span class="gl_message">*</span><small>(注意：支持JPG，PNG，BMP等图片格式的图片，最大不超过4MB,并且至少包含1张图片)</small>
+			            </p>	
+			            
+			            <p style="margin-left: 50px;">
+			              <input id="bt_modify_renlingbaoguo" class="button" type="submit" value="提交" />
+			              <input class="button" type="reset" value="重置">
+			            </p>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+		</div>
+		
+		<div id="tmpmsgdiv1" style="display:none;"></div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNavRL02Data();
+	});
+</script>
+</html>

@@ -1,0 +1,216 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>物流仓储管理系统</title>
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap-responsive.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/theme.css">
+    <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/common.css">
+	<link rel="stylesheet" type="text/css" href="stylesheets/user.css">
+<!--    <link rel="stylesheet" type="text/css" href="stylesheets/dialog.css">-->
+	<link rel="stylesheet" type="text/css" href="stylesheets/jqmodal.css">
+    
+
+    <script src="lib/jquery-1.8.1.min.js" type="text/javascript"></script>
+
+    <!-- Demo page code -->
+    
+    <style type="text/css">
+        #line-chart {
+            height:300px;
+            width:800px;
+            margin: 0px auto;
+            margin-top: 1em;
+        }
+        .brand { font-family: georgia, serif; }
+        .brand .first {
+            color: #ccc;
+            font-style: italic;
+        }
+        .brand .second {
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="javascripts/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <!--[if lt IE 7 ]> <body class="ie ie6"> <![endif]-->
+  <!--[if IE 7 ]> <body class="ie ie7"> <![endif]-->
+  <!--[if IE 8 ]> <body class="ie ie8"> <![endif]-->
+  <!--[if IE 9 ]> <body class="ie ie9"> <![endif]-->
+  <!--[if (gt IE 9)|!(IE)]><!--> 
+  <body> 
+  <!--<![endif]-->
+
+
+        <div class="span9">
+            <script type="text/javascript" src="lib/jqplot/jquery.jqplot.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="javascripts/graphDemo.js"></script>
+
+
+<div class="block">
+        <p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">投诉管理</p>
+    
+      
+<!--<h1 class="page-title">包裹预报</h1>-->
+
+
+  <table class="optable">
+        <tr>
+            <td>
+                <label>用户名：</label>
+                <input name="ctl00$MainHolder$shippingNotb" type="text" id="ctl00_MainHolder_shippingNotb" class="normaltb" onfocus="this.className='focustb';" onblur="this.className='normaltb';" size="30" style="width:120px;" />
+            </td>
+            <td>
+                <label>投诉时间：</label>
+                <input name="ctl00$MainHolder$starttimetb" type="text" id="ctl00_MainHolder_starttimetb" class="normaltb" onfocus="this.className='focustb';" onblur="this.className='normaltb';" size="30" style="width:100px;" />
+                
+            </td>
+        </tr>
+        <tr>
+             <td>
+                <label>投诉状态：</label>
+                <select name="ctl00$MainHolder$statusdpl" id="ctl00_MainHolder_statusdpl" class="normaldpl" style="width:100px;">
+	<option selected="selected" value="0">全部</option>
+	<option value="1">未解决</option>
+	<option value="2">已解决</option>
+
+
+</select>
+            </td>
+            <td>
+                <label>投诉仓库：&nbsp;&nbsp;</label>
+                <select name="ctl00$MainHolder$warehousedpl" id="ctl00_MainHolder_warehousedpl" class="normaldpl">
+	<option selected="selected" value="0">请选择</option>
+	<option value="1">本站主仓库</option>
+	<option value="3">日本仓库</option>
+	<option value="2">欧洲仓库</option>
+
+</select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <label>投诉原因：&nbsp;&nbsp;</label><input name="ctl00$MainHolder$goodsNametb" type="text" id="ctl00_MainHolder_goodsNametb" class="normaltb" onfocus="this.className='focustb';" onblur="this.className='normaltb';" size="30" style="width:300px;" />
+                <input type="submit" name="ctl00$MainHolder$searchbtn" value="提交退款" id="ctl00_MainHolder_searchbtn" class="combtn" />
+              
+            </td>
+        </tr>
+    </table>
+    <div id="LogTab"><span class="current"><a href="kucunliebiao.html">投诉记录</a></span></div>
+    <div>
+	<table class="datav" cellspacing="0" rules="all" border="1" id="ctl00_MainHolder_cgv" style="border-collapse:collapse;">
+		<tr>
+			<th align="center" scope="col" style="width:30px;">
+                    <input id="CheckAll" type="checkbox" />
+                </th><th scope="col">用户名</th><th scope="col">投诉时间</th><th scope="col">投诉状态</th><th scope="col">投诉仓库</th><th scope="col">投诉原因</th>
+		</tr><tr>
+			<td align="center">
+                    <input id='check15' rel='15' type="checkbox" />
+                </td><td>
+                    <a href="purchase_detail.aspx?id=15">DG20150804001</a>
+                </td><td>
+                    Express-
+                        1231
+                </td><td>
+                    未解决
+                </td><td>
+                    本站主仓库
+                </td><td class="tit">
+                    
+                </td>
+		</tr><tr>
+			<td align="center">
+                    <input id='dis10' rel='10' type="checkbox" disabled="disabled" />
+                </td><td>
+                    <a href="purchase_detail.aspx?id=10">F-150713001</a>
+                </td><td>
+                    DHL-
+                        79879887
+                </td><td>
+                   已解决
+                </td><td>
+                    本站主仓库
+                </td><td class="tit">
+                    874
+                </td>
+		</tr><tr>
+			<td align="center">
+                    <input id='check8' rel='8' type="checkbox" />
+                </td><td>
+                    <a href="purchase_detail.aspx?id=8">F-150711001</a>
+                </td><td>
+                    DHL-
+                        235235235
+                </td><td>
+                   未解决
+                </td><td>
+                    本站主仓库
+                </td><td class="tit">
+                    124125
+                </td>
+		</tr>
+	</table>
+</div>
+    <div class="itemR">
+        <ul id="ctl00_MainHolder_Pager1" class="Pager">
+
+</ul>
+    </div>
+    <div class="blank"></div>
+    <input type="hidden" name="ctl00$MainHolder$idstb" id="ctl00_MainHolder_idstb" />
+    <div id="ctl00_MainHolder_delDIV" class="itemR">
+        <input type="submit" name="ctl00$MainHolder$delbtn" value="删除" onclick="javascript:aaaaaaaa();" id="ctl00_MainHolder_delbtn" class="combtn" />
+    </div>
+    <script language="javascript" type="text/javascript">            setCurrent('forecast_list.aspx');</script>
+
+      </div>
+      <div class="blank10"></div>
+    </div>
+    
+
+
+    
+    <footer>
+        <hr>
+        
+        <p class="pull-right">Collect from <a href="#" title="网页模板" target="_blank">物流仓储管理系统</a> </p>
+        
+        
+      <!--  <p>&copy; 2015 <a href="#"></a></p>-->
+    </footer>
+    
+
+    
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="lib/bootstrap/js/bootstrap.js"></script>
+  
+
+  </body>
+</html>
+
+

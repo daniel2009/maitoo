@@ -1,0 +1,289 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <style type="text/css">
+        .ui-jqgrid-view > .ui-jqgrid-titlebar {
+            display: block;
+        }
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">新闻公告管理</a>
+                </li>
+
+                <li>
+                    <a href="#">新闻管理</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content" id="divGrid">
+           
+
+            <div class="row toolrow" id="divAdvanceSearch" style="border:1px solid #ccc">
+                <div class="col-xs-12" style="padding:3px 5px 0px;">
+                    <div style="float:left">
+                        <button type="button" class="btn btn-yellow btn-sm" id="btnAdd">
+                            <span class="icon-pencil"></span>
+                            添加新闻
+                        </button>
+                    </div>
+                    <div style="float:right">
+                        搜索内容：
+                        <select name="column" class="table-selectheight" style="width:130px;margin-left:5px">
+                            <option value="0">
+                                新闻标题
+                            </option>
+                            <option value="1">
+                                新闻内容
+                            </option>
+                            <option value="2">
+                                发布人
+                            </option>
+                        </select>
+                        <input name="key" id="keyword" placeholder="关键字">
+                        <button type="button" class="btn btn-purple btn-sm" id="btnAdvanceSearch">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            搜索
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div style="clear:both">
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-xs-12">
+
+                    <!-- PAGE CONTENT BEGINS -->
+                    <table id="yundangrid-table"></table>
+                    <div id="yundangrid-pager"></div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content" id="divAdd" style="display:none">
+
+           
+            <div class="row" >
+                <div class="col-xs-12">
+                    <form class="form" action="/admin/news/add" enctype="multipart/form-data">
+
+                        <table class="table table-bordered  table-striped table-condensed ">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        添加新闻
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+
+                                <tr>
+                                    <td class="name">
+                                        新闻标题：
+                                    </td>
+                                    <td class="value">
+                                        <input name="title" type="text" placeholder="必填项" />
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        新闻内容：
+                                    </td>
+                                    <td class="value">
+                                        <textarea style="width:85%; height:400px;" name="content" placeholder="必填项"></textarea>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+                                    <td class="name">
+                                        新闻图片：
+                                    </td>
+                                    <td class="value">
+                                        <input name="picture1" placeholder="" type="file" />
+                                    </td>
+                                </tr>
+
+
+                            </tbody>
+                        </table>
+
+                        <div class="clearfix form-buttons">
+                            <label class="control-label col-md-5"></label>
+                            <button type="submit" class="btn btn-success btn-sm" id="btnAddSave"><i class="glyphicon glyphicon-ok"></i><strong>添加</strong></button>
+                            <button type="button" class="cancel btn btn-sub btn-sm btn-warning"><i class="glyphicon glyphicon-remove"></i><strong>返回列表</strong></button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content" id="divEdit" style="display:none">
+
+         
+            <div class="row" >
+                <div class="col-xs-12">
+
+                    <form class="form" action="/admin/news/modify" enctype="multipart/form-data">
+                        <input name="id" type="hidden" placeholder="" />
+                        <table class="table table-bordered  table-striped table-condensed ">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        修改新闻
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+
+                                <tr>
+                                    <td class="name">
+                                        新闻标题：
+                                    </td>
+                                    <td class="value">
+                                        <input name="title" type="text" placeholder="必填项" />
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        新闻内容：
+                                    </td>
+                                    <td class="value">
+                                        <textarea style="width:85%; height:400px;" name="content" placeholder="必填项"></textarea>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+                                    <td class="name">
+                                        新闻图片：
+                                    </td>
+                                    <td class="value">
+                                        <a id="picA" href="#" target="_blank">  <img src="" style="width:300px; height:100px" /></a> 
+                                        <input name="picture1" placeholder="" type="file" />
+                                    </td>
+                                </tr>
+
+
+                            </tbody>
+                        </table>
+<input type="hidden" name="pic1"/>
+                        <div class="clearfix form-buttons">
+                            <label class="control-label col-md-5"></label>
+                            <button type="submit" class="btn btn-success btn-sm" id="btnAddSave"><i class="glyphicon glyphicon-ok"></i><strong>保存修改</strong></button>
+                            <button type="button" class="cancel btn btn-sub btn-sm btn-warning"><i class="glyphicon glyphicon-remove"></i><strong>返回列表</strong></button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+
+    <!--开关插件-->
+
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <!--表单验证插件-->
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+    <script src="../resources/js/jquery.form.js"></script>
+
+    <script src="../resources/scripts/common.js"></script>
+    <script src="../resources/scripts/newsguanli.js"></script>
+</body>
+</html>

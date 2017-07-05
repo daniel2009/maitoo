@@ -1,0 +1,360 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <style type="text/css">
+        .page-content thead tr {
+            height: 40px;
+            line-height: 40px;
+            font: bold 16px large,400;
+        }
+
+        .page-content tbody tr {
+            height: 35px;
+        }
+
+        .page-content tbody td {
+            font-size: 14px;
+            line-height: 25px;
+        }
+
+        .page-content .name {
+            width: 120px;
+        }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            vertical-align: middle;
+            padding: 0 5px;
+        }
+
+        .btn {
+            font-size: 12px;
+        }
+
+        .btn {
+            border: 0px;
+            padding: 5px 8px;
+        }
+
+        .btn-info .badge {
+            color: #fff;
+        }
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">管理平台</a>
+                </li>
+
+                <li>
+                    <a href="#">管理台首页</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content">
+            <table class="table table-bordered  table-striped table-condensed ">
+                <thead>
+                    <tr>
+                        <th colspan="2">
+                            我的个人信息
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="name">用户信息</td>
+                        <td class="value"> 用户名：<sapn id="employeename" style='color:blue'></sapn> ,&nbsp;&nbsp;身份：<sapn id="employeetype" style='color:blue'></sapn>,&nbsp;&nbsp;所属门店：<sapn id="belongstore" style='color:blue'></sapn></td>
+                    </tr>
+                    <tr>
+                        <td class="name">登录信息</td>
+                        <td class="value"><span>上次登录时间：<sapn id="lastlogintime" style='color:blue'></sapn>，&nbsp;&nbsp;登录次数：<sapn id="lastloginNo" style='color:blue'></sapn></span> </td>
+                    </tr>
+                    <tr>
+                        <td class="name"></td>
+                        <td class="value">
+                            <a href="resetPw.html" class="btn  btn-primary " target="main">
+                                <i class="icon-edit "></i>
+                                修改密码
+                            </a>
+                            <a href="#" class="btn btn-primary" onclick="adminlogout()">
+                                <i class="icon-lock "></i>
+                                退&nbsp;&nbsp;出
+                            </a>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <table class="table table-bordered  table-striped table-condensed ">
+                <thead>
+                    <tr style="height:35px;line-height:35px;">
+                        <th colspan="2">
+                            待处理信息
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="name">待处理会员留言</td>
+                        <td class="value">
+                            <a href="#" class="btn btn-yellow">
+                                <i class="icon-comments-alt"></i>
+                                留言
+                                <span class="badge badge-warning badge-right">5</span>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="name">预报信息</td>
+                        <td class="value">
+                            <a href="#" class="btn btn-yellow">
+                                <i class="icon-bell"></i>
+                                在线置单
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                <i class="icon-bell"></i>
+                                在线置单
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="name">退货信息</td>
+                        <td class="value">
+                            <a href="#" class="btn btn-yellow">
+                                <i class=" icon-check-empty"></i>
+                                未处理
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                <i class=" icon-check"></i>
+                                已处理
+                                <span class="badge badge-warning badge-right">150</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                <i class="icon-info-sign"></i>
+                                有问题
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="name">认领信息</td>
+                        <td class="value">
+
+                            <a href="#" class="btn btn-yellow">
+                                <i class=" icon-check-empty"></i>
+                                未认领
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                <i class=" icon-check"></i>
+                                已认领
+                                <span class="badge badge-warning badge-right">150</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                <i class="icon-ban-circle"></i>
+                                已失效
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                <i class="icon-edit"></i>
+                                未审核
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="name">运单信息</td>
+                        <td class="value">
+
+                            <a href="#" class="btn btn-yellow">
+                                <i class=" icon-check-empty"></i>
+                                运单作废
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                    <i class=" icon-edit"></i>
+                                运单作废
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                <i class=" icon-check-empty"></i>
+                                运单作废
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="name">购买信息</td>
+                        <td class="value">
+
+                            <a href="#" class="btn btn-yellow">
+                                <i class=" icon-check-empty"></i>
+                                运单作废
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                <i class=" icon-info-sign"></i>
+                                有问题
+                                <span class="badge badge-warning badge-right">150</span>
+                            </a>
+                            <a href="#" class="btn btn-yellow">
+                                <i class="icon-check"></i>
+                                已完成
+                                <span class="badge badge-warning badge-right">15</span>
+                            </a>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+    <!--开关插件-->
+    <script src="../resources/bootstrap-switch/bootstrap-switch.min.js"></script>
+
+    <script src="../resources/js/fuelux/fuelux.spinner.min.js"></script>
+    <script src="../resources/scripts/common.js"></script>
+   <!--   <script src="../resources/scripts/yundanlist.js"></script>-->
+     <script type="text/javascript">
+       
+   
+   $(document).ready(function(){ 
+    //获取管理员信息
+        	$.ajax({
+        		type : "get",
+        		url : "/admin/emp/get_self",
+        		success : function(response) {
+        			var code = response.code;
+        			if (code == "200") {
+        				
+        				$("#employeename").html(response.data.account);
+        				$("#admin_user_account").html(response.data.account);
+        				
+        				if(response.data.superadmin=="1")
+        				{
+        					$("#employeetype").html("高级管理员");
+        					
+        				}
+        				else
+        				{
+        					$("#employeetype").html("普通管理员");
+        				}
+        				$("#belongstore").html(response.data.storeName);
+        				
+        			} else if ("607" == code) {
+        				alert("您尚未登录或登录已失效！");
+        				adminlogout();
+        			} else {
+        				// 失败
+        				// alert("获取仓库数据失败，原因是:" + response.message);
+        			}
+        		}
+        	});
+        	
+        		// 获取最近登录时间
+	$.get("/logininfo/get_self",
+			function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					var lastDate = response.data.lastDate;
+					var times = response.data.times;
+					
+				
+					$("#lastlogintime").html( lastDate);
+					$("#lastloginNo").html( times);
+				} else if ("607" == code) {
+					logout();
+				}
+				return false;
+			});
+			
+			 
+        	
+   });     	
+   
+
+</script>      
+</body>
+</html>

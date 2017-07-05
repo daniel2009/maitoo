@@ -1,0 +1,130 @@
+package com.weiye.controller;
+
+import java.util.Arrays;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.ErrorOrderInfoUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.model.ErrorOrderInfo;
+import com.weiye.model.Order;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.ErrorOrderInfoService;
+import com.weiye.service.OrderService;
+
+@Controller
+public class ErrorOrderController extends BasicController {
+
+	private static final long serialVersionUID = -8158555007757915055L;
+	private static final Logger log = Logger.getLogger(ErrorOrderController.class);
+
+	@Resource(name = "errorOrderInfoService")
+	private ErrorOrderInfoService errorOrderInfoService;
+	@Resource(name = "orderService")
+	private OrderService orderService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+
+	@RequestMapping(value = "/admin/error/order/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addErrorOrderInfo(HttpServletRequest request, ErrorOrderInfo info) {
+		// check the error order info
+		if (info == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		if (!ErrorOrderInfoUtil.validateContent(info.getContent())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "异常件的提交内容长度不能超多200个字符！");
+		}
+		if (!ErrorOrderInfoUtil.validateParentId(info.getParentId())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "回复异常件时候父id格式错误");
+		}
+		if (StringUtil.isEmpty(info.getParentId()) && !StringUtil.isEmpty(info.getOrderId())) {
+			// 是添加异常件，进行判断
+			info.setOrderId(info.getOrderId().toUpperCase());
+			try {
+				Order order = this.orderService.getOrderByOrderId(info.getOrderId()).getData();
+				if (order == null) {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "运单号错误，没有对应的运单数据");
+				}
+			} catch (Exception e) {
+				log.error("根据运单id获取运单信息失败", e);
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "根据指定的运单号获取运单信息出现异常");
+			}
+		}
+
+		try {
+			String empName = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+			info.setEmpName(empName);
+			return this.errorOrderInfoService.saveErrorOrderInfo(info);
+		} catch (Exception e) {
+			log.error("保存异常件信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "保存异常件信息出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/admin/error/order/del", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> deleteErrorOrderInfo(@RequestParam(value = "eid") String[] eid) {
+		if (eid == null || eid.length == 0) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			return this.errorOrderInfoService.deleteErrorOrderInfos(Arrays.asList(eid));
+		} catch (Exception e) {
+			log.error("删除异常件失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除异常件出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/admin/error/order/modify_state", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyErrorOrderInfoState(ErrorOrderInfo info) {
+		if (info == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		
+		if (StringUtil.isEmpty(info.getId())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "异常件id不能为空");
+		}
+		
+		if(StringUtil.isEmpty(info.getState())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "异常件状态值只能是0或者1，不能为空！");
+		}
+		
+		try {
+			return this.errorOrderInfoService.modifyErrorOrderInfo(info);
+		} catch (Exception e) {
+			log.error("修改运单状态失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改运单状态失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/error/order/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<ErrorOrderInfo>> searchAll(
+	        HttpServletRequest request,
+	        @RequestParam(value = "oid", required = false, defaultValue = "") String oid,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			pageIndex = Math.max(pageIndex, 1);
+			return this.errorOrderInfoService.searchByOrderId(oid, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取异常运单列表出现异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取异常运单列表出现异常!");
+		}
+	}
+}

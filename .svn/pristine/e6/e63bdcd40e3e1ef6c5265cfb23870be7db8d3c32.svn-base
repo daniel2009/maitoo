@@ -1,0 +1,152 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">添加储藏间
+			<a href="#" onclick="javascript:navStorageClick();" class="button">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">添加储藏间</div>
+			<div class="content_text">
+		
+				<div class="tab-content" id="tab2">
+		          
+		          <form action="" id="form" method="post">
+			            <p>
+			              <label class="cllabel">储藏间名称：</label>
+			              <input class="text-input small-input" type="text" id="name" name="name" maxlength="30"/>
+			            </p>
+			            <p>
+			              <label class="cllabel">门店：</label>
+			              <select class="text-input" style="width: 150px;" id="warehouseSelect" name="warehouseId" onchange="javascript: changeType($('select[name=\'type\']').val());"></select><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label class="cllabel">类型：</label>
+			              <select class="text-input" style="width: 150px;" name="type" onchange="javascript: changeType(this.value);"><option value="0">转运州仓位</option><option value="1">本地转运仓位</option><option value="2">运单归类仓位</option></select><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label class="cllabel">关联：</label>
+			              <span id="typeRelateIdSpan"></span><span class="gl_message">*</span>
+			            </p>
+						<p>
+			              <label class="cllabel">行：</label>
+			              <input class="text-input small-input" type="number" id="rowNumber" name="rowNumber" value="1" maxlength="5"  min="1" step="1" />
+			            </p>
+						<p>
+			              <label class="cllabel">列：</label>
+			              <input class="text-input small-input" type="number" id="colNumber" name="colNumber" value="1" maxlength="5" min="1" step="1" />
+						</p>
+			            <p style="margin-left: 50px;">
+			              <input class="button" type="button" value="提交" onclick="addStorage();"/>
+			              <input class="button" type="reset" value="重置">
+			            </p>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+		</div>
+		
+		<div id="tmpmsgdiv1" style="display:none;"></div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		$.ajax({
+			type : "get",
+			async : true,
+			url : "../warehouse/all",
+			success : function(response) {
+				var code = response.code;
+				if (code == '200') {
+					if (response.data != null) {
+						var str = "";
+						$.each(response.data, function() {
+							str += "<option value='" + this.id + "' >" + this.name + "</option>";
+						});
+						$("#warehouseSelect").html(str);
+						$("#typeRelateIdSpan").html("<select class='text-input' name='typeRelateId'>" + str + "</select>");
+					}
+				}
+			}
+		});
+	});
+	function addStorage(){
+		var name = $("#name").val();
+		if("" == name){
+			alert("储藏间名称不能为空");
+			return false;
+		}
+		
+	
+		$.ajax({
+			type : "post",
+			url : "../admin/storage/add",
+			data : new FormData(document.getElementById("form")),
+			processData : false,
+			contentType : false,
+			success : function(response) {
+				var code = response.code;
+				if("200" == code){
+					alert("添加成功");
+					navStorageClick();
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("添加数据失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function changeType(value){
+		var string = "";
+		if(value==0){
+			$.ajax({
+				type : "get",
+				async : true,
+				url : "../warehouse/all",
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						var string = "";
+						string += "<select class='text-input' name='typeRelateId'>";
+						$.each(response.data, function() {
+							string += "<option value='" + this.id + "'>" + this.name + "</option>";
+						});
+						string += "</select>";
+						$("#typeRelateIdSpan").html(string);
+					}
+				}
+			});
+		}else if(value==1){
+			string = "<input type='hidden' name='typeRelateId' value='-1'>";
+			$("#typeRelateIdSpan").html(string);
+		}else{
+			$.ajax({
+				post : "get",
+				url : admin_channel_list_url,
+				data : {wid : document.getElementById("warehouseSelect").value},
+				success : function(response) {
+					var code = response.code;
+					if ("200" == code) {
+						var string = "";
+						string += "<select class='text-input' name='typeRelateId'>";
+						$.each(response.data, function() {
+							string += "<option value='" + this.id + "'>" + this.name + "</option>";
+						});
+						string += "</select>";
+						$("#typeRelateIdSpan").html(string);
+					}
+				}
+			});
+		}
+	}
+</script>
+</html>

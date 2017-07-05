@@ -1,0 +1,254 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+   <!--  <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <style type="text/css">
+        .ui-jqgrid-view > .ui-jqgrid-titlebar {
+            display: block;
+        }
+
+        .ui-jqgrid tr.ui-row-ltr td, .ui-jqgrid tr.ui-row-rtl td {
+            border-bottom: 1px solid #E1E1E1;
+            padding: 6px 4px;
+            border-color: #E1E1E1;
+        }
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">自助打单管理</a>
+                </li>
+
+                <li>
+                    <a href="#">身份证信息管理</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content" id="divGrid">
+           
+            <div class="row">
+                <div style="margin-top: 10px; margin-bottom:0px;font-size:14px;font-weight:bold; color:blue" class="well well-sm">
+                    <span>导入身份证信息</span>
+                </div>
+            </div>
+            <div class="row toolrow" style="border:1px solid #ccc; border-bottom:0px;  padding-top:5px; background:#fcfcfc">
+                <div class="col-xs-12" style="padding-top:5px; padding-bottom:0px;border-bottom:1px dashed #ccc">
+                    <form id="import_cardid_zip_form" action="/admin/cardid/import_zip" method="post" enctype="multipart/form-data">
+                        <fieldset>
+                            <p>
+                                <label style="display: inline;">方法一、身份证压缩包文件：</label>
+                                <input type="file" name="file" class="text-input">
+
+                                <button type="submit"  class="btn btn-primary btn-sm" >
+                                    <span class=" icon-cloud-upload"></span>
+                                    导入身份证
+                                </button>
+                                &nbsp;&nbsp;<span style="color:red"> 仅仅支持zip文件，如可使用WinZip软件来压缩，并且小于50M的文件</span>
+                            </p>
+
+
+                        </fieldset>
+
+                    </form>
+
+                </div>
+
+                <div class="col-xs-12" style="padding-top:10px; padding-bottom:0px;border-bottom:1px dashed #ccc">
+                    <form id="import_cardid_pre_form" action="/admin/cardid_lib/import_scan" enctype="multipart/form-data">
+                        <fieldset>
+                            <p>
+                                <label style="display: inline;">方法二、预扫描导入:</label>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="check()">
+                                    <span class=" icon-cloud-upload"></span>
+                                    检测
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-sm" >
+                                    <span class=" icon-cloud-upload"></span>
+                                    导入
+                                </button>
+                                &nbsp;&nbsp;<span style="color:red"> 必须在服务中预先使用ftp或直接拷贝到指定的pictures文件夹中，适用大量文件上传！</span>
+                            </p>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="col-xs-12" style="padding-top:15px; padding-bottom:5px;">
+                    <form id="import_cardid_orders_form" action="/admin/CardId_lib/import_table_meitao" method="post" enctype="multipart/form-data">
+                        <fieldset>
+                            <p>
+                                <label style="display: inline;">上传文件：</label>
+                                <input type="file" name="filemeitao" class="text-input"><br>
+                                <label style="display: inline;">导出模板：</label>
+                                <input type="radio" name="inputmode" value="0" class="text-input" checked="true">内蒙模板&nbsp;&nbsp;
+                                <input type="radio" name="inputmode" value="1" class="text-input">内蒙模板1&nbsp;&nbsp;
+                                <input type="radio" name="inputmode" value="2" class="text-input">深圳模板（不匹配身份证）&nbsp;&nbsp;
+                                <input type="radio" name="inputmode" value="3" class="text-input">上海模板&nbsp;&nbsp;<br>
+                                <label style="display: inline;">匹配原则：</label>
+                                <input type="radio" name="inputrude" value="0" class="text-input" checked="true">绝对匹配&nbsp;&nbsp;
+                                <input type="radio" name="inputrude" value="1" class="text-input">模糊匹配&nbsp;&nbsp;<br>
+                                <label style="display: inline;">开始导出：</label>
+                               
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <span class=" icon-download"></span>
+                                    导出
+                                </button>
+                                &nbsp;&nbsp;<a target="_blank" href="/admin/cardid_lib/upload_orders_example">模板下载</a>
+                            </p>
+
+
+                        </fieldset>
+                        <div class="clear"></div>
+                    </form>
+                    <div class="alert alert-info" style="margin:0px 15px;padding:6px;font-size:12px;">
+                        <div>
+                            1、请确认导入的文件是否是正确(必须使用2003的excel表格，后缀名是:xls)，如果不是的话，可能会导入不成功。<br/>
+                            2、最新模板和内蒙模板都会匹配身份证，并在返回文件的最后一行，包含了图片的压缩包下载路径，请务必当天下载!<br/>
+                            3、匹配原则为绝对匹配时，只有姓名完全一样时才匹配。如果为模糊匹配，匹配原则为先匹配姓名，如果找不到，去掉最后一个字再查找，直到只有一个字，如果还匹配不上，则随机匹配。
+
+
+                        </div>
+                    </div>
+                </div>
+                </div>
+                
+                
+                
+                <div class="row toolrow" id="divAdvancedownloadword" style="border:1px solid #ccc">
+                <div class="col-xs-12" style="padding:10px 5px 0px;">
+                  <form action="/admin/cardid_lib/import_cardid_word" method="post">
+                  <span>这里下载身份证的所有信息，但不包含下载图片！如要下载，请点击按键：</span>
+                  <button type="submit">下载表格</button>
+                  </form>
+
+                   
+
+                </div>
+            </div>
+
+            <div class="row toolrow" id="divAdvanceSearch" style="border:1px solid #ccc">
+                <div class="col-xs-12" style="padding:10px 5px 0px;">
+                  
+
+                    <div style="float:right">
+                        <label for="orderId" class="control-label width60px">姓名:</label>
+                        <input name="searchInfo" id="orderId" placeholder="关键字">
+                        <button type="button" class="btn btn-purple btn-sm" id="btnAdvanceSearch">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            搜索
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div style="clear:both">
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-xs-12">
+
+                    <!-- PAGE CONTENT BEGINS -->
+                    <table id="yundangrid-table"></table>
+                    <div id="yundangrid-pager"></div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+
+    <!--开关插件-->
+
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <!--表单验证插件-->
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+    <script src="../resources/js/jquery.form.js"></script>
+
+    <script src="../resources/scripts/common.js"></script>
+    <script src="../resources/scripts/shenfenzhengguanli.js"></script>
+</body>
+</html>

@@ -1,0 +1,695 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>美淘快递</title>
+    <meta charset="utf-8" />
+    <!-- Page Loader - Needs to be placed in header for loading at top of all content -->
+    <script type="text/javascript" src="js/pace.min.js"></script>
+    <link href="css/pace-loading-bar.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/animate.shipping.css">
+    <link rel="stylesheet" type="text/css" href="css/ShippingIcon.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" id="main-style" type="text/css" href="css/style.css">
+</head>
+
+<body class="blue page-loading">
+    <!-- Section Start - Header -->
+    <section class='header' id='header'>
+        <!-- Header Top Bar - Start -->
+         <div class="topbar-wrap">
+            <div class="container">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 logo-area">
+                    <div class="logo">
+                        <div>
+                         <a href="../fleet/index.html">
+                            <img id="logoHeader" src="img/logo.jpg" alt="Header Image" class="img-responsive"><!--<i class="icon icon-logo white"></i>-->
+                        </a>
+                        </div>
+                        <!--<span class="name">SHIPPING</span>
+                        <span class="small">Logistics & Transport</span>-->
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-9 col-sm-8 col-xs-5 menu-area pull-right">
+                    <!-- Menu Top Bar - Start -->
+                    <div class="topbar">
+                        <div class="menu">
+                            <div class="primary inviewport animated delay2" data-effect="">
+                                <div class='cssmenu'>
+                                    <!-- Menu - Start -->
+                                    <ul class='menu-ul'>
+                                        <li class='has-sub'>
+                                            <a href='index.html'><b>首页</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='price.html'><b>收费标准</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='about-us-2.html'><b>关于我们</b></a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='contact.html'><b>联系我们</b></a>
+                                        </li>
+                                        <!--<li class='has-sub'>
+                                            <a href='location.html'><b>公司地点</b></a>
+                                        </li>-->
+                                         <li class='has-sub'>
+                                            <a href='News.html'><b>新闻公告</b></a>
+                                        </li> 
+                                         <li class='has-sub'>
+                                            <a href='login.jsp'><b>登陆</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='registe.html'><b>注册</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='upload.html'><b>上传ID</b></a>
+                                        </li>
+                                          
+                                    </ul>
+                                    <!-- Menu - End -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Menu Top Bar - End -->
+                    <!-- Mobile Menu - Start -->
+                    <div class="menu-mobile col-xs-10 pull-right cssmenu">
+                        <i class="icon icon-menu menu-toggle"></i>
+                        <ul class="menu" id='parallax-mobile-menu'>
+                        </ul>
+                    </div>
+                    <!-- Mobile Menu - End -->
+                </div>
+            </div>
+        </div>
+        <!-- Header Top Bar - End -->
+        <div class="header-bg header-small">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 slantbar hidden-xs"></div>
+            <!-- Header Tracking Box - Start -->
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 white-wrap hidden-xs">
+                <div class="white-box">
+                    <div class="track-order">
+                        <div class="track-logo transition col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <i class="icon icon-logo"></i>
+                        </div>
+                        <div class=" col-lg-9 col-md-9 col-sm-9 col-xs-9 track-form-wrap">
+                            <form method='post' action="#" class="track-form" onsubmit="return false">
+                                <input type="text" id="searchinput" placeholder="Track ID" value="${param.oid }" onkeypress="keydown_searck_order(event)">
+                               <a href="javascript: searchCode();"><i class="icon icon-magnify" ></i></a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Tracking Box - End -->
+            <!-- Header Content Slide - Start -->
+            <div style="position:relative;display:inline-block;width:100%;height:auto;">
+                <img src="img/banner-2s.jpg" alt="Header Image" class="img-responsive">
+                <div class="bg-overlay"></div>
+                <div class="main-wrap">
+                    <div class="container">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 main-content">
+                            <h1>欢迎查询</h1>
+                            <div class="headul"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Content Slide - End -->
+        </div>
+    </section>
+    <!-- Section End - Header -->
+   <!--  <a href="javascript:addiframeDlg('')">路由信息</a>
+    <hr/>
+    <textarea class="transition" placeholder="批量查询" id="c_manyorders" style="margin-left: 100px;"></textarea>
+    <input onclick="search_manyorders()" type="button" value="查询"><span>使用空格、回车或";"来区分运单号</span> -->
+    <hr/>
+    
+    <!-- Section Start - Get In Touch -->
+    <section class='contact' id='contact'>
+        <div class="container">
+            <div class="row">
+				<table style="width: 100%; " id="ydroutetable" border="1">
+					<thead >
+						<tr >
+							<th style="background-color:#87CEEB; width:150px;">运单单号</th><th style="background-color:#87CEEB">时间</th><th style="background-color:#87CEEB">状态</th><th style="background-color:#87CEEB">状态说明</th><th style="background-color:#87CEEB">备注信息</th>
+						</tr>
+					</thead>
+					<tbody id="tbody">
+					</tbody>
+				</table>
+				<br/>
+				<div style="margin-left:50px;display:none;" id="show_return_title"><strong>快递公司代号：</strong><span id="expresscompanyname" style="color:red;"></span>&nbsp;&nbsp;<strong>快递公司单号：</strong><span id="expresscompanycodes" style="color:red;"></span><span>&nbsp;&nbsp;查询结果如下(或请到<a href="http://www.kuaidi100.com/">快递100</a>查询单号)：</span></div>
+				<iframe src="" id="returnurl" style="display:none;">
+				</iframe>
+			</div>
+        </div>
+    </section> 
+    
+    
+    
+    <!-- Section End - Get In Touch 
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="row">
+            <div id="contact-map" class="gmap"></div>
+        </div>
+    </div>
+    <!-- Section Start - Footer -->
+        <!-- Section Start - Footer -->
+       <!-- Section Start - Footer -->
+    <section class='footer bg-black parallax ' id='footer'>
+        <div class="bg-overlay"></div>
+        <div class="container">
+            <div class="row">
+                <!-- Text Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 text-widget inviewport animated delay1" data-effect="fadeInUp">
+                    <div class="logo">
+                        <div>
+                        <a href="index.html">
+                            <img src="img/logo.jpg" alt="Header Image" class="img-responsive" style="width:50%; height:50%;">
+                            </a>
+                        </div>
+                    </div>
+                    <p>公司简介</p>
+                    
+                </div>
+                <!-- Text Widget - End -->
+                <!-- News Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 news-widget inviewport animated delay2" data-effect="fadeInUp">
+                    <h4>微信公众号</h4>
+                    <div class="headul left-align"></div>
+                    <div class="news-wrap row">
+                        <div class="pic col-md-3 col-xs-3 col-sm-3 col-lg-3">
+                            <img alt="news-image" class="img-responsive" src="img/news-1.jpg">
+                        </div>
+                        <div class="info col-md-9 col-xs-9 col-sm-9 col-lg-9">
+                            <h5 class="title"><a href='#'>公众号名称(或微信号)</a></h5>
+                            <div class="date">william18559</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- News Widget - End -->
+                <!-- Contact Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 contact-widget inviewport animated delay3" data-effect="fadeInUp">
+                    <h4>公司地址</h4>
+                    <div class="headul left-align"></div>
+                    <p>地址:357 E Garvey Ave Monterey Park  
+                        
+                        <br> CA 91755 </p>
+                    <p>电子邮箱: support@usitao.net
+                        <br> 联系电话: +1(626)872-1082&nbsp;&nbsp;&nbsp;&nbsp;+1(626)593-5872&nbsp;</p>
+                </div>
+                <!-- Contact Widget - End -->
+            </div>
+        </div>
+        <!-- Copyright Bar - Start -->
+        <div class="copyright">
+            <div class="col-md-12">
+                <div class="container">
+                    <div class="">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 message inviewport animated delay1" data-effect="fadeInUp">
+                            <span class="">&copy; Copyright WebXury Inc. 2016. ® All Rights Reserved </span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 social">
+                            <a href="#" class="inviewport animated delay1" data-effect="fadeInUp"><i class="icon icon-facebook text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay2" data-effect="fadeInUp"><i class="icon icon-twitter text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay3" data-effect="fadeInUp"><i class="icon icon-dribbble text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay4" data-effect="fadeInUp"><i class="icon icon-google-plus text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay5" data-effect="fadeInUp"><i class="icon icon-youtube-play text-on-primary"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Copyright Bar - End -->
+    </section>
+    <!-- Section End - Footer -->
+    <!-- Javascript & CSS Files moved to bottom of page for faster loading -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/inviewport-1.3.2.js"></script>
+    <!-- Google Map -->
+     <!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyArv9ALhBv6ihfhABHEAkFg0-JHywhtgjM&amp;sensor=false"></script>
+    <script type="text/javascript" src="js/gmap.js"></script> -->
+    <!--Fancybox -->
+    <script type="text/javascript" src="js/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" src="js/jquery.fancybox-media.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery.fancybox.css" media="screen" />
+    <!-- Bootstrap Carousel -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Main JS -->
+    <script type="text/javascript" src="js/main.js"></script>
+    
+    <script src="../../js/jquery.js"></script>
+	<script src="../../js/kuaidi_map.js"></script>
+<script type="text/javascript">
+loadGlobalArgs();
+function removenull(str)
+{
+	if((str=="")||(str==null)||(str=="null")||(str=="undefined"))
+	{
+		return "";
+	}
+	else
+	{
+		return str;
+	}
+}
+
+
+function keydown_searck_order(event) {
+
+	event=(event)?event:((window.event)?window.event : "");
+	var key=event.keyCode? event.keyCode : event.wihch;
+	if (key == 13)// 回车事件
+	{
+		searchCode();
+	}
+}
+
+
+function search_manyorders() {
+
+	var orders=$("#c_manyorders").val();
+	
+	if(removenull(orders)=="")
+	{
+		return false;
+	}
+	else
+	{
+		
+		orders=$.trim(orders);
+		if(removenull(orders)=="")
+		{
+			return false;
+		}
+	}
+	
+	orders = orders.replace(/\r\n/g,";");
+	orders = orders.replace(/\n/g,";"); 
+	orders = orders.replace(/；/g,";"); 
+	 //orders = orders.replace("\r\n",";");
+	 //orders = orders.replace("\n",";");
+	 //替换所有空格
+	 orders = orders.replace(/\s+/g,';');
+		
+		var arrs=orders.split(";"); 
+		if (arrs!=null) {
+			
+			$.ajax({
+				type:"get",
+				url:"../route/guest_orders",
+				data : $.param({
+					"oids" : arrs,
+					"kuaidi_type" : "0",
+				}, true),
+				success : function(response) {
+					var code = response.code;
+					
+					if ("200" == code) {
+						//alert(response.data);
+						//showRouteList(response.data);
+						showRouteLists(response.data);
+					} else {
+						alert("获取运单路由状态失败，原因是:" + response.message);
+						
+					}
+					return false;
+				}
+			});
+			
+		}
+	//alert(orders);
+}
+
+	$(function(){ 
+		// 开始获取数据
+		//update by chenkanghua  订单号为 WY+8位+US
+		
+		
+	
+		
+		
+		var value = $("#searchinput").val();
+		
+		
+		
+		
+		var arrs=value.split(";"); 
+		if (arrs!=null) {
+			search(arrs);
+		}
+		
+	});
+	function searchCode(){
+		var value = $("#searchinput").val();
+		
+		  if((value!="")||(value!="undefined")||(value!=null))
+      	{
+			  value=value.trim();
+      	}
+		
+		var arrs=value.split(";"); 
+		
+		if (arrs!=null) {
+			search(arrs);
+		}
+		return false;
+	}
+	function search(arrs) {
+		
+		$.ajax({
+			type:"get",
+			url:"../../route/guest",
+			data : $.param({
+				"oids" : arrs[0],
+				"kuaidi_type" : "0",
+			}, true),
+			success : function(response) {
+				var code = response.code;
+				
+				if ("200" == code) {
+					showRouteList(response.data);
+				} else {
+					alert("获取运单路由状态失败，原因是:" + response.message);
+					
+				}
+				return false;
+			}
+		});
+	}
+	
+	function showRouteList(value) {
+		$("#tbody").html("");
+		$("#show_return_title").attr("style","margin-left:50px;display:none;");
+		$("#returnurl").attr("style","display:none;");
+		if (value == null) {
+			var str = "<tr><td colspan='4'>" + key + "运单没有对应的路由信息或者是该运单号错误！</td></tr>";
+			$("#tbody").append(str);
+		} else {
+			$.each(value, function(){
+				var str="<tr>";
+				if(this.state==""){
+					str="<tr style='color:blue;'>";
+					if((this.returnurl=="")||(this.returnurl=="null")||(this.returnurl==null)||(this.returnurl=="undefined")){}
+					else{
+						$("#show_return_title").show();
+						$("#returnurl").attr("style","width: 800px;height: 500px;margin-left: 50px;word-break:break-all; word-wrap:break-all;");
+						$("#returnurl").attr("src",this.returnurl);
+						$("#show_return_title").show();
+						if((removenull(this.thrid_pns)!="")){
+						for(var i=0;i<_kuaidi_map.length;i++){
+							if(this.thrid_pns==_kuaidi_map[i][0]){
+								this.thrid_pns=_kuaidi_map[i][1];
+								break;
+							}
+						}
+					}
+						$("#expresscompanyname").html(this.thrid_pns);
+						$("#expresscompanycodes").html(this.thrid_no);
+					}
+				}
+				else{
+					str="<tr>";
+				}
+				if((this.orderId==null)||(this.orderId=="null"))
+				{this.orderId="";}
+				if((this.date==null)||(this.date=="null"))
+				{this.date="";}
+				if((this.state==null)||(this.state=="null"))
+				{this.state="";}
+				if((this.stateRemark==null)||(this.stateRemark=="null"))
+				{this.stateRemark="";}
+				if((this.remark==null)||(this.remark=="null"))
+				{this.remark="";}
+				str+="<td>" + this.orderId + "</td>";
+				str+="<td>" + this.date + "</td>";
+				str+="<td>" + this.state + "</td>";
+				str+="<td>" + this.stateRemark + "</td>";
+				str+="<td>" + this.remark + "</td>";
+				str+="</tr>";
+				$("#ydroutetable tbody").append(str);
+			});
+		}
+	}
+    function loadGlobalArgs(){
+		$.ajax({
+   			type: "get",
+   			url: "../globalargs/getcontents",
+   			data : {
+   				"flags" : "logo_big"
+   			},
+   			success: function(response){
+   				var code = response.code;
+   				if("200" == code){
+   					var data = response.data;
+   					if(data != null){
+   						//$("#logoHeader").attr("src", "../" + data);
+   						//$("#logoFooter").attr("src", "../" + data);
+   					}
+   				}
+   			}
+		});
+    }
+    
+    
+    
+    //显示批量运单路由查询信息
+    
+      function showRouteLists(list) {
+    	
+    	  $("#tbody").html("");
+    	  if (list == null) {
+  			var str = "<tr><td colspan='4'>" + key + "查找失败</td></tr>";
+  			$("#tbody").append(str);
+  		} else {
+  			var colorflag="0";
+  			$.each(list, function(){
+  				
+  				
+  				if(this.route==null)//查找失败
+  				{
+  					var str="<tr>";
+  					str+="<td>" + this.orderId + "</td>";
+  					str+="<td colspan=4 style='color:red;'>" + "查找失败!" + "</td>";
+  					str+="</tr>";
+  					$("#ydroutetable tbody").append(str);
+  				}
+  				else
+  				{
+  					var length=this.route.length;
+  					var flag=0;
+  					$.each(this.route, function(){//查找成功
+  						var str="<tr>";
+  						if(colorflag=="0")
+  						{
+  							str="<tr>";
+  						}
+  						else
+  						{
+  							str="<tr style='background-color:#D4F0FB'>";
+  						}
+  						
+  						if(length>0)
+  						{
+  							if(flag==0)
+  							{
+  								str+="<td rowspan="+length+">" + this.orderId + "</td>";
+  								flag=1;
+  							}
+  						}
+  						else
+  						{
+  							str+="<td>" +removenull(this.orderId) + "</td>";
+  						}
+  						str+="<td>" + removenull(this.date) + "</td>";
+  						str+="<td>" + removenull(this.state) + "</td>";
+  						
+  						var thirdstr="";
+  						if(removenull(this.state)==""){
+  							
+  							if((this.returnurl=="")||(this.returnurl=="null")||(this.returnurl==null)||(this.returnurl=="undefined")){}
+  							else{
+  								
+  								thirdstr="<a href='javascript:addiframeDlg(\""+this.returnurl+"\")'>"+"查看"+"</a>";
+  								//$("#expresscompanyname").html(this.thrid_pns);
+  								//$("#expresscompanycodes").html(this.thrid_no);
+  							}
+  						}
+  						
+  						
+  						str+="<td>" + removenull(this.stateRemark)+" "+thirdstr + "</td>";
+  						str+="<td>" + removenull(this.remark) + "</td>";
+  						str+="</tr>";
+  	  					$("#ydroutetable tbody").append(str);
+  					});
+  				}
+				
+  				if(colorflag=="0")
+  				{
+  					colorflag=1;
+  				}
+  				else
+  				{
+  					colorflag="0";
+  				}
+				
+  			});}
+    }
+    
+    /*function showRouteList(value) {
+		$("#tbody").html("");
+		$("#show_return_title").attr("style","margin-left:50px;display:none;");
+		$("#returnurl").attr("style","display:none;");
+		if (value == null) {
+			var str = "<tr><td colspan='4'>" + key + "运单没有对应的路由信息或者是该运单号错误！</td></tr>";
+			$("#tbody").append(str);
+		} else {
+			$.each(value, function(){
+				var str="<tr>";
+				if(this.state==""){
+					str="<tr style='color:blue;'>";
+					if((this.returnurl=="")||(this.returnurl=="null")||(this.returnurl==null)||(this.returnurl=="undefined")){}
+					else{
+						$("#show_return_title").show();
+						$("#returnurl").attr("style","width: 800px;height: 500px;margin-left: 50px;word-break:break-all; word-wrap:break-all;");
+						$("#returnurl").attr("src",this.returnurl);
+						$("#show_return_title").show();
+						if((removenull(this.thrid_pns)!="")){
+						for(var i=0;i<_kuaidi_map.length;i++){
+							if(this.thrid_pns==_kuaidi_map[i][0]){
+								this.thrid_pns=_kuaidi_map[i][1];
+								break;
+							}
+						}
+					}
+						$("#expresscompanyname").html(this.thrid_pns);
+						$("#expresscompanycodes").html(this.thrid_no);
+					}
+				}
+				else{
+					str="<tr>";
+				}
+				if((this.orderId==null)||(this.orderId=="null"))
+				{this.orderId="";}
+				if((this.date==null)||(this.date=="null"))
+				{this.date="";}
+				if((this.state==null)||(this.state=="null"))
+				{this.state="";}
+				if((this.stateRemark==null)||(this.stateRemark=="null"))
+				{this.stateRemark="";}
+				if((this.remark==null)||(this.remark=="null"))
+				{this.remark="";}
+				str+="<td>" + this.orderId + "</td>";
+				str+="<td>" + this.date + "</td>";
+				str+="<td>" + this.state + "</td>";
+				str+="<td>" + this.stateRemark + "</td>";
+				str+="<td>" + this.remark + "</td>";
+				str+="</tr>";
+				$("#ydroutetable tbody").append(str);
+			});
+		}
+	}*/
+    
+	function addiframeDlg(key) {
+	    var msgw, msgh, msgbg, msgcolor, bordercolor, titlecolor, titlebg, con;
+	    con ="";
+	    con +='<div id="get_route">';  
+	    
+		con+='<iframe src="'+key+'" id="returnurl_iframe" style="width:100%;height:350px">';
+		con+='</iframe>';
+		con+='<input type="button" value="关闭" class="btn btn-primary transition" onclick="CloseMsgiframe()"/>';
+	    con +='</div>';
+
+	    //弹出窗口设置
+	    msgw = 710;   //窗口宽度
+	    msgh = 600;   //窗口高度
+	    msgbg = "#FFF";    //内容背景
+	    msgcolor = "#000";   //内容颜色
+	    bordercolor = "#000"; //边框颜色
+	    titlecolor = "#FFF"; //标题颜色
+	    titlebg = "#369";   //标题背景
+	    //遮罩背景设置
+	    var sWidth, sHeight;
+	    sWidth = screen.availWidth;
+	    sHeight = document.body.scrollHeight;
+	    //创建遮罩背景
+	    var maskObj = document.createElement("div");
+	    maskObj.setAttribute('id', 'maskdiv');
+	    maskObj.setAttribute('text-align', 'center');
+	    maskObj.style.position = "absolute";
+	    maskObj.style.top = "0";
+	    maskObj.style.left = "0";
+	    maskObj.style.background = "#777";
+	    maskObj.style.filter = "Alpha(opacity=30);";
+	    maskObj.style.opacity = "0.3";
+	    maskObj.style.width = sWidth + "px";
+	    maskObj.style.height = sHeight + "px";
+	    maskObj.style.zIndex = "10000";
+	  
+	    document.body.appendChild(maskObj);
+	    //创建弹出窗口
+	    var msgObj = document.createElement("div");
+	    msgObj.setAttribute("id", "msgdiv");
+	    msgObj.style.position = "absolute";
+	    msgObj.style.top = (screen.availHeight - msgh) / 4 + "px";
+	    msgObj.style.left = (screen.availWidth - msgw) / 2 + "px";
+	    //msgObj.style.top = (screen.availHeight - msgh) / 4 + "px";
+	    //msgObj.style.left = (screen.availWidth - msgw) / 2 + "px";
+	    msgObj.style.width = msgw + "px";
+	    msgObj.style.height = msgh + "px";
+	    msgObj.style.fontSize = "12px";
+	    msgObj.style.background = msgbg;
+	    msgObj.style.border = "1px solid " + bordercolor;
+	    msgObj.style.zIndex = "10001";
+	    //创建标题
+	    var thObj = document.createElement("div");
+	    thObj.setAttribute("id", "msgth");
+	    thObj.className = "DragAble";
+	    thObj.style.cursor = "move";
+	    thObj.style.padding = "10px 6px";
+		
+	    thObj.style.color = titlecolor;
+	    thObj.style.background = titlebg;
+	    var titleStr = "<a title='Close' style='cursor:pointer;float:right;cursor:default;color: #FFF000' onclick='CloseMsgiframe()'>取消</a>" + "<span>路由信息</span>";
+	    thObj.innerHTML = titleStr;
+	    //创建内容
+	    var bodyObj = document.createElement("div");
+	    bodyObj.setAttribute("id", "msgbody");
+	    bodyObj.style.padding = "10px";
+	    bodyObj.style.lineHeight = "1.5em";
+	    bodyObj.innerHTML = con;
+	    //var txt = document.createTextNode(content)
+	    //bodyObj.appendChild(txt);
+	    //生成窗口
+	    document.body.appendChild(msgObj);
+	    document.getElementById("msgdiv").appendChild(thObj);
+	    document.getElementById("msgdiv").appendChild(bodyObj);
+	    
+	   /* $("#bt_add_user").click(function(){
+	    	var phone = $(":text[name='phone']").val();
+			var name = phone;//$(":text[name='email']").val();
+			var password = $(":password[name='password']").val();
+			var email = "";//$(":text[name='email']").val();
+			var realName = $(":text[name='realName']").val();
+			var type = $("select[name='type']").val();
+			submitAddUser(name, password, email, realName, phone, "", "","", type);
+		});*/
+	    
+	}
+	
+	function CloseMsgiframe() {
+	    //移除对象
+	    document.body.removeChild(document.getElementById("maskdiv"));
+	    document.getElementById("msgdiv").removeChild(document.getElementById("msgth"));
+	    document.getElementById("msgdiv").removeChild(document.getElementById("msgbody"));
+	    document.body.removeChild(document.getElementById("msgdiv"));
+	}
+</script>
+</body>
+
+</html>

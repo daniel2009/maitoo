@@ -1,0 +1,89 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">添加会员
+			<a href="#" id="a_back_user_list_link">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">添加会员</div>
+			<div class="content_text">
+			
+				<div class="tab-content" id="tab2">
+					<div class="notification information png_bg">
+						<a href="#" class="close">
+							<img src="${pageContext.request.contextPath }/resources/images/icons/cross_grey_small.png" title="关闭" alt="关闭" /></a>
+	      				<div>手机号码和密码不能为空。</div>
+	      				<div>用户可以通过手机+密码登录</div>
+	    			</div>
+		          <form action="#" method="post" >
+		            <fieldset>
+			            <p>
+			              <label style="display: inline;">手机号码：</label>
+			              <input class="text-input small-input" type="text" name="phone" />
+			               <span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label style="display: inline;">Email：</label>
+			              <input class="text-input small-input" type="text" name="email" />
+			             
+			            </p>
+			           
+			            <p>
+			              <label style="display: inline;">登录密码：</label>
+			              <input class="text-input small-input" type="password" name="password" />
+			              <span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label style="display: inline;">真实姓名：</label>
+			              <input class="text-input small-input" type="text" name="realName" />
+			            </p>
+			            
+			            <p>
+			              <label style="display: inline;">QQ：</label>
+			              <input class="text-input small-input" type="text" name="qq" />
+			            </p>
+			            <p>
+			              <label style="display: inline;">国家：</label>
+			              <input class="text-input small-input" type="text" name="country" />
+			            </p>
+			            <p>
+			              <label style="display: inline;">地址：</label>
+			              <input class="text-input small-input" type="text" name="address" />
+			            </p>
+			            <p>
+			              <label style="display: inline;">用户类型：</label>
+			              <select name="type">
+								<option value="0">普通会员</option>
+								<option value="1" selected="selected">门市会员</option>
+								<option value="2">VIP会员</option>
+								<option value="3">VIP2会员</option>
+								<option value="4">VIP3会员</option>
+						  </select>
+			            </p>
+			            <p style="margin-left: 50px;">
+			              <input id="bt_add_user" class="button" type="submit" value="提交" />
+			              <input id="bt_add_user_reset" class="button" type="reset" value="重置"/>
+			            </p>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+	</div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav32Data();
+	});
+</script>
+</html>

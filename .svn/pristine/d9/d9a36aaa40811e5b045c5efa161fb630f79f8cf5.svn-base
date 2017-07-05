@@ -1,0 +1,773 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+
+<body>
+
+	<%
+		HttpSession session1 = request.getSession();
+	%>
+
+	<input type="hidden" id="store_id_flag"
+		value="<%=session.getAttribute("emp_store_id").toString()%>" />
+	<input type="hidden" id="admin_id_flag"
+		value="<%=session.getAttribute("emp_store_supperadmin_flag")
+					.toString()%>" />
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">
+			修改包裹信息 <a href="#" id="a_back_tranship_list_link">返回列表</a>
+		</p>
+
+		<div class="box_content">
+			<div class="content_title">修改包裹信息</div>
+			<div class="content_text">
+
+				<div class="tab-content" id="tab2">
+					<!--  <form action="#" method="post">-->
+					<form action="#" id="modify_online_tran_pic" method="post"
+						enctype="multipart/form-data" onsubmit="return false;">
+						<input type="hidden" name="id" value="${param.id }" /> <input
+							type="hidden" name="t_tran_type" /> <input type="hidden"
+							name="t_user_rmbBalance" /> <input type="hidden"
+							name="t_user_usdBalance" /> <input type="hidden"
+							name="t_to_order_pay" /> <input type="hidden" name="t_tran_no" />
+						<input type="hidden" name="t_tran_wid_no" /> <input
+							type="hidden" name="t_totalmoney" /> <input type="hidden"
+							name="t_au_paymoney" /> <input type="hidden"
+							name="count_emp_store_id" />
+						<!-- 标识计费的仓库所属id -->
+						<input type="hidden" name="count_tranwarehouseId_id" />
+						<input type="hidden" name="t_divide_money" value="0"/>
+						<input type="hidden" name="t_selfgetpackageFlag" />
+						<input type="hidden" name="t_CommodityCost" value="0"/>
+						
+						<!-- 记录转运单状态 -->
+						<input type="hidden" id="tranship_state" name="tranship_state"/>
+						<!-- 标识对应计费的转运州id -->
+
+
+						<fieldset>
+							<p>
+								<label class="cllabel" style="padding: 0px">包裹编号：</label> <label
+									class="vallabel" style="padding: 0px;color:red;" id="t_id">${param.id }</label>
+								<label class="cllabel" style="padding: 0px">用户编号：</label> <label
+									class="vallabel" style="padding: 0px;color:red;" id="u_id">&nbsp;</label>
+								<label class="cllabel" style="padding: 0px">所属用户：</label> <label
+									class="vallabel" style="padding: 0px;color:red;"
+									id="u_nick_name">&nbsp;</label> <label class="cllabel"
+									style="padding: 0px">用户余额：</label> <label class="vallabel"
+									style="padding: 0px;color:red;" id="t_user_balance">&nbsp;</label>
+								<br />
+							</p>
+							<p>
+								<!-- <label class="cllabel" style="padding: 0px">拆包数量：</label>
+			              <label class="vallabel" style="padding: 0px" id="t_c_b_num">&nbsp;</label> -->
+								<label class="cllabel" style="padding: 0px">包裹运单号：</label> <label
+									class="vallabel" style="padding: 0px;color:red;"
+									id="t_c_b_tranno">&nbsp;</label> <label class="cllabel"
+									style="padding: 0px">转运公司：</label> <label class="vallabel"
+									style="padding: 0px;color:red;" id="t_c_b_tran_company">&nbsp;</label>
+
+								<label class="cllabel" style="padding: 0px">包裹状态：</label> <label
+									class="vallabel" style="padding: 0px;color:red;"
+									id="t_old_state">&nbsp;</label>
+								<label class="cllabel" style="padding: 0px">所在仓位：</label> <label class="vallabel" style="padding: 0px;color:red;" id="t_old_position">&nbsp;</label>
+								<label class="cllabel"
+									style="padding: 0px">转运类型：</label> <label class="vallabel"
+									style="padding: 0px;color:blue;" id="t_tran_type">&nbsp;</label>
+								<br />
+							</p>
+							<p>
+
+								<label class="cllabel" style="padding: 0px">用户授权扣款：</label> <label
+									class="vallabel" style="padding: 0px;color:blue;"
+									id="t_u_au_paymoney">&nbsp;</label>
+
+
+							</p>
+							<div style="clear: both;"></div>
+							<br />
+							<hr />
+							<p>
+								&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" onChange="javascript: findByWarehouseIdAndTypeAndRelateIdList();"
+									name="fromTransportState">转运州包裹 <label
+									style="display: inline;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;修改状态：</label>
+								<select name="state" class="text-input">
+									<option value="-5">待检入库</option>
+									<option value="1" selected="selected">已入库</option>
+									<option value="2">等待审核</option>
+									<option value="3">等待付款</option>
+									<option value="4">已付款</option>
+									<option value="5">分拣完成</option>
+									<option value="-10">包裹异常</option>
+								</select> &nbsp;&nbsp; <span id="Towarehouse_show" style="display:none;">
+									<label style="display: inline;">去往仓库：</label> <select
+									name="Towarehouse" onchange="javascript: findByWarehouseIdAndTypeAndRelateIdList();"></select>
+								</span>
+
+							</p>
+<p style="display:none" id="wrong_message_show">
+
+
+<label style="display: inline; " >异常描述：</label>
+								<textarea rows="2" cols="20" class="text-input" name="wrong_remark"
+									maxlength="100"></textarea>
+									<label style="display: inline;color:red;">注意："包裹异常"状态只保存“异常描述”信息，其它内容不变!</label>
+
+</p>
+							<hr />
+							<label style="display: inline;">转运仓库：</label><input type="text"
+								name="tran_warehouse_name" style="width:120px"
+								class="text-input" readonly="readonly" /> &nbsp;&nbsp;<label
+								style="display: inline;">入库仓库：</label> <select name="warehouse"></select>
+							&nbsp;&nbsp;&nbsp;&nbsp; <input type="hidden"
+								id="old_storagePositionId" name="old_storagePositionId"><input type="hidden"
+								id="storagePositionId" name="storagePositionId"> 储藏间<select type="text"
+								id="storageName" name="storageName"></select><input
+								type="number" style="margin: 0;" id="storagePositionRowNumber" onchange="javascript: storagePositionRowNumberChange();"
+								min="0" step="1">行<input
+								type="number" style="margin: 0;" id="storagePositionColNumber"
+								onchange="javascript: storagePositionColNumberChange();">列<label
+								id="storagePositionSuggestion"
+								style="display: inline; color: #d77;"></label>
+								<!-- 是否超出存储间范围，超出不能提交 -->
+								<input type="hidden" id="exsit_storagePosition" name="exsit_storagePosition" value='true'/>
+							<div id="tran_state_info_show">
+								选择渠道： <select class="text-input" name="cid"></select>
+								&nbsp;&nbsp;渠道附加费</span> <input type="text" name="addtivePrice"
+									style="width:60px" class="text-input" readonly="readonly" />
+
+								&nbsp;&nbsp;&nbsp;&nbsp;商品SKU录入：&nbsp;&nbsp;<input
+									class="text-input" type="text"
+									onkeypress="skuaddcommodify(event)" name="skuscan" /><label>商品列表：&nbsp;&nbsp;
+									<a href="#" id="a_add_commodity_quantity_link">添加</a>
+								</label>
+								<div style="margin: 0px;width: 90%;">
+									<table id="commodity_list_table">
+										<col width="140px" />
+										<col width="140px" />
+										<col width="140px" />
+										<col width="120px" />
+										<col width="120px" />
+										<col width="120px" />
+										<col width="30px" />
+										<thead>
+											<tr>
+												<th style="text-align: center;">商品类别</th>
+												<th style="text-align: center;">SKU</th>
+												<th style="text-align: center;">商品详情</th>
+												<th style="text-align: center;">数量</th>
+												<th style="text-align: center;">单件重量</th>
+												<th style="text-align: center;">重量小计</th>
+												<!-- <th style="text-align: center;">计费重量</th> -->
+												<th style="text-align: center;">操作</th>
+											</tr>
+										</thead>
+										<tbody>
+										</tbody>
+									</table>
+								</div>
+
+
+								<p>
+									<label style="display: inline;">
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;重量：
+									</label> <input value="0" class="text-input" size="15" type="text"
+										name="weight" /> <small>磅</small> <label
+										style="display: inline;"> &nbsp;&nbsp;&nbsp;总重量(kg)： </label>
+									<input value="0" class="text-input" size="15" type="text"
+										name="weightKg" /> <small>kg</small> <label
+										style="display: inline;"> &nbsp;&nbsp;包裹长度： </label> <input
+										class="text-input" size="15" type="text" name="length"
+										value="0" maxlength="10" /> <label style="display: inline;">
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;包裹宽度：
+									</label> <input class="text-input" size="15" type="text" name="width"
+										value="0" maxlength="10" /> <label style="display: inline;">
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;包裹高度： </label> <input
+										class="text-input" size="15" type="text" name="height"
+										value="0" maxlength="10" />
+
+								</p>
+								<p>
+
+
+									<label style="display: inline;">
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;其他费用： </label> <input
+										value="0" class="text-input" size="15" type="text"
+										name="other" />
+									<!-- <input type="hidden" name="premium" /> <small>美元</small> -->
+
+									<label style="display: inline;">
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保险： </label> <input
+										class="text-input" size="15" type="text" name="premium"
+										value="0" maxlength="10" /> <small>美元</small> 
+										&nbsp;&nbsp;保险额度（美元）：<input type="text" name="premiumtotal" readonly= "true" 
+							style="width:80px" value="0" /><small>美元</small>
+										
+										<label
+										style="display: inline;">
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关税： </label> <input
+										value="0" class="text-input" size="15" type="text"
+										name="tariff" /> <small>美元</small> <label
+										style="display: inline;">
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;申报价值： </label> <input
+										class="text-input" size="15" type="text" name="parceValue"
+										value="0" maxlength="10" /> <small>美元</small>
+
+								</p>
+								<p>
+									<label style="display: none;">
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;邮寄方式： </label> <select
+										class="text-input" name="mail" style="display:none;">
+										<option value="0">邮包</option>
+										<option value="1">电商</option>
+										<option value="2">快件</option>
+									</select> <label style="display: inline;"> <label
+										style="display: inline;"> OR转运费： </label> <input value="0"
+										class="text-input" size="15" type="text" name="or" readonly="readonly" /> <small>美元</small>
+
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总费用：
+									</label> <input class="text-input" size="15" type="text"
+										name="totalmoney" placeholder="0.00" disabled="true" value="0" />&nbsp;&nbsp;&nbsp;&nbsp;
+									<input type="checkbox" name="divideboxmoney" onclick="orderModifyCalcFreight_dhyb()">分合箱手续费
+									&nbsp;&nbsp;&nbsp;&nbsp; <input type="checkbox"
+										name="getpackagebyself" onclick="orderModifyCalcFreight_dhyb()">自提&nbsp;&nbsp;<select name="self_paytype" id="self_paytype" style="display:none"><option value="0">现金支付</option>
+										<option value="1">余额支付</option></select><span style="color:red;display:none;" id="getpackagebyselfshow">只计算自提“OR转运费”和“其他费用”</span>
+								</p>
+
+
+
+
+
+
+								<div id="showquicktraninfo" style="display:none;">
+
+
+									<p>
+										<label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;收件人姓名： </label> <input
+											type="text" class="text-input" name="cName" /> <br /> <label
+											style="display: inline;"> 收件人省/市/区： </label> <input
+											type="text" class="text-input" size="10" name="cProvince" />
+										/ <input type="text" class="text-input" size="10" name="cCity" />
+										/ <input type="text" class="text-input" size="10"
+											name="cDistrict" /> <br /> <label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;详细地址： </label>
+										<input type="text" class="text-input medium-input"
+											name="cStreetAddress" /> <br /> <label
+											style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;联系电话： </label>
+										<input type="text" class="text-input" name="cPhone" /> <label
+											style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;邮 编： </label> <input
+											type="text" class="text-input" name="cZipCode" /> <br />
+									</p>
+									<!-- kai 20150911-1 modify -->
+									<p>
+										<label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;身份证号： </label> <input
+											name="cardidname" type="text" class="text-input"
+											style="width:150px" maxlength="18" /> <br /> <label
+											style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;身份证正面图： </label> <input id="cardpicid"
+											class="text-input" name="file" type="file" /><label
+											style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;身份证反面图： </label> <input id="cardpicidother"
+											class="text-input" name="fileother" type="file" /><br />
+										注意：支持JPG，PNG，BMP等图片格式的身体证图片，最大不超过4MB <br />
+
+									</p>
+
+
+
+									<input type="text" name="idurlcard"
+										style="width:120px;display:none;" />
+									<p id="showcardpicid" style="display:none;">
+										<label style="display: inline;"> &nbsp;&nbsp;身份证正面图预览:
+										</label> <a href="" target="_blank" id="imacardurlid"><img
+											width="150px" height="150px" src=""></a>
+									</p>
+
+									<input type="text" name="idurlcardother"
+										style="width:120px;display:none;" />
+									<p id="showcardpicidother" style="display:none;">
+										<label style="display: inline;"> &nbsp;&nbsp;身份证反面图预览:
+										</label> <a href="" target="_blank" id="imacardurlidother"><img
+											width="150px" height="150px" src=""></a>
+									</p>
+
+									<input type="text" name="idurlcardtogether"
+										style="width:120px;display:none;" />
+									<p id="showcardpicidtogether" style="display:none;">
+										<label style="display: inline;"> &nbsp;&nbsp;身份证合成图预览:
+										</label> <a href="" target="_blank" id="imacardurlidtogether"><img
+											width="150px" height="150px" src=""></a>
+									</p>
+
+								</div>
+
+							</div>
+							<p>
+								<label style="display: inline;">备注信息：</label>
+								<textarea rows="2" cols="20" class="text-input" name="remark"
+									maxlength="100"></textarea>
+							</p>
+							<hr />
+
+							<p style="margin-left: 50px;">
+								<input id="bt_tranship_modify1" class="button" type="button"
+									onclick="submit_tranorder()" value="保存修改" />&nbsp;&nbsp; <input
+									id="bt_tranship_submit_to_order" class="button" type="button"
+									onclick="submit_tranorder_to_orders()" value="生成订单"
+									style="display:none;" />
+							</p>
+						</fieldset>
+						<div class="clear"></div>
+						<!-- End .clear -->
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 不要删除这个div -->
+	<div id="tmpmsgdiv1" style="display:none;"></div>
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+
+		loadNav512Data();
+		
+	});
+	
+	//02/11/2016再次修改
+	function findStorage4User() {
+		var url = "";
+		var checkbox = document.getElementsByName("fromTransportState");
+		//var url = "../admin/storagePosition/findStoragePosition4UserByAfterType";
+		if (checkbox[0].checked == true) {
+			//url = "../admin/storagePosition/findStoragePosition4UserByBeforeType";
+		}
+		/*
+		//02/11/2016修改
+		var checkbox = document.getElementsByName("fromTransportState");
+		if (checkbox[0].checked == true) {
+			url = "../admin/storagePosition/findStoragePosition4UserByBeforeType";
+		}
+		*/
+		$
+				.ajax({
+					type : "post",
+					url : url,
+					data : {
+						warehouseId : $("select[name='warehouse']").val(),
+						typeRelateId : $("select[name='Towarehouse']").val(),
+						userId : $("#u_id").html()
+					},
+					success : function(response) {
+						var code = response.code;
+						if ("200" == code) {
+							//$("#storagePositionId").val(response.data.id);
+							//$("#storageName").val(response.data.storageName);
+							
+							var sel = document.getElementById('storageName');
+							sel.options.add(new Option(response.data.storageName,response.data.storageId));
+							$("#storagePositionColNumber").val(response.data.colNumber);
+							$("#storagePositionRowNumber").val(response.data.rowNumber);
+							
+							//findByWarehouseIdAndTypeAndRelateIdList();		
+							//$("#storagePositionSuggestion").html("");
+						} else if("31007" == code){
+							$("#storagePositionSuggestion").html("没有设置储藏间");
+						} else {
+							//$("#storagePositionId").val("");
+							//$("#storageName").empty();
+							//$("#storagePositionColNumber").val("");
+							//$("#storagePositionRowNumber").val("");
+							//$("#storagePositionSuggestion").html("");
+						}
+						return false;
+					}
+				});
+	}
+	
+	//02/04/16新增
+	function findStorage4UserList() {
+		var url = "../admin/storagePosition/findStoragePosition4UserByAfterType";
+		var checkbox = document.getElementsByName("fromTransportState");
+		if (checkbox[0].checked == true) {
+			url = "../admin/storagePosition/findStoragePosition4UserByBeforeTypeList";
+		}
+		$
+				.ajax({
+					type : "post",
+					url : url,
+					data : {
+						warehouseId : $("select[name='warehouse']").val(),
+						typeRelateId : $("select[name='Towarehouse']").val(),
+						userId : $("#u_id").html()
+					},
+					success : function(response) {
+						var code = response.code;
+						if ("200" == code) {
+						
+						//console.log("获取到了数据:"+response.data);
+						var sel = document.getElementById('storageName');
+						for(var o in response.data){  
+						//console.log("id:"+response.data[o].id);
+						sel.options.add(new Option(response.data[o].storageName,response.data[o].id));
+
+						}
+						/*
+							$("#storagePositionId").val(response.data.id);
+							$("#storageName").val(response.data.storageName);
+							$("#storagePositionColNumber").val(
+									response.data.colNumber);
+							$("#storagePositionRowNumber").val(
+									response.data.rowNumber);
+							$("#storagePositionSuggestion").html("");
+							*/
+						} else if("31007" == code){
+							$("#storagePositionSuggestion").html("没有设置储藏间");
+						} else {
+							//$("#storagePositionId").val("");
+							//02/11/16修改
+							$("#storageName").empty();
+							$("#storagePositionColNumber").val("");
+							$("#storagePositionRowNumber").val("");
+							$("#storagePositionSuggestion").html("");
+						}
+						return false;
+					}
+				});
+	}
+	
+	function storageNameChange(){
+		console.log("我改变了！！！");
+	}
+	function storagePositionRowNumberChange(){
+		
+		//console.log("我变了!");
+		//var storagePositionRowNumber = $("storagePositionRowNumber").val();
+		var storagePositionColNumber = $("storagePositionColNumber").val();
+		if('' != storagePositionColNumber || null !=storagePositionColNumber || 0 !=storagePositionColNumber){
+			findStoragePositionByWarehouseIdAndTypeAndRelateIdRowCol();
+		}
+		
+	}
+	function storagePositionColNumberChange(){
+		//console.log("我也改变了！");
+		//console.log($("select[name='storageName']").val()); 
+		findStoragePositionByWarehouseIdAndTypeAndRelateIdRowCol();
+	}
+	
+	
+	
+	function checkStoragePositionByUser() {
+		$
+				.ajax({
+					post : "get",
+					url : "../admin/storagePosition/checkStoragePosition4User",
+					data : {
+						userId : $("#u_id").html(),
+						storageName : $("#storageName").val(),
+						colNumber : $("#storagePositionColNumber").val(),
+						rowNumber : $("#storagePositionRowNumber").val()
+					},
+					success : function(response) {
+						var code = response.code;
+						if ("200" == code) {
+							if (!response.data) {//false, 不可以使用
+								document.getElementById("storageName").style.background = "#f77";
+								document
+										.getElementById("storagePositionColNumber").style.backgroundColor = "#f77";
+								document
+										.getElementById("storagePositionRowNumber").style.backgroundColor = "#f77";
+								//document.getElementById("storagePositionId").value = "";
+								var url = "../admin/storagePosition/findEmptyStoragePositionByAfterType";
+								var checkbox = document
+										.getElementsByName("fromTransportState");
+								if (checkbox[0].checked == true) {
+									url = "../admin/storagePosition/findEmptyStoragePositionByBeforeType";
+								}
+								$
+										.ajax({
+											post : "get",
+											url : url,
+											data : {
+												warehouseId : $(
+														"select[name='warehouse']")
+														.val(),
+												typeRelateId : $(
+														"select[name='Towarehouse']")
+														.val()
+											},
+											success : function(response) {
+												var code = response.code;
+												if ("200" == code) {
+													if (response.data == null) {
+														alert(response.message);
+													} else {
+														document
+																.getElementById("storagePositionSuggestion").innerHTML = "建议位置："
+																+ response.data.storageName
+																+ "/"
+																+ response.data.rowNumber
+																+ "/"
+																+ response.data.colNumber;
+													}
+													//020616
+													//return false;
+												}
+												;
+											}
+										});
+							} else {
+								document.getElementById("storageName").style.background = "inherit";
+								document
+										.getElementById("storagePositionColNumber").style.backgroundColor = "inherit";
+								document
+										.getElementById("storagePositionRowNumber").style.backgroundColor = "inherit";
+								document.getElementById("storagePositionId").value = response.data;
+								document
+										.getElementById("storagePositionSuggestion").innerHTML = "";
+							}
+						} else if ("607" == code) {
+							alert("您尚未登录或登录已失效！");
+							logout();
+						} else if ("31001" == code) {
+							//$("#storagePositionId").val(response.data.id);
+							$("#storageName").val(response.data.storageName);
+							$("#storagePositionColNumber").val(
+									response.data.colNumber);
+							$("#storagePositionRowNumber").val(
+									response.data.rowNumber);
+							document.getElementById("storageName").readOnly = true;
+							document.getElementById("storagePositionColNumber").readOnly = true;
+							document.getElementById("storagePositionRowNumber").readOnly = true;
+							document
+									.getElementById("storagePositionSuggestion").innerHTML = "用户已有仓位";
+						} else {
+							document
+									.getElementById("storagePositionSuggestion").innerHTML = "";
+						}
+						;
+					}
+				});
+	}
+	//li zhang
+//02182016
+function findStoragePositionByWarehouseIdAndTypeAndRelateIdRowCol(){
+	var url = "../admin/storagePosition/findStoragePositionByWarehouseIdAndTypeAndRelateIdRowColAfter";
+	var checkbox = document.getElementsByName("fromTransportState");
+	if (checkbox[0].checked == true) {
+		url = "../admin/storagePosition/findStoragePositionByWarehouseIdAndTypeAndRelateIdRowCol";
+	}
+	var colNumberVal = $("#storagePositionColNumber").val();
+	var rowNumberVal = $("#storagePositionRowNumber").val();
+	var storageNameVal = $("select[name='storageName']").val();
+	$.ajax({
+				type : "post",
+				url : url,
+				async:false,
+				data : {
+				
+					warehouseId : $("select[name='warehouse']").val(),
+					typeRelateId : $("select[name='Towarehouse']").val(),
+					userId : $("#u_id").html(),
+					storageId :  storageNameVal,
+					colNumber : colNumberVal,
+					rowNumber: rowNumberVal
+				},
+				success : function(response) {
+					var code = response.code;
+					if ("200" == code) {
+					
+					//console.log("findStoragePositionByWarehouseIdAndTypeAndRelateIdRowCol获取到了数据:"+response.data);
+						
+						var dStorageName = response.data.storageName;
+						var dRowNumber = response.data.rowNumber;
+						var dColNumber = response.data.colNumber;
+						var dStorageId  = response.data.storageId;
+						$("#storagePositionId").val(response.data.id);
+						$("#storagePositionSuggestion").html("储藏间:"+dStorageName+"的"+dRowNumber+"行/"+dColNumber+"列可用");
+						$("#exsit_storagePosition").val(true);
+						
+						
+						//console.log("dStorageId:"+dStorageId+",storageNameVal:"+storageNameVal+",rowNumberVal:"+rowNumberVal+",dRowNumber:"+dRowNumber+",colNumberVal:"+colNumberVal+",dColNumber:"+dColNumber);
+						if("0" == response.data.available){
+							if(dStorageId != storageNameVal || rowNumberVal != dRowNumber || colNumberVal != dColNumber){
+							$("#storagePositionSuggestion").html("此用户已有储藏间:"+dStorageName+"的"+dRowNumber+"行/"+dColNumber+"列");
+								$("#exsit_storagePosition").val(false);
+							}
+						}
+					
+					/*
+					var sel = document.getElementById('storageName');
+					for(var o in response.data){  
+					console.log("id:"+response.data[o].id);
+					sel.options.add(new Option(response.data[o].name,response.data[o].id));
+					
+					} */
+							
+					} else if("31011" == code){
+					var sName = $("select[name='storageName']").text();
+						$("#storagePositionSuggestion").html("储藏间:"+sName+"的"+rowNumberVal+"行/"+colNumberVal+"列 不可用");
+						$("#exsit_storagePosition").val(false);
+					}
+					return false;
+				}
+			});
+}
+
+//li zhang
+//020416新增
+function findByWarehouseIdAndTypeAndRelateIdList(){
+	
+	$("#storagePositionId").val("");
+	$("#storageName").empty();
+	var url = "../admin/storage/findByWarehouseIdAndTypeAndRelateIdListAfter";
+	var checkbox = document.getElementsByName("fromTransportState");
+	if (checkbox[0].checked == true) {
+		url = "../admin/storage/findByWarehouseIdAndTypeAndRelateIdList";
+	}
+	$.ajax({
+				type : "post",
+				url : url,
+				async:false,
+				data : {
+					warehouseId : $("select[name='warehouse']").val(),
+					typeRelateId : $("select[name='Towarehouse']").val(),
+					userId : $("#u_id").html()
+				},
+				success : function(response) {
+					var code = response.code;
+					if ("200" == code) {
+					
+					console.log("findByWarehouseIdAndTypeAndRelateIdList获取到了数据:"+response.data);
+					
+					var sel = document.getElementById('storageName');
+					
+					//sel.options.add(new Option("去Monterey2",2));
+					//sel.options.add(new Option("去Monterey",1));
+					
+					for(var o in response.data){  
+					console.log("id:"+response.data[o].id);
+					sel.options.add(new Option(response.data[o].name,response.data[o].id));
+					} 
+					
+					suggestStoragePosition();
+					} 
+					
+					else if("31006" == code){
+						$("#storagePositionId").val("");
+						$("#storageName").empty();
+						$("#storagePositionColNumber").val("");
+						$("#storagePositionRowNumber").val("");
+						$("#storagePositionSuggestion").html("没有设置储藏间");
+					}
+					/*
+					 else {
+						$("#storagePositionId").val("");
+						$("#storageName").val("");
+						$("#storagePositionColNumber").val("");
+						$("#storagePositionRowNumber").val("");
+						$("#storagePositionSuggestion").html("");
+					}
+					*/
+					 else {
+					 	$("#storagePositionId").val("");
+						$("#storageName").empty();
+						$("#storagePositionColNumber").val("");
+						$("#storagePositionRowNumber").val("");
+						$("#storagePositionSuggestion").html("");
+					}
+					return false;
+				}
+			});
+
+}
+//li zhang
+//02182016
+//建议位置
+function suggestStoragePosition(){
+	console.log("suggestStoragePosition开始");
+	
+	var url = "../admin/storagePosition/findStoragePositionByWarehoseIdTypeRelateUserAfter";
+	var checkbox = document.getElementsByName("fromTransportState");
+	if (checkbox[0].checked == true) {
+		//url = "../admin/storagePosition/findNextEmptyStoragePositionByWarehoseIdTypeRelate";
+		url = "../admin/storagePosition/findStoragePositionByWarehoseIdTypeRelateUser";
+	}
+	
+	console.log("warehouse:"+$("select[name='warehouse']").val());
+	console.log("towarehouse" + $("select[name='Towarehouse']").val());
+	console.log("userid:"+$("#u_id").html());
+	
+	$.ajax({
+				type : "post",
+				url : url,
+				async:false,
+				data : {
+				
+					warehouseId : $("select[name='warehouse']").val(),
+					typeRelateId : $("select[name='Towarehouse']").val(),
+					userId : $("#u_id").html()
+				},
+				success : function(response) {
+					var code = response.code;
+					if ("200" == code) {
+					
+					var row = response.data.rowNumber;
+					var col = response.data.colNumber;
+					var storageName = response.data.storageName;
+					var storageId = response.data.storageId;
+					var id = response.data.id;
+					
+					console.log("suggestStoragePosition获取到了数据:"+response.data);
+					
+					$("#storageName").attr('value',storageId);
+					
+					
+					$("#storagePositionSuggestion").html("建议位置：" + storageName + "的" + row + "行/" + col + "列");
+					$("#storagePositionColNumber").val(col);
+					$("#storagePositionRowNumber").val(row);
+					$("#storagePositionId").val(id);
+					
+					//var sel = document.getElementById('storageName');
+					//sel.options.add(new Option(response.data.storageName,response.data.storageId));
+					
+					console.log("storageId:"+storageId);
+					
+					
+					
+					
+					//$("#storagePositionSuggestion").text("建议位置:" + row + "行/" + col + "列");
+					
+					//document.getElementById("storagePositionSuggestion").innerHTML = "建议位置：";
+					/*
+					var sel = document.getElementById('storageName');
+					for(var o in response.data){  
+					console.log("id:"+response.data[o].id);
+					sel.options.add(new Option(response.data[o].name,response.data[o].id));
+					
+					} */
+					
+					}  else if ("31011" == code){
+						$("#storagePositionSuggestion").html("已没有储藏间,请添加储藏间");
+						$("#storageName").empty();
+					}
+					//return false;
+				}
+			});
+
+	
+	
+}
+</script>
+</html>

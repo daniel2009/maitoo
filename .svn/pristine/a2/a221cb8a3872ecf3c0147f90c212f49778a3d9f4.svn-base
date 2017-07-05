@@ -1,0 +1,107 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="id" value="${param.id }"/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">会员信息详情
+			<a href="#" id="a_back_user_list_link">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">会员信息详情</div>
+			<div class="content_text">
+			
+				<div class="tab-content" id="tab2">
+		          <form action="#" method="post">
+		            <fieldset>
+		            	<p>
+			              <label style="display: inline;">用户编号：</label>
+			              <label style="display: inline;" id="u_d_id">${param.id }</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">用户名：</label>
+			              <label style="display: inline;" id="u_d_nick_name">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">Email：</label>
+			              <label style="display: inline;" id="u_d_email">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">真实姓名：</label>
+			              <label style="display: inline;" id="u_d_real_name">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">联系电话：</label>
+			              <label style="display: inline;" id="u_d_phone">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">QQ：</label>
+			              <label style="display: inline;" id="u_d_qq">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">国家：</label>
+			              <label style="display: inline;" id="u_d_country">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">地址：</label>
+			              <label style="display: inline;" id="u_d_address">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">用户类型：</label>
+			              <label style="display: inline;" id="u_d_type">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">注册时间：</label>
+			              <label style="display: inline;" id="u_d_sign_date">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">账户余额：</label>
+			              <label style="display: inline;" id="u_d_banlcen">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">是否管理员添加：</label>
+			              <label style="display: inline;" id="u_d_emp_add">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">登录次数：</label>
+			              <label style="display: inline;" id="u_d_times">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">上次登录时间：</label>
+			              <label style="display: inline;" id="u_d_last_date">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+		</div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav35Data();
+	});
+</script>
+</html>

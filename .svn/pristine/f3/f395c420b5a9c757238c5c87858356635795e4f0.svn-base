@@ -1,0 +1,34 @@
+function usaLocation() {
+	this.items	= {
+	'0':{1:'USA'},
+	'0,1':{2:'Alabama AL',3:'Alaska AK',4:'Arizona AZ',5:'Arkansas AR',6:'California CA',7:'Colorado CO',8:'Connecticut CT',9:'Delaware DE',10:'Florida FL',11:'Georgia GA ',12:'Hawaii HI',13:'Idaho ID',14:'Illinois IL',15:'Indiana IN',16:'Iowa IA',17:'Kansas KS',18:'Kentucky KY',19:'Louisiana LA',20:'Maine ME',21:'Maryland MD',22:'Massachusetts MA',23:'Michigan MI',24:'Minnesota MN',25:'Mississippi MS',26:'Missouri MO',27:'Montana MT',28:'Nebraska NE',29:'Nevada NV',30:'New Hampshire NH ',31:'New Jersey NJ',32:'New Mexico NM',33:'New York NY',34:'North Carolina NC',35:'North Dakota ND',36:'Ohio OH',37:'Oklahoma OK',38:'Oregon OR',39:'Pennsylvania PA',40:'Rhode Island RL',41:'South Carolina SC',42:'South Dakota SD',43:'Tennessee TN',44:'Texas TX',45:'Utah UT',46:'Vermont V',47:'Virginia VA',48:'Washington WA',49:'West Virginia WV',50:'Wisconsin WI',51:'Wyoming WY'}
+	};
+}
+
+usaLocation.prototype.find	= function(id) {
+	if(typeof(this.items[id]) == "undefined")
+		return false;
+	return this.items[id];
+};
+
+usaLocation.prototype.fillOption	= function(el_id , loc_id , selected_id) {
+	var el	= $('#'+el_id);
+	
+	var json	= this.find(loc_id);
+	
+	if (json) {
+		var index	= 1;
+		var selected_index	= 0;
+		$.each(json , function(k , v) {
+			var option	= '<option name="' + v + '" value="'+k+'">'+v+'</option>';
+			el.append(option);
+			
+			if (k == selected_id) {
+				selected_index	= index;
+			}
+			
+			index++;
+		});
+		el.attr('selectedIndex' , selected_index);
+	}
+};

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.MessageRecordDao">
+
+
+
+	<resultMap id="basic_result_map" type="com.meitao.model.MessageRecord">
+		<id column="id" property="id" javaType="String" />
+		<result column="usa_nos" property="usa_nos" javaType="String" />
+		<result column="rmb_nos" property="rmb_nos" javaType="String" />
+		<result column="type" property="type" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+
+
+
+
+
+	</resultMap>
+
+	<insert id="insert" parameterType="com.meitao.model.MessageRecord">
+		insert into
+		messagerecord(usa_nos,rmb_nos,create_date,modify_date,remark,type)
+		values(#{usa_nos},#{rmb_nos},#{createDate},#{modifyDate},#{remark},#{type})
+	</insert>
+
+
+
+	
+	<select id="countKeysbyadmin" resultType="java.lang.Integer">
+		select count(distinct `messagerecord`.id)
+		from messagerecord
+		<where>
+			<if test="csdate!=null and csdate!=''">
+				and `messagerecord`.`create_date` <![CDATA[>=]]>
+				#{csdate}
+			</if>
+			<if test="cedate!=null and cedate!=''">
+				and `messagerecord`.`create_date` <![CDATA[<=]]>
+				#{cedate}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (`messagerecord`.remark like #{wordkey} )
+			</if>
+			<if test="type!=null and type!=''">
+				and `messagerecord`.type = #{type}
+			</if>
+		</where>
+	</select>
+
+	<select id="searchKeysByadmin" resultMap="basic_result_map">
+		select distinct `messagerecord`.* 
+			from messagerecord
+			<where>
+			<if test="csdate!=null and csdate!=''">
+				and `messagerecord`.`create_date` <![CDATA[>=]]>
+				#{csdate}
+			</if>
+			<if test="cedate!=null and cedate!=''">
+				and `messagerecord`.`create_date` <![CDATA[<=]]>
+				#{cedate}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (`messagerecord`.remark like #{wordkey} )
+			</if>
+			<if test="type!=null and type!=''">
+				and `messagerecord`.type = #{type}
+			</if>
+		</where>
+		
+		order by `messagerecord`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+	
+</mapper>

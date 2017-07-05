@@ -1,0 +1,723 @@
+function loadNav41Data() {
+	loadNewsListFirst();
+
+	
+	$(":submit[name='searchSub']").click(function() {
+
+		var key=$(":text[name='key']").val();
+		var column = $("select[name='type']").val();
+		//alert(column);
+		
+		loadNewsList(key,column,1);
+		return false;
+	});
+	
+	$("#a_add_news_link").click(function() {
+		$("#main-content").load(admin_news_add_page_url);
+		return false;
+	});
+	$("#a_delete_news_link").click(function() {
+		var chk_value1 = [];
+		$('input[name="del_id"]:checked').each(function() {
+			chk_value1.push($(this).val()); // 这里就是拼数组了，也就是后台的list集合
+		});
+		if (chk_value1.length == 0) {
+			alert("您还没有选择要删除的新闻！");
+		} else {
+			if (confirm("您是否确认要删除新闻信息?")) {
+				$.ajax( {
+					type : "post",
+					url : admin_news_dele_url,
+					data : $.param({
+						"ids" : chk_value1,
+					}, true),
+					success : function(response) {
+						var code = response.code;
+						if ("200" == code) {
+							alert("删除成功");
+							//$("#nav41").click();
+							nav41Click();
+						} else if ("607" == code) {
+							alert("您尚未登录或登录已失效！");
+							logout();
+						} else {
+							alert("删除新闻失败，原因是:" + response.message);
+						}
+						return false;
+					}
+				});
+			}
+		}
+		return false;
+	});
+	
+
+	$("#u_del_check_all").click(function() {
+		if ($(this).is(':checked')) {
+			$('input[name="del_id"]').attr("checked", 'true');
+		} else {
+			$('input[name="del_id"]').removeAttr("checked");
+		}
+	});
+	
+	setBackNewsLinkFunction();
+}
+
+function loadNewsListFirst() {
+	loadNewsList("","",1);
+}
+
+function loadNewsList(key,column,pageNow) {
+	key = encodeURI(key);
+	$.ajax( {
+		post : "get",
+		url : admin_news_list_url,
+		data : {
+			"key" : key,
+			"column" : column,
+			"pageIndex" : pageNow
+		},
+		success : function(response) {
+			var code = response.code;
+			//alert(code);
+			if ("200" == code) {
+				if((response.data==null)||(response.data.datas==null))
+				{
+					showNewsList(null);
+					showNewsLink(null);
+				}
+				else
+				{
+					showNewsList(response.data.datas);
+					showNewsLink(response.data);
+				}
+				afterLoadNewsList();
+				//afterLoadNewsList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+function showEmpList(list) {
+
+	var str = "";
+	$.each(list, function() {
+		str += "<tr id='" + this.id
+				+ "'><td><a href='#' name='a_news_detail_link'>" + this.account
+				+ "</a></td>";//新闻id以及根据id获取详情
+		str += "<td>" + this.title + "</td>";//新闻标题
+		str += "<td>" + this.content + "</td>";//新闻内容
+		//str += "<td>"+this.author+"</td>";//这里新闻作者信息
+		//str +="<td>"+this.releasetime+"<td>";//新闻增加修改时间
+		str += "<td><a href='#' name='a_news_delete_link'>删除</a></td>";
+		str += "<td><a href='#' name='a_news_modify_link'>修改</a></td></tr>";
+	});
+	$("#tab1 table tbody").html(str);
+
+}
+function showEmpLink(pageSplit) {
+	var rowCount = pageSplit.rowCount;
+	var pageSize = pageSplit.pageSize;
+	var pageNow = pageSplit.pageNow;
+	var pageCount = pageSplit.pageCount;
+	$("tfoot .pagination").html(
+			createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount));
+
+	$("tfoot .pagination a").click(function() {
+		// 跳页
+			var pn = $(this).attr("href");
+			loadEmpList(pn);
+			return false;
+		});
+
+	$("tfoot .pagination input").keydown(function(event) {
+		var key=$(":text[name='key']").val();
+		var column = $("select[name='type']").val();
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				loadNewsList(key,column,pn);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});
+}
+
+function loadNav43Data(){
+	setBackNewsLinkFunction();
+	$("#bt_add_news").click(function() {
+		var title = $(":text[name='title']").val();
+		//var author = $(":text[name='author']").val();
+		var content = $("textarea[name='content']").val();
+		//var myDate=new Date();
+		//var releasetime=myDate.toLocaleTimeString();
+		var picture1 = $("picutre1").val();
+		submitAddNews(title,content, picture1);
+	});
+}
+function submitAddNews(title,content) {
+	//alert(title);
+	//alert(releasetime);
+	if (title=='') {
+		alert("请填写标题后再提交!");
+	}
+	else if(content=="")
+	{
+		alert("内容不能留空!");
+	}
+	else {
+		//$("#bt_add_news").attr("disabled", true);
+		var formData = new FormData(document.getElementById("form"));
+		$.ajax( {
+			type : "post",
+			url :admin_news_add_url,
+			data: formData,
+			contentType : false,
+			processData : false,
+			success : function(response) {
+				//$("#bt_add_news").attr("disabled", false);
+				var code = response.code;
+				//alert(code);
+				if ("200" == code) {
+					alert("添加成功");
+					$("#main-content").load(admin_news_list_page_url);
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("添加新闻失败:" + response.message);
+				}
+				return false;
+			}
+		});
+		//alert("测试是否传递完毕");
+	}
+	return false;
+}
+function setBackNewsLinkFunction() {
+	$("#a_back_news_list_link").click(function() {
+		/*if (!$("#nav4").hasClass("current")) {
+			$("#nav4").click();
+		}*/
+		//$("#nav41").click();
+		nav41Click();
+		return false;
+	});
+}
+
+
+//kai 20150925 modify
+function showNewsList(list) {
+	var str = "";
+	if (list != null) {
+		$
+				.each(
+						list,
+						function() {
+							str += "<tr id='" + this.id + "'>";
+							str += "<td><input type='checkbox' name='del_id' value='"
+									+ this.id + "'/></td>";
+							str += "<td>" + this.id + "</td>";
+							str += "<td>" + this.title + "</td>";							
+							str += "<td>" + this.viewcontent + "</td>";
+							str += "<td>" + this.author + "</td>";
+							
+							str += "<td>" + this.releasetime + "</td>";
+							str += "<td>" + this.modifytime + "</td>";
+							str += "<td>" + this.remark + "</td>";
+							str += "<td><a href='"+ this.id +"' name='a_news_modify_link'>修改</a></td>";
+							str += "</tr>";
+						});
+	} else {
+		if (str == null || str == '') {
+			
+		}
+	}
+	$("#tab1 table tbody").html(str);
+}
+
+function showNewsLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .bulk-actions").show();
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+
+			var key=$(":text[name='key']").val();
+			var column = $("select[name='type']").val();
+			var pn = $(this).attr("href");
+
+			//loadTranshipList(tid, key, type, sdate, edate, pn);
+			loadNewsList(key,column,pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var key=$(":text[name='key']").val();
+					var column = $("select[name='type']").val();
+					//loadTranshipList(key, type, sdate, edate, pn);
+					loadNewsList(key,column,pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .bulk-actions").hide();
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterLoadNewsList() {
+	$("a[name='a_news_modify_link']").click(function() {
+		var id = $(this).attr("href");
+		var url = admin_news_modify_page_url + "?newsid=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+
+
+}
+//////
+//修改新闻入口
+function loadNav412Data(){
+	
+	//开始调用一条新闻的内容出来
+	$.ajax({
+		type : "get",
+		url : admin_news_get_one_url,
+		data : {
+			"id" : $(":hidden[name='id']").val()
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data != null) {
+					shownewsInfo(response.data);
+				} else {
+					alert("没有对应id的新闻记录!");
+					// $("#nav52").click();
+					nav41Click();
+				}
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取新闻详情失败，失败原因是：" + response.message);
+				// $("#nav52").click();
+				nav41Click();
+			}
+		}
+	});
+	
+	$("#bt_modify_news")
+	.click(
+			function() {
+				var title=$(":text[name='title']").val();
+				var content=$("textarea[name='content']").val();
+				submitModifyNews(title,content);
+			});
+
+}
+
+function shownewsInfo(news) {
+
+	$(":text[name='title']").val(news.title);
+	$("textarea[name='content']").val(news.content);
+	$("#picture1Img").attr("src", baseUrl + news.pic1);
+	$("#pic1").val(news.pic1);
+	
+}
+
+function submitModifyNews(title,content) {
+	if (title=='') {
+		alert("请填写标题后再提交!");
+	}
+	else if(content=="")
+	{
+		alert("内容不能留空!");
+	}
+	else {
+		//$("#bt_add_news").attr("disabled", true);
+		var formData = new FormData(document.getElementById("form"));
+		$.ajax( {
+			type : "post",
+			url :admin_news_modify_url,
+			data: formData,
+			contentType : false,
+			processData : false,
+			success : function(response) {
+				//$("#bt_add_news").attr("disabled", false);
+				var code = response.code;
+				//alert(code);
+				if ("200" == code) {
+					alert("修改成功");
+					nav41Click();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("添加新闻失败:" + response.message);
+				}
+				return false;
+			}
+		});
+		//alert("测试是否传递完毕");
+	}
+	return false;
+}
+
+
+///////////////////////////////////////////////////////////公告内容//////////////////////////////
+//公告列表入口函数
+function loadNav42Data(){
+	
+	loadGongGaoListFirst();
+
+	
+	$(":submit[name='searchSub']").click(function() {
+
+		var key=$(":text[name='key']").val();
+		var column = $("select[name='type']").val();
+		//alert(column);
+		
+		loadGongGaoList(key,column,1);
+		return false;
+	});
+	
+	$("#a_add_gonggao_link").click(function() {
+		$("#main-content").load(admin_gonggao_add_page_url);
+		return false;
+	});
+	$("#a_delete_gonggao_link").click(function() {
+		var chk_value1 = [];
+		$('input[name="del_id"]:checked').each(function() {
+			chk_value1.push($(this).val()); // 这里就是拼数组了，也就是后台的list集合
+		});
+		if (chk_value1.length == 0) {
+			alert("您还没有选择要删除的新闻！");
+		} else {
+			if (confirm("您是否确认要删除新闻信息?")) {
+				$.ajax( {
+					type : "post",
+					url : admin_gonggao_dele_url,
+					data : $.param({
+						"ids" : chk_value1,
+					}, true),
+					success : function(response) {
+						var code = response.code;
+						if ("200" == code) {
+							alert("删除成功");
+							//$("#nav41").click();
+							nav42Click();
+						} else if ("607" == code) {
+							alert("您尚未登录或登录已失效！");
+							logout();
+						} else {
+							alert("删除公告失败，原因是:" + response.message);
+						}
+						return false;
+					}
+				});
+			}
+		}
+		return false;
+	});
+	
+
+	$("#u_del_check_all").click(function() {
+		if ($(this).is(':checked')) {
+			$('input[name="del_id"]').attr("checked", 'true');
+		} else {
+			$('input[name="del_id"]').removeAttr("checked");
+		}
+	});
+}
+
+function loadGongGaoListFirst() {
+	loadGongGaoList("","",1);
+}
+function loadGongGaoList(key,column,pageNow) {
+	key = encodeURI(key);
+	$.ajax( {
+		post : "get",
+		url : admin_gonggao_list_url,
+		data : {
+			"key" : key,
+			"column" : column,
+			"pageIndex" : pageNow
+		},
+		success : function(response) {
+			var code = response.code;
+			//alert(code);
+			if ("200" == code) {
+				if((response.data==null)||(response.data.datas==null))
+				{
+					showGonggaoList(null);
+					showGonggaoLink(null);
+				}
+				else
+				{
+					showGonggaoList(response.data.datas);
+					showGonggaoLink(response.data);
+				}
+				afterLoadGonggaoList();
+				//afterLoadNewsList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+function showGonggaoList(list) {
+	var str = "";
+	if (list != null) {
+		$
+				.each(
+						list,
+						function() {
+							str += "<tr id='" + this.id + "'>";
+							str += "<td><input type='checkbox' name='del_id' value='"
+									+ this.id + "'/></td>";
+							str += "<td>" + this.id + "</td>";
+							str += "<td>" + this.title + "</td>";							
+							str += "<td>" + this.viewcontent + "</td>";
+							str += "<td>" + this.author + "</td>";
+							
+							str += "<td>" + this.releasetime + "</td>";
+							str += "<td>" + this.modifytime + "</td>";
+							str += "<td>" + this.remark + "</td>";
+							str += "<td><a href='"+ this.id +"' name='a_gonggao_modify_link'>修改</a></td>";
+							str += "</tr>";
+						});
+	} else {
+		if (str == null || str == '') {
+			
+		}
+	}
+	$("#tab1 table tbody").html(str);
+}
+
+function showGonggaoLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .bulk-actions").show();
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+
+			var key=$(":text[name='key']").val();
+			var column = $("select[name='type']").val();
+			var pn = $(this).attr("href");
+
+			//loadTranshipList(tid, key, type, sdate, edate, pn);
+			loadGongGaoList(key,column,pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var key=$(":text[name='key']").val();
+					var column = $("select[name='type']").val();
+					//loadTranshipList(key, type, sdate, edate, pn);
+					loadGongGaoList(key,column,pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .bulk-actions").hide();
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterLoadGonggaoList() {
+	$("a[name='a_gonggao_modify_link']").click(function() {
+		var id = $(this).attr("href");
+		var url = admin_gonggao_modify_page_url + "?gonggaoid=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+
+
+}
+
+function loadNav422Data(){
+	setBackgonggaoLinkFunction();
+	$("#bt_add_gonggao").click(function() {
+		var title = $(":text[name='title']").val();
+		//var author = $(":text[name='author']").val();
+		var content = $("textarea[name='content']").val();
+		//var myDate=new Date();
+		//var releasetime=myDate.toLocaleTimeString();
+		submitGonggaoNews(title,content);
+	});
+}
+function submitGonggaoNews(title,content) {
+	//alert(title);
+	//alert(releasetime);
+	if (title=='') {
+		alert("请填写标题后再提交!");
+	}
+	else if(content=="")
+	{
+		alert("内容不能留空!");
+	}
+	else {
+		//$("#bt_add_news").attr("disabled", true);
+		
+		$.ajax( {
+			type : "post",
+			url :admin_gonggao_add_url,
+			//url:"../news/add",
+			data:{
+				"title" : title,
+				"content" : content
+			},
+			success : function(response) {
+				//$("#bt_add_news").attr("disabled", false);
+				var code = response.code;
+				//alert(code);
+				if ("200" == code) {
+					alert("添加成功");
+					$("#main-content").load(admin_gonggao_list_page_url);
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("添加新闻失败:" + response.message);
+				}
+				return false;
+			}
+		});
+		//alert("测试是否传递完毕");
+	}
+	return false;
+}
+function setBackgonggaoLinkFunction() {
+	$("#a_back_gonggao_list_link").click(function() {
+		/*if (!$("#nav4").hasClass("current")) {
+			$("#nav4").click();
+		}*/
+		//$("#nav41").click();
+		nav42Click();
+		return false;
+	});
+}
+
+//////
+//修改公告入口
+function loadNav423Data(){
+	
+	//开始调用一条新闻的内容出来
+	$.ajax({
+		type : "get",
+		url : admin_gonggao_get_one_url,
+		data : {
+			"id" : $(":hidden[name='gonggaoid']").val()
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data != null) {
+					showgonggaoInfo(response.data);
+				} else {
+					alert("没有对应id的新闻记录!");
+					// $("#nav52").click();
+					nav42Click();
+				}
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取新闻详情失败，失败原因是：" + response.message);
+				// $("#nav52").click();
+				nav42Click();
+			}
+		}
+	});
+	
+	$("#bt_modify_gonggao")
+	.click(
+			function() {
+				var title=$(":text[name='title']").val();
+				var content=$("textarea[name='content']").val();
+				submitModifygonggao(title,content);
+			});
+
+}
+
+function showgonggaoInfo(gonggao) {
+
+	$(":text[name='title']").val(gonggao.title);
+	$("textarea[name='content']").val(gonggao.content);
+
+}
+
+function submitModifygonggao(title,content) {
+	if (title=='') {
+		alert("请填写标题后再提交!");
+	}
+	else if(content=="")
+	{
+		alert("内容不能留空!");
+	}
+	else {
+		//$("#bt_add_news").attr("disabled", true);
+		
+		$.ajax( {
+			type : "post",
+			url :admin_gonggao_modify_url,
+			data:{
+				"title" : title,
+				"content" : content,
+				"id" : $(":hidden[name='gonggaoid']").val()
+			},
+			success : function(response) {
+				//$("#bt_add_news").attr("disabled", false);
+				var code = response.code;
+				//alert(code);
+				if ("200" == code) {
+					alert("修改成功");
+					nav42Click();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("添加新闻失败:" + response.message);
+				}
+				return false;
+			}
+		});
+		//alert("测试是否传递完毕");
+	}
+	return false;
+}

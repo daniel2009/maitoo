@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.Shelves_positionDao">
+	<resultMap id="basic_result_map" type="com.meitao.model.Shelves_position">
+		<id column="id" property="id" javaType="String" />
+		<result column="indexId" property="indexId" javaType="String" />
+		<result column="position" property="position" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		
+	
+		
+	</resultMap>
+
+	<insert id="insert" parameterType="com.meitao.model.Shelves" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		shelves_position(indexId,position,create_date,modify_date,state,remark)
+		values(#{indexId},#{position},#{createDate},#{modifyDate},#{state},#{remark})
+	</insert>
+
+
+	<select id="getbyid" resultMap="basic_result_map">
+		select shelves_position.* from shelves_position where id=#{id}
+	</select>
+	
+	<select id="getone" resultMap="basic_result_map">
+		select shelves_position.* from shelves_position where state!='1' and indexId=#{indexId} limit 1
+	</select>
+	<update id="updatestate">
+		update `shelves_position`
+		set
+		`modify_date`=#{modifyDate},
+		`state`=#{state}
+		<if test="remark!=null">
+		   ,`remark`=#{remark}
+		</if>
+		where id=#{id}
+	</update>
+	
+	<select id="countOfunused" resultType="java.lang.Integer">
+		select count(distinct `shelves_position`.id) from `shelves_position`
+		where state!='1' and indexId=#{indexId}
+	</select>
+	
+	<select id="countOfused" resultType="java.lang.Integer">
+		select count(distinct `shelves_position`.id) from `shelves_position`
+		where state='1' and indexId=#{indexId}
+	</select>
+	
+	<delete id="detelebyindex" parameterType="java.lang.String">
+		delete from shelves_position
+		where indexId=#{indexId}
+	</delete>
+	
+	
+	
+	<select id="countOfsearchShelvesPosition" resultType="java.lang.Integer">
+		select count(distinct `shelves_position`.id) from `shelves_position`
+		<where>
+			<if test="indexId!=null and indexId!=''">
+				and `shelves_position`.`indexId` = #{indexId}
+			</if>
+			<if test="state!=null and state!=''">
+				and `shelves_position`.`state` = #{state}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (`shelves_position`.`remark` like #{wordkey} or `shelves_position`.`position` like #{wordkey})
+			</if>
+		</where>
+	</select>
+	<select id="searchShelvesPosition" resultMap="basic_result_map">
+		select shelves_position.* from `shelves_position`
+		<where>
+			<if test="indexId!=null and indexId!=''">
+				and `shelves_position`.`indexId` = #{indexId}
+			</if>
+			<if test="state!=null and state!=''">
+				and `shelves_position`.`state` = #{state}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (`shelves_position`.`remark` like #{wordkey} or `shelves_position`.`position` like #{wordkey})
+			</if>
+		</where>
+		order by `shelves_position`.create_date asc
+		limit
+		#{index},#{size}
+	</select>
+	
+</mapper>

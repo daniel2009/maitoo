@@ -1,0 +1,128 @@
+﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+		
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">权限管理</p>
+
+		<div class="box_content">
+			<div class="content_title">权限管理</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u31" style="margin: 0px;height: auto;">
+						<div style="clear: both;"></div>
+					</div>
+
+					<table style="width: 100%">
+									<col width="100px" />
+									<col width="70px" />
+									<col width="150"/>
+									<col width="400px" />
+									<col width="80px" />
+									
+						<thead>
+									<tr>
+										<th id="account">
+											员工ID
+										</th>
+										<th id="storeid">
+											门市编号
+										</th>
+										<th id="storename">
+											门市名称
+										</th>
+										<th id="authority">
+											权限
+										</th>
+										<th id="operator" colspan="2"><!-- colspan="2"-->
+											操作
+										</th>
+									</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="4">
+									<div class="pagination" style="font-size: 15px;margin-right: 30px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		
+		<!--  <div id="modifyauthority" style="display: none;">
+          <h3>权限管理</h3>
+		          <form id="modify_form" action="" onSubmit="return false;" method="post" enctype="multipart/form-data">
+		          	<input type="hidden" name="id" value="${param.id }"/>
+		            <fieldset>
+			            <p>
+			               <label style="display: inline;">权限管理：</label>
+			         		&nbsp;&nbsp;&nbsp;<input  class="" type="checkbox" name="auth" value="1">授权管理</br>
+			         		<label style="display: inline;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							<input  class="" type="checkbox" name="auth" value="2">员工管理总
+							<input  class="" type="checkbox" name="auth" value="3">员工管理
+							<input  class="" type="checkbox" name="auth" value="4">店面管理</br>
+							<label style="display: inline;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							<input  class="" type="checkbox" name="auth" value="5">会员管理总
+							<input  class="" type="checkbox" name="auth" value="6">会员管理
+							<input  class="" type="checkbox" name="auth" value="7">会员导出管理</br>
+							<label style="display: inline;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							<input  class="" type="checkbox" name="auth" value="8">运单管理总
+							<input  class="" type="checkbox" name="auth" value="9">预报管理
+							<input  class="" type="checkbox" name="auth" value="10">运单管理
+							<input  class="" type="checkbox" name="auth" value="11">门市件管理
+							<input  class="" type="checkbox" name="auth" value="12">散件管理
+							<input  class="" type="checkbox" name="auth" value="13">路由管理</br>
+							<label style="display: inline;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							<input  class="" type="checkbox" name="auth" value="14">充值管理总
+							<input  class="" type="checkbox" name="auth" value="15">预充值管理
+							<input  class="" type="checkbox" name="auth" value="16">账户管理</br>
+							<label style="display: inline;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							<input  class="" type="checkbox" name="auth" value="17">客服管理总
+							<input  class="" type="checkbox" name="auth" value="18">留言管理
+							<input  class="" type="checkbox" name="auth" value="19">异常运单管理
+							<input  class="" type="checkbox" name="auth"value="20">异常预订单管理</br>
+							<label style="display: inline;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							<input  class="" type="checkbox" name="auth" value="21">新闻公告管理总
+							<input  class="" type="checkbox" name="auth" value="22">新闻管理
+							<input  class="" type="checkbox" name="auth" value="23">公告管理
+			            </p>
+						<hr/>
+			            <p style="margin-left: 50px;">
+			              <input name="a_emp_authority_modify_link" class="button" type="button" value="提交" />
+			            </p>
+		            </fieldset>
+		          </form>
+      	</div> -->
+      </div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav25Data();
+	});
+</script>
+</html>

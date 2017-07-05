@@ -1,0 +1,115 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="toid"/>
+	<input type="hidden" name="pn" value="1"/>
+		<div class="content-box" style="width: 1050px;">
+			<!-- Start Content Box -->
+			<div class="content-box-header" style="width: 1050px;">
+				<h3>异常预报订单</h3>
+				<div class="clear"></div>
+			</div>
+			<!-- End .content-box-header -->
+			<div class="content-box-content">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u31" style="padding-top: 5px;">
+						<div id="u310">
+							<form action="">
+								预定单号：<input class="text-input small-input" type="text" name="toid" maxlength="16" />
+								<input class="button" type="submit" value="搜索异常" name="searchSub73" />
+							</form>
+						</div>
+						<div id="u320">
+							<span>
+								<a href="#addetoinfo" id="a_add_error_torder_info_link">添加异常件</a>
+							</span>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+
+					<table id="msgtable" style="width: 100%">
+						<col width="120"/>
+						<col/>
+						<col width="150px"/>
+						<col width="150px" />
+						<col width="90px" />
+						<thead>
+							<tr>
+								<th id="m_id">
+									预报订单编号
+								</th>
+								<th id="m_content">
+									预报订单异常处理流程
+								</th>
+								<th id="m_state">
+									创建时间
+								</th>
+								<th id="m_style">
+									是否处理完成
+								</th>
+								<th id="m_modify_date">
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="4">
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div id="addetoinfo" style="display: none;">
+          <h3>异常件添加</h3>
+          <fieldset>
+          <form action=""  style="width: 350px;">
+          	<p>
+          		<span name="msg"></span>
+          	</p>
+            <p>
+              <label style="display: inline;">预报订单编号：</label>
+              <input class="text-input" type="text" name="toid"/>
+              <!--<span class="gl_message">*</span>-->
+              <!--这个验证是验证输入的运单号是否是运单号，本来让在前面加一个运单搜索验证是不是我觉得没必要就想到了这个方法-->
+              <input class="button" type="submit" value="验证" name="v_btn_torder" />
+            </p>
+            <p>
+              <label style="display: inline;">异常内容：</label>
+              <small>最多200个字符</small>
+              <span class="gl_message">*</span>
+              <textarea rows="10" cols="10" class="text-input" name="content"></textarea>
+            </p>
+            <p style="margin-left: 50px;">
+              <input class="button" type="submit" name="bt_add_error_torder_info" value="提交" />
+              <input class="button" type="reset" onclick="" value="取消">
+            </p>
+           </form>
+           </fieldset>
+      	</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav73Data();
+	});
+</script>
+</html>

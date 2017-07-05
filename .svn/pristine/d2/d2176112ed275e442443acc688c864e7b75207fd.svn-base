@@ -1,0 +1,125 @@
+function loadNav1Data() {
+	$("#a_reset_pwd").click(function() {
+		$("#main-content").load(admin_reset_pwd_url);
+		return false;
+	});
+
+	$("#fp_a_logout").click(function() {
+		logout();
+	});
+
+	// 获取留言数量
+	$.get(admin_message_count_url, function(response) {
+		var code = response.code;
+		var msg = "0";
+		if (typeof (code) == "undefined") {
+			// ignore
+		} else if ("200" == code) {
+			msg = response.data.count;
+		} else if ("607" == code) {
+			alert("您尚未登录或登录已失效！");
+			logout();
+			return false;
+		}
+		$("#no_deal_message_count").html(msg);
+	});
+
+	// 获取最近登录时间
+	$.get(admin_login_info_url,
+			function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					var lastDate = response.data.lastDate;
+					var times = response.data.times;
+					$("#time span").html(
+							"上次登录时间：" + lastDate + "，登录次数：" + times);
+				} else if ("607" == code) {
+					logout();
+				}
+				return false;
+			});
+
+	$("#no_deal_message_count").click(function() {
+		nav71Click();
+		return false;
+	});
+	getNeedFocusCount();
+}
+
+function loadNav11Data() {
+	$("#code").click(function() {
+		resetValidateCode(this);
+	});
+	$("#bt_reset_pwd").click(
+			function() {
+				var password = $("#password").val();
+				var confirmPassword = $("#confirmpwd").val();
+				var oldPwd = $("#oldpwd").val();
+				var vcode = $("#vcode").val();
+
+				if (!checkEmpPassword(password)) {
+					alert("新密码格式错误，密码由6到20位非空字符组成。");
+				} else if (!checkEmpPassword(confirmPassword)) {
+					alert("确认密码格式错误，密码由6到20位非空字符组成。");
+				} else if (!checkEmpPassword(oldPwd)) {
+					alert("原密码格式错误，密码由6到20位非空字符组成。");
+				} else if (password != confirmPassword) {
+					alert("新密码和确认密码不一致，请重新输入!");
+				} else {
+					// 开始修改密码
+					$("#bt_reset_pwd").attr("disabled", true);
+					$.ajax( {
+						type : "post",
+						url : admin_reset_pwd,
+						data : {
+							"password" : password,
+							"oldpwd" : oldPwd,
+							"vcode" : vcode
+						},
+						success : function(response) {
+							var code = response.code;
+							if ("200" == code) {
+								alert("修改密码成功");
+								nav1Click();
+							} else if ("607" == code) {
+								logout();
+							} else {
+								alert("修改密码失败，失败原因是:" + response.message);
+								resetValidateCode($("#code"));
+								$("#bt_reset_pwd").attr("disabled", false);
+								$("#reset").click();
+							}
+							return false;
+						}
+					});
+				}
+				return false;
+			});
+}
+
+function getNeedFocusCount(){
+	getAllStateCount("transhipmentBill");
+	getAllStateCount("order");
+	getAllStateCount("returnPackage");
+	getAllStateCount("claimPackage");
+	getAllStateCount("productRecord");
+}
+function getAllStateCount(type){
+	$.ajax({
+		type:"get",
+		url: "../admin/" + type + "/getAllStateCount",
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				var array = response.data;
+				for(var i=0; i<array.length>>1; i++){
+					//alert(array[2*i]);
+					$("#" + array[2*i]).html(array[2*i+1]);
+				}
+			} else {
+				// 失败
+				alert("获取数量信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}

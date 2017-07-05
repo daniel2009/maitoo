@@ -1,0 +1,212 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">转为转运单
+			<a  href="#" onclick="javascript: navProductRecordClick();">返回列表</a>
+		</p>
+		<div class="box_content">
+			<div class="content_title">转为转运单</div>
+			<div class="content_text">
+				<div class="tab-content" id="tab2">
+					<article style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+						<label class="center">商品信息：</label>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">名称：</label>
+							<label id="productName"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">类型：</label>
+							<label id="productTypeName"></label>
+						</div>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">价格：</label>
+							<label id="productPrice"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">剩余：</label>
+							<label id="productQuantity"></label>
+						</div>
+						<div style="flex-basis: 100%;">
+							<label style="display: inline;">详情：</label>
+							<label id="productDescription"></label>
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">图片：</label>
+							<img id="productPic1">
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">图片：</label>
+							<img id="productPic2">
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">图片：</label>
+							<img id="productPic3">
+						</div>
+					</article>
+					<hr/>
+					<article style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">购买数量：</label>
+							<label id="quantity"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">下单时间：</label>
+							<label id="date"></label>
+						</div>
+					</article>
+					<form action="" id="form" method="post" enctype="multipart/form-data">
+					<input type="hidden" id="idHidden" name="rate">
+					<input type="hidden" id="userIdHidden" name="userId">
+					<input type="hidden" id="productIdHidden" name="productId">
+					<input type="hidden" id="priceHidden">
+					<input type="hidden" id="productRecordQuantityHidden" name="quantity">
+		            <p>
+		              <label class="cllabel">快递公司:</label>
+		              <input class="text-input small-input" type="text" name="transitCompany" maxlength="16" placeholder="填写运单公司" required/><span class="gl_message">*</span>
+		            </p>
+		             <p>
+		              <label class="cllabel">运单号公司:</label>
+		              <input class="text-input small-input" type="text" name="transitNo" maxlength="16" placeholder="填写运单号" required/><span class="gl_message">*</span>
+		            </p>
+		            <br/>
+					<label class="center">运单收发用户信息：</label>
+					<div style="flex: 1; margin: 30px;">
+						<input type="radio" class="radio" name="transitType" value="2" checked>购物转运
+						<article class="fastArticle">
+							<label style="display: inline;">寄件人手机号码：</label>
+							<input id="fromUser" name="from_user_name" class="text-input" type="text" maxlength="16" readonly/>
+							<label style="display: inline;">寄件人姓名：</label>
+							<input name="from_user_real_name" class="text-input" type="text" maxlength="50" readonly/>
+							<hr/>
+							<label style="display: inline;">收件人姓名：</label>
+							<input name="cName" class="text-input" type="text" maxlength="16"/>
+							<hr />
+							<hr/>
+							<label style="display: inline;">收件人手机：</label>
+							<input name="cPhone" class="text-input" type="text" maxlength="16"/>
+							<hr />
+							<label style="display: inline;">地址：</label>
+							<input name="cAddress" type="text" style="width: 95%;"/>
+							<br/>
+							<hr />
+							<label style="display: inline;">邮编：</label>
+							<input type="text" name="cZipCode" class="text-input" maxlength="6" />
+							<hr />
+							<label style="display: inline;">身份证号：</label>
+							<input name="cCardId" type="text" maxlength="18" />
+							<br/><br/>
+							<label style="display: inline;">身份证正面：</label>
+							<img id="idCardImg">
+							<label style="display: inline;">身份证反面：</label>
+							<img id="idCardOtherImg">
+							
+							<br/>
+							注意：支持JPG，PNG，BMP等图片格式的身体证图片，最大不超过4MB<br>
+							<input type="text" name="cIdCardPic" style="width:120px;display:none;" />
+							<input type="text" name="cIdCardOtherPic" style="width:120px;display:none;" />
+							<input type="text" name="cIdCardTogetherPic" style="width:120px;display:none;" />
+							 <hr/>
+						</article>
+					</div>
+					结果<select name="state"><option value="1">有问题</option><option value="2" selected>通过</option></select>
+					反馈信息<textarea rows="3" cols="10" name="empRemark"></textarea>
+					<hr />
+					<input class="button" style="margin-left: 100px;" type="button" value="提交" onclick="javascript:transhipmentAdd();"/>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+$("#main-content").ready(function(){
+	$("#idHidden").val(window.sessionStorage.getItem("productRecordId"));
+	window.sessionStorage.clear();
+	$.ajax({
+		type : "post",
+		url : "../admin/productRecord/findById",
+		data : {id : $("#idHidden").val()},
+		success : function(response){
+			if("200" == response.code){
+				var productRecord = response.data;
+				$("#userIdHidden").val(productRecord.userId);
+				$("#productIdHidden").val(productRecord.productId);
+				$("#productRecordQuantityHidden").val(productRecord.quantity);
+				$("input[name=from_user_name]").val(productRecord.userPhone);
+				$("input[name=from_user_real_name]").val(productRecord.userName);
+				$("input[name=cName]").val(productRecord.cName);
+				$("input[name=cPhone]").val(productRecord.cPhone);
+				$("input[name=cAddress]").val(productRecord.cAddress);
+				$("input[name=cZipCode]").val(productRecord.cZipCode);
+				$("input[name=cCardId]").val(productRecord.cCardId);
+				$("input[name=cIdCardPic]").val(productRecord.cIdCardPic);
+				$("input[name=cIdCardOtherPic]").val(productRecord.cIdCardOtherPic);
+				$("input[name=cIdCardTogetherPic]").val(productRecord.cIdCardTogetherPic);
+				$("#idCardImg").attr("src", "../"+productRecord.cIdCardPic);
+				$("#idCardOtherImg").attr("src", "../"+productRecord.cIdCardOtherPic);
+				$("#quantity").html(productRecord.quantity);
+				$("#date").html(productRecord.date);
+				loadProduct();
+			}else{
+				alert("获取商品失败，原因是:" + response.message);
+			}
+		}
+	});
+});
+function loadProduct(){
+	$.ajax({
+		type : "post",
+		url : "../admin/product/findById",
+		data : {id : $("#productIdHidden").val()},
+		success : function(response){
+			if("200" == response.code){
+				var product = response.data;
+				$("#productName").html(product.name);
+				$("#productTypeName").html(product.typeName);
+				$("#productPrice").html(product.currency + product.price);
+				$("#productQuantity").html(product.quantity);
+				$("#productDescription").html(product.description);
+				$("#productPic1").attr("src", "../" + product.pic1);
+				$("#productPic2").attr("src", "../" + product.pic2);
+				$("#productPic3").attr("src", "../" + product.pic3);
+				clearWrongImg();
+			}else{
+				alert("获取商品失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+function transhipmentAdd(){
+	if($("#priceHidden").val()=="-999999"){
+		alert("价格不合理，请重新设置价格");
+		return false;
+	}
+	var formData = new FormData(document.getElementById("form"));
+	formData.append("fromUser", $("#fromUser").val());
+	$.ajax({
+		type : "post",
+		url : "../admin/transhipment/addByProductRecord",
+		data : formData,
+		processData : false,
+		contentType : false,
+		success : function(response){
+			if("200" == response.code){
+				alert("审核成功");
+				navProductRecordClick();
+			}else{
+				alert("审核数据失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+</script>
+</html>

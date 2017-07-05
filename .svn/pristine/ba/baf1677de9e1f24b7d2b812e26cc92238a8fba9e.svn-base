@@ -1,0 +1,70 @@
+#content-box {
+    height: 100%;
+    width: 800px;
+    margin: 0px;
+    padding: 0px;
+    margin-top: 10px;
+}
+
+#content-box table {
+	border-left: 1px solid #666;
+	border-top: 1px solid #666;
+	border-bottom: 0px;
+	border-right: 0px;
+	padding: 0px;
+	margin: 0px;
+	border-collapse: 0px;
+	border-spacing: 0px;
+}
+
+#content-box table tr table,
+#content-box table tr tr {
+	border: 0px;
+}
+
+#content-box table tr {
+	padding: 0px;
+	border-left: 0px;
+	border-top: 0px;
+	border-bottom: 1px solid #666;
+	border-right: 0px;
+}
+#content-box table th {
+	padding: 0px;
+	border-left: 0px;
+	border-top: 0px;
+	border-bottom: 0px;
+	border-right: 1px solid #666;
+	line-height: 50px;
+}
+#content-box table td {
+	padding: 0px;
+	border-left: 0px;
+	border-top: 0px;
+	border-bottom: 0px;
+	border-right: 1px solid #666;
+	line-height: 40px;
+}
+
+/* THE OPTION PAGE STYLE LIKE ADU user/exam/question */
+#content-box #form-box {
+    position: absolute;
+    left: 80px;
+    top: 30px;
+    width: 680px;
+    height: auto;
+}
+
+#content-box #form-box table {
+    margin: 0;
+    padding: 0;
+    border-collapse: 2px;
+    border-spacing: 8px;
+}
+
+
+.gl_message {
+    color: red;
+    font-size: 12px;
+    margin: 2px;
+}

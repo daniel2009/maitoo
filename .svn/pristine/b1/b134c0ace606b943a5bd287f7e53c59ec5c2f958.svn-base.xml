@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.ChannelDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.Channel">
+		<id column="id" property="id" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="alias" property="alias" javaType="String"/>
+		<result column="state" property="state" javaType="String"/>
+		<result column="warehouse_id" property="warehouseId" javaType="String" />
+		<result column="additive_price" property="additivePrice" javaType="String" />
+		
+	</resultMap>
+
+	<select id="getChannelById" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from channels where id=#{id}
+	</select>
+	
+	<select id="getByWarhouseId" resultMap="basic_result_map">
+		select * from channels where warehouse_id = #{warehouseId} 
+		<if test="state!=null and state!=''">
+					and state= #{state}
+		</if>
+	</select>
+	
+	<select id="getByWarhouseIdandid" resultMap="basic_result_map">
+		select * from channels where warehouse_id = #{warehouseId} and id=#{id} and state= #{state}
+	</select>
+
+	<insert id="insertChannel" parameterType="com.weiye.model.Channel"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into channels(name,alias,state,warehouse_id,additive_price) values(#{name},#{alias},#{state},#{warehouseId},#{additivePrice})
+	</insert>
+	
+	<insert id="insertChannelByList" parameterType="com.weiye.model.Channel">
+		 insert into channels(name,alias,state,warehouse_id) 
+		 values
+		<foreach collection="list" item="channel" separator=",">
+			(#{channel.name},#{channel.alias},#{channel.state},#{channel.warehouseId})
+		</foreach>
+	</insert>
+	
+	<update id="modifyChannel">
+		update `channels`
+		set `name`=#{name},
+		`alias`=#{alias},
+		`state`=#{state},
+		`warehouse_id`=#{warehouseId},
+		`additive_price`=#{additivePrice}
+		where id = #{id} 
+	</update>
+</mapper>

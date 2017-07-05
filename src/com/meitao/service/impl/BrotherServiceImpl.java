@@ -1,0 +1,282 @@
+package com.meitao.service.impl;
+//package net.usitao.service.impl;
+//
+//import java.util.Arrays;
+//import java.util.Date;
+//import java.util.HashMap;
+//import java.util.List;
+//import java.util.Map;
+//
+//import net.usitao.common.constants.ResponseCode;
+//import net.usitao.common.util.DateUtil;
+//import net.usitao.common.util.ExceptionUtil;
+//import net.usitao.common.util.MD5Util;
+//import net.usitao.common.util.StringUtil;
+//import net.usitao.dao.AccountDao;
+//import net.usitao.dao.AccountDetailDao;
+//import net.usitao.dao.ConsigneeInfoDao;
+//import net.usitao.dao.LoginInfoDao;
+//import net.usitao.dao.UserDao;
+//import net.usitao.exception.ServiceException;
+//import net.usitao.model.Account;
+//import net.usitao.model.PageSplit;
+//import net.usitao.model.ResponseObject;
+//import net.usitao.model.User;
+//import net.usitao.service.UserService;
+//
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.stereotype.Service;
+//
+//@Service("userService")
+//public class BrotherServiceImpl extends BasicService implements UserService {
+//	@Autowired
+//	private UserDao userDao;
+//	@Autowired
+//	private AccountDao accountDao;
+//	@Autowired
+//	private AccountDetailDao accountDetailDao;
+//	@Autowired
+//	private LoginInfoDao loginInfoDao;
+//	@Autowired
+//	private ConsigneeInfoDao consigneeInfoDao;
+//
+//	public ResponseObject<User> getUserById(String id) throws ServiceException {
+//		ResponseObject<User> result = new ResponseObject<User>();
+//		if (StringUtil.isEmpty(id)) {
+//			result.setCode(ResponseCode.PARAMETER_ERROR);
+//			result.setMessage("参数无效");
+//		} else {
+//			try {
+//				User user = this.userDao.getUserById(id);
+//				if (user != null) {
+//					result.setCode(ResponseCode.SUCCESS_CODE);
+//					result.setData(getSecurityValue(user));
+//				} else {
+//					result.setCode(ResponseCode.USER_ID_EXISTS);
+//					result.setMessage("数据库中没有对应id的用户，ID:" + id);
+//				}
+//			} catch (Exception e) {
+//				throw ExceptionUtil.handle2ServiceException(e);
+//			}
+//		}
+//		return result;
+//	}
+//
+//	public ResponseObject<Object> addUser(User user) throws ServiceException {
+//		ResponseObject<Object> responseObj = new ResponseObject<Object>();
+//		if (null == user) {
+//			responseObj.setCode(ResponseCode.PARAMETER_ERROR);
+//			responseObj.setMessage("参数无效");
+//		} else {
+//			String date = DateUtil.date2String(new Date());
+//			user.setPassword(MD5Util.encode(user.getPassword()));
+//			user.setSignDate(date);
+//			try {
+//				int iresult = this.userDao.insertUser(user);
+//				if (iresult > 0) {
+//					// 创建一个账户
+//					Account account = new Account();
+//					account.setUserId(user.getId());
+//					account.setRmb("0");
+//					account.setUsd("0");
+//					account.setModifyDate(date);
+//					account.setCreateDate(date);
+//					this.accountDao.insertOrUpdateAccount(account);
+//					Map<String, String> map = new HashMap<String, String>();
+//					map.put("id", user.getId());
+//					responseObj.setCode(ResponseCode.SUCCESS_CODE);
+//					responseObj.setData(map);
+//				} else {
+//					responseObj.setCode(ResponseCode.USER_INSERT_ERROR);
+//					responseObj.setMessage("添加新用户保存到数据库中失败");
+//				}
+//			} catch (Exception e) {
+//				throw ExceptionUtil.handle2ServiceException(e);
+//			}
+//		}
+//		return responseObj;
+//	}
+//
+//	public ResponseObject<User> checkLogin(String account, String password) throws ServiceException {
+//		ResponseObject<User> result = new ResponseObject<User>();
+//		try {
+//			String pwd = MD5Util.encode(password);
+//			User user = this.userDao.getUserByAccount(account);
+//			if (user != null && pwd.equals(user.getPassword())
+//			        && (account.equals(user.getNickName()) || account.equals(user.getEmail()))) {
+//				result.setCode(ResponseCode.SUCCESS_CODE);
+//				result.setData(getSecurityValue(user));
+//				try {
+//					this.loginInfoDao.insertUpdate(user.getId(), "0", DateUtil.date2String(new Date()));
+//				} catch (Exception e) {
+//					// ignore
+//				}
+//			} else {
+//				result.setCode(ResponseCode.USER_LOGIN_ACCOUNT_ERROR);
+//				result.setMessage("账户或者密码错误");
+//			}
+//		} catch (Exception e) {
+//			throw ExceptionUtil.handle2ServiceException("检验用户登录失败", e);
+//		}
+//		return result;
+//	}
+//
+//	public boolean checkExistsByEmail(String email) throws ServiceException {
+//		if (StringUtil.isEmpty(email)) {
+//			return false;
+//		} else {
+//			try {
+//				User user = this.userDao.getUserByAccount(email);
+//				if (user != null && email.equalsIgnoreCase(user.getEmail())) {
+//					// this user is exists
+//					return true;
+//				} else {
+//					return false;
+//				}
+//			} catch (Exception e) {
+//				throw ExceptionUtil.handle2ServiceException(e);
+//			}
+//		}
+//	}
+//
+//	public boolean checkExistsByName(String name) throws ServiceException {
+//		if (StringUtil.isEmpty(name)) {
+//			return false;
+//		} else {
+//			try {
+//				User user = this.userDao.getUserByAccount(name);
+//				if (user != null && name.equalsIgnoreCase(user.getNickName())) {
+//					// this user is exists
+//					return true;
+//				} else {
+//					return false;
+//				}
+//			} catch (Exception e) {
+//				throw ExceptionUtil.handle2ServiceException(e);
+//			}
+//		}
+//	}
+//
+//	public ResponseObject<Object> modifyUser(User user) throws ServiceException {
+//		ResponseObject<Object> result = new ResponseObject<Object>();
+//		if (user == null) {
+//			result.setCode(ResponseCode.PARAMETER_ERROR);
+//			result.setMessage("修改用户参数错误");
+//		} else {
+//			try {
+//				int iresult = this.userDao.updateUserById(user);
+//				if (iresult > 0) {
+//					result.setCode(ResponseCode.SUCCESS_CODE);
+//				} else {
+//					result.setCode(ResponseCode.USER_MODIFY_FAILURE);
+//					result.setMessage("修改用户信息失败，请重新尝试！");
+//				}
+//			} catch (Exception e) {
+//				throw ExceptionUtil.handle2ServiceException(e);
+//			}
+//		}
+//		return result;
+//	}
+//
+//	public ResponseObject<Object> modifyPassword(String id, String email, String password, String oldPassword)
+//	        throws ServiceException {
+//		ResponseObject<Object> result = new ResponseObject<Object>();
+//		if (StringUtil.isEmpty(password)) {
+//			result.setCode(ResponseCode.PARAMETER_ERROR);
+//			result.setMessage("无效的参数");
+//		} else {
+//			try {
+//				int iresult = this.userDao.updatePassword(id, email, MD5Util.encode(password), MD5Util
+//				        .encode(oldPassword));
+//				if (iresult > 0) {
+//					result.setCode(ResponseCode.SUCCESS_CODE);
+//				} else {
+//					result.setCode(ResponseCode.USER_MODIFY_FAILURE);
+//					result.setMessage("数据库中没有对应账号的用户");
+//				}
+//			} catch (Exception e) {
+//				throw ExceptionUtil.handle2ServiceException(e);
+//			}
+//		}
+//		return result;
+//	}
+//
+//	public ResponseObject<Object> deleteUserByIds(String[] ids) throws ServiceException {
+//		ResponseObject<Object> result = new ResponseObject<Object>();
+//		if (ids == null || ids.length == 0) {
+//			result.setCode(ResponseCode.PARAMETER_ERROR);
+//			result.setMessage("参数无效");
+//		} else {
+//			try {
+//				List<String> userIds = Arrays.asList(ids);
+//				int iresult = this.userDao.deleteUserByIds(userIds);
+//				if (iresult > 0 && iresult == userIds.size()) {
+//					this.accountDao.deleteAccountByUserIds(userIds);
+//					this.accountDao.deleteCreditByUserIds(userIds);
+//					this.accountDetailDao.deleteAccountDetailByUserIds(userIds);
+//					this.consigneeInfoDao.deleteConsigneeInfoByUserIds(userIds);
+//					result.setCode(ResponseCode.SUCCESS_CODE);
+//				} else {
+//					// 进行事务回滚
+//					throw new Exception();
+//				}
+//			} catch (Exception e) {
+//				throw ExceptionUtil.handle2ServiceException(e);
+//			}
+//		}
+//		return result;
+//	}
+//
+//	@SuppressWarnings("unchecked")
+//	public <T> ResponseObject<PageSplit<T>> searchByKey(String userId, String key, String searchColumn, int pageSize, int pageNow)
+//	        throws ServiceException {
+//		try {
+//			key = StringUtil.escapeStringOfSearchKey(key);
+//			int rowCount = 0;
+//			try {
+//				rowCount = this.userDao.countByKey(userId, key, searchColumn);
+//			} catch (Exception e) {
+//				throw ExceptionUtil.handle2ServiceException("获取用户个数失败", e);
+//			}
+//
+//			ResponseObject<PageSplit<T>> responseObj = new ResponseObject<PageSplit<T>>(ResponseCode.SUCCESS_CODE);
+//			if (rowCount > 0) {
+//				pageSize = Math.max(pageSize, 1);
+//				int pageCount = rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1);
+//				pageNow = Math.min(pageNow, pageCount);
+//				PageSplit<T> pageSplit = new PageSplit<T>();
+//				pageSplit.setPageCount(pageCount);
+//				pageSplit.setPageNow(pageNow);
+//				pageSplit.setRowCount(rowCount);
+//				pageSplit.setPageSize(pageSize);
+//
+//				int startIndex = (pageNow - 1) * pageSize;
+//				try {
+//					List<User> users = this.userDao.searchUserByKey(userId, key, searchColumn, startIndex, pageSize);
+//					if (users != null && !users.isEmpty()) {
+//						for (User u : users) {
+//							pageSplit.addData((T) getSecurityValue(u));
+//						}
+//					}
+//				} catch (Exception e) {
+//					throw ExceptionUtil.handle2ServiceException("获取用户列表失败", e);
+//				}
+//				responseObj.setData(pageSplit);
+//			} else {
+//				responseObj.setMessage("没有用户");
+//			}
+//			return responseObj;
+//		} catch (ServiceException e) {
+//			throw e;
+//		}
+//	}
+//
+//	public List<User> getExportUserDatas(String sdate, String edate, String type) throws ServiceException {
+//		try {
+//			return this.userDao.getExportUsersBySignDate(sdate, edate, type);
+//		} catch (Exception e) {
+//			throw ExceptionUtil.handle2ServiceException(e);
+//		}
+//	}
+//
+//}

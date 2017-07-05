@@ -1,0 +1,175 @@
+/**
+ * 第三方登陆接口（实现美淘电商网站到美淘快递的快速登陆与会员的快速注册）
+ * 张敬琦
+ * 2015-01-27
+ */
+
+
+package com.weiye.controller;
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.MD5Util;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.UserUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.User;
+import com.weiye.service.UserService;
+@Controller
+public class ThreeController extends BasicController {
+	private static final long serialVersionUID = -6149958129898075129L;
+	private static final String key="usitaoPsF9527";
+	private static final Logger log = Logger.getLogger(UserController.class);
+    @Resource(name = "userService")
+	private UserService userService;
+//    @Autowired
+//	private UserDao userDao;
+
+    /**
+     * 这个方法就是提供给电商第三方登录的接口,这里的接口就是:<br/>
+     * http://www.usitao.com/threelogin?username=xxx&email=xxx&stime=xxx&sinKey=
+     * xxx<br/>
+     * 如果有其他的参数自己加。
+     */
+    @RequestMapping(value = "/threelogin", method = { RequestMethod.GET, RequestMethod.POST })
+//	@ResponseBody
+    public void func(HttpServletRequest request,
+    		 HttpServletResponse response) {
+    	ResponseObject<Object> responseObj = null;
+   
+        try {
+            request.setCharacterEncoding("utf-8");
+            // 2、获取参数
+            String name = request.getParameter("username");
+            String email = request.getParameter("email");
+            String stime = request.getParameter("stime");
+            String sinKey = request.getParameter("sinKey");
+            String recommender=null;
+            if (createSinKey(name, email,stime,key).equals(sinKey)) {
+//            	if (createSinKey(name, email,stime,key).equals(sinKey)) {
+                if (validator(name, email)) {
+                    if (!checkIsExists(name, email)) {
+                        	try{
+                        		User user = new User();
+        						user.setNickName(name);
+        						user.setPassword(name);
+        						user.setEmail(StringUtil.isEmpty(email) ? null : email);
+        						//user.setEmail(email);
+        						user.setRecommender(StringUtil.isEmpty(recommender) ? "-1" : recommender);
+        						user.setType(Constant.USER_TYPE_NORMAL);
+        						user.setAddress("");
+        						user.setCountry("");
+        						
+        						user.setPhone(null);
+        						user.setQq("");
+        						user.setRealName("");
+        						responseObj = this.userService.addUser(user);
+        						if (ResponseCode.SUCCESS_CODE.equals(responseObj.getCode())) {
+        							// 注册成功, 需要直接登录的
+        							String userId = ((Map<String, String>) responseObj.getData()).get("id");
+        							HttpSession session = request.getSession();
+        							session.setAttribute(Constant.USER_ID_SESSION_KEY, userId);
+        							session.setAttribute(Constant.USER_NICK_NAME_SESSION_KEY, user.getNickName());
+        							session.setAttribute(Constant.USER_EMAIL_SESSION_KEY, user.getEmail());
+        							session.setAttribute(Constant.USER_TYPE_SESSION_KEY, user.getType());
+        							session.setAttribute(Constant.LOGIN_ACCOUNT_TYPE, "0");
+        						}
+                        	}catch (Exception e) {
+                        		log.error("用户注册失败", e);
+                        		System.out.println(e);
+							}
+                    } else {
+                        // 存在，就获取用户信息，并将该用户的信息保存到session中
+                    	try{
+                    		ResponseObject<User> resObj = null;//userService.getUserByAccount(name, email);
+                    		if (resObj != null && ResponseCode.SUCCESS_CODE.equals(resObj.getCode())) {
+                    			User user = resObj.getData();
+                    		System.out.println("要获取用户了进行登录了");
+    							// 注册成功, 需要直接登录的
+    							String userId = user.getId();
+    							HttpSession session = request.getSession();
+    							session.setAttribute(Constant.USER_ID_SESSION_KEY, userId);
+    							System.out.println(userId+"这是获取的id");
+    							session.setAttribute(Constant.USER_NICK_NAME_SESSION_KEY, user.getNickName());
+    							session.setAttribute(Constant.USER_EMAIL_SESSION_KEY, user.getEmail());
+    							session.setAttribute(Constant.USER_TYPE_SESSION_KEY, user.getType());
+    							session.setAttribute(Constant.LOGIN_ACCOUNT_TYPE, "0");
+    						System.out.println(user.getType()+"这是获取的type");
+                    		}
+                    	}catch (Exception e) {
+							// TODO: handle exception
+                    		System.out.println(e);
+						}
+                    }
+                }
+            } else {
+            	System.out.println("nihao123123,这个的输出标识sinkey的产生有问题，不是接口的问题，这里直接写一个main函数就可以了，主要检测createdSinkey这个方法");
+            }
+        } catch (Exception e) {
+        	log.error("用户登陆失败", e);
+        	System.out.println(e);
+        }
+
+        try {
+            // 这两种选一种，第一种可以
+            response.sendRedirect("");
+//            response.sendRedirect("index.jsp");
+        } catch (Exception e) {
+        	System.err.println(e);
+        	log.error("用户信息获取失败", e);
+        }
+//		return responseObj;
+    }
+
+    private String createSinKey(String name, String email, String stime ,String key) {
+    	String sinkey= "username="+name+"&email="+email+"&stime="+stime+"&key="+key;
+		String asinKey=MD5Util.encode(sinkey);
+		System.out.println(sinkey);
+		System.out.println(asinKey);
+        return asinKey;
+    }
+
+    /**
+     * 检测是否是符合规定格式的
+     * 
+     * @param username
+     * @param email
+     * @return
+     */
+    private boolean validator(String name, String email)throws ServiceException {
+		if(!UserUtil.validateNickName(name)){
+                		return false;					
+		}else if (!UserUtil.validateEmail(email)) {
+               return false;
+          }
+        return true;
+    }
+
+    /**
+     * 检测是否存在
+     * 
+     * @param username
+     * @param email
+     * @return
+     */
+    private boolean checkIsExists(String name, String email)throws ServiceException {
+		return false;
+		
+    	//return userService.checkExistsByEmail(email)|| userService.checkExistsByName(name);
+    }
+   
+}

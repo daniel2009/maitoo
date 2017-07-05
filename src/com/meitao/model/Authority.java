@@ -1,0 +1,45 @@
+/**
+ * 张敬琦
+ * 权限控制实体类（绑定权限与可操作url）
+ * 2015年-1月-16日
+ * @param args
+ */
+
+
+package com.meitao.model;
+
+import java.io.Serializable;
+//import java.util.List;
+
+
+
+public class Authority  implements Serializable{
+	private static final long serialVersionUID = 3037774521572346372L;
+	private String authority_id;
+	private String employees_id;
+	//private List<Authority> authoritys;
+	
+	public Authority( String authorityId,String employees_id) {
+		// TODO Auto-generated constructor stub
+		this.authority_id = authorityId;
+		this.employees_id = employees_id;
+	}
+	
+	public String getAuthority_id() {
+		return authority_id;
+	}
+
+	public void setAuthority_id(String authoriyId) {
+		authority_id = authoriyId;
+	}
+	public String getEmployees_id() {
+		return employees_id;
+	}
+	public void setEmployees_id(String employeesId) {
+		employees_id = employeesId;
+	}
+	@Override
+    public String toString() {
+        return "Authority [authoriy_id=" + authority_id + ", employees_id=" + employees_id + "]";
+    }
+}

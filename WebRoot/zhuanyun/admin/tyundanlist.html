@@ -1,0 +1,1236 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="../resources/My97DatePicker/skin/WdatePicker.css" type="text/css" media="screen" />
+    <script type="text/javascript" src="../resources/My97DatePicker/WdatePicker.js"></script>
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+
+
+
+    <script src="../resources/scripts/LodopFuncs.js"></script>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">管理平台</a>
+                </li>
+
+                <li>
+                    <a href="#">运单列表</a>
+                </li>
+
+            </ul>
+        </div>
+        <div class="page-header" style="margin:3px 20px; padding:7px 0px;">
+
+            <div class="content_title">
+                <span>运单列表</span>
+                <a href="#" onclick="javascript: searchState(-10);">在线置单<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState-10">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(0);">运单作废<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState0">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(1);">包裹异常<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState1">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(2);">已揽收<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState2">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(3);">送往集散中心<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState3">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(4);">已打件<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState4">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(5);">送往机场<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState5">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(6);">空运中<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState6">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(7);">海关清关<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState7">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(8);">美淘中国分部已揽收<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState8">0</label>)</span></a>
+                <a href="#" onclick="javascript: searchState(9);">收件人已接收<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState9">0</label>)</span></a>
+            </div>
+
+        </div>
+
+        <div class="page-content">
+
+            <div style="border-style:solid;border-color: #CAC9D2;margin-bottom:3px">
+                <div class="row toolrow" style="margin: 5px;">
+                <form id="import_uploadmorders_ex_form" action="/admin/m_order/import_old1_orders" method="post" enctype="multipart/form-data" onSubmit="return checksumbitformforupload();">
+                    <div class="col-xs-12">
+
+                        <div style="float:left">
+                            <label class="control-label width60px"><strong>导入运单操作：</strong></label>
+                            <label class="control-label width60px">选择门店</label>
+                            <select name="uploadwid" class="table-selectheight" style="width:120px;margin-left:5px"></select>
+
+                            <label class="control-label width60px">选择渠道</label>
+                            <select name="uploadcid" class="table-selectheight" style="width:120px;margin-left:5px"></select>
+							
+							<label class="control-label width60px">上传文件</label>
+                            <input name="uploadfile" type="file" class="table-selectheight" style="width:120px;margin-left:5px"/>
+
+                        </div>
+
+                        <div style="float:left">
+                            <label class="control-label width60px">&nbsp;&nbsp;EXCEL文件</label>
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <span class=" icon-cloud-upload"></span>
+                                导入第三方运单
+                            </button>
+                            <a href="/admin/m_order/down_third_old_model" target="_blank">模板下载1</a>
+                            <a href="/admin/m_order/down_third_old_model2" target="_blank">模板下载2</a>
+
+                        </div>
+
+
+                    </div>
+                    </form>
+                </div>
+            </div>
+
+
+            <div style="border-style:solid;border-color: #CAC9D2;">
+                <div class="row" id="divyundan" style="margin:5px;">
+                    <div class="col-xs-12">
+
+                        <label for="yundan" class="control-label width60px">运单号:</label>
+                        <input name="oid" id="yundan_oid" placeholder="" style="width:126px">
+
+                        <label for="sea orderid" class="control-label width60px">海关单号:</label>
+                        <input name="sod" id="yundan_sod" placeholder="" style="width:126px">
+
+                        <label for="sea orderid" class="control-label width60px">第三方快递号:</label>
+                        <input name="god" id="yundan_god" placeholder="" style="width:126px">
+                        <button type="button" class="btn btn-purple btn-sm" id="btnyundan">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            搜索
+                        </button>
+
+                        <!-- <a href="#" class="btn btn-yellow btn-sm">
+                             <span class=" icon-download-alt"></span>
+                             订单下载处理
+                         </a> -->
+                        <!-- PAGE CONTENT ENDS -->
+                    </div>
+                </div>
+                <div class="row toolrow" id="divAdvanceSearch">
+                    <div class="col-xs-12" style="margin-bottom:5px;">
+
+                        <div style="float:left">
+                            <label class="control-label width60px" for="dtStart">创建时间:</label>
+                            <span class=" width60px"><i class="fa fa-calendar"></i></span>
+                            <input name="sdate" id="sdate" dateformat="yyyy-mm-dd" class=" form_datetime" style="width: 110px;">
+                            至
+                            <span class=" width60px"><i class="fa fa-calendar"></i></span>
+                            <input name="edate" id="edate" dateformat="yyyy-mm-dd" class=" form_datetime" style="width: 110px;">
+
+                        </div>
+                        <div style="float:left">
+                            <label class="control-label width60px" for="dtStart">&nbsp;&nbsp;支付时间:</label>
+                            <span class=" width60px"><i class="fa fa-calendar"></i></span>
+                            <input name="psdate" id="psdate" dateformat="yyyy-mm-dd" class=" form_datetime" style="width: 110px;">
+                            至
+                            <span class=" width60px"><i class="fa fa-calendar"></i></span>
+                            <input name="pedate" id="pedate" dateformat="yyyy-mm-dd" class=" form_datetime" style="width: 110px;">
+
+                        </div><br /><br />
+                        <div style="float:left">
+                            <label class="control-label width60px" for="userinfo">
+                                用户信息:
+                            </label>
+                            <input name="userinfo" id="userinfo" placeholder="">
+                        </div>
+                        <div style="float:left">
+                            <label class="control-label width60px" for="userinfo">
+                                &nbsp;&nbsp; 商品信息:
+                            </label>
+                            <input name="commudityinfo" id="commudityinfo" placeholder="">
+                        </div>
+                        <div style="float:left">
+                            <label class="control-label width60px" for="flyno">
+                                &nbsp;&nbsp;   航班号:
+                            </label>
+                            <input name="flyno" id="flyno" placeholder="">
+                        </div>  <br /><br />
+                        <div style="float:left">
+                            <label class="control-label width60px" for="selectStore">
+                                所属门店:
+                            </label>
+                            <select name="wid" class="table-selectheight" style="width:120px;margin-left:5px"></select>
+                            <label class="control-label width60px" for="selectStore">
+                                &nbsp;&nbsp; 渠道:
+                            </label>
+                            <select name="cid" class="table-selectheight" style="width:120px; margin-left:5px"></select>
+                        </div>
+
+                        <div style="float:left">
+                            <label class="control-label width60px" for="selectState">
+                                &nbsp;&nbsp; 状态:
+                            </label>
+                            <select name="state" class="table-selectheight" style="width:120px;margin-left:5px">
+
+
+                                <option value="-1">
+                                    请选择状态
+                                </option>
+                                <!-- kai 20150911-1 -->
+                                <option value="-10">网上置单</option>
+                                <option value="-9">转运置单</option>
+                                <option value="0">运单作废</option>
+                                <option value="1">包裹异常</option>
+                                <option value="2">已揽收</option>
+                                <option value="3">送往集散中心</option>
+                                <option value="4">已打件</option>
+                                <option value="5">送往机场</option>
+                                <option value="6">空运中</option>
+                                <option value="7">海关清关</option>
+                                <option value="8">美淘中国分部已揽收</option>
+                                <option value="9">收件人已接收</option>
+
+
+
+
+
+                            </select>
+                            <label class="control-label width60px" for="selectType">
+                                &nbsp;&nbsp; 类型:
+                            </label>
+
+                            <select name="type" class="table-selectheight" style="width:120px;margin-left:5px">
+
+                                <option value="-1">
+                                    请选择类型
+                                </option>
+
+                                <option value="1">门市运单</option>
+                                <option value="2">转运运单</option>
+                                <option value="3">网上置单</option>
+                                <option value="4">第三方运单</option>
+                                <!-- <option value="5">上门收货</option> -->
+                                <option value="6">空运单</option>
+                                <option value="7">批量生成门市运单</option>
+
+
+                            </select>
+                            <select name="payway" class="table-selectheight" style="width:120px;margin-left:5px">
+
+                                <option value="-1">
+                                    请选择支付方式
+                                </option>
+
+                                <option value="0">余额支付</option>
+                                <option value="1">现金支付</option>
+                                <option value="2">用户自付</option>
+
+
+
+                            </select>
+                            <select name="payornot" class="table-selectheight" style="width:120px; margin-left:5px">
+                                <option value="-1">请选择支付状态</option>
+                                <option value="0">未付款</option>
+                                <option value="1">已付款</option>
+                            </select>
+
+                            <button type="button" class="btn btn-purple btn-sm" id="btnAdvanceSearch">
+                                <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                                高级搜索
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div style="clear:both">
+
+            </div>
+            <div class="row" style="margin-top:5px">
+                <div class="col-xs-12">
+                    <!-- PAGE CONTENT BEGINS -->
+                    <table id="yundangrid-table"></table>
+                    <div id="yundangrid-pager"></div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div style="display:none" id="divDetail">
+
+
+
+        <table id="huizhonginfo" class="table table-bordered  table-striped table-condensed ">
+            <thead>
+                <tr>
+                    <th colspan="8" style="color:blue;">
+                        汇总信息
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="name">运单号：</td>
+                    <td class="value">
+                        <span name="orderId"></span>
+                    </td>
+                    <td class="name">类型：</td>
+                    <td class="value">
+                        <span name="typeName" id="typeName"></span>
+                    </td>
+                    <td class="name">状态：</td>
+                    <td class="value">
+                        <span name="stateName" style="color:red" id="stateName"></span>
+                    </td>
+                    <td class="name">支付方式：</td>
+                    <td class="value">
+                        <span name="paywayName" id="paywayName"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name">所属门店：</td>
+                    <td class="value">
+                        <span name="storeName"></span>
+                    </td>
+                    <td class="name">渠道：</td>
+                    <td class="value">
+                        <span name="channelName"></span>
+                    </td>
+                    <td class="name">总价钱：</td>
+                    <td class="value">
+                        <span name="totalmoney" style="color:red"></span>
+                    </td>
+                    <td class="name">操作人：</td>
+                    <td class="value">
+                        <span name="employeeName"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="name">海关号：</td>
+                    <td class="value">
+                        <span name="sorderId"></span>
+                    </td>
+                    <td class="name">国内快递号：</td>
+                    <td class="value">
+                        <span name="thirdNo"></span>
+                    </td>
+                    <td class="name">国内快递公司：</td>
+                    <td class="value">
+                        <span name="thirdPNS"></span>
+                    </td>
+                    <td class="name">航班号：</td>
+                    <td class="value">
+                        <span name="flyno"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name">创建时间：</td>
+                    <td class="value">
+                        <span name="createDate"></span>
+                    </td>
+                    <td class="name">最新修改时间：</td>
+                    <td class="value">
+                        <span name="modifyDate"></span>
+                    </td>
+                    <td class="name">支付时间：</td>
+                    <td class="value">
+                        <span name="payDate"></span>
+                    </td>
+                     <td class="name">支付状态:</td>
+                    <td class="value">
+                      <span name="payornotName" style="color:blue;"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name">转运单：</td>
+                    <td class="value">
+                        <span name="torderIds"></span>
+                    </td>
+                    <td class="name">运单仓位：</td>
+                    <td class="value">
+                        <span name="spositionId"></span>
+                    </td>
+                    <td class="name">转运费用</td>
+                    <td class="value">
+                        <span name="tmoney" style="color:red;"></span>
+                    </td>
+                     <td class="name">转运成本</td>
+                    <td class="value">
+                      <span name="tcost" style="color:blue;"></span>
+                    </td>
+                </tr>
+
+
+
+
+
+
+            </tbody>
+        </table>
+
+        <table id="belonguserid" class="table table-bordered  table-striped table-condensed ">
+            <thead>
+                <tr>
+                    <th colspan="8" style="color:blue;">
+                        所属用户信息
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="name">姓名：</td>
+                    <td class="value">
+                        <span name="realName"></span>
+                    </td>
+                    <td class="name">电话：</td>
+                    <td class="value">
+                        <span name="phone"></span>
+                    </td>
+                    <td class="name">邮箱：</td>
+                    <td class="value">
+                        <span name="email" style="color:red"></span>
+                    </td>
+                    <td class="name">用户id号：</td>
+                    <td class="value">
+                        <span name="id"></span>
+                    </td>
+                </tr>
+
+
+
+
+
+
+            </tbody>
+        </table>
+
+
+        <table id="senderTableInfo" class="table table-bordered  table-striped table-condensed ">
+            <thead>
+                <tr>
+                    <th colspan="4" style="color:blue;">
+                        寄件人信息
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="name">
+                        寄件人姓名：
+                    </td>
+                    <td class="value">
+                        <span name="name"></span>
+                    </td>
+                    <td class="name">
+                        寄件人电话：
+                    </td>
+                    <td class="value">
+                        <span name="phone"></span>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="name">
+                        寄件人地址：
+                    </td>
+                    <td class="value" colspan="3">
+                        <span name="address"></span>
+
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="name">
+                        城市：
+                    </td>
+                    <td class="value">
+
+                        <span name="city"></span>
+                    </td>
+                    <td class="name">
+                        州：
+                    </td>
+                    <td class="value">
+
+                        <span name="state"></span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="name">
+                        邮编：
+                    </td>
+                    <td class="value">
+                        <span name="zipcode"></span>
+                    </td>
+                    <td class="name">
+                        EMail：
+                    </td>
+                    <td class="value">
+
+                        <span name="email"></span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="name">
+                        公司名称：
+                    </td>
+                    <td class="value">
+                        <span name="company"></span>
+                    </td>
+                    <td class="name"></td>
+                    <td class="value">
+                        <span name="yue"></span>
+                    </td>
+
+
+                </tr>
+
+            </tbody>
+        </table>
+        <table id="receiverInfoTable" class="table table-bordered  table-striped table-condensed ">
+            <thead>
+                <tr>
+                    <th colspan="4" style="color:blue;">
+                        收件人信息
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="name">
+                        收件人姓名：
+                    </td>
+                    <td class="value">
+                        <span name="name"></span>
+                    </td>
+                    <td class="name">
+                        电话：
+                    </td>
+                    <td class="value">
+                        <span name="phone"></span>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td class="name">
+                        省/市/县：
+                    </td>
+                    <td class="value" colspan="3">
+                        <div style="float:left">
+                            <span>&nbsp;&nbsp;省: </span>
+                            <span name="state"></span>
+
+                        </div>
+                        <div style="float:left">
+                            <span>&nbsp;&nbsp;市: </span>
+                            <span name="city"></span>
+
+                        </div>
+                        <div style="float:left">
+                            <span>&nbsp;&nbsp;县/区：</span>
+                            <span name="dist"></span>
+
+                        </div>
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td class="name">
+                        街道：
+                    </td>
+                    <td class="value" colspan="3">
+                        <span name="address"></span>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td class="name">
+                        邮编：
+                    </td>
+                    <td class="value" colspan="3">
+
+                        <span name="zipcode"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="name">身份证号</td>
+                    <td class="value" colspan="3">
+                        <span name="cardid"></span>
+
+                    </td>
+                </tr>
+
+                <tr id="shenfengzhengimage">
+                    <td class="name" style="padding-top:15px;">
+                        身份证图片：
+                    </td>
+                    <td>
+                        合成:<img id="hcimage" src="" height="50" width="70" name="cardtogether" />
+                        <button type="button" style="margin-top:8px;" id="upload" class="btn btn-primary btn-sm table-button" onclick="showbigpic(this)"><i class="ace-icon fa fa-home"></i><strong>大图</strong></button>
+                    </td>
+                    <td>
+                        正面：<img id="zmimage" src="" height="50" width="70" name='cardurl' />
+                        <button type="button" style="margin-top:8px;" id="upload" class="btn btn-primary btn-sm table-button" onclick="showbigpic(this)"><i class="ace-icon fa fa-home"></i><strong>大图</strong></button>
+                    </td>
+                    <td>
+                        反面：<img id="fmimage" src="" height="50" width="70" name='cardother' />
+                        <button type="button" style="margin-top:8px;" id="upload" class="btn btn-primary btn-sm table-button" onclick="showbigpic(this)"><i class="ace-icon fa fa-home"></i><strong>大图</strong></button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="name">
+                        匹配名称：
+                    </td>
+                    <td class="value">
+                        <span name="secondName"></span>
+                    </td>
+                    <td class="name">
+                        备注：
+                    </td>
+                    <td class="value">
+                        <span name="remark" style='color:red;'></span>
+
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+
+
+        <table class="table table-bordered  table-striped table-condensed ">
+            <thead>
+                <tr>
+                    <th colspan="8" style="color:blue;">
+                        运单商品信息
+
+                    </th>
+                </tr>
+            </thead>
+
+            <tr id="goodsItemTeplament" style="display:none">
+                <td class="value">
+
+                    商品类型:
+
+                    <span name="name"></span>
+                    品名:
+                    <span name="productName"></span>
+                    品牌:
+                    <span name="brands"></span>
+                    数量:
+                    <span name="quantity"></span>
+                    重量:
+                    <span name="weight"></span>
+                    价值:
+                    <span name="value"></span>
+                    关税:
+                    <span name="tariff"></span>
+                    其他费用:
+                    <span name="other"></span>
+                    备注:
+                    <span name="remark"></span>
+
+
+                </td>
+            </tr>
+            <tbody id="goodsItemBody">
+                <!--此tr 用于在点击添加多个商品时使用，初始化的时候请把商品类型的option内容一起初始化化-->
+
+
+
+            </tbody>
+        </table>
+
+        <table id="yundanTableInfo" class="table table-bordered  table-striped table-condensed ">
+            <thead>
+                <tr>
+                    <th colspan="8" style="color:blue;">
+                        运单信息
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="name">重量信息</td>
+                    <td class="value">
+                        总计费重量(磅)&nbsp;：
+
+                        <span name="weight"></span>
+                        &nbsp; 总实际重量(磅)：
+
+                        <span name="sjweight"></span>
+                        &nbsp;总数量：
+
+                        <span name="quantity"></span>
+                        &nbsp;   申报总价值(美元)：
+
+                        <span name="value"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="name">保险、费用</td>
+                    <td class="value">
+                        保险费(美元)：
+
+                        <span name="insurance"></span>
+
+                        &nbsp; 其他总费用(美元)：
+
+                        <span name="other"></span>
+                        &nbsp;   关税总费用(美元)：
+
+                        <span name="tariff"></span>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td class="name">备注信息</td>
+                    <td class="value">
+
+
+                        <span name="remark"></span>
+                    </td>
+
+                </tr>
+  <tr>
+                    <td class="name">问题备注</td>
+                    <td class="value">
+
+                       
+                       <span name="qremark" style="color:red;"></span>
+                    </td>
+
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+
+    <div style="display:none" id="divbigimg">
+        <img id="popimg" src="" max-height="100%" width="90%" />
+    </div>
+
+    <iframe id="iframePrint1" src="" style=" width:0; height:0; display:none;"></iframe>
+    <iframe id="iframePrint2" src="" style=" width:0; height:0; display:none;"></iframe>
+    <iframe id="iframePrint3" src="" style=" width:0; height:0; display:none;"></iframe>
+
+    <div id="divEdit" style="display:none;">
+<input type="hidden" name="editorder_id" />
+        <div class="page-content">
+            <div>
+                运单号：<span style="display:inline-block;width:100px;color:blue;" name="orderId"></span>
+                 总费用：<span style="display:inline-block;width:60px;color:red;"  name="e_totalmoney"></span>
+                运单类型：<span style="display:inline-block;width:100px;color:blue;"  name="type"></span>
+        当前状态：<span style="display:inline-block;width:100px;color:blue;" name="curstate"></span>
+        支付状态：<span style="display:inline-block;width:100px;color:blue;" name="curpayornot"></span>          
+                会员信息：<span style="display:inline-block;width:100px;color:red;" name="orderIduserinfo"></span>
+                     
+                
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <!-- PAGE CONTENT BEGINS -->
+
+                    <div class="row">
+                        <div class="col-sm-6" id="senderdiv">
+                            <table id="senderTableInfo" class="table table-bordered  table-striped table-condensed ">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4">
+                                            寄件人信息
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            寄件人姓名：
+                                        </td>
+                                        <td class="value">
+                                            <input name="name" class="width80p" /><span style="color:red">*</span>
+                                        </td>
+                                        <td class="name">
+                                            寄件人电话：
+                                        </td>
+                                        <td class="value">
+                                            <input name="phone" class="width80p" maxlength="11"/><span style="color:red">*</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="name">
+                                            寄件人地址：
+                                        </td>
+                                        <td class="value" colspan="3">
+                                            <input name="address" class="width80p" />
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            城市：
+                                        </td>
+                                        <td class="value">
+                                            <input name="city" class="width80p" />
+                                        </td>
+                                        <td class="name">
+                                            州：
+                                        </td>
+                                        <td class="value">
+                                            <input name="state" class="width80p" />
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            邮编：
+                                        </td>
+                                        <td class="value">
+                                            <input name="zipcode" class="width80p" maxlength="6" />
+                                        </td>
+                                        <td class="name">
+                                            EMail：
+                                        </td>
+                                        <td class="value">
+                                            <input name="email" class="width80p" />
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="name">
+                                            公司名称：
+                                        </td>
+                                        <td class="value">
+                                            <input name="company" class="width80p" />
+                                        </td>
+                                        <td class="name">
+                                            账号余额($)：
+                                        </td>
+                                        <td class="value">
+                                            <input class="width80p" readonly="readonly" name="usermoney" style="width:120px"/>
+                                            &nbsp;余额支付：<input type="checkbox" name="payway"  />
+                                        </td>
+
+
+                                    </tr>
+                                     
+                                    <tr style="display:none">
+                                        <td class="name">
+                                            用户id：
+                                        </td>
+                                        <td class="value">
+                                            <input name="id" class="width80p" readonly="readonly" /> 
+                                        </td>
+                                        <td class="name">
+                                           
+                                        </td>
+                                        <td class="value">
+                                            
+                                           
+                                        </td>
+
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <div class="col-sm-6">
+
+
+                            <table id="receiverInfoTable" class="table table-bordered  table-striped table-condensed ">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4">
+                                            收件人信息
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            收件人姓名：
+                                        </td>
+                                        <td class="value">
+                                            <input name="name" class="width80p" /><span style="color:red">*</span>
+                                        </td>
+                                        <td class="name">
+                                            电话：
+                                        </td>
+                                        <td class="value">
+                                            <input name="phone" class="width80p" maxlength="11"/><span style="color:red">*</span>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td class="name">
+                                            省/市/县：
+                                        </td>
+                                        <td class="value" colspan="3">
+                                            <div style="float:left">
+                                                <span>&nbsp;&nbsp;省: </span><input name="state" style="width:120px" /><span style="color:red">*</span>
+                                            </div>
+                                            <div style="float:left">
+                                                <span>&nbsp;&nbsp;市: </span> <input name="city" style="width:100px" /><span style="color:red">*</span>
+                                            </div>
+                                            <div style="float:left">
+                                                <span>&nbsp;&nbsp;县/区：</span><input name="dist" style="width:100px" /><span style="color:red">*</span>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td class="name">
+                                            街道：
+                                        </td>
+                                        <td class="value" colspan="3">
+                                            <input name="address" class="width80p" /><span style="color:red">*</span>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td class="name">
+                                            邮编：
+                                        </td>
+                                        <td class="value" colspan="3">
+                                            <input name="zipcode" class="width80p" maxlength="6"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="name"></td>
+                                        <td class="value" colspan="3">
+                                            <button type="button" onclick="displayReceiverIdTable(this)" class="btn btn-danger btn-sm" id="cardinfoshow">
+                                                <span class="ace-icon fa fa-home icon-on-right bigger-110"></span>
+                                                显示身份证信息
+                                            </button>
+
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div><!-- /row -->
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+            </div>
+            <div class="row" id="receiverIdTable" style="display:none">
+                <div class="col-xs-12">
+                    <table class="table table-bordered  table-striped table-condensed ">
+                        <thead>
+                            <tr>
+                                <th colspan="4">
+                                    收件人身份证信息
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="shenfengzhengimage">
+                                <td class="name" style="padding-top:15px;">
+                                    身份证号：<input style="width:160px;" name="cardid" maxlength="18"/>
+
+                                    <button type="button" id="upload" onclick="upload()" class="btn btn-success btn-sm table-button"><i class="glyphicon glyphicon-plus"></i><strong>上传</strong></button>
+                                </td>
+                                <td>
+                                    合成:<img id="hcimage1" src="" height="50" width="70" name="cardtogether"/>
+                                    <button type="button" style="margin-top:8px;" id="upload" class="btn btn-danger btn-sm" onclick="deletepics(this)"><i class="ace-icon fa fa-trash"></i><strong >删除</strong></button>
+                                    <button type="button" style="margin-top:8px;" id="upload" class="btn btn-primary btn-sm table-button"  onclick="showbigpic(this)"><i class="ace-icon fa fa-home"></i><strong>大图</strong></button>
+                                </td>
+                                <td>
+                                    正面：<img id="zmimage1" src="" height="50" width="70" name="cardurl"/>
+                                    <button type="button" style="margin-top:8px;" id="upload" class="btn btn-danger btn-sm" onclick="deletepics(this)"><i class="ace-icon fa fa-trash"></i><strong >删除</strong></button>
+                                    <button type="button" style="margin-top:8px;" id="upload" class="btn btn-primary btn-sm table-button"  onclick="showbigpic(this)"><i class="ace-icon fa fa-home"></i><strong>大图</strong></button>
+                                </td>
+                                <td>
+                                    反面：<img id="fmimage1" src="" height="50" width="70" name="cardother"/>
+                                    <button type="button" style="margin-top:8px;" id="upload" class="btn btn-danger btn-sm" onclick="deletepics(this)"><i class="ace-icon fa fa-trash"></i><strong >删除</strong></button>
+                                    <button type="button" style="margin-top:8px;" id="upload" class="btn btn-primary btn-sm table-button" onclick="showbigpic(this)"><i class="ace-icon fa fa-home"></i><strong>大图</strong></button>
+                                </td>
+                            </tr>
+                            <tr id="uploadshenfenzheng" style="display:none">
+                                <td class="name">
+
+                                    <label for="hcradio">上传合成图</label> <input id="hcradio" type="radio" name="shenfenzhenradio" value="hc" checked="checked" onclick="hcShow()" />
+                                    <br />
+                                    <label for="zfradio">上传正反面图</label> <input id="zfradio" type="radio" name="shenfenzhenradio" value="zf" onclick="zfShow()" />
+                                </td>
+
+
+                                <td class="value" colspan="3" id="uploadhcTd">
+                                    注意：支持JPG，PNG，BMP,JPEG等图片格式的                                          图片，最大不超过4MB<br />
+                                    <span style="color:red">合成：</span>
+                                    <input type="file" name="hcpicture" id="hcpicture"/>
+                                    
+                                    <br />
+
+                                </td>
+
+                                <td class="value" id="uploadzfTd" colspan="3" style="display:none">
+                                    注意：支持JPG，PNG，BMP,JPEG等图片格式的                                          身份证图片，最大不超过4MB<br />
+                                    <span style="color:red">正面：</span>
+                                    <input type="file" name="zmpicture" id="zmpicture"/>
+                                    <br />
+                                    <span style="color:red">反面：</span>
+                                    <input type="file" name="fmpicture" id="fmpicture"/>
+
+                                </td>
+
+                            </tr>
+
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <table class="table table-bordered  table-striped table-condensed ">
+                        <thead>
+                            <tr>
+                                <th colspan="2">
+                                    门店渠道
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="name">
+                                    选择门店渠道：
+                                </td>
+                                <td class="value">
+                                <select class="table-selectheight" name="modifystorelist"></select>
+                                    <select class="table-selectheight" name="channellist"></select>
+                                    <!--  渠道附加费--><input name="addtivePrice" value="0" readonly="readonly" style="display:none;"/>
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <table class="table table-bordered  table-striped table-condensed ">
+                        <thead>
+                            <tr>
+                                <th colspan="8">
+                                    运单商品信息
+                                    <button type="button" style="margin-top:2px;" onclick="addGoodsItem()" class="btn btn-success btn-sm table-button"><i class="glyphicon glyphicon-plus"></i><strong>添加</strong></button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <!--此tr 用于在点击添加多个商品时使用，初始化的时候请把商品类型的option内容一起初始化化-->
+
+                        <tr id="goodsItemTeplamentEdit" style="display:none">
+                            <td class="value">
+                              
+                                商品类型:
+                                <select class="table-selectheight" name="commodityName"></select>
+                                品名:<input style="width:120px" value="" name="productName" />
+                                品牌:<input style="width:80px" name="brands" />
+                                数量:<input style="width:40px" name="quantity" />
+                                重量:<input style="width:40px" name="weight" />
+                                价值:<input style="width:40px" name="value" />
+                                关税:<input style="width:40px" name="tariff" value="0" />
+                                其他费用:<input style="width:40px" name="other" value="0" />
+                                备注:<input style="width:170px" name="remark" />
+
+                                <button type="submit" onclick="delGoodsItem(this)" class="btn btn-danger btn-sm table-button"><i class="glyphicon glyphicon-remove"></i><strong>移除</strong></button>
+                            </td>
+                        </tr>
+                        <tbody id="goodsItemBody">
+                          
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+          
+            <div class="row">
+                <div class="col-xs-12">
+                    <table class="table table-bordered  table-striped table-condensed " id="yundanTableInfo">
+                        <thead>
+                            <tr>
+                                <th colspan="8">
+                                    运单信息
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="name">重量信息</td>
+                                <td class="value">
+                                    总计费重量(磅)&nbsp;：
+                                    <input style="width:60px" value="0" name="weight" readonly="readonly" />
+
+                                    &nbsp; 总实际重量(磅)：
+                                    <input style="width:60px" value="0" name="sjweight" readonly="readonly" />
+
+                                    &nbsp;总数量：
+                                    <input style="width:60px" value="0" name="quantity" readonly="readonly" />
+                                    &nbsp;   申报总价值(美元)：
+                                    <input style="width:60px" value="0" name="value" value="0" readonly="readonly" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="name">保险、费用</td>
+                                <td class="value">
+                                    保险费(美元)：
+                                    <input style="width:60px" value="0" name="insurance" />
+                                   &nbsp; 保险额度：
+                                    <input style="width:60px" value="0" name="maxinsurance" />
+                                 
+                                    &nbsp; 其他总费用(美元)：
+                                    <input style="width:60px" value="0" name="other" readonly="readonly" />
+                                    &nbsp;   关税总费用(美元)：
+                                    <input style="width:60px" value="0" name="tariff" value="0" readonly="readonly" />
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+                                <td class="name">备注信息</td>
+                                <td class="value">
+
+                                    <input name="totalremark" style="width:80%;" />
+
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td class="name">问题备注</td>
+                                <td class="value">
+
+
+                                    <input name="qremark" style="color:red;width:80%;"  />
+                                </td>
+
+                            </tr>
+                            
+                            <tr>
+                                <td class="name">路由支付状态</td>
+                                <td class="value">
+
+
+                                   <select name="newstate"><option value="-1">选择新状态</option><option value="0">运单作废</option><option value="1">包裹异常</option><option value="2" selected="selected">已揽收</option><option value="3">送往集散中心</option><option value="4">已打件</option><option value="5">送往机场</option><option value="6">空运中</option><option value="7">海关清关</option><option value="8">美淘中国分部已揽收</option><option value="9">收件人已接收</option></select>
+                               <select name="newpayornot"><option value="-1">选择支付状态</option><option value="0">未付款</option><option value="1" selected="selected">已付款</option></select>
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-footer" style="padding-bottom:25px;">
+        <label class="control-label col-md-5"></label> 是否发送短信:<input name="sendmessage" type="checkbox" />&nbsp;&nbsp;
+            <label class="control-label col-md-5"></label>
+            <button type="submit" class="btn btn-success btn-sm" onclick="savemodifyinfo()"><i class="glyphicon glyphicon-ok"></i><strong>保存</strong></button>&nbsp;&nbsp;&nbsp;
+<button type="submit" class="btn btn-primary btn-sm" onclick="payOrderinfo()"><i class="glyphicon glyphicon-ok"></i><strong>支付运单</strong></button>&nbsp;
+        </div>
+       
+    </div>
+    
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+    <!--开关插件-->
+    <script src="../resources/bootstrap-switch/bootstrap-switch.min.js"></script>
+<script src="../resources/js/jquery.form.js"></script>
+    <script src="../resources/js/fuelux/fuelux.spinner.min.js"></script>
+    <script src="../resources/scripts/common.js"></script>
+    <script src="../resources/scripts/yundanedit.js"></script>
+    <script src="../resources/scripts/tyundanlist.js"></script>
+    
+</body>
+</html>

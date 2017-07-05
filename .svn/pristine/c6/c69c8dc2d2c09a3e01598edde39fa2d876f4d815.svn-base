@@ -1,0 +1,504 @@
+﻿<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+<meta name="description" content="Your description">
+<meta name="keywords" content="Your keywords">
+<meta name="author" content="Your name">
+<link rel="stylesheet" href='css/bootstrap.css' type="text/css" media="screen">
+<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/inner.css" type="text/css" media="screen">
+<link rel="stylesheet" href="demo/switcher.css" type="text/css"media="screen">
+<link rel="stylesheet" href="css/es-carousel.css" type="text/css"
+	media="screen">
+<link rel="stylesheet" href="css/prettyphoto.css" type="text/css"
+	media="screen">
+<link rel="stylesheet" href="css/footer-color.css" type="text/css"
+	media="screen">
+<link rel="stylesheet" href="css/color1.css" type="text/css" id="theme" />
+<link rel="stylesheet" href="css/footer-color.css" type="text/css"
+	media="screen">
+<!-- CSS STYLE -->
+
+<link rel="stylesheet" href='css/common.css'>
+<link rel="stylesheet" type="text/css" media="all" href="css/style3.css">
+<link id="main_stylesheet" rel="stylesheet" href='css/indexstyle.css'
+	type="text/css">
+<link rel="stylesheet" type="text/css" href='css/common1.css'>
+
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css"
+	media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css"
+	media="screen" />
+<!-- REVOLUTION BANNER CSS SETTINGS -->
+<link rel="stylesheet" href="css/rs-plugin/settings.css" type="text/css"
+	media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/captions.css" type="text/css"
+	media="screen" />
+<link rel="stylesheet" href="css/portfolio.css" type="text/css"
+	media="screen">
+<link rel="stylesheet" href="css/portfolio-shape.css" type="text/css"
+	media="screen">
+<link rel="stylesheet" href="css/elements.css" type="text/css"
+	media="screen">
+<!--[if lt IE 9]>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+  <![endif]-->
+</head>
+<body class="home-page stretched">
+
+
+	<div id="wrapper">
+		
+
+		<!--==============================content=================================-->
+		<div class="breadcrumb-wrapper">
+			<div class="shadowdrop"></div>
+			<div class="container">
+				<h2>新闻与公告</h2>
+				<ul class="breadcrumb fright">
+					<li><a href="index.jsp">首页</a> <span class="divider">/</span>
+					</li>
+					<li class="active">新闻与公告</li>
+				</ul>
+			</div>
+		</div>
+
+
+		<!--=========== Scaffolding ===========-->
+		<div id="content">
+
+			<!-- Global Bootstrap settings
+        ================================================== -->
+			<section id="global">
+			<div class="page-header">
+		
+
+				<!-- Grid system ================================================== -->
+
+				<br>
+				<h1><span style="font-size:30px;color:red;padding-top: 10px;padding-bottom: 10px;">新闻</span></h1>
+<br>
+
+
+				<table
+					class="table table-bordered table-striped responsive-utilities" id="newstable">
+					<thead>
+						<tr>
+							<th style="width:15%">时间</th>
+							<th style="width:25%">新闻标题 </th>
+							<th style="width:60%">新闻内容</th>
+
+						</tr>
+					</thead>
+					<tfoot>
+							<tr>
+								<td colspan="3">
+								
+									<div class="pagination" style="font-size: 15px;margin-right: 30px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+					<tbody>
+			
+					</tbody>
+				</table>
+
+
+
+
+			</div>
+			</section>
+			<section id="global">
+			<div class="page-header">
+		
+
+				<!-- Grid system ================================================== -->
+<br>
+				<h1><span style="font-size:30px;color:red;padding-top: 10px;padding-bottom: 10px;">公告</span></h1>
+<br>
+
+				<table
+					class="table table-bordered table-striped responsive-utilities" id="gonggaotable">
+					<thead>
+						<tr>
+							<th style="width:15%">时间</th>
+							<th style="width:25%">公告标题 </th>
+							<th style="width:60%">公告内容</th>
+
+						</tr>
+					</thead>
+					<tfoot>
+							<tr>
+								<td colspan="3">
+								
+									<div class="pagination" style="font-size: 15px;margin-right: 30px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+					<tbody>
+			
+					</tbody>
+				</table>
+
+
+
+
+			</div>
+			</section>
+		</div>
+		<!--==============================footer=================================-->
+		
+	</div>
+
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
+	<script type="text/javascript" src="js/custom.js"></script>
+	<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+	<script type="text/javascript" src="js/jquery.sliderTabs.js"></script>
+	<!-- jQuery Slider  -->
+	<script type="text/javascript"
+		src="js/rs-plugin/jquery.themepunch.plugins.min.js"></script>
+	<script type="text/javascript"
+		src="js/rs-plugin/jquery.themepunch.revolution.min.js"></script>
+	<!-- Elastislider  -->
+	<script type="text/javascript" src="js/jquery.elastislide.js"></script>
+	<!-- Pretty photo  -->
+	<script type="text/javascript" src="js/jquery.prettyphoto.js"></script>
+	<!-- Carousel  -->
+	<script type="text/javascript" src="js/carousel.js"></script>
+	<!-- totop  -->
+	<script type="text/javascript" src="js/jquery.ui.totop.js"></script>
+	<script type="text/javascript" src="js/prettify.js"></script>
+	<script type="text/javascript" src="js/application.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+	<!-- Quicksand  -->
+	<script type="text/javascript" src="js/jquery.quicksand.js"></script>
+	<!-- Image animated Style  -->
+	<script type="text/javascript" src="js/jquery.gridrotator.js"></script>
+	<script type="text/javascript" src="js/jquery.mobile.customized.min.js"></script>
+	<!-- Accordion  -->
+	<script type="text/javascript" src="js/accordion.js"></script>
+	<!-- Tabs  -->
+	<script type="text/javascript" src="js/tabs.js"></script>
+	<!-- Sitemap  -->
+	<script type="text/javascript" src="js/sitemap.js"></script>
+	<!-- Navigation  -->
+	<script type="text/javascript" src="js/nav-small.js"></script>
+	<script type="text/javascript" src="js/jquery.mobilemenu.js"></script>
+	<!-- Isotope  -->
+	<script type="text/javascript" src="js/jquery.isotope.min.js"></script>
+	<!-- Metro Style  -->
+	<script type="text/javascript" src="js/boxgrid.js"></script>
+	<script type="text/javascript" src="demo/switcher.js"></script>
+
+
+
+
+
+
+
+
+</body>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	loadNewsList("","",1);
+});
+
+
+	
+	function loadNewsList(key,column,pageNow) {
+		key = encodeURI(key);
+		$.ajax( {
+			post : "get",
+			url : "news/search",
+			data : {
+				"key" : key,
+				"column" : column,
+				"pageIndex" : pageNow
+			},
+			success : function(response) {
+				var code = response.code;
+				//alert(code);
+				if ("200" == code) {
+					
+					if((response.data==null)||(response.data.datas==null))
+					{
+						showNewsList(null);
+						showNewsLink(null);
+					}
+					else
+					{
+						showNewsList(response.data.datas);
+						showNewsLink(response.data);
+					}
+					afterLoadNewsList();
+					//afterLoadNewsList();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+			}
+		});
+	}
+	
+	
+	
+	function showNewsList(list) {
+		var str = "";
+		if (list != null) {
+			$
+					.each(
+							list,
+							function() {
+								str += "<tr id='" + this.id + "'>";
+								str += "<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis;'>" + this.modifytime + "</td>";
+								str += "<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis;'><a name='a_news_get_link' href='"+this.id+"'>" + this.title + "</a></td>";							
+								str += "<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis; max-width:400px'><a name='a_news_get_link' href='"+this.id+"'>" + this.viewcontent + "</a></td>";								
+								str += "</tr>";
+							});
+		} else {
+			if (str == null || str == '') {
+				
+			}
+		}
+		$("#newstable tbody").html(str);
+	}
+
+	function showNewsLink(pageSplit) {
+		if (pageSplit != null) {
+			var rowCount = pageSplit.rowCount;
+			var pageSize = pageSplit.pageSize;
+			var pageNow = pageSplit.pageNow;
+			var pageCount = pageSplit.pageCount;
+			$("#newstable tfoot .bulk-actions").show();
+			$("#newstable tfoot .pagination")
+					.html(
+							createPaginationHtmlStr(rowCount, pageSize, pageNow,
+									pageCount));
+
+			$("#newstable tfoot .pagination a").click(function() {
+
+				var key=$(":text[name='key']").val();
+				var column = $("select[name='type']").val();
+				var pn = $(this).attr("href");
+
+				//loadTranshipList(tid, key, type, sdate, edate, pn);
+				loadNewsList(key,column,pn);
+				return false;
+			});
+
+			$("#newstable tfoot .pagination input").keydown(function(event) {
+				if (event.which == 13) {
+					var pn = $(this).val();
+					if (/^\d*$/.test(pn)) {
+						var key=$(":text[name='key']").val();
+						var column = $("select[name='type']").val();
+						//loadTranshipList(key, type, sdate, edate, pn);
+						loadNewsList(key,column,pn);
+					} else {
+						alert("只能输入数字");
+					}
+					$(this).blur();
+				}
+			});
+		} else {
+			$("#newstable tfoot .bulk-actions").hide();
+			$("#newstable tfoot .pagination").html("");
+		}
+	}
+	
+	function createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount) {
+		var prePage = pageNow - 1;
+		prePage = prePage < 1 ? 1 : prePage;
+		var nextPage = pageNow + 1;
+		nextPage = nextPage > pageCount ? pageCount : nextPage;
+		var info = "共" + rowCount + "条/共" + pageCount + "页&nbsp;";
+		info += "当前第" + pageNow + "页&nbsp;&nbsp;";
+		info += "<a href='1' id='a_first_page'>首页</a>|";
+		info += "<a href='" + prePage + "' id='a_pre_page'>上一页</a>";
+		info += "<input style='width: 30px;' type='text' name='pageNow' />";
+		info += "<a href='" + nextPage + "' id='a_next_page'>下一页</a>|";
+		info += "<a href='" + pageCount + "' id='a_last_page'>尾页</a>";
+		return info;
+	}
+	
+	function afterLoadNewsList() {
+	
+		
+		$("a[name='a_news_get_link']").click(function() {
+			var id = $(this).attr("href");
+			var url = "newshow.jsp" + "?newsid=" + id;
+			window.location=url;
+			return false;
+		});
+
+	}
+	</script>
+	
+	
+	<script type="text/javascript">
+
+
+$(document).ready(function(){
+	loadGonggaoList("","",1);
+});
+	
+	function loadGonggaoList(key,column,pageNow) {
+		key = encodeURI(key);
+		$.ajax( {
+			post : "get",
+			url : "gonggao/search",
+			data : {
+				"key" : key,
+				"column" : column,
+				"pageIndex" : pageNow
+			},
+			success : function(response) {
+				var code = response.code;
+				//alert(code);
+				if ("200" == code) {
+					
+					if((response.data==null)||(response.data.datas==null))
+					{
+						showGonggaoList(null);
+						showGonggaoLink(null);
+					}
+					else
+					{
+						showGonggaoList(response.data.datas);
+						showGonggaoLink(response.data);
+					}
+					afterLoadGonggaoList();
+					//afterLoadNewsList();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+			}
+		});
+	}
+	
+	
+	
+	function showGonggaoList(list) {
+		var str = "";
+		if (list != null) {
+			$
+					.each(
+							list,
+							function() {
+								str += "<tr id='" + this.id + "'>";
+								str += "<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis;'>" + this.modifytime + "</td>";
+								str += "<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis;'><a name='a_gonggao_get_link' href='"+this.id+"'>" + this.title + "</a></td>";							
+								str += "<td style='white-space:nowrap;overflow:hidden;text-overflow: ellipsis; max-width:400px'><a name='a_gonggao_get_link' href='"+this.id+"'>" + this.viewcontent + "</a></td>";								
+								str += "</tr>";
+							});
+		} else {
+			if (str == null || str == '') {
+				
+			}
+		}
+		$("#gonggaotable tbody").html(str);
+	}
+
+	function showGonggaoLink(pageSplit) {
+		if (pageSplit != null) {
+			var rowCount = pageSplit.rowCount;
+			var pageSize = pageSplit.pageSize;
+			var pageNow = pageSplit.pageNow;
+			var pageCount = pageSplit.pageCount;
+			$("#gonggaotable tfoot .bulk-actions").show();
+			$("#gonggaotable tfoot .pagination")
+					.html(
+							createPaginationHtmlStr(rowCount, pageSize, pageNow,
+									pageCount));
+
+			$("#gonggaotable tfoot .pagination a").click(function() {
+
+				var key=$(":text[name='key']").val();
+				var column = $("select[name='type']").val();
+				var pn = $(this).attr("href");
+
+				//loadTranshipList(tid, key, type, sdate, edate, pn);
+				loadNewsList(key,column,pn);
+				return false;
+			});
+
+			$("#gonggaotable tfoot .pagination input").keydown(function(event) {
+				if (event.which == 13) {
+					var pn = $(this).val();
+					if (/^\d*$/.test(pn)) {
+						var key=$(":text[name='key']").val();
+						var column = $("select[name='type']").val();
+						//loadTranshipList(key, type, sdate, edate, pn);
+						loadNewsList(key,column,pn);
+					} else {
+						alert("只能输入数字");
+					}
+					$(this).blur();
+				}
+			});
+		} else {
+			$("#gonggaotable tfoot .bulk-actions").hide();
+			$("#gonggaotable tfoot .pagination").html("");
+		}
+	}
+	
+	function createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount) {
+		var prePage = pageNow - 1;
+		prePage = prePage < 1 ? 1 : prePage;
+		var nextPage = pageNow + 1;
+		nextPage = nextPage > pageCount ? pageCount : nextPage;
+		var info = "共" + rowCount + "条/共" + pageCount + "页&nbsp;";
+		info += "当前第" + pageNow + "页&nbsp;&nbsp;";
+		info += "<a href='1' id='a_first_page'>首页</a>|";
+		info += "<a href='" + prePage + "' id='a_pre_page'>上一页</a>";
+		info += "<input style='width: 30px;' type='text' name='pageNow' />";
+		info += "<a href='" + nextPage + "' id='a_next_page'>下一页</a>|";
+		info += "<a href='" + pageCount + "' id='a_last_page'>尾页</a>";
+		return info;
+	}
+	
+	function afterLoadGonggaoList() {
+	
+		
+		$("a[name='a_gonggao_get_link']").click(function() {
+			var id = $(this).attr("href");
+			var url = "gonggaoshow.jsp" + "?gonggaoid=" + id;
+			window.location=url;
+			return false;
+		});
+
+	}
+	</script>
+
+</html>

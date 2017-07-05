@@ -1,0 +1,129 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+		
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">公告列表</p>
+
+		<div class="box_content">
+			<div class="content_title">公告列表</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u31" style="margin: 0px;height: auto;">
+						<div style="clear: both;"></div>
+					</div>
+					<div id="u320">
+							<span>
+								<a href="#" id="a_add_gonggao_link">添加公告</a>
+							</span>
+						</div>
+						
+						<form action="">
+								&nbsp;
+								关键字：
+								<input class="text-input" size="10" type="text" name="key" style="width:100px;" />
+								&nbsp;
+								搜索内容：
+								<select class="text-input" name="type" style="width:100px;">
+									<option value="0">
+										公告标题
+									</option>
+									<option value="1">
+										公告内容
+									</option>
+									<option value="2">
+										发布人
+									</option>
+								</select>
+								
+								<input class="button" type="submit" value="高级搜索" name="searchSub" />
+							</form>
+						
+						
+					<table style="width: 100%">
+									<col width="40"/>
+						<col width="90px" />
+						<col width="90px" />
+						<col/>
+						<col width="100px" />
+						<col width="120px" />
+						<col width="80px" />
+									
+						<thead>
+								<tr>
+								<th id="n_newchoose">
+									选择
+								</th>
+								<th id="n_id">
+									公告编号
+								</th>
+								<th id="n_title">
+									公告标题
+								</th>
+								
+								<th id="n_context" align="center">
+									公告内容
+								</th>
+								 <th id="n_author">
+									发布人
+								</th>
+								<th id="n_time">
+									添加时间
+								</th>
+								<th id="n_modifytime">
+									修改时间
+								</th>
+								<th id="n_remark">
+									备注
+								</th>
+								<th>
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="9">
+									<div class="bulk-actions align-left">
+										&nbsp;
+										<label>
+											<input type="checkbox" name="u_del_check_all"
+												id="u_del_check_all" />
+											全选
+										</label>
+										&nbsp;&nbsp;
+										<a href="#" id="a_delete_gonggao_link">删除</a>
+									</div>
+									<div class="pagination" style="font-size: 15px;margin-right: 30px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav42Data();
+	});
+</script>
+</html>

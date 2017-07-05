@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.globalargsDao">
+	<resultMap id="basic_result_map" type="com.weiye.model.globalargs">
+		<id column="id" property="id" javaType="String" />
+		<result column="argflag" property="argflag" javaType="String" />
+		<result column="argcontent" property="argcontent" javaType="String" />
+		<result column="argtype" property="argtype" javaType="String" />
+		<result column="argremark" property="argremark" javaType="String" />
+		<result column="modifytime" property="modifytime" javaType="String" />
+		<result column="createtime" property="createtime" javaType="String" />
+		<result column="index" property="index" javaType="String" />
+	</resultMap>
+	
+	<resultMap id="basic_result_index_map" type="com.weiye.model.globalargsIndex">
+		<id column="id" property="id" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+	</resultMap>
+	
+	<select id="searchallofglobalargs" resultMap="basic_result_map">
+		select globalargs.*
+		from globalargs
+	</select>
+	<select id="getglobalargsById" resultMap="basic_result_map">
+		select globalargs.*
+		from globalargs
+		where globalargs.id=#{id}
+	</select>
+	<insert id="insertglobalargs" parameterType="com.weiye.model.globalargs"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		globalargs(argflag,argcontent,argtype,argremark,index)
+		values(#{argflag},#{argcontent},#{argtype},#{argremark},#{index})
+	</insert>
+	<insert id="insertglobalargsbyobject" parameterType="com.weiye.model.globalargs"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		`globalargs`(`argflag`,`argcontent`,`argtype`,`argremark`,`modifytime`,`createtime`,`index`)
+		values(#{argflag},#{argcontent},#{argtype},#{argremark},#{modifytime},#{createtime},#{index})
+	</insert>
+
+	<select id="countByargflag" resultType="java.lang.Integer">
+		select count(distinct `globalargs`.id)
+		from globalargs
+		where `globalargs`.`argflag`=#{argflag}
+	</select>
+
+	<select id="countByKeys" resultType="java.lang.Integer">
+		select count(distinct `globalargs`.id)
+		from globalargs
+		<where>
+			<if test="column!=null and column!='' and key!=null and key!=''">
+				and ${column} like #{key}
+			</if>
+		</where>
+	</select>
+	<select id="searchByKeys" resultMap="basic_result_map">
+		select distinct `globalargs`.* from `globalargs`
+		<where>
+			<if test="column!=null and column!='' and key!=null and key!=''">
+				and ${column} like #{key}
+			</if>
+		</where>
+		order by `globalargs`.`modifytime` desc
+		limit
+		#{index},#{size}
+	</select>
+
+	<update id="updateglobalargsbyflag" parameterType="com.weiye.model.globalargs"> update 
+		globalargs set argcontent=#{argcontent} , modifytime=#{modifytime},argremark=#{argremark}
+		 where `globalargs`.`argflag`=#{argflag} and `globalargs`.`id`=#{id} </update>
+		
+	<delete id="deleteglobalargsbyadmin">
+		delete from `globalargs`
+		where `id` in
+		<foreach collection="ids" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>		
+	</delete>
+		<delete id="deleteglobalargsbyadminid">
+		delete from `globalargs`
+		where `globalargs`.`id`=#{id} 
+	</delete>
+		
+	<select id="getcontentbyflag" resultType="java.lang.String">
+		select `globalargs`.`argcontent`
+		from globalargs
+		where `globalargs`.`argflag`=#{flag}
+	</select>
+	
+	<!-- 获取索引表中的所有值 -->
+	<select id="getallindexs" resultMap="basic_result_index_map">
+		select globalargs_index.*
+		from globalargs_index
+	</select>
+	<!-- 根据索引号获取对应的所有全局变量-->
+	<select id="getallbyindex" resultMap="basic_result_map">
+		select globalargs.*
+		from globalargs
+		where `globalargs`.`index`=#{index}
+	</select>
+</mapper>

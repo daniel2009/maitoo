@@ -1,0 +1,252 @@
+package com.meitao.controller;
+
+
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.meitao.service.ClaimPackageService;
+import com.meitao.service.ClaimPersonService;
+import com.meitao.common.constants.Constant;
+import com.meitao.common.constants.ParameterConstants;
+import com.meitao.common.constants.ResponseCode;
+
+import com.meitao.common.util.StringUtil;
+import com.meitao.common.util.UploadUtil;
+import com.meitao.model.PageSplit;
+import com.meitao.model.RenlingBaoguo;
+import com.meitao.model.RenlingPersons;
+import com.meitao.model.ResponseObject;
+
+@Controller
+public class ClaimPersonController extends BasicController{
+	private static final long serialVersionUID = 8121507813377133751L;
+	private static final Logger log = Logger.getLogger(ClaimPersonController.class);
+	@Resource(name = "claimPersonService")
+	private ClaimPersonService claimPersonService;
+	@Resource(name = "claimPackageService")
+	private ClaimPackageService claimPackageService;
+	@Value(value = "${default_img_type}")
+	private String defaultImgType;
+	@Value(value = "${default_img_size}")
+	private Long defaultImgSize;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+	private static final String IMG_PACKAGE = "/img/claimPackage/";
+	
+	@RequestMapping(value = "/user/claimPackage/claim", method = {RequestMethod.POST})
+	@ResponseBody
+	public ResponseObject<Object> claimByUser(HttpServletRequest request, RenlingPersons renlingPerson,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE1, required = false) MultipartFile picture1,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE2, required = false) MultipartFile picture2,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE3, required = false) MultipartFile picture3,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE4, required = false) MultipartFile picture4,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE5, required = false) MultipartFile picture5){
+		if(!UploadUtil.hasFile(picture1, picture2, picture3, picture4, picture5)){
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "最少要有一张图片");
+		}
+		String realPath = request.getSession().getServletContext().getRealPath("/");
+		String[] fileNames = UploadUtil.uploadFile(IMG_PACKAGE, realPath, defaultImgSize, defaultImgType, false, 0, picture1, picture2, picture3, picture4, picture5);
+		if(fileNames[0].indexOf(".") < 0){
+			return generateResponseObject(ResponseCode.CLAIM_PERSON_PICTURE_ERROR, fileNames[0]);
+		}else{
+			renlingPerson.setPic1(fileNames[0]);
+			renlingPerson.setPic2(fileNames[1]);
+			renlingPerson.setPic3(fileNames[2]);
+			renlingPerson.setPic4(fileNames[3]);
+			renlingPerson.setPic5(fileNames[4]);
+		}
+		HttpSession session = request.getSession();
+		renlingPerson.setUserId((String) session.getAttribute(Constant.USER_ID_SESSION_KEY));
+		renlingPerson.setUserName((String) session.getAttribute(Constant.USER_NICK_NAME_SESSION_KEY));
+		try{
+			return this.claimPersonService.add(renlingPerson);
+		}catch(Exception e){
+			log.error("claim package error", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "认领包裹出现异常");
+		}
+	}
+	@RequestMapping(value = "/user/claimPackage/reclaim", method = {RequestMethod.POST})
+	@ResponseBody
+	public ResponseObject<Object> reclaimByUser(HttpServletRequest request, RenlingPersons renlingPerson,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE1, required = false) MultipartFile picture1,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE2, required = false) MultipartFile picture2,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE3, required = false) MultipartFile picture3,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE4, required = false) MultipartFile picture4,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_PICTURE5, required = false) MultipartFile picture5){
+		if(!UploadUtil.hasFile(picture1, picture2, picture3, picture4, picture5) && !UploadUtil.isFileUrl(renlingPerson.getPic1(), renlingPerson.getPic2(), renlingPerson.getPic3(), renlingPerson.getPic4(), renlingPerson.getPic5())){
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "最少要有一张图片");
+		}
+		String realPath = request.getSession().getServletContext().getRealPath("/");
+		String[] fileNames = UploadUtil.uploadFileWithoutSort(IMG_PACKAGE, realPath, defaultImgSize, defaultImgType, false, 0, picture1, picture2, picture3, picture4, picture5);
+		if(fileNames[0].indexOf(".") < 0){
+			return generateResponseObject(ResponseCode.CLAIM_PERSON_PICTURE_ERROR, fileNames[0]);
+		}else{
+			if(fileNames[0].indexOf(".") > 0){
+				renlingPerson.setPic1(fileNames[0]);
+			}
+			if(fileNames[1].indexOf(".") > 0){
+				renlingPerson.setPic2(fileNames[1]);
+			}
+			if(fileNames[2].indexOf(".") > 0){
+				renlingPerson.setPic3(fileNames[2]);
+			}
+			if(fileNames[3].indexOf(".") > 0){
+				renlingPerson.setPic4(fileNames[3]);
+			}
+			if(fileNames[4].indexOf(".") > 0){
+				renlingPerson.setPic5(fileNames[4]);
+			}
+		}
+		try{
+			return this.claimPersonService.reclaimByUser(renlingPerson);
+		}catch(Exception e){
+			log.error("reclaim package error", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "认领包裹出现异常");
+		}
+	}
+	@RequestMapping(value = "/claimPackage/all", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<PageSplit<RenlingBaoguo>> searchClaimPackageByNotClaimed(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_NAME_CONDITION, required = false, defaultValue = "") String nameCondition){
+		pageIndex = Math.max(pageIndex, 1);
+		try{
+			return claimPackageService.findByNotClaimed(nameCondition, pageIndex, defaultPageSize);
+		}catch(Exception e){
+			log.error("get not claimed package data fail", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取包裹认领列表失败");
+		}
+	}
+	@RequestMapping(value = "/user/claimPackage/notClaimed", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<PageSplit<RenlingBaoguo>> searchClaimPackageBySelfNotClaimed(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_NAME_CONDITION, required = false, defaultValue = "") String nameCondition){
+		pageIndex = Math.max(pageIndex, 1);
+		String userId = (String) request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY);
+		try{
+			return claimPackageService.findByNotClaimedAndUser(userId, nameCondition, pageIndex, defaultPageSize);
+		}catch(Exception e){
+			log.error("get not claimed package data fail", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取包裹认领列表失败");
+		}
+	}
+	@RequestMapping(value = "/user/claimPackage/self", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<PageSplit<RenlingBaoguo>> searchClaimPackageByLoginUser(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_NAME_CONDITION, required = false, defaultValue = "")String nameCondition,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false, defaultValue = "")String state,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1")int pageIndex
+			){
+		pageIndex = Math.max(pageIndex, 1);
+		String userId = (String) request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY);
+		try{
+			return claimPersonService.findByUser(userId, state, nameCondition, pageIndex, defaultPageSize);
+		}catch(Exception e){
+			log.error("get claim package data fail", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取自己的认领包裹列表失败");
+		}
+	}
+	@RequestMapping(value = "/user/claimPerson/getLastByRenlingId", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<RenlingPersons> getLastClaimPersonByClaimPackage(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_RENLING_ID) String renlingId){
+		String userId = (String) request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY);
+		try{
+			return claimPersonService.findLastClaimedByClaimPackage(renlingId, userId);
+		}catch(Exception e){
+			log.error("get last claim person by claim package id data fail", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取自己上一次认领的信息失败");
+		}
+	}
+	@RequestMapping(value = "/user/claimPerson/getById", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<RenlingPersons> getById(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_ID) String id){
+		try{
+			return claimPersonService.findById(id);
+		}catch(Exception e){
+			log.error("get last claim person by claim package id data fail", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取自己上一次认领的信息失败");
+		}
+	}
+	@RequestMapping(value = "/admin/claimPackage/initAudit", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<RenlingBaoguo> initAuditClaimPackage(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CLAIM_PACKAGE_ID) String id){
+		try{
+			return claimPackageService.getByIdWithClaimPerson(id);
+		}catch(Exception e){
+			log.error("fail to get claim package info with last claim person");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取认领信息+审核认领信息失败");
+		}
+	}
+	@RequestMapping(value = "/admin/claimPackage/findClaimPersonByClaimPackageId", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<PageSplit<RenlingPersons>> findClaimPersonByClaimPackageId(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_CLAIM_PACKAGE_ID) String claimPackageId,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex){
+		pageIndex = Math.max(pageIndex, 1);
+		try{
+			return claimPackageService.getByClaimPackageId(claimPackageId, pageIndex, defaultPageSize);
+		}catch (Exception e){
+			log.error("fail to get claim person list by with claim package");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据认领包裹提取认领记录失败");
+		}
+	}
+	@RequestMapping(value = "/admin/claimPackage/findAllClaimPersonByClaimPackageId", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<PageSplit<RenlingPersons>> findAllClaimPersonByClaimPackageId(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_CLAIM_PACKAGE_ID) String claimPackageId,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex){
+		pageIndex = Math.max(pageIndex, 1);
+		try{
+			return claimPackageService.findAllByClaimPackageId(claimPackageId, pageIndex, defaultPageSize);
+		}catch (Exception e){
+			log.error("fail to get claim person list by with claim package");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据认领包裹提取认领记录失败");
+		}
+	}
+	@RequestMapping(value = "/admin/claimPackage/audit", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> auditClaimPackage(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CLAIM_PACKAGE_ID) String id,
+			@RequestParam(value = ParameterConstants.CLAIM_PACKAGE_STATE) String state,
+			@RequestParam(value = ParameterConstants.CLAIM_PACKAGE_CLAIM_PERSON_ID) String claimPersonId,
+			@RequestParam(value = ParameterConstants.CLAIM_PACKAGE_REMARK, required = false) String remark){
+		if("3".equals(state)){
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "未更新审核状态");
+		}else{
+			try{
+				return claimPackageService.updateByAudit(id, state, claimPersonId, remark);
+			}catch(Exception e){
+				log.error("fail to audit claim package", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "审核记录提交失败");
+			}
+		}
+	}
+	@RequestMapping(value = "/user/claimPerson/delete", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<Object> auditClaimPackage(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CLAIM_PERSON_ID) String id){
+		String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+		try{
+			return claimPersonService.deleteByUser(id, userId);
+		}catch(Exception e){
+			log.error("fail to audit claim package", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "审核记录提交失败");
+		}
+	}
+}

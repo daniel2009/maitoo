@@ -1,0 +1,217 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>用户中心</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+
+    <link href="css/usercenter.css" rel="stylesheet" />
+    <style type="text/css">
+       #divDetail .profile-info-name{width:200px;}
+    </style>
+
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon blue"></i>
+                    <a href="#">用户中心</a>
+                </li>
+
+                <li>
+                    <a href="#">上门取件</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content" id="divList">
+
+            <div class="row" id="divAdd" style="display:block;">
+                <div style="height:10px;color:#fff">1</div>
+                <div class=" col-xs-12 col-sm-12 col-md-12">
+                    <div class="pull-left alert alert-success no-margin infotitle">
+
+                        <i class="icon-edit bigger-120 blue"></i>
+                        请填写预约上门信息
+                    </div>
+                    <form>
+
+                        <div class="profile-user-info profile-user-info-striped" style="width:100%">
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">联系人： </div>
+
+                                <div class="profile-info-value">
+                                    <input name="name" type="text" placeholder="必填项" />
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">联系人手机： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" size="30" id="sPhone" name="phone" placeholder="必填项">
+                                </div>
+                            </div>
+                            
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">预约时间： </div>
+
+                                <div class="profile-info-value">
+                                    <input name="appointmentDate" class="text-input Wdate" type="text" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm' })" placeholder="必填项" />
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">上门门店： </div>
+
+                                <div class="profile-info-value">
+                                    <select id="warehouseSelect" class="table-selectheight " name="storeId" onchange="javascript:changeWarehouseSelect();">
+                                    
+                                    </select> <span style="color:red">请选择附近门店</span> 
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">州、市： </div>
+
+                                <div class="profile-info-value">
+                                  
+                                    <input type="text" id="warehouseProvince" name="province" readonly="readonly">
+                                    <select id="warehouseCallOrderCity" class="table-selectheight " name="city"></select>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">上门详细地址： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" size="50" id="address" name="address" placeholder="必填项">
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">邮编： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" size="30" id="zipCode" name="zipCode" placeholder="必填项">
+                                </div>
+                            </div>
+
+                            
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">包裹数量： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" id="quantity" placeholder="必填项" name="quantity" value="1" size="30" style="width:100px;">
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name" style="padding:0">预估重量(磅)： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" id="weight" placeholder="必填项" name="weight" size="30" style="width:100px;">
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">备注： </div>
+
+                                <div class="profile-info-value">
+                                    <textarea rows="2" class="text-input textarea wysiwyg" id="remark" name="remark" style="width:50%;"></textarea>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="clearfix form-buttons">
+                            <label class="control-label col-md-5"></label>
+                            <button type="submit" id="btnSave" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-ok"></i><strong>保存</strong></button>
+
+                            <button type="button" id="cancel" class="btn btn-sub btn-sm btn-warning"><i class="glyphicon glyphicon-remove"></i><strong>取消</strong></button>
+                        </div>
+                        <p style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;亲爱的用户，预约成功后，请先在菜单导航栏中的"运单中心/在线制单/制单"中预先填写运单信息，这样可以提高收货速度，节约你我的时间，谢谢！</p>
+                    </form>
+                </div>
+            </div>
+
+         
+        </div>
+
+        </div>
+   
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+
+    <script src="../resources/My97DatePicker/WdatePicker.js"></script>
+
+
+    <!--表单验证插件-->
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+
+    <script src="../resources/scripts/common.js"></script>
+
+    <script src="scripts/shangmenqujian_add.js"></script>
+    
+</body>
+</html>

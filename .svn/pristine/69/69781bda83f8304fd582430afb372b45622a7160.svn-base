@@ -1,0 +1,1197 @@
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : localhost_3306
+Source Server Version : 50622
+Source Host           : localhost:3306
+Source Database       : weiye0908
+
+Target Server Type    : MYSQL
+Target Server Version : 50622
+File Encoding         : 65001
+
+Date: 2015-12-23 14:38:53
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for `account`
+-- ----------------------------
+DROP TABLE IF EXISTS `account`;
+CREATE TABLE `account` (
+`user_id`  int(11) NOT NULL ,
+`rmb`  decimal(18,2) NULL DEFAULT NULL ,
+`usd`  decimal(18,2) NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`user_id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `account_detail`
+-- ----------------------------
+DROP TABLE IF EXISTS `account_detail`;
+CREATE TABLE `account_detail` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`name`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`credit_id`  int(11) NULL DEFAULT NULL ,
+`user_id`  int(11) NULL DEFAULT NULL ,
+`type`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`state`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`amount`  decimal(18,2) NULL DEFAULT NULL ,
+`currency`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`emp_id`  int(11) NULL DEFAULT NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`emp_name`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`emp_store`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`groupid`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=327
+
+;
+
+-- ----------------------------
+-- Table structure for `authority_employees`
+-- ----------------------------
+DROP TABLE IF EXISTS `authority_employees`;
+CREATE TABLE `authority_employees` (
+`authority_id`  int(10) NOT NULL ,
+`employees_id`  int(11) NOT NULL 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `authority_url`
+-- ----------------------------
+DROP TABLE IF EXISTS `authority_url`;
+CREATE TABLE `authority_url` (
+`authority_id`  int(11) NOT NULL ,
+`name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`menu_id`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`authority_id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `authority_url_copy`
+-- ----------------------------
+DROP TABLE IF EXISTS `authority_url_copy`;
+CREATE TABLE `authority_url_copy` (
+`authority_id`  int(11) NOT NULL ,
+`name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`menu_id`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`authority_id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `batch`
+-- ----------------------------
+DROP TABLE IF EXISTS `batch`;
+CREATE TABLE `batch` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=1
+
+;
+
+-- ----------------------------
+-- Table structure for `call_order`
+-- ----------------------------
+DROP TABLE IF EXISTS `call_order`;
+CREATE TABLE `call_order` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`user_id`  int(11) NULL DEFAULT NULL ,
+`send_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '寄件人' ,
+`send_province`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`send_city`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`send_district`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`send_street_address`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`send_zip_code`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`send_phone`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`weight`  decimal(18,2) NULL DEFAULT NULL ,
+`state`  int(11) NULL DEFAULT NULL ,
+`emp_id`  int(11) NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`quantity`  int(11) NULL DEFAULT NULL ,
+`type`  int(11) NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=5
+
+;
+
+-- ----------------------------
+-- Table structure for `channels`
+-- ----------------------------
+DROP TABLE IF EXISTS `channels`;
+CREATE TABLE `channels` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`alias`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`warehouse_id`  int(11) NULL DEFAULT NULL ,
+`state`  int(11) NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=9
+
+;
+
+-- ----------------------------
+-- Table structure for `commodity`
+-- ----------------------------
+DROP TABLE IF EXISTS `commodity`;
+CREATE TABLE `commodity` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`name`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cost`  decimal(18,2) NULL DEFAULT 0.00 ,
+`price`  decimal(18,2) NULL DEFAULT 0.00 COMMENT '转运价格' ,
+`ms_price`  decimal(18,2) NULL DEFAULT 0.00 COMMENT '门市价格' ,
+`vip_one_price`  decimal(18,2) NULL DEFAULT 0.00 ,
+`vip_two_price`  decimal(18,2) NULL DEFAULT 0.00 ,
+`vip_three_price`  decimal(18,2) NULL DEFAULT 0.00 ,
+`first_fee`  decimal(18,2) NULL DEFAULT NULL ,
+`store_id`  int(11) NULL DEFAULT NULL ,
+`channel_id`  int(11) NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=45
+
+;
+
+-- ----------------------------
+-- Table structure for `consignee_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `consignee_info`;
+CREATE TABLE `consignee_info` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`province`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`city`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`district`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`street_address`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`zip_code`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`phone`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`telephone`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`card_id`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`card_url`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`user_id`  int(11) NULL DEFAULT NULL ,
+`last_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cardurlother`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cardurltogether`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=156
+
+;
+
+-- ----------------------------
+-- Table structure for `credit_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `credit_info`;
+CREATE TABLE `credit_info` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`user_id`  int(11) NULL DEFAULT NULL ,
+`name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`address1`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`address2`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`city`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`province`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`zip_code`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`type`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`credit_no`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`credit_security_code`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`expire_year`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`expire_month`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=1
+
+;
+
+-- ----------------------------
+-- Table structure for `e_o_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `e_o_info`;
+CREATE TABLE `e_o_info` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`order_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`emp_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`parent_id`  int(11) NULL DEFAULT NULL ,
+`state`  int(11) UNSIGNED NULL DEFAULT 0 ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=1
+
+;
+
+-- ----------------------------
+-- Table structure for `e_t_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `e_t_info`;
+CREATE TABLE `e_t_info` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`transh_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`emp_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`parent_id`  int(11) NULL DEFAULT NULL ,
+`state`  int(11) UNSIGNED NULL DEFAULT 0 ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=3
+
+;
+
+-- ----------------------------
+-- Table structure for `employees`
+-- ----------------------------
+DROP TABLE IF EXISTS `employees`;
+CREATE TABLE `employees` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`account`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`password`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`store_id`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`store_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`phone`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pic_url`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`sign_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`groupid`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`superadmin`  tinyint(4) NULL DEFAULT 0 ,
+PRIMARY KEY (`id`),
+UNIQUE INDEX `account` (`account`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=137
+
+;
+
+-- ----------------------------
+-- Table structure for `endicia_label`
+-- ----------------------------
+DROP TABLE IF EXISTS `endicia_label`;
+CREATE TABLE `endicia_label` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`user_id`  int(11) NOT NULL ,
+`labelType`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`dateAdvance`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`value`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`mailpieceShape`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`description`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`weightOz`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`quantity`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`toState`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`toCountry`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`toPhone`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`toZIP4`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`ToPostalCode`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`toCountryCode`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`toCity`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`toAddress1`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`toName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`mailClass`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`fromPhone`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`fromZIP4`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`fromPostalCode`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`fromState`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`fromCity`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`returnAddress1`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`fromName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`weight`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=1
+
+;
+
+-- ----------------------------
+-- Table structure for `ex_rate`
+-- ----------------------------
+DROP TABLE IF EXISTS `ex_rate`;
+CREATE TABLE `ex_rate` (
+`usd2rmb`  decimal(18,2) NULL DEFAULT NULL ,
+`rmb2usd`  decimal(18,2) NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `flyinfo`
+-- ----------------------------
+DROP TABLE IF EXISTS `flyinfo`;
+CREATE TABLE `flyinfo` (
+`id`  int(12) NOT NULL AUTO_INCREMENT ,
+`flightno`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`state`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`),
+UNIQUE INDEX `flightno` (`flightno`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=4
+
+;
+
+-- ----------------------------
+-- Table structure for `globalargs`
+-- ----------------------------
+DROP TABLE IF EXISTS `globalargs`;
+CREATE TABLE `globalargs` (
+`id`  int(32) NOT NULL AUTO_INCREMENT ,
+`argflag`  varchar(256) CHARACTER SET gb2312 COLLATE gb2312_chinese_ci NULL DEFAULT NULL ,
+`argcontent`  text CHARACTER SET gb2312 COLLATE gb2312_chinese_ci NULL ,
+`argtype`  varchar(28) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ,
+`modifytime`  varchar(28) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ,
+`createtime`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`argremark`  text CHARACTER SET gb2312 COLLATE gb2312_chinese_ci NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=latin1 COLLATE=latin1_swedish_ci
+AUTO_INCREMENT=33
+
+;
+
+-- ----------------------------
+-- Table structure for `gonggao`
+-- ----------------------------
+DROP TABLE IF EXISTS `gonggao`;
+CREATE TABLE `gonggao` (
+`id`  int(12) NOT NULL AUTO_INCREMENT ,
+`title`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`authorid`  int(11) NOT NULL ,
+`author`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`releasetime`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`viewcontent`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`tag`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modifytime`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`img`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=12
+
+;
+
+-- ----------------------------
+-- Table structure for `jiedagonggao`
+-- ----------------------------
+DROP TABLE IF EXISTS `jiedagonggao`;
+CREATE TABLE `jiedagonggao` (
+`id`  int(12) NOT NULL AUTO_INCREMENT ,
+`title`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`author`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`releasetime`  datetime NULL DEFAULT NULL ,
+`viewcontent`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`tag`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`img`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=1
+
+;
+
+-- ----------------------------
+-- Table structure for `jiedanews`
+-- ----------------------------
+DROP TABLE IF EXISTS `jiedanews`;
+CREATE TABLE `jiedanews` (
+`id`  int(12) NOT NULL AUTO_INCREMENT ,
+`title`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`author`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`releasetime`  datetime NULL DEFAULT NULL ,
+`viewcontent`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`tag`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`img`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=1
+
+;
+
+-- ----------------------------
+-- Table structure for `login_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `login_info`;
+CREATE TABLE `login_info` (
+`id`  int(11) NOT NULL DEFAULT 0 ,
+`login_times`  int(11) NULL DEFAULT NULL ,
+`last_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`now_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`type`  varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ,
+PRIMARY KEY (`id`, `type`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `login_info_copy`
+-- ----------------------------
+DROP TABLE IF EXISTS `login_info_copy`;
+CREATE TABLE `login_info_copy` (
+`id`  int(11) NOT NULL DEFAULT 0 ,
+`login_times`  int(11) NULL DEFAULT NULL ,
+`last_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`now_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`type`  varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ,
+PRIMARY KEY (`id`, `type`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `login_info_copy1`
+-- ----------------------------
+DROP TABLE IF EXISTS `login_info_copy1`;
+CREATE TABLE `login_info_copy1` (
+`id`  int(11) NOT NULL DEFAULT 0 ,
+`login_times`  int(11) NULL DEFAULT NULL ,
+`last_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`now_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`type`  varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ,
+PRIMARY KEY (`id`, `type`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `login_info_copy2`
+-- ----------------------------
+DROP TABLE IF EXISTS `login_info_copy2`;
+CREATE TABLE `login_info_copy2` (
+`id`  int(11) NOT NULL DEFAULT 0 ,
+`login_times`  int(11) NULL DEFAULT NULL ,
+`last_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`now_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`type`  varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' ,
+PRIMARY KEY (`id`, `type`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `message`
+-- ----------------------------
+DROP TABLE IF EXISTS `message`;
+CREATE TABLE `message` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`user_id`  int(11) NULL DEFAULT NULL ,
+`user_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`parent_id`  int(11) NULL DEFAULT NULL ,
+`state`  int(11) NULL DEFAULT 0 ,
+`groupid`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=7
+
+;
+
+-- ----------------------------
+-- Table structure for `news`
+-- ----------------------------
+DROP TABLE IF EXISTS `news`;
+CREATE TABLE `news` (
+`id`  int(12) NOT NULL AUTO_INCREMENT ,
+`title`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`author`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`authorid`  int(11) NOT NULL ,
+`releasetime`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modifytime`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`viewcontent`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`tag`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`img`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=35
+
+;
+
+-- ----------------------------
+-- Table structure for `order`
+-- ----------------------------
+DROP TABLE IF EXISTS `order`;
+CREATE TABLE `order` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`order_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`warehouse_id`  int(11) NULL DEFAULT NULL ,
+`user_id`  int(11) NULL DEFAULT NULL ,
+`weight`  decimal(18,2) NULL DEFAULT NULL ,
+`jwweight`  decimal(18,2) NULL DEFAULT NULL ,
+`tariff`  decimal(18,2) NULL DEFAULT NULL ,
+`or`  decimal(18,2) NULL DEFAULT NULL ,
+`other`  decimal(18,2) NULL DEFAULT NULL ,
+`premium`  decimal(18,2) NULL DEFAULT NULL ,
+`parce_value`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`consignee_id`  int(11) NULL DEFAULT NULL ,
+`consignee_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`consignee_province`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`consignee_city`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`consignee_district`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`consignee_street_address`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`consignee_zip_code`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`consignee_phone`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`state`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`mail`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`emp_id`  int(11) NULL DEFAULT NULL ,
+`store_id`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pay_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`third_pns`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`third_no`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`batch_id`  int(11) NULL DEFAULT NULL ,
+`flight`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`CommodityCost`  decimal(18,2) NULL DEFAULT NULL ,
+`total_money`  decimal(18,2) NULL DEFAULT 0.00 ,
+`type`  int(11) NOT NULL ,
+`length`  decimal(18,2) NULL DEFAULT 0.00 ,
+`width`  decimal(18,2) NULL DEFAULT 0.00 ,
+`height`  decimal(18,2) NULL DEFAULT 0.00 ,
+`channel_id`  int(11) NULL DEFAULT NULL ,
+`cardid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cardurl`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`weight_kg`  decimal(18,0) NULL DEFAULT NULL ,
+`address_all`  varchar(556) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`name_pinyi`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`express_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`senduserphone`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`senduserAddress`  varchar(556) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`senduser_zipcode`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`senduser_city`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`senduser_state`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`senduserName`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cardurlother`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cardurltogether`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`tran_pro`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`third_create_date`  varchar(56) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`box_no`  varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pay_or_not`  varchar(11) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`card_or_not`  varchar(11) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`commodity_third_list`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`import_remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`base_money`  decimal(18,2) NULL DEFAULT NULL ,
+`state_remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`third_brands`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`order_type`  varchar(11) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=2856
+
+;
+
+-- ----------------------------
+-- Table structure for `order_detail`
+-- ----------------------------
+DROP TABLE IF EXISTS `order_detail`;
+CREATE TABLE `order_detail` (
+`order_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' ,
+`transhipment_id`  int(11) NOT NULL DEFAULT 0 ,
+`commodity_id`  int(11) NOT NULL DEFAULT 0 ,
+`quantity`  int(11) NULL DEFAULT NULL ,
+`name`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`weight`  decimal(18,2) NULL DEFAULT NULL ,
+`tariff`  decimal(18,2) NULL DEFAULT NULL ,
+`or`  decimal(18,2) NULL DEFAULT NULL ,
+`other`  decimal(18,2) NULL DEFAULT NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`sjweight`  decimal(18,2) NULL DEFAULT NULL ,
+`jfweight`  decimal(18,2) NULL DEFAULT NULL ,
+`brands`  varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`jwweight`  decimal(18,2) NULL DEFAULT NULL ,
+`xiangqing`  varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `renling_bill`
+-- ----------------------------
+DROP TABLE IF EXISTS `renling_bill`;
+CREATE TABLE `renling_bill` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`warehouse_id`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`user_id`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`emp_id`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`company`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`state`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`baoguo_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`title`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`tran_id`  varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pic_1`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pic_2`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pic_3`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`rev_name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`baoguo_phone`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=182
+
+;
+
+-- ----------------------------
+-- Table structure for `renling_person`
+-- ----------------------------
+DROP TABLE IF EXISTS `renling_person`;
+CREATE TABLE `renling_person` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`renling_id`  int(11) NOT NULL ,
+`user_id`  int(11) NULL DEFAULT NULL ,
+`user_name`  varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`user_phone`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`baoguo_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`baoguo_remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`pic1`  varchar(265) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pic2`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pic3`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pic4`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`pic5`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`create_person`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`state`  varchar(11) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`audit_remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=24
+
+;
+
+-- ----------------------------
+-- Table structure for `route`
+-- ----------------------------
+DROP TABLE IF EXISTS `route`;
+CREATE TABLE `route` (
+`order_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`state`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`address`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`flight`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`third_pns`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`third_no`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`state_remark`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `tab_regions`
+-- ----------------------------
+DROP TABLE IF EXISTS `tab_regions`;
+CREATE TABLE `tab_regions` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`code`  int(50) NULL DEFAULT NULL ,
+`name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`p_code`  int(50) NULL DEFAULT NULL ,
+`level`  int(11) NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=4647
+
+;
+
+-- ----------------------------
+-- Table structure for `test`
+-- ----------------------------
+DROP TABLE IF EXISTS `test`;
+CREATE TABLE `test` (
+`name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `transhipment_bill`
+-- ----------------------------
+DROP TABLE IF EXISTS `transhipment_bill`;
+CREATE TABLE `transhipment_bill` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`warehouse_id`  int(11) NULL DEFAULT NULL ,
+`user_id`  int(11) NOT NULL ,
+`emp_id`  int(11) NULL DEFAULT NULL ,
+`from_user`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`state`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`eta`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`awt`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`weight`  decimal(18,2) NULL DEFAULT NULL ,
+`parce_value`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`tariff`  decimal(18,2) NULL DEFAULT NULL ,
+`or`  decimal(18,2) NULL DEFAULT NULL ,
+`other`  decimal(18,2) NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`transit_no`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`transit_company`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`length`  decimal(18,2) NULL DEFAULT 0.00 ,
+`width`  decimal(18,2) NULL DEFAULT 0.00 ,
+`height`  decimal(18,2) NULL DEFAULT 0.00 ,
+`channel_id`  int(11) NULL DEFAULT NULL ,
+`cName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`transit_type`  varchar(11) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cProvince`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cCity`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cDistrict`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cStreetAddress`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cZipCode`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cPhone`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cardid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cardurl`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cardurlother`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`cardurltogether`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`weight_kg`  decimal(18,0) NULL DEFAULT NULL ,
+`mail`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`premium`  decimal(18,0) NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=201
+
+;
+
+-- ----------------------------
+-- Table structure for `transhipment_commodity`
+-- ----------------------------
+DROP TABLE IF EXISTS `transhipment_commodity`;
+CREATE TABLE `transhipment_commodity` (
+`id`  int(32) NOT NULL AUTO_INCREMENT ,
+`transhipment_id`  int(11) NULL DEFAULT NULL ,
+`commodity_id`  int(11) NULL DEFAULT NULL ,
+`quantity`  int(11) NULL DEFAULT NULL ,
+`sjweight`  decimal(18,2) NULL DEFAULT NULL ,
+`tariff`  decimal(18,2) NULL DEFAULT NULL ,
+`jfweight`  decimal(18,2) NULL DEFAULT NULL ,
+`xiangqing`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`eachjfweight`  decimal(18,2) NULL DEFAULT NULL ,
+`commodity_sku`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=282
+
+;
+
+-- ----------------------------
+-- Table structure for `transhipment_route`
+-- ----------------------------
+DROP TABLE IF EXISTS `transhipment_route`;
+CREATE TABLE `transhipment_route` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`transhipment_id`  int(11) NULL DEFAULT NULL ,
+`state`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`date`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`warehouse_id`  int(11) NULL DEFAULT NULL ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=1
+
+;
+
+-- ----------------------------
+-- Table structure for `url`
+-- ----------------------------
+DROP TABLE IF EXISTS `url`;
+CREATE TABLE `url` (
+`id`  int(10) NOT NULL ,
+`name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `user_token`
+-- ----------------------------
+DROP TABLE IF EXISTS `user_token`;
+CREATE TABLE `user_token` (
+`email`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`token`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`status`  int(11) NULL DEFAULT NULL ,
+`date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `usercode`
+-- ----------------------------
+DROP TABLE IF EXISTS `usercode`;
+CREATE TABLE `usercode` (
+`id`  int(10) NOT NULL AUTO_INCREMENT ,
+`usercode`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`state`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=2205
+
+;
+
+-- ----------------------------
+-- Table structure for `users`
+-- ----------------------------
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`email`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`password`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`nick_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`real_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`phone`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`qq`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`recommender`  int(11) NULL DEFAULT NULL ,
+`country`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`address`  varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`sign_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`type`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`status`  int(11) NULL DEFAULT NULL ,
+`emp_account`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`useralias`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`usercode`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`groupid`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`phone_state`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' ,
+`email_state`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' ,
+`reg_type`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' ,
+`modify_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`),
+UNIQUE INDEX `phone` (`phone`) USING BTREE ,
+UNIQUE INDEX `email` (`email`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=1177
+
+;
+
+-- ----------------------------
+-- Table structure for `warehouse`
+-- ----------------------------
+DROP TABLE IF EXISTS `warehouse`;
+CREATE TABLE `warehouse` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`company`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`country`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`address`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`city`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`province`  varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`zip_code`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`telephone`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`contact_name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`serial_no`  int(11) NULL DEFAULT 0 ,
+`remark`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`create_date`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`groupid`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`print_phone_cn`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`print_phone_usa`  varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`print_logo`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`print_2_code`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`type`  varchar(11) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=15
+
+;
+
+-- ----------------------------
+-- Table structure for `zhiyougonggao`
+-- ----------------------------
+DROP TABLE IF EXISTS `zhiyougonggao`;
+CREATE TABLE `zhiyougonggao` (
+`id`  int(11) NOT NULL AUTO_INCREMENT ,
+`title`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`author`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`releasetime`  datetime NULL DEFAULT NULL ,
+`viewcontent`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`tag`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`img`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=2
+
+;
+
+-- ----------------------------
+-- Table structure for `zhiyounews`
+-- ----------------------------
+DROP TABLE IF EXISTS `zhiyounews`;
+CREATE TABLE `zhiyounews` (
+`id`  int(12) NOT NULL AUTO_INCREMENT ,
+`content`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`author`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`releasetime`  datetime NULL DEFAULT NULL ,
+`viewcontent`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
+`tag`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`img`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+`title`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+AUTO_INCREMENT=2
+
+;
+
+-- ----------------------------
+-- Auto increment value for `account_detail`
+-- ----------------------------
+ALTER TABLE `account_detail` AUTO_INCREMENT=327;
+
+-- ----------------------------
+-- Auto increment value for `batch`
+-- ----------------------------
+ALTER TABLE `batch` AUTO_INCREMENT=1;
+
+-- ----------------------------
+-- Auto increment value for `call_order`
+-- ----------------------------
+ALTER TABLE `call_order` AUTO_INCREMENT=5;
+
+-- ----------------------------
+-- Auto increment value for `channels`
+-- ----------------------------
+ALTER TABLE `channels` AUTO_INCREMENT=9;
+
+-- ----------------------------
+-- Auto increment value for `commodity`
+-- ----------------------------
+ALTER TABLE `commodity` AUTO_INCREMENT=45;
+
+-- ----------------------------
+-- Auto increment value for `consignee_info`
+-- ----------------------------
+ALTER TABLE `consignee_info` AUTO_INCREMENT=156;
+
+-- ----------------------------
+-- Auto increment value for `credit_info`
+-- ----------------------------
+ALTER TABLE `credit_info` AUTO_INCREMENT=1;
+
+-- ----------------------------
+-- Auto increment value for `e_o_info`
+-- ----------------------------
+ALTER TABLE `e_o_info` AUTO_INCREMENT=1;
+
+-- ----------------------------
+-- Auto increment value for `e_t_info`
+-- ----------------------------
+ALTER TABLE `e_t_info` AUTO_INCREMENT=3;
+
+-- ----------------------------
+-- Auto increment value for `employees`
+-- ----------------------------
+ALTER TABLE `employees` AUTO_INCREMENT=137;
+
+-- ----------------------------
+-- Auto increment value for `endicia_label`
+-- ----------------------------
+ALTER TABLE `endicia_label` AUTO_INCREMENT=1;
+
+-- ----------------------------
+-- Auto increment value for `flyinfo`
+-- ----------------------------
+ALTER TABLE `flyinfo` AUTO_INCREMENT=4;
+
+-- ----------------------------
+-- Auto increment value for `globalargs`
+-- ----------------------------
+ALTER TABLE `globalargs` AUTO_INCREMENT=33;
+
+-- ----------------------------
+-- Auto increment value for `gonggao`
+-- ----------------------------
+ALTER TABLE `gonggao` AUTO_INCREMENT=12;
+
+-- ----------------------------
+-- Auto increment value for `jiedagonggao`
+-- ----------------------------
+ALTER TABLE `jiedagonggao` AUTO_INCREMENT=1;
+
+-- ----------------------------
+-- Auto increment value for `jiedanews`
+-- ----------------------------
+ALTER TABLE `jiedanews` AUTO_INCREMENT=1;
+
+-- ----------------------------
+-- Auto increment value for `message`
+-- ----------------------------
+ALTER TABLE `message` AUTO_INCREMENT=7;
+
+-- ----------------------------
+-- Auto increment value for `news`
+-- ----------------------------
+ALTER TABLE `news` AUTO_INCREMENT=35;
+
+-- ----------------------------
+-- Auto increment value for `order`
+-- ----------------------------
+ALTER TABLE `order` AUTO_INCREMENT=2856;
+
+-- ----------------------------
+-- Auto increment value for `renling_bill`
+-- ----------------------------
+ALTER TABLE `renling_bill` AUTO_INCREMENT=182;
+
+-- ----------------------------
+-- Auto increment value for `renling_person`
+-- ----------------------------
+ALTER TABLE `renling_person` AUTO_INCREMENT=24;
+
+-- ----------------------------
+-- Auto increment value for `tab_regions`
+-- ----------------------------
+ALTER TABLE `tab_regions` AUTO_INCREMENT=4647;
+
+-- ----------------------------
+-- Auto increment value for `transhipment_bill`
+-- ----------------------------
+ALTER TABLE `transhipment_bill` AUTO_INCREMENT=201;
+
+-- ----------------------------
+-- Auto increment value for `transhipment_commodity`
+-- ----------------------------
+ALTER TABLE `transhipment_commodity` AUTO_INCREMENT=282;
+
+-- ----------------------------
+-- Auto increment value for `transhipment_route`
+-- ----------------------------
+ALTER TABLE `transhipment_route` AUTO_INCREMENT=1;
+
+-- ----------------------------
+-- Auto increment value for `usercode`
+-- ----------------------------
+ALTER TABLE `usercode` AUTO_INCREMENT=2205;
+
+-- ----------------------------
+-- Auto increment value for `users`
+-- ----------------------------
+ALTER TABLE `users` AUTO_INCREMENT=1177;
+
+-- ----------------------------
+-- Auto increment value for `warehouse`
+-- ----------------------------
+ALTER TABLE `warehouse` AUTO_INCREMENT=15;
+
+-- ----------------------------
+-- Auto increment value for `zhiyougonggao`
+-- ----------------------------
+ALTER TABLE `zhiyougonggao` AUTO_INCREMENT=2;
+
+-- ----------------------------
+-- Auto increment value for `zhiyounews`
+-- ----------------------------
+ALTER TABLE `zhiyounews` AUTO_INCREMENT=2;

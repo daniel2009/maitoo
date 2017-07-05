@@ -1,0 +1,23 @@
+function loadNav81Data() {
+	$.ajax({
+		type:"get",
+		async:true,
+		url:admin_warehosue_all,
+		success:function(response){
+			var code = response.code;
+			if (code == '200') {
+				if(response.data != null) {
+					var str = "";
+					$.each(response.data,function(){
+						str += "<option value='" + this.id + "'>" + this.name + "</option>";
+					});
+					$("select[name='wid']").append(str);
+				}
+			} else if (code == '607') {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+

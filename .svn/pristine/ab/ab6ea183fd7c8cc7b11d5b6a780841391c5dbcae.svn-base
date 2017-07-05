@@ -1,0 +1,15 @@
+package com.weiye.service;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.OrderMidfix;
+import com.weiye.model.ResponseObject;
+
+
+public abstract interface OrderMidfixService
+{
+  public abstract ResponseObject<Object> modifyOrderMidfix(String paramString1, String paramString2)
+    throws ServiceException;
+  
+  public abstract OrderMidfix findOrderMidfixByState0() throws ServiceException;
+  
+}

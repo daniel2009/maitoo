@@ -1,0 +1,147 @@
+<%@page language="java" import="java.util.*" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html>
+  <head>
+  <link rel="shortcut icon" href="../img/favicon.ico" /> 
+  </head>
+  
+  <body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">管理台首页</p>
+
+		<div class="box_content">
+			<div class="content_title" style="font-size:18px">管理台首页</div>
+			<div class="content_text">
+				<div class="span12">
+					<div id="u11" class="ax_text" style="font-size:18px">我的个人信息</div>
+						<table>
+							<tr>
+								<td><span>您的用户名：${emp_account_session_key}</span></td>
+								<td><span><a id="a_reset_pwd" href="#">修改密码</a>
+								</span></td>
+							</tr>
+							<tr>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td>您的身份：管理员</td>
+								<td><a id="fp_a_logout" href="#">退出系统</a></td>
+							</tr>
+							<tr>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>
+							<tr>
+								<td id="time" colspan="2"><span>上次登入时间：2014年9月24号&nbsp; 00:00:00</span></td>
+							</tr>
+						</table>
+					</div>
+			<div class="span12" style="margin-left:0px">
+			<div id="u11" class="ax_text" style="font-size:18px">待处理情况</div>
+			<table>
+				<tr>
+					<td><span>待处理会员留言：<a href="#" id="no_deal_message_count">0</a>
+						条</span></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span>预报信息</span></td>
+				</tr>
+				<tr>
+					<td style="display: flex; flex-wrap: wrap;">
+						<a href="#" onclick="javascript: forwardPage('transhipment', 0);">未入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState0">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', -7);">转运入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN7">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', -6);">转运出库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN6">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', -5);">待检入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN5">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', 1);">已入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState1">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', 2);">等待审核<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState2">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', 3);">等待付款<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState3">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', 4);">已付款<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState4">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', 5);">分拣完成<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillState5">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', -9);">退货中<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN9">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', -8);">已退货<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN8">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('transhipment', -10);">包裹异常<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentBillStateN10">0</label>)</span></a>
+					</td>
+				</tr>
+				<tr>
+					<td><span>退货信息</span></td>
+				</tr>
+				<tr>
+					<td style="display: flex; flex-wrap: wrap;">
+						<a href="#" onclick="javascript: forwardPage('returnPackage', 0);">未处理<span style="margin: 0 3px; color: #f00;">(<label id="countReturnPackageState0">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('returnPackage', 1);">已处理<span style="margin: 0 3px; color: #f00;">(<label id="countReturnPackageState1">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('returnPackage', 2);">有问题<span style="margin: 0 3px; color: #f00;">(<label id="countReturnPackageState2">0</label>)</span></a>
+					</td>
+				</tr>
+				<tr>
+					<td><span>认领信息</span></td>
+				</tr>
+				<tr>
+					<td style="display: flex; flex-wrap: wrap;">
+						<a href="#" onclick="javascript: forwardPage('claimPackage', 0);">未认领<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState0">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('claimPackage', 1);">已认领<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState1">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('claimPackage', 2);">已失效<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState2">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('claimPackage', 'audit');">未审核<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState3">0</label>)</span></a>
+					</td>
+				</tr>
+				<tr><td><span>运单信息</span></td></tr>
+				<tr>
+					<td style="display: flex; flex-wrap: wrap;">
+						<a href="#" onclick="javascript: forwardPage('order', -10);">在线置单<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState-10">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 0);">等待审核<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState0">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 1);">未付款<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState1">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 2);">已入库<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState2">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 3);">送往集散中心<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState3">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 4);">集散中心已入库<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState4">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 5);">送往机场<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState5">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 6);">空运中<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState6">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 7);">海关清关<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState7">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 8);">目的地第三方快递<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState8">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('order', 9);">收件人已接收<span style="margin: 0 3px; color: #f00;">(<label id="countOrderState9">0</label>)</span></a>
+					</td>
+				</tr>
+				<tr><td>购买信息</td></tr>
+				<tr>
+					<td style="display: flex; flex-wrap: wrap;">
+						<a href="#" onclick="javascript: forwardPage('productRecord', 0);">等待审核<span style="margin: 0 3px; color: #f00;">(<label id="countProductRecordState0">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('productRecord', 1);">有问题<span style="margin: 0 3px; color: #f00;">(<label id="countProductRecordState1">0</label>)</span></a>
+						<a href="#" onclick="javascript: forwardPage('productRecord', 2);">完成<span style="margin: 0 3px; color: #f00;">(<label id="countProductRecordState2">0</label>)</span></a>
+					</td>
+				</tr>
+			</table>
+		</div>
+			</div>
+		</div>
+	</div>
+</body>
+  <script type="text/javascript">
+  	$("#main-content").ready(function(){
+  		loadNav1Data();
+  	});
+  	function forwardPage(type, state){
+	window.sessionStorage.setItem("searchState", state);
+	switch(type){
+		case "transhipment":
+			nav51Click();
+			break;
+		case "returnPackage":
+			nav_returnPackage_click();
+			break;
+		case "order":
+			nav52Click();
+			break;
+		case "claimPackage":
+			nav_renling_Click();
+			break;
+		case "productRecord":
+			navProductRecordClick();
+			break;
+	}
+}
+  </script>
+</html>

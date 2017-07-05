@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.RenlingDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.RenlingBaoguo">
+		<id column="id" property="id" javaType="String" />
+		<result column="warehouse_id" property="warehouseId" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="emp_id" property="empId" javaType="String" />
+		<result column="company" property="company" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="baoguo_id" property="baoguoId" javaType="String" />
+		<result column="title" property="title" javaType="String" />
+		<result column="content" property="content" javaType="String" />
+		<result column="tran_id" property="tranId" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String"/>
+		<result column="rev_name" property="revName" javaType="String"/>
+		<result column="baoguo_phone" property="baoguoPhone" javaType="String"/>
+		
+		<result column="pic_1" property="pic1" javaType="String"/>
+		<result column="pic_2" property="pic2" javaType="String"/>
+		<result column="pic_3" property="pic3" javaType="String"/>
+		
+		<result column="user_name" property="userName" javaType="String"/>
+		<result column="warehouse_name" property="warehouseName" javaType="String"/>
+		<result column="empName" property="empName" javaType="String"/>
+		<result column="total_audit" property="totalAudit" javaType="String"/>
+		
+	</resultMap>
+
+
+
+	<insert id="insertRenling" parameterType="com.weiye.model.RenlingBaoguo"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		renling_bill(warehouse_id,user_id,emp_id,company,state,baoguo_id,title,content,tran_id,remark,create_date,modify_date,rev_name,baoguo_phone,pic_1,pic_2,pic_3)
+		values(#{warehouseId},#{userId},#{empId},#{company},#{state},#{baoguoId},#{title},#{content},#{tranId},#{remark},#{createDate},#{modifyDate},#{revName},#{baoguoPhone},#{pic1},#{pic2},#{pic3})
+	</insert>
+
+	<select id="countByKey" resultType="java.lang.Integer">
+		select count(*) from renling_bill r left join `users` as u on u.id = user_id		
+ 		left join `warehouse` as w on w.id = r.`warehouse_id`
+ 		left join `employees` as e on e.id = r.`emp_id`
+		<where>
+			<if test="rid != null and rid != ''">
+				r.`id` = #{rid}
+			</if>
+			<if test="column!=null and column!='' and key!=null and key!=''">
+				r.${column} like #{key}
+			</if>
+			<if test="sdate!=null and sdate!=''">
+				and r.`create_date` <![CDATA[>=]]> #{sdate}
+			</if>
+			<if test="edate!=null and edate!=''">
+				and r.`create_date` <![CDATA[<=]]> #{edate}
+			</if>
+			<if test="userId!=null and userId!=''">
+				and r.`user_id`=#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				<if test="state!='audit' and state!=3">
+					and r.`state`=#{state}
+				</if>
+				<if test="state=='audit' or state==3">
+					and r.state=0 AND 0!=(SELECT COUNT(id) FROM renling_person p2 WHERE renling_id=r.id AND state=3)
+				</if>
+			</if>
+		</where>
+	</select>
+	
+	<select id="searchByKey" resultMap="basic_result_map">
+		select r.*,u.phone as user_name,	w.name as warehouse_name,e.account as empName,
+			(SELECT COUNT(id) FROM renling_person p WHERE renling_id=r.id AND state=3) AS total_audit
+		from `renling_bill` r left join `users` as u on u.id = r.user_id		
+	 		left join `warehouse` as w on w.id = r.`warehouse_id`
+	 		left join `employees` as e on e.id = r.`emp_id`	
+		<where>
+		    <if test="rid != null and rid != ''">
+				r.`id` = #{rid}
+			</if>
+			<if test="column!=null and column!='' and key!=null and key!=''">
+				r.${column} like #{key}
+			</if>
+			<if test="sdate!=null and sdate!=''">
+				and r.`create_date` <![CDATA[>=]]> #{sdate}
+			</if>
+			<if test="edate!=null and edate!=''">
+				and r.`create_date` <![CDATA[<=]]> #{edate}
+			</if>
+			<if test="userId!=null and userId!=''">
+				and r.`user_id`=#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				<if test="state!='audit'">
+					and r.`state`=#{state}
+				</if>
+				<if test="state=='audit'">
+					and r.state=0 AND 0!=(SELECT COUNT(id) FROM renling_person p2 WHERE renling_id=r.id AND state=3)
+				</if>
+			</if>
+		</where>
+		order by create_date desc
+		limit
+		#{index},#{size}
+	</select>
+	
+	
+	<delete id="deleteMultiRenlingBill">
+		delete from `renling_bill`
+		where `id` in
+		<foreach collection="list" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+	</delete>
+	
+	
+	<select id="getRenlingBillbyid" resultMap="basic_result_map">
+		select renling_bill.*,u.phone as user_name,	w.name as warehouse_name,e.account as empName	
+		from `renling_bill` left join `users` as u on u.id = user_id		
+ 		left join `warehouse` as w on w.id = renling_bill.`warehouse_id`
+ 		left join `employees` as e on e.id = renling_bill.`emp_id`			
+		where `renling_bill`.`id`=#{id}
+	</select>
+	
+	<update id="updateRenling" parameterType="com.weiye.model.RenlingBaoguo"> update 
+		renling_bill set user_id=#{userId} , company=#{company}, state=#{state},baoguo_id=#{baoguoId},remark=#{remark}
+		,title=#{title},content=#{content},tran_id=#{tranId},modify_date=#{modifyDate},rev_name=#{revName},baoguo_phone=#{baoguoPhone}
+		, pic_1=#{pic1},pic_2=#{pic2},pic_3=#{pic3}
+		 where id=#{id} </update>
+		 
+	<update id="updateClaimedByUser" parameterType="com.weiye.model.RenlingBaoguo">
+		UPDATE renling_bill SET user_id=#{userId}, tran_id=#{tranId}, modify_date=#{modifyDate}, state=#{state} WHERE id=#{id}
+	</update>
+	<select id="countByUser" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM renling_bill WHERE user_id=#{userId} 
+		<if test="nameCondition != null and nameCondition != ''">
+			AND (title LIKE #{nameCondition} OR content LIKE #{nameCondition})
+		</if>
+	</select>
+	<select id="findByUser" resultMap="basic_result_map">
+		SELECT * FROM renling_bill WHERE user_id=#{userId}
+		<if test="nameCondition != null and nameCondition != ''">
+			AND (title LIKE #{nameCondition} OR content LIKE #{nameCondition})
+		</if>
+		 ORDER BY modify_date DESC LIMIT #{firstResult}, #{maxResult}
+	</select>
+	<select id="countByNotClaimed" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM renling_bill WHERE state=0
+		<if test="nameCondition != null and nameCondition != ''">
+			AND (title LIKE #{nameCondition} OR content LIKE #{nameCondition})
+		</if>
+	</select>
+	<select id="findByNotClaimed" resultMap="basic_result_map">
+		SELECT * FROM renling_bill WHERE state=0
+		<if test="nameCondition != null and nameCondition != ''">
+			AND (title LIKE #{nameCondition} OR content LIKE #{nameCondition}) 
+		</if>
+		ORDER BY modify_date DESC
+	</select>
+	<select id="countByNotClaimedAndUser" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM renling_bill WHERE state=0 AND id NOT IN (SELECT DISTINCT(renling_id) FROM renling_person WHERE user_id=#{userId})
+		<if test="nameCondition != null and nameCondition != ''">
+			AND (title LIKE #{nameCondition} OR content LIKE #{nameCondition})
+		</if>
+	</select>
+	<select id="findByNotClaimedAndUser" resultMap="basic_result_map">
+		SELECT * FROM renling_bill WHERE state=0 AND id NOT IN (SELECT DISTINCT(renling_id) FROM renling_person WHERE user_id=#{userId})
+		<if test="nameCondition != null and nameCondition != ''">
+			AND (title LIKE #{nameCondition} OR content LIKE #{nameCondition}) 
+		</if>
+		ORDER BY modify_date DESC, create_date DESC
+	</select>
+
+	<update id="updateState">
+		UPDATE renling_bill SET state = #{state} WHERE id=#{id}
+	</update>
+	<update id="updateTranshipmentId">
+		UPDATE renling_bill SET tran_id = #{tranId} WHERE id=#{id}
+	</update>
+	<select id="countNeedAudit" resultType="java.lang.Integer">
+		SELECT COUNT(DISTINCT(b.id)) FROM renling_bill b LEFT JOIN renling_person p ON b.id=p.renling_id WHERE b.state=0 AND p.state=3
+	</select>
+	<update id="updateByAuditPass">
+		UPDATE renling_bill b LEFT JOIN renling_person p ON b.id=p.renling_id SET b.state = #{state}, b.user_id=p.user_id WHERE p.id=#{claimPersonId}
+	</update>
+	<update id="updateTransitId">
+		UPDATE renling_bill SET transit_id = #{transitId} WHERE id=#{id}
+	</update>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.SendUserDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.SendUser">
+		<id column="id" property="id" javaType="String" />
+		<result column="phone" property="phone" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="userid" property="userid" javaType="String" />
+	
+		
+	</resultMap>
+
+	<insert id="insertSendUser" parameterType="com.weiye.model.SendUser"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		senduser(phone,name,create_date,modify_date,userid)
+		values(#{phone},#{name},#{createDate},#{modifyDate},#{userid})
+	</insert>
+	<select id="getAllbyuserid" resultMap="basic_result_map">
+		select * from senduser where `userid`=#{userid}
+		ORDER BY modify_date DESC
+	</select>
+	<select id="checksenduser" resultType="java.lang.Integer">
+		select count(distinct `senduser`.`id`) 
+		from `senduser`
+		where `phone`=#{phone} and `name`=#{name} and `userid`=#{userid}
+	</select>
+	
+</mapper>

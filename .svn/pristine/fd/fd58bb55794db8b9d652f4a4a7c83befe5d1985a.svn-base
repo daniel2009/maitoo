@@ -1,0 +1,89 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+		<div style="display: none;" id="tmpmsgdiv"></div>
+		<input type="hidden" name="print_retail_e_oid"/>
+		<input type="hidden" name='old_retail_e_oid'/>
+		<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">散件管理
+			现在系统中空运单个数为：<strong name="count_rlorder">&nbsp;</strong>个！
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">散件管理</div>
+			<div class="content_text">
+		
+				<div class="tab-content default-tab" id="tab1">
+					<div class="notification information png_bg">
+	      				<div>
+	      				批量打印新的运单的个数最多为999个，最少1个！<strong>推荐每次最多打印100张</strong><br/>
+	      				批量打印旧的空运单，需要明确的指定开始的运单号和结束的运单的号，最多每次打印100张<br/>
+	      				请先下载导入运单的excel模板，清空里面的内容后，重新导入！下载文件模板。
+	      				请点击<a href="${pageContext.request.contextPath }/admin/rlorder/download">运单模板文件</a>下载文件!
+	      				<br/>
+	      				点击直接导出新运单按钮的时候，请不要重复点击，谢谢！
+	      				</div>
+	    			</div>
+					<form action="${pageContext.request.contextPath }/admin/rlorder/export" method="post" name="export_new">
+						<fieldset>
+							<p>
+								<label style="display: inline;">批量打印新的空运单：</label>
+				              	<input type="text" maxlength="3" placeholder="打印数量，1到999" name="size" class="text-input"/>
+				              	<input type="hidden" name="type" value="1"/><!-- 控制导出的方式 -->
+				              	<input style="display: none;" id="bt_batch_print_empty_order" class="button" type="submit" value="批量打印新空运单" />
+				              	<input name="cont" id="bt_export_output_empty_order" class="button" type="submit" value="导出新空运单" />
+				              	<!-- onclick="document.export_new.cont.value='正在提交,请等待...';document.export_new.cont.disabled=true;document.export_new.submit();" -->
+				            </p>
+						</fieldset>
+					</form>
+					<form id="import_form" action="#"  method="post" enctype="multipart/form-data">
+			            <fieldset>
+				            <p>
+				              <label style="display: inline;">散户运单EXCEL文件：</label>
+				              <input type="file" name="file" class="text-input"/>
+				              <input id="bt_import_rlorder" class="button" type="submit" value="导入运单" />
+				            </p>
+				         </fieldset>
+				         <div class="clear"></div>
+			         </form>
+					<form action="${pageContext.request.contextPath }/admin/rlorder/export" method="post">
+						<fieldset>
+							<p>
+								<label style="display: inline;">开始运单号：</label>
+				              	<input type="text" maxlength="15" placeholder="开始运单号，如：68614208152" name="soid" class="text-input small-input"/>
+								<label style="display: inline;">结束运单号：</label>
+				              	<input type="text" maxlength="15" placeholder="开始运单号，如：68614208198" name="eoid" class="text-input small-input"/>
+				              	<input id="bt_old_empty_order" class="button" type="submit" value="获取空运单" />
+				              	<!-- 此时不需要打印，所以将这个按钮设置成style="display: none;"，如果再需要，只要删除就可以了 -->
+				              	<input style="display: none;" id="bt_batch_print_old_empty_order" class="button" type="submit" value="导出已有空运单" />
+				              	<input type="hidden" name="size" value="100"/>
+				              	<input type="hidden" name="type" value="2"/>
+				              	<input class="button" type="submit" value="导出" title="点击此按钮是导出下面所有的空运单" />
+				              	<br/>
+				              	<input id="bt_batch_delete_old_empty_order" class="button" type="submit" value="批量删除空运单" />
+				            </p>
+						</fieldset>
+					</form>
+					
+					<div id="show_div">
+					</div>
+					<br/>
+					<br/>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+	<script type="text/javascript">
+		$("#main-content").ready(function() {
+			loadNav56Data();
+		});
+	</script>
+</html>

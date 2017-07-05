@@ -1,0 +1,64 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	
+</head>
+
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">我的资料</p>
+		<div class="box_content">
+			<div class="content_title">我的资料</div>
+			<div class="content_text">
+				<table class="itable">
+					<tr>
+						<td class="align_right">用户名：</td>
+						<td class="align_left"><span id="yonghuming">&nbsp;</span>
+						</td>
+					</tr>
+					<tr>
+						<td class="align_right">用户姓名：</td>
+						<td class="align_left"><span id="realName">&nbsp;</span>
+						</td>
+					</tr>
+					<tr>
+						<td class="align_right">联系手机：</td>
+						<td class="align_left"><span id="phone">&nbsp;</span></td>
+					</tr>
+					<tr>
+						<td class="align_right">Email：</td>
+						<td class="align_left"><span id="email">&nbsp;</span>
+						</td>
+					</tr>
+					<tr>
+						<td class="align_right">QQ：</td>
+						<td class="align_left"><span id="qq">&nbsp;</span>
+						</td>
+					</tr>
+					<tr>
+						<td class="align_right">地址：</td>
+						<td class="align_left"><span id="address">&nbsp;</span>
+						</td>
+					</tr>
+					<tr>
+						<td class="align_right">国家：</td>
+						<td class="align_left"><span id="country">&nbsp;</span>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="align_right"></td>
+						<td class="align_left"><a class="btn" href="javascript:nav73Click()">修改</a>
+						</td>
+					</tr>
+				</table>
+			</div>
+
+		</div>
+	</div>
+
+</body>
+</html>

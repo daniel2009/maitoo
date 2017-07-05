@@ -1,0 +1,184 @@
+package com.weiye.service.impl;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+
+
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.NewsUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.NewsDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.News;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.NewsService;
+
+@Service("newsService")
+public class NewsServiceImpl extends BasicService implements NewsService {
+	@Autowired
+	private NewsDao newsDao;
+
+	public ResponseObject<Object> saveNews(News news) throws ServiceException {
+		if (news == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		// deal the special words
+		//news.setViewCount(0);
+		String date = DateUtil.date2String(new Date());// 修改时间
+		news.setReleaseTime(date);//创建时间
+		news.setReleasetime(date);
+		news.setModifytime(date);
+
+		try {
+			int iresult = this.newsDao.insertNews(news);
+			if (iresult > 0) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.NEWS_INSERT_FAILURE, "插入新闻失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> deleteNews(String id) throws ServiceException {
+		if (StringUtil.isEmpty(id)) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			int iresult = this.newsDao.deleteNews(id);
+			if (iresult > 0) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.NEWS_DELETE_FAILURE, "删除新闻失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<News> getNewsById(String id) throws ServiceException {
+		if (StringUtil.isEmpty(id)) {
+			return new ResponseObject<News>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			ResponseObject<News> responseObj = new ResponseObject<News>();
+			News tmp = this.newsDao.retrieveNewsById(id);
+			if (tmp != null) {
+				responseObj.setCode(ResponseCode.SUCCESS_CODE);
+				responseObj.setData(tmp);
+			} else {
+				responseObj.setCode(ResponseCode.NEWS_NOT_EXISTS);
+				responseObj.setMessage("新闻不存在");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> ResponseObject<PageSplit<T>> getNewsByKey(String key,String column,  int pageSize, int pageNow)
+	        throws ServiceException {
+		/*if (StringUtil.isEmpty(key)) {
+			return new ResponseObject<PageSplit<T>>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		} else {*/
+			try {
+				
+				
+				key = StringUtil.escapeStringOfSearchKey(key);
+				
+				column=NewsUtil.validatecolumn(column);
+				int rowCount = 0;
+				try {
+					rowCount = this.newsDao.countByKey(key,column);
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("根据关键字获取失败新闻数量失败", e);
+				}
+
+				if (rowCount > 0) {
+					pageSize = Math.max(pageSize, 1);
+					int pageCount = rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1);
+					pageNow = Math.min(pageNow, pageCount);
+					PageSplit<T> pageSplit = new PageSplit<T>();
+					pageSplit.setPageCount(pageCount);
+					pageSplit.setPageNow(pageNow);
+					pageSplit.setRowCount(rowCount);
+					pageSplit.setPageSize(pageSize);
+
+					int startIndex = (pageNow - 1) * pageSize;
+					try {
+						List<News> result = this.newsDao.searchByKeys(key,column, startIndex, pageSize);
+						if (result != null && !result.isEmpty()) {
+							for (News t : result) {
+								pageSplit.addData((T) t);
+							}
+						}
+					} catch (Exception e) {
+						throw ExceptionUtil.handle2ServiceException("根据关键字获取新闻纪录列表失败", e);
+					}
+					ResponseObject<PageSplit<T>> responseObj = new ResponseObject<PageSplit<T>>();
+					responseObj.setCode(ResponseCode.SUCCESS_CODE);
+					responseObj.setData(pageSplit);
+					return responseObj;
+				} else {
+					return new ResponseObject<PageSplit<T>>(ResponseCode.SUCCESS_CODE, "现在还没有新闻");
+				}
+			} catch (ServiceException e) {
+				throw e;
+			}
+		//}
+	}
+
+	public ResponseObject<Object> modifyNews(News news) throws ServiceException {
+		if (news == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		String date = DateUtil.date2String(new Date());// 修改时间
+		news.setModifytime(date);
+		try {
+			int iresult = this.newsDao.updateNews(news);
+			if (iresult > 0) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.NEWS_MODIFY_FAILURE, "修改新闻记录失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+	
+	public ResponseObject<Object> deleteNewsbyadmin(String[] ids) throws ServiceException {
+		for(String id : ids)
+		{
+			if (StringUtil.isEmpty(id)) {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "参数无效");
+			}
+		}
+
+		try {
+			
+			int iresult = this.newsDao.deleteNewsbyadmin(Arrays.asList(ids));
+			if (iresult > 0) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.NEWS_DELETE_FAILURE, "删除新闻失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+}

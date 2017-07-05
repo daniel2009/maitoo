@@ -1,0 +1,917 @@
+
+// /////////////////////////////////////////////////
+// kai 20150914 添加图片处理接口函数和订单下载
+function loadNavCountOrdersMoney() {
+	// loadFirstOrderList();
+	//loadOrderList_CountOrdersMoney("", "", "", "", "", "","","", "1");
+
+	$(":submit[name='searchSub']").click(function() {
+
+		var oid = $(":text[name='search_order_no']").val();
+		
+		if (oid == null || oid == '') {
+			var sdate = $(":text[name='sdate']").val();
+			var edate = $(":text[name='edate']").val();
+			var key = $(":text[name='key']").val();
+			var type = $("select[name='type']").val();
+			var state = $("select[name='state']").val();
+			var wid = $("select[name='wid_download']").val();
+			var cid = $("select[name='cid_downloadload']").val();
+
+			loadOrderList_CountOrdersMoney("", key, type, state, sdate, edate,wid,cid, "1");
+		} else {
+			$(":text[name='sdate']").val('');
+			$(":text[name='edate']").val('');
+			$(":text[name='key']").val('');
+			$("select[name='type']").val('');
+			$("select[name='state']").val('');
+			$("select[name='wid_download']").val("-1");
+			$("select[name='cid_downloadload']").val("-1");
+			loadOrderList_CountOrdersMoney(oid, "", "", "", "", "","","", "1");
+		}
+		return false;
+	});
+
+	// kai 20150914 订单图片处理连接
+	// alert("4454566");
+	$("#a_order_pics_process_link").click(function() {
+		// alert("sadfa");
+		$("#main-content").load(admin_order_pics_process_link_url);
+		return false;
+	});
+
+	$("#o_order_checked_all").click(function() {
+//alert("asdfas");
+		if ($(this).is(':checked')) {
+			$('input[name="order_checked_id"]').attr("checked", 'true');
+		} else {
+			$('input[name="order_checked_id"]').removeAttr("checked");
+		}
+		countorderchecked();
+	});
+
+//	$("#order_checked_id")(function() {
+
+		//alert("sdf22");
+		/*
+		 * if ($(this).is(':checked')) {
+		 * $('input[name="order_checked_id"]').attr("checked", 'true'); } else {
+		 * $('input[name="order_checked_id"]').removeAttr("checked"); }
+		 */
+	//});
+
+	//kai 20150915
+	countorderchecked();
+	
+	//kai 20151028导入仓库信息
+	loadwid_CountordersMoney();// 引入仓库信息
+	
+	//提交选择的订单信息
+	$("a[name='a_pay_link']").click(function(){
+		var chk_value ="" ;
+		$(':checkbox[name="cb_submit"]:checked').each(function() {
+			chk_value += $(this).val()+",";
+		});
+		if (chk_value == null||chk_value=="") {
+			alert("您还没有选择要支付的运单或运单已经支付！");
+		} else {
+			chk_value=chk_value.substring(0,chk_value.length-1);
+			//window.location.href = "dingdanzhifu.jsp?oid="+chk_value;
+			nav442Click(chk_value);
+		}
+		return false;
+	});
+	
+	
+	$("#bt_orders_money").click(function() {
+		
+	/*	var chk_value ="" ;
+		$(':checkbox[name="cb_submit"]:checked').each(function() {
+			chk_value += $(this).val()+",";
+		});
+		if (chk_value == null||chk_value=="") {
+			alert("您还没有选择要支付的运单或运单已经支付！");
+		} else {
+			chk_value=chk_value.substring(0,chk_value.length-1);
+			//window.location.href = "dingdanzhifu.jsp?oid="+chk_value;
+			nav442Click(chk_value);
+		}
+		return false;*/
+		
+		
+		
+				var m = 0;
+				var chk_value ="" ;
+				var userid="";
+				var wrongflag=0;
+				var checkbox = document.getElementsByName("order_checked_id"); // id表示你的checkbox的name属性
+				for (var i = 0; i < checkbox.length; i++) {
+					if (checkbox[i].checked == true) {
+						m = m + 1;userId_id
+						var userid_1=$(checkbox[i]).parent().parent().find("td[id='userId_id']").html();
+						if((userid_1=="")||(userid_1=="null")||(userid_1==null)||(userid_1=="undefined"))
+						{
+							alert("所选择的运单对应的用户不存在!单号为:"+$(checkbox[i]).parent().parent().find("td[id='orderId_id']").html());
+							return false;
+						}
+						else
+						{
+							if(userid=="")
+							{
+								userid=userid_1;
+							}
+							else
+							{
+								if(userid!=userid_1)
+								{
+									wrongflag="1";
+									break;
+								}
+							}
+						}
+						chk_value += $(checkbox[i]).parent().parent().find("td[id='orderId_id']").html()+",";
+					}
+				}
+				
+				if(wrongflag=="1")
+				{
+					alert("必须选择同一个用户的运单！选择出错!");
+					return false;
+				}
+				
+				if (chk_value == null||chk_value=="") {
+					alert("至少选择一条运单支付！");
+					count_orders_money();
+				} else {
+					chk_value=chk_value.substring(0,chk_value.length-1);
+					//alert(chk_value);
+					var url=admin_dingdanzhifu_url + "?oid=" + chk_value+"&userid="+userid;
+					$("#main-content").load(url);
+					//Countordersmoneyinfo(chk_value);
+					//nav442Click(chk_value);
+				}
+		
+			});
+	
+}
+//kai 20151028 在导出订单时装的仓库
+function loadwid_CountordersMoney()
+{
+	$
+	.ajax({
+		type : "get",
+		async : true,
+		// url:"../user/warehouse/all",
+		url : "../warehouse/all",
+		success : function(response) {
+			var code = response.code;
+			// alert(code);
+			if (code == '200') {
+				if (response.data != null) {
+					var str = '<option value="-1">请选择门店</option>';
+				
+					$.each(response.data, function() {
+						str += "<option value='" + this.id + "'>"
+								+ this.name + "</option>";
+					});
+				
+					$("select[name='wid_download']").html(str);
+					$("select[name='wid_download']").change(loadcid_CountordersMoney);
+					
+				}
+			}
+		}
+	});
+}
+//kai 20151028 在导出订单时装的渠道方式
+function loadcid_CountordersMoney() {
+	// alert(channelId);
+	var wid = $("select[name='wid_download']").val();
+	if(wid=="-1")//没有选择仓库
+	{
+		var str = '<option value="-1">请选择渠道</option>';
+		$("select[name='cid_downloadload']").html(str);
+		return false;
+	}
+	$("select[name='cid_downloadload']").html("");
+	$.ajax({
+		post : "get",
+		url : admin_channel_list_url,
+		data : {
+			"wid" : wid
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data == null) {
+					alert("门店中没有该运单的渠道，请联系系统管理员！");
+				} else {
+					var str = '<option value="-1">请选择渠道</option>';
+					$.each(response.data, function() {
+						str += '<option value="' + this.id + '">' + this.name
+								+ '</option>';
+					});
+					$("select[name='cid_downloadload']").html(str);
+					
+
+				}
+
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+//kai 20150915 选中订单的条数
+function countNum() {
+	var m = 0;
+	var weightlb=0;
+	var weightkg=0;
+	var totalmoney=0;
+	var checkbox = document.getElementsByName("order_checked_id"); // id表示你的checkbox的name属性
+	for (var i = 0; i < checkbox.length; i++) {
+		if (checkbox[i].checked == true) {
+			m = m + 1;
+			//添加显示价格
+			//alert($(checkbox[i]).parent().parent().find("td[id='weight_id']").html());
+			weightlb+=parseFloat($(checkbox[i]).parent().parent().find("td[id='weight_id']").html());
+			weightkg+=parseFloat($(checkbox[i]).parent().parent().find("td[id='weightKg_id']").html());
+			totalmoney+=parseFloat($(checkbox[i]).parent().parent().find("td[id='totalMoney_id']").html());
+			
+			
+		}
+	}
+	
+	$("#totalweightlb").val(weightlb);
+	$("#totalweightkg").val(weightkg);
+	$("#totalMoneys").val(totalmoney);
+	return m;
+}
+//kai 20150915 选中订单的条数
+function countNum_picchecked() {
+	var m = 0;
+	var checkbox = document.getElementsByName("o_order_checked_pics"); // id表示你的checkbox的name属性
+	for (var i = 0; i < checkbox.length; i++) {
+		if (checkbox[i].checked == true) {
+			m = m + 1;
+		}
+	}
+	return m;
+}
+
+//kai 20151028 选中订单的条数
+function countNum_commoditychecked() {
+	var m = 0;
+	var checkbox = document.getElementsByName("o_order_checked_commoditys"); // id表示你的checkbox的name属性
+	for (var i = 0; i < checkbox.length; i++) {
+		if (checkbox[i].checked == true) {
+			m = m + 1;
+		}
+	}
+	return m;
+}
+// 用于点击计算被选择的订单条数
+function countorderchecked() {
+	var numbers=countNum();
+	var str=" 选中订单数:<span style='color:red;'>"+numbers+"</span>条";
+	$("#orderschecked_no").html(str);
+	
+}
+
+function submitorderdowloadclik()
+{
+	//alert(document.submitdownn.button_submit.value);
+	var numbers=countNum();
+	if(numbers==0)
+	{
+		alert("请先选择要操作的订单!");
+		return false;
+	}
+	numbers=countNum_picchecked();
+	var num=countNum_commoditychecked();
+	//if((document.submitdownn.button_submit.value=="pictures download"))
+	//{
+		//alert("222");
+		if(numbers==0)
+		{
+			alert("请选择要下载的图片类型!");
+			return false;
+		}
+		
+		if(num==0)
+		{
+			alert("请选择商品数据下载方式!");
+			return false;
+		}
+	//}
+	return true;
+	
+}
+
+/*function loadFirstOrderList() {
+	loadOrderList("", "", "", "", "", "", "1");
+}
+
+function loadOrderList(oid, key, type, state, sdate, edate, pn) {
+
+	$(":hidden[name='key']").val(key);
+	$(":hidden[name='type']").val(type);
+	$(":hidden[name='state']").val(state);
+	$(":hidden[name='sdate']").val(sdate);
+	$(":hidden[name='edate']").val(edate);
+	$(":hidden[name='pn']").val(pn);
+
+	$.ajax({
+		type : "get",
+		url : admin_order_list_url,
+		data : {
+			oid : oid,
+			key : key,
+			type : type,
+			state : state,
+			sd : sdate,
+			ed : edate,
+			pageIndex : pn
+		},
+		success : function(response) {
+			var code = response.code;
+
+			if ("200" == code) {
+				if (response.data == null) {
+					showOrderList(null);
+					showOrderLink(null);
+				} else {
+
+					showOrderList(response.data.datas);
+					showOrderLink(response.data);
+				}
+				afterLoadOrderList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='8'>"
+						+ "<span>&nbsp;&nbsp;获取运单列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+
+	});
+}*/
+// kai 20150914 modify
+function loadOrderList_CountOrdersMoney(oid, key, type, state, sdate, edate,wid,cid, pn) {
+
+	$(":hidden[name='key']").val(key);
+	$(":hidden[name='type']").val(type);
+	$(":hidden[name='state']").val(state);
+	$(":hidden[name='sdate']").val(sdate);
+	$(":hidden[name='edate']").val(edate);
+	$(":hidden[name='pn']").val(pn);
+	$(":hidden[name='wid']").val(wid);
+	$(":hidden[name='cid']").val(cid);
+	if((key=="")&&(oid=="")&&(sdate=="")&&(edate=="")&&(state=="-1"))
+	{
+		alert("搜索条件不能全为空!");
+		return;
+	}
+
+
+	$.ajax({
+		type : "get",
+		url : "../admin/weborder/searchnopay",
+		data : {
+			oid : oid,
+			key : key,
+			type : type,
+			state : state,
+			sd : sdate,
+			ed : edate,
+			wid : wid,
+			cid :cid,
+			pageIndex : pn
+		},
+		success : function(response) {
+			var code = response.code;
+
+			if ("200" == code) {
+				if (response.data == null) {
+					showOrderList(null);
+					showOrderLink1(null);
+					str = " 总订单数:<span style='color:red;'>" + "0" + "</span>条";
+					$("#orders_no").html(str);
+					countorderchecked();
+				} else {
+
+					// showOrderList(response.data.datas);
+					showOrderList_CountOrdersMoney(response.data.datas);
+					// showOrderLink(response.data);
+				}
+				afterLoadOrderList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='8'>"
+						+ "<span>&nbsp;&nbsp;获取运单列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+
+	});
+}
+
+function showOrderList_CountOrdersMoney(list) {
+
+	var str = "";
+	var flag_no = 0;
+	if (list != null) {
+
+		$
+				.each(
+						list,
+						function() {
+
+							flag_no = flag_no + 1;
+							str += "<tr id='" + this.id + "'>";
+							// kai 20150911-1 modify
+							str += "<td style='text-align:center;'>" + flag_no
+									+ "</td>";
+
+							str += "<td style='text-align:center;'><input type='checkbox' name='order_checked_id' onclick='countorderchecked()' value='"
+									+ this.orderId + "'/></td>";
+
+							str += "<td id='orderId_id'>" + this.orderId + "</td>";
+							var tc = "";
+							$.each(this.details, function() {
+								tc += this.ctype + ":" + this.quantity + ";";
+							});
+							str += "<td>" + tc + "</td>";
+							if (this.user == null) {
+								str += "<td>&nbsp;</td>";
+							} else {
+								var strtemp="";
+								if((this.user.phone==null)||(this.user.phone=="null")||(this.user.phone=="")||(this.user.phone=="undefined"))
+								{
+									
+								}
+								else
+								{
+									strtemp=this.user.phone;
+								}
+								if((this.user.email==null)||(this.user.email=="null")||(this.user.email=="")||(this.user.email=="undefined"))
+								{
+									
+								}
+								else
+								{
+									if(strtemp!="")
+									{
+										strtemp=strtemp+"/"+this.user.email;
+									}
+									else
+									{
+										strtemp=this.user.email;
+									}
+									
+								}
+								if((this.user.nickName==null)||(this.user.nickName=="null")||(this.user.nickName=="")||(this.user.nickName=="undefined"))
+								{
+									
+								}
+								else
+								{
+									if(strtemp!="")
+									{
+										strtemp=strtemp+"/"+this.user.nickName;
+									}
+									else
+									{
+										strtemp=this.user.nickName;
+									}
+									
+								}
+								
+								if((this.user.realName==null)||(this.user.realName=="null")||(this.user.realName=="")||(this.user.realName=="undefined"))
+								{
+									
+								}
+								else
+								{
+									if(strtemp!="")
+									{
+										strtemp=strtemp+"/"+this.user.realName;
+									}
+									else
+									{
+										strtemp=this.user.realName;
+									}
+									
+								}
+								
+								str += "<td>" + strtemp + "</td>";
+							}
+
+							str += "<td>" + this.cName + "</td>";
+							str += "<td>" + this.stateStr + "</td>";
+							str += "<td>" + this.createDate + "</td>";
+							str += "<td id='weight_id'>" + this.weight + "</td>";
+							str += "<td id='weightKg_id'>" + this.weightKg + "</td>";
+							str += "<td id='totalMoney_id'>" + this.totalMoney + "</td>";
+							str += "<td id='userId_id' style='display:none;'>" + this.userId + "</td>";
+							str += "</tr>";
+						});
+
+	} else {
+		if (str == null || str == '') {
+			str = "<td style='text-align: left;' colspan='8'>"
+					+ "<span>&nbsp;&nbsp;没有符合您查找要求的运单信息!</span></td>";
+		}
+	}
+
+	$("#tab1 table tbody").html(str);
+	str = "";
+	str = " 总订单数:<span style='color:red;'>" + flag_no + "</span>条";
+	$("#orders_no").html(str);
+	countorderchecked();
+
+}
+
+//kai 20151004 添加用户提交时的并没有打印的处理方式
+function showOrderList555(list) {
+
+	var str = "";
+	if (list != null) {
+
+		$.each(list, function() {
+
+			str += "<tr id='" + this.id + "'>";
+			// kai 20150911-1 modify
+			if ((this.state == "0") || (this.state == "1")
+					|| (this.state == "-10")) {
+				str += "<td><input type='checkbox' name='del_id' value='"
+						+ this.orderId + "'/></td>";
+			} else {
+				str += "<td>&nbsp;</td>";
+			}
+			
+			//str += "<td >" + this.orderId + "</td>";
+			str += '<td><a href="' + this.orderId
+			+ '" name="a_order_route_detail_link">'
+			+ this.orderId + '</a></td>';
+			
+			var tc = "";
+			$.each(this.orderDetailTranshipmentIds, function() {
+				tc += this + "<br/>";
+			});
+			str += "<td>" + tc + "</td>";
+			if (this.user == null) {
+				str += "<td>&nbsp;</td>";
+			} else {
+				//str += "<td>" + this.user.phone + "</td>";
+				var strtemp="";
+				if((this.user.phone==null)||(this.user.phone=="null")||(this.user.phone=="")||(this.user.phone=="undefined"))
+				{
+					
+				}
+				else
+				{
+					strtemp=this.user.phone;
+				}
+				if((this.user.email==null)||(this.user.email=="null")||(this.user.email=="")||(this.user.email=="undefined"))
+				{
+					
+				}
+				else
+				{
+					if(strtemp!="")
+					{
+						strtemp=strtemp+"/"+this.user.email;
+					}
+					else
+					{
+						strtemp=this.user.email;
+					}
+					
+				}
+				if((this.user.nickName==null)||(this.user.nickName=="null")||(this.user.nickName=="")||(this.user.nickName=="undefined"))
+				{
+					
+				}
+				else
+				{
+					if(strtemp!="")
+					{
+						strtemp=strtemp+"/"+this.user.nickName;
+					}
+					else
+					{
+						strtemp=this.user.nickName;
+					}
+					
+				}
+				
+				if((this.user.realName==null)||(this.user.realName=="null")||(this.user.realName=="")||(this.user.realName=="undefined"))
+				{
+					
+				}
+				else
+				{
+					if(strtemp!="")
+					{
+						strtemp=strtemp+"/"+this.user.realName;
+					}
+					else
+					{
+						strtemp=this.user.realName;
+					}
+					
+				}
+				
+				str += "<td>" + strtemp + "</td>";
+			}
+
+			str += "<td>" + this.cName + "</td>";
+			str += "<td>" + this.stateStr + "</td>";
+			var storagePosition = "&nbsp;";
+			if(null != this.storagePosition){
+				storagePosition = this.storagePosition.storageName + "-" + this.storagePosition.rowNumber + "-" + this.storagePosition.colNumber;
+			}
+			str += "<td>" + storagePosition + "</td>";
+			str += "<td>" + this.createDate + "</td>";
+			// kai 20150911-1 modify
+
+			if (this.state == "0" || this.state == "1" || this.state == "-1"
+					|| this.state == "-10") {
+				
+				str += "<td><a href='" + this.orderId
+						+ "' name='a_order_modify_link'>修改</a></td>";
+			} else {
+				/*if((this.state == "2")&&(this.tranPro==0))
+				{
+					str += "<td id='" + this.orderId + "'><a href='" + this.orderId
+						+ "' name='a_order_modify_link'>修改</a>|<a href='" + this.orderId
+						+ "' name='a_order_print_a4_link'>A4打印</a>|<a href='" + this.orderId
+					+ "' name='a_order_print_link'>热敏(4x6)</a></td>";
+				}
+				else
+				{*/
+					str += "<td id='" + this.orderId + "'><a href='" + this.orderId
+						+ "' name='a_order_print_a4_link'>A4打印</a> | <a href='" + this.orderId
+						+ "' name='a_order_print_link'>热敏(4x6)</a></td>";
+				//}
+			}
+			str += "</tr>";
+		});
+
+	} else {
+		if (str == null || str == '') {
+			str = "<td style='text-align: left;' colspan='11'>"
+					+ "<span>&nbsp;&nbsp;没有符合您查找要求的运单信息!</span></td>";
+		}
+	}
+
+	$("#tab1 table tbody").html(str);
+	
+	$("a[name='a_order_route_detail_link']").click(function() {
+		var oid = $(this).attr("href");
+		var url = admin_route_order_detail_page_url + "?oid=" + oid;
+		$("#main-content").load(url);
+		return false;
+	});
+}
+
+
+
+function showOrderLink1(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .bulk-actions").show();
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var key = $(":hidden[name='key']").val();
+			var type = $(":hidden[name='type']").val();
+			var state = $(":hidden[name='state']").val();
+			var sdate = $(":hidden[name='sdate']").val();
+			var edate = $(":hidden[name='edate']").val();
+			//alert("666");
+			loadOrderList("", key, type, state, sdate, edate, pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var key = $(":hidden[name='key']").val();
+					var type = $(":hidden[name='type']").val();
+					var state = $(":hidden[name='state']").val();
+					var sdate = $(":hidden[name='sdate']").val();
+					var edate = $(":hidden[name='edate']").val();
+					//alert("222");
+					loadOrderList("", key, type, state, sdate, edate, pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .bulk-actions").hide();
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterLoadOrderList() {
+	$("a[name='a_order_modify_link']").click(function() {
+		var id = $(this).attr("href");
+		var url = admin_order_modify_page_url + "?orderId=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+
+	$("a[name='a_order_print_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var orderId = $(this).parent().attr("id");
+
+		var url = admin_print_page_url + "?id=" + id + "&orderId=" + orderId;
+
+		$("#my_print_div").load(url);
+		return false;
+	});
+	
+	$("a[name='a_order_print_a4_link']").click(function() {
+
+		
+		var id = "";
+		var orderId = $(this).parent().attr("id");
+
+		var url = admin_print_A4_page_url + "?id=" + id + "&orderId=" + orderId;
+
+		$("#my_print_div").load(url);
+		return false;
+	});
+}
+
+// //////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+
+function loadCountordersmoney442Data(){
+	
+	// 开始获取数据
+	//var regx=/[a-zA-Z]*\d+/g;  
+	//update by chenkanghua  订单号为 WY+8位+US
+	
+	var regx=/[A-Z]{2}[\d]{8}[A-Z]{2}|[a-zA-Z]*\d+/g
+	var value = $(":hidden[name='oid']").val();
+	
+	var arrs = value.match(regx);
+	if (arrs!=null) {
+		search(arrs);
+	}
+	
+	$("input[name='a_order_pay_link']").click(function(){
+		var value = $(":hidden[name='oid']").val();
+		var userid = $(":hidden[name='userid']").val();
+		//alert("555555");
+		
+		var paytype = $("select[name='paytype']").val();
+		var arrs = value.match(regx);
+		if (arrs!=null) {
+			$.ajax({
+				type:"post",
+				url:admin_order_payorders_url,
+				data : $.param({
+					"oid" : arrs,
+					"userid":userid,
+					"paytype":paytype				
+				}, true),
+				success:function(response) {
+					//alert(response);
+					var code = response.code;
+					if (code == "200") {
+						alert("支付成功");
+						//nav44Click();
+						count_orders_money();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else if ("18005" == code) {
+						alert("账户余额不足，请去充值！");
+						//nav61Click();
+					} else {
+						// 失败
+						alert("支付运单失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	});
+
+
+function search(arrs) {
+	var userid=$(":hidden[name='userid']").val();
+	$.ajax({
+		type:"get",
+		url:admin_order_get_url,
+		data : $.param({
+			"oid" : arrs,
+			"userid":userid,
+		}, true),
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				showOrders(response.data);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取运单详情失败，原因是:" + response.message);
+			}
+			return false;
+		}
+	});
+}
+
+function showOrders(list) {
+	$("#order_pay_info").html("");
+	if (list != null) {
+		var rmb = 0.0;
+		var usd = 0.0;
+		var totalMoney = 0.0;
+		var userid="";
+		var wrongflag=0;
+		var userinfo="";
+		$.each(list, function(){
+			
+			if((this.userId=="")||(this.userId=="null")||(this.userId==null)||(this.userId=="undefined"))
+			{
+				wrongflag=1;
+				return;
+			}
+			else
+			{
+				if(userid=="")
+				{
+					userid=this.userId;
+					if(this.user!=null)
+					{
+						userinfo=this.user.phone+"/"+this.user.realName+"/"+this.user.nickName;
+					}
+				}
+				else
+				{
+					if(userid!=this.userId)
+					{
+						wrongflag=1;
+						return;
+					}
+				}
+			}
+			
+			var str = '<div>';
+			str += '<label>运单号：</label>' + this.orderId + '<br/>';
+			str += '<label>收货信息：</label>' + this.cName + '&nbsp;' + this.cPhone + '&nbsp;' + this.address + '<br/>';
+			var pm = '';
+			$.each(this.details,function(){
+				pm += this.xiangqing + ":" + this.quantity + ";";
+			});
+			str += '<label>运单信息：</label>' + pm + '<br/>';
+			str += '<label>运费(￥)：</label>' + this.totalMoney + '<br/>';
+			str += '</div><hr/><br/>';
+			totalMoney += parseFloat(this.totalMoney);
+			rmb = this.user.rmbBalance;
+			usd = this.user.usdBalance;
+			$("#order_pay_info").append(str);
+		});
+		
+		if(wrongflag==1)
+		{
+			alert("用户信息有误!");
+			return false;
+		}
+		if((userinfo!="//")||(userinfo!=""))
+		{
+			$("#order_pay_info").append("所属用户:" + userinfo + "<br/>");
+		}
+		$("#order_pay_info").append("账户余额:￥" + rmb +"&nbsp;/&nbsp;$" + usd + "<br/>");
+		$("#order_pay_info").append("总运费(￥):" + totalMoney + "<hr/><br/>");
+	}
+}
+
+};

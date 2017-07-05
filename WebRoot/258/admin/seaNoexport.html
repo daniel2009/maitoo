@@ -1,0 +1,233 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+    
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden;">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">海关管理</a>
+                </li>
+
+                <li>
+                    <a href="menshidadan.html">导出海关单</a>
+                </li>
+                
+
+            </ul>
+        </div>
+
+        <div class="page-content">
+
+            <form id="config_orderId_excel" action="/admin/m_order/import_table_meitao" method="post" enctype="multipart/form-data">
+
+                <table class="table table-bordered  table-striped table-condensed ">
+                    <thead>
+                        <tr>
+                            <th colspan="4">
+                                导入运单号直接导出模板
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="name">
+                              上传文件
+                            </td>
+                            <td class="value" >
+                            
+                     
+                                <input type="file" name="filemeitao" class="text-input">
+
+                                
+                            </td>
+                                    
+                        </tr>
+
+                        <tr>
+                            <td class="name">
+                                导出模板：
+                            </td>
+                            <td>
+
+                                <input type="radio" name="inputmode" value="0" class="text-input" checked="true">内蒙模板&nbsp;&nbsp;
+                                <input type="radio" name="inputmode" value="1" class="text-input">内蒙模板1&nbsp;&nbsp;
+                                <input type="radio" name="inputmode" value="2" class="text-input">深圳模板&nbsp;&nbsp;
+                                <input type="radio" name="inputmode" value="3" class="text-input">上海模板&nbsp;&nbsp;
+                                <input type="radio" name="inputmode" value="4" class="text-input">A奶粉模板&nbsp;&nbsp;
+                                <input type="radio" name="inputmode" value="5" class="text-input">A普货模板&nbsp;&nbsp;
+                                </td>
+                                
+                         
+                           
+                        </tr>
+                         <tr>
+                            <td class="name">
+                                匹配原则：
+                            </td>
+                            <td class="value" colspan="3">
+                                <input type="radio" name="inputrude" value="0" class="text-input" checked="true">绝对匹配&nbsp;&nbsp;
+                                <input type="radio" name="inputrude" value="1" class="text-input">模糊匹配&nbsp;&nbsp;
+                                <input type="radio" name="inputrude" value="2" class="text-input">不匹配&nbsp;&nbsp;
+                                 
+                               
+                               
+                            </td>
+                        </tr>
+                        
+                    <tr>
+                            <td class="name">
+                               是否下载图片：
+                            </td>
+                            <td class="value" colspan="3">
+                                <input type="radio" name="picdownload" value="1" class="text-input" checked="true">下载&nbsp;&nbsp;
+                                <input type="radio" name="picdownload" value="0" class="text-input">不下载&nbsp;&nbsp;
+
+                                                                
+                               
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="name">
+                               获取海关单号：
+                            </td>
+                            <td class="value" colspan="3">
+                                <input type="radio" name="getseaNo" value="1" class="text-input" checked="true">获取(原已匹配过的将不会重新获取)&nbsp;&nbsp;
+                                <input type="radio" name="getseaNo" value="0" class="text-input">不获取&nbsp;&nbsp;
+                                <input type="radio" name="getseaNo" value="2" class="text-input" >重新获取(不管之前是否获取过，将重新获取)&nbsp;&nbsp;<span style="color:red;">(暂时只对深圳模板起作用！)</span>
+
+                                                                
+                               
+                            </td>
+                        </tr>
+                        
+                        
+                            <tr>
+                            <td class="name">
+                               说明：
+                            </td>
+                            <td class="value" colspan="3">
+                               1、上传文件是指要导出数据的运单号，第一列存放运单号，只能使用2003版本的excel文件。<br/>
+                               2、导出模板是指根据海关口岸而定义的导出模板，要根据实际情况来选择。<br/>
+                               3、匹配原则是否与数据库中身份证库存进行匹配，其中绝对匹配是指收件人要完全相同，模糊匹配是指随机匹配，不匹配是指不进行身份证匹配。<br/>注意：如果运单号之前进行过匹配，在模糊匹配情况下，将优先获取之前的匹配信息；绝对匹配将重新获取信息；不匹配之前的信息不影响。<br/>
+                               4、是否下载是指包含的身份证图片是否随导出数据一起下载，如果下载，将在下载表格中最后一行添加下载连接，务必当天下载，否则可能被删除。<br/>
+                               5、是否从库存中获取海关单号，如果之前已经获取了，将使用之前的海关单号；如果选择不获取，在海关单号一栏将只获取之前包含的海关单号；如果选择重新获取，将不管之前是否获取过，都重新获取海关单号。
+                                                                
+                               
+                            </td>
+                        </tr>
+                      
+                    </tbody>
+                </table>
+             
+                <div class="clearfix form-buttons">
+                    <label class="control-label col-md-5"></label>
+                    <button type="submit" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-ok"></i><strong>提交</strong> </button>
+                   &nbsp;&nbsp;<a target="_blank" href="/admin/m_order/upload_sno">模板下载</a>
+                </div>
+            </form>
+
+
+
+
+
+            <div id="divKehu" style="display:none; position:absolute; border:1px solid #aaa; padding-top:5px; background:#fff">
+                <div>
+                    <label for="receiverphone" class="control-label width60px">客户名称：</label>
+                    <input name="q" id="receiverinfo" placeholder="">
+
+                    <button type="button" class="btn btn-purple btn-sm" id="btnReceiver">
+                        <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                        查询
+                    </button>
+                </div>
+                <table id="receivergrid-table"></table>
+            </div>
+        </div>
+        <!-- 最早引入基本脚本 -->
+        <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+        <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+        <!-- ace 设置 -->
+        <script src="../resources/ace/js/ace.min.js"></script>
+        <script src="../resources/ace/js/ace-elements.min.js"></script>
+        <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+        <!--grid 控件-->
+        <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+        <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+        <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+        <!--[if lte IE 8]>
+        <script src="../resources/js/html5shiv.min.js"></script>
+        <script src="../resources/js/respond.min.js"></script>
+        <![endif]-->
+        <!--日历控件支持-->
+
+        <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+        <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+        <!--表单验证插件-->
+        <script src="../resources/js/jquery.validate.min.js"></script>
+        <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+        <!--开关插件-->
+        <script src="../resources/bootstrap-switch/bootstrap-switch.min.js"></script>
+        <!--弹出框插件-->
+        <script src="../resources/artDialog/dist/dialog-min.js"></script>
+        <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <script src="../resources/js/jquery.form.js"></script>
+        <script src="../resources/js/jquery.bigautocomplete.js"></script>
+        <script src="../resources/scripts/area.js"></script>
+        <script src="../resources/js/fuelux/fuelux.spinner.min.js"></script>
+        <script src="../resources/scripts/menshidadan_manage.js"></script>
+        <script src="../resources/scripts/common.js"></script>
+
+</body>
+</html>

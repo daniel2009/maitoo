@@ -1,0 +1,101 @@
+package com.weiye.model;
+
+import java.io.Serializable;
+import java.util.List;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+public class ErrorTranshipmentBillInfo implements Serializable {
+
+    private static final long serialVersionUID = 7195772204277448468L;
+	private String id;
+	private String transhId;
+	private String empName;
+	private String content;
+	private String createDate;
+	private String modifyDate;
+	private String state;
+	private String groupId;
+	@JsonIgnore
+	private String parentId;
+	private List<ErrorTranshipmentBillInfo> replyInfos;
+
+	public String getGroupId() {
+		return this.groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getEmpName() {
+		return empName;
+	}
+
+	public void setEmpName(String empName) {
+		this.empName = empName;
+	}
+
+	public String getTranshId() {
+    	return transhId;
+    }
+
+	public void setTranshId(String transhId) {
+    	this.transhId = transhId;
+    }
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+
+	public String getModifyDate() {
+		return modifyDate;
+	}
+
+	public void setModifyDate(String modifyDate) {
+		this.modifyDate = modifyDate;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
+
+	public List<ErrorTranshipmentBillInfo> getReplyInfos() {
+		return replyInfos;
+	}
+
+	public void setReplyInfos(List<ErrorTranshipmentBillInfo> replyInfos) {
+		this.replyInfos = replyInfos;
+	}
+}

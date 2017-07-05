@@ -1,0 +1,8 @@
+package com.weiye.dao;
+
+import com.weiye.model.WarehouseLocation;
+
+public interface WarehouseLocationDao {
+	public int insertWarehouseLocation(WarehouseLocation wl) throws Exception;
+	public int updateWarehouseLocationState(WarehouseLocation wl) throws Exception;
+}

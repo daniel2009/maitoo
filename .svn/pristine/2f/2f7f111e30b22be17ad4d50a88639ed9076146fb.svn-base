@@ -1,0 +1,233 @@
+.userMenu { width:140px; border:solid 1px #ccc; background:#f5f5f5; overflow:hidden; }
+.userMain { width:830px; padding-bottom:10px; overflow:hidden; background:#fff; border:solid 1px #ccc; }
+div.itemR { text-align:right; margin:10px; font-weight:bold; }
+div.opInfo { width:800px; margin:0 auto; }
+h2.tit,h2.tit2 { font-size:15px; color:#03599d; height:27px; text-indent:20px; line-height:29px; background:url('../img/mya_01.gif') no-repeat; }
+h2.tit2 { background:none; margin-top:10px; }
+h2.tit a,h2.tit a:link,h2.tit a:visited { color:#333; }
+div.hint { color:#666; font-weight:bold; border:solid 1px #ccc; padding:10px; margin:10px; position:relative; }
+div.hint span { font-weight:normal; margin-left:10px; color:#aaa; }
+.combtn { background: #555; padding:0px 20px; height:23px; display:inline-block; color:#fff; text-align:center; color:#fff; border:none; overflow:hidden; line-height:23px; }
+a.combtn,a.combtn:link,a.combtn:visited { color:#fff; }
+a.combtn:hover { text-decoration:none; }
+div.hint span.more { top:10px; }
+span.warn { padding:0px; padding-left:5px; border:none; background:none; }
+.hint2 { border: dashed 1px #ccc; background: #eef; color: #666; padding:10px 20px; line-height: 150%; margin:10px; }
+    .hint2 a, .hint2 a:link, .hint2 a:visited { color: #f60; text-decoration: underline; }
+        .hint2 a:hover { color: #f00; }
+
+div.addressDiv { padding: 5px 20px; height:50px; line-height: 50px; border:solid 1px #ccc; color:#666; margin:10px; color: #000; position:relative; }
+    div.addressDiv strong { color: #f60; font-weight: normal; margin-right:10px; }
+    div.addressDiv span.more { width:100px; line-height: 22px; top:5px; right:-10px; }
+    a.address { color:#f60; display:block; }
+div.user_nav { background:#5e5b5b; margin:2px; height:28px; line-height:28px; color:#fff; overflow:hidden; position:relative; text-indent:26px; }
+div.user_nav a,div.user_nav a:link,div.user_nav a:visited { color:#fff; }
+
+span.item_span { border:solid 1px #ccc; padding:2px 5px; margin-right:10px; }
+
+div.menuItem { margin:0 1px; }
+div.menuItem h2 { background:#fff; font-size:14px; line-height:26px; color:#555; height:26px; text-indent:15px; border-bottom:solid 1px #ccc; }
+div.menuItem ul { margin:5px auto; }
+div.menuItem ul li { line-height:23px; height:23px; overflow:hidden; padding-left:10px; text-indent:5px; }
+div.menuItem ul li.darr { background:#06c url('../img/darr.gif') 80px center no-repeat; color:#fff; padding-left:15px; }
+div.menuItem ul li.darr a,div.menuItem ul li.darr a:visited { color:#fff; }
+div.menuItem ul li.subItem { padding-left:20px; }
+div.menuItem ul li a,div.menuItem ul li a:link,div.menuItem ul li a:visited { color:#333; display:inline-block; height:23px; width:102px; text-indent:10px; }
+div.menuItem ul li a:hover { background:url('../img/uhover.gif') no-repeat; color:#c90000; }
+div.menuItem ul li a.current { background:url('../img/current.gif') no-repeat; color:#fff; }
+div.menuItem ul li a.org { color:#f60; }
+div.menuItem ul li.subItem a:hover { background:none; color:#900; }
+
+div.bulletin { background:#ffffe3 url('../img/ann.gif') 10px center no-repeat; padding-left:30px; margin:10px; height:26px; line-height:26px; }
+div.userDesc { background:url('mya_03.gif') left top repeat-x; padding:15px; height:100px; }
+div.avator { width:100px; text-align:center; }
+div.avator a img { width:80px; height:80px; margin-bottom:10px; }
+div.avator a,div.avator a:link,div.avator a:visited { display:block; line-height:150%; color:#009; }
+div.avator a:hover { text-decoration:underline; }
+div.userInfo { width:650px; height:100px; }
+strong.username { font-size:20px; margin-right:10px; }
+ul.userstatus { height:100px; overflow:hidden; }
+ul.userstatus li { float:left; width:230px; height:30px; line-height:30px; overflow:hidden; }
+ul.userstatus li.r { float:right; width:410px; }
+    ul.userstatus li.long { width:auto; float:none; clear:both; }
+ul.userstatus li input { vertical-align:middle; }
+span.bkd { margin-left:30px; color:#aaa; }
+span.bkd a.help { cursor:help; }
+
+
+table.orderTable { width:98%; margin:10px auto; }
+
+table.orderInfo { border-collapse:collapse; border:solid 1px #ccc; width:810px; margin:10px; }
+    table.orderInfo tr td, table.orderInfo tr th { border: none; padding: 8px; text-align: left; border-bottom: solid 1px #c4d5e0; }
+    table.orderInfo tr th { width: 70px; background:#ebebeb; text-align:right; color:#000; }
+    table.orderInfo tr { border-bottom: solid 1px #c4d5e0; }
+
+div.uListItem,div.uListItemR { border:solid 1px #c4d5e0; margin:10px; }
+div.uListItemR { width:372px; float:right; }
+div.uListItem h2,div.uListItemR h2 { background:url('../img/mya_06.gif') repeat-x; font-size:13px; color:#555; height:21px; line-height:21px; text-indent:10px; margin:1px; }
+div.uListItem div.cnt,div.uListItemR div.cnt { border-top:solid 1px #c4d5e0; padding:10px; }
+
+ul.newsList { font-size:14px; }
+ul.newsList li { line-height:190%; text-indent:10px; background:url('../img/arr3.gif') left 12px no-repeat; border-bottom:dashed 1px #ccc; position:relative; }
+
+ul.addressList { }
+ul.addressList li { width:360px; float:left; height:26px; line-height:26px; color:#666; }
+ul.addressList li.long { width:100%; clear:both; }
+
+table.userTable { border:none; width:95%; margin:10px auto; }
+table.userTable tr th,table.userTable tr td { border:none; padding:5px; position:relative; }
+table.userTable tr th { text-align:right; width:18%; font-size:13px; font-weight:normal; }
+table.userTable tr th.area_tit { text-align:left; width:auto; border:solid 3px #eee; }
+table.userTable tr td select { vertical-align:middle; }
+table.userTable tr td table.itemList { background:#f1f1f1; margin-bottom:10px; width:100%; }
+table.userTable tr td table.itemList tr th,table.userTable tr td table.itemList tr td { padding:5px; } /*text-align:center; */
+    table.userTable tr td table.itemList tr td.c { text-align:center; }
+table.userTable tr td table.itemList tr th { background:#ddd; }
+table.userTable tr td table.itemList tr th label { background:#009; color:#fff; padding:2px 5px; }
+table.userTable tr td table.itemList tr td input { }
+table.userTable tr td table.itemList tr td input.name { text-align:left; }
+    table.userTable tr td#yd_zone table.itemList tr th, table.userTable tr td#yd_zone table.itemList tr td { text-align: center; }
+    
+    
+    
+    
+  
+table.mtable tr td { border:1px solid #AFACA6;; padding:5px; position:relative; }
+    
+    
+td#ordergoodsList ul li { line-height: 18px; }
+    td#ordergoodsList ul li input { vertical-align: middle; margin-right: 5px; }
+    td#ordergoodsList ul li.item { margin-left:50px; font-weight:bold; }
+
+div.item_box { background:#eef; border:solid 1px #ccc; margin-bottom:10px; }
+    div.item_box h3.item_tit { font-size: 14px; line-height: 32px; background: #666; color: #fff; text-indent: 10px; margin-bottom: -10px; }
+ul.address_list { border-top:dashed 1px #ccc; margin:0px 10px; padding:10px 0px; line-height:150%; }
+table.itemList { margin-top:10px; }
+
+div.static_info { border:solid 1px #c4d5e0; padding:10px 20px; margin:10px 20px; }
+div.static_info table { width:100%; }
+div.static_info table tr th,div.static_info table tr td { padding:2px; }
+div.static_info table tr th { text-align:right; font-weight:normal; }
+div.static_info table tr td strong { margin:0 5px; padding:0 5px; background:#eee; }
+
+table.datav { width:99%; margin:0 auto; border-collapse:collapse; }
+table.datav tr td,table.datav tr th { padding:5px; border:solid 1px #ccc; text-align:center; }
+table.datav tr th { background:#efefef; }
+table.datav tr td.tit { text-align:left; }
+table.datav tr td.op { color:#aaa; }
+table.datav tr td.op a,table.datav tr td.op a:link,table.datav tr td.op a:visited { margin:0 5px; }
+    table.datav tr td a.model_2, table.datav tr td a.model_3, table.datav tr td a.model_6,table.datav tr td span.model_2, table.datav tr td span.model_3, table.datav tr td span.model_6 { background:url('../img/delivery.png') left center no-repeat; padding-left:12px; }
+    table.datav tr td a.model_3, table.datav tr td span.model_3 { background-image:url('../img/box.png'); }
+    table.datav tr td a.model_6, table.datav tr td span.model_6 { background-image:url('../img/inbox.png'); }
+
+table.askTable { border:solid 1px #ccc; border-collapse:collapse; width:95%; margin:10px auto; }
+table.askTable tr th,table.askTable tr td { border:solid 1px #ccc; padding:5px; }
+table.askTable tr th { width:13%; text-align:right; background:#efefef; }
+
+div.orderInfo { margin:10px; color:#333; }
+div.succOrder { background:#8ad98f url('../img/check.gif') 60px center no-repeat; font-size:15px; font-weight:bold; text-indent:100px; border:solid 1px #080; padding:30px 50px; }
+h2.orderNo { font-size:15px; }
+h3.shipping { font-size:13px; line-height:32px; color:#555; }
+h3.shipping span { font-weight:normal; }
+div.orderDetail { border:solid 1px #cdc4aa; background:#fef8e7; padding:10px 0px; }
+div.zone { padding:10px 50px; margin:0 auto; border-bottom:dashed 1px #cdc4aa; }
+div.zone h2 { font-size:15px; color:#555; }
+div.zone p {  line-height:200%; }
+
+div#tab { border-bottom:solid 1px #ccc; }
+div#tab span { background:#efefef; display:inline-block; margin:0px 3px; width:75px; height:26px; line-height:26px; text-align:center; cursor:pointer; }
+div#tab span.current { background:#03599d; color:#fff; }
+div#tab span a,div#tab span a:visited,div#tab span a:link { color:#666; }
+div#tab span.current a,div#tab span.current a:link,div#tab span.current a:visited { color:#fff; }
+
+
+div.uc_border { border:solid 1px #ccc; margin:10px; }
+div.uc_cnt { padding:10px; overflow:hidden; }
+h2.referTitle { background:#efefef; border-bottom:solid 1px #ccc; height:24px; line-height:24px; font-size:12px; text-indent:10px; color:#333; }
+p.info { font-size:12px; line-height:150%; color:#666; margin:10px 0px; }
+
+/*---------------操作表格----------------*/
+table.optable { width:99%; margin:10px auto; border-collapse:collapse; border:solid 1px #ccc; background:#eef; }
+table.optable tr td { padding:5px; }
+table.optable tr td label { margin:0px 5px; color:#666; }
+table.optable tr td.optd { text-align:right; padding-right:20px; }
+
+div#service-zone { padding:5px 10px 5px 20px; background:#ddf; margin:0 10px; }
+
+div.pay_border { border:solid 5px #d4eefa; margin:20px; padding:10px; }
+
+
+div.u_border { background:url('../img/u_border.gif') left top no-repeat; padding-top:5px; width:792px; margin:10px auto; }
+div.u_border_cnt { background:url('../img/u_border2.gif') left bottom no-repeat; min-height:200px; }
+div.u_border_cnt h2 { font-size:14px; padding:10px 0px 0px 20px; }
+div.u_border_cnt dl dt { float:left; width:170px; height:105px; }
+div.u_border_cnt dl dd { float:right; width:590px; }
+dl.prepaid_info,dl.prepaid_buy_info { margin:10px; }
+dl.prepaid_info dt { text-align:center; }
+dl.prepaid_info dt img { width:112px; height:72px; }
+dl.prepaid_info dd table { width:100%; }
+dl.prepaid_info dd table tr td { padding:5px; }
+dl.prepaid_buy_info { border-top:solid 1px #ccc; padding-top:10px; }
+dl.prepaid_buy_info dt { font-weight:bold; font-size:14px; text-indent:20px; }
+dl.prepaid_buy_info dd ul { line-height:26px; }
+.deng { background:url('../img/deng.gif') left center no-repeat; text-indent:20px; color:#666; }
+
+div.pd10 h4 { font-size:14px; }
+div.pd10 { line-height:24px; }
+div.pd10 p { color:#666; }
+
+
+/*---------------代购订单列表----------------------*/
+div.warn { margin:10px; }
+table.cartTable { width:800px; border-collapse:collapse; text-align:center; border:none; margin:0px 10px; }
+table.cartTable tr th,table.cartTable tr td { padding:5px 7px; }
+table.cartTable thead tr td { border:solid 1px #aed2ff; border-left:none; border-right:none; background:#e8f2ff; }
+
+    table.cartTable .product_ptitle ul { float: left; margin: 0 5px; }
+        table.cartTable .product_ptitle ul img { width: 60px; height: 55px; }
+    table.cartTable .product_tips { color: #666; font-size: 12px; font-weight: normal; margin: 5px 0 0 0; }
+    table.cartTable .product_total { color: #f60; font-weight: bold; }
+    table.cartTable .product_list td { border-bottom: 1px dotted #aed2ff; border-right: 0px solid #fff; background: #f2f9ff; }
+    table.cartTable .product_saler td { text-align: left; padding-top: 10px; border-bottom: 2px solid #aed2ff; }
+
+table.cartTable thead tr td { border:solid 1px #aed2ff; border-left:none; border-right:none; background:#e8f2ff; }
+table.cartTable input { vertical-align:middle; }
+input.txtAmount { border:solid 1px #ccc; color:#666; width:45px; padding:2px; text-align:center; }
+
+div.payZone { border-top:dashed 1px #f60; padding:10px; margin:10px; }
+table.pay { width:780px; margin:0 auto; border-collapse:collapse; background:#fff; font-size:14px; }
+table.pay tr td,table.pay tr th { border:solid 1px #ccc; padding:5px; }
+table.pay tr th { width:150px; text-align:right; font-weight:normal; }
+table.pay tr td strong { color:#f00; }
+
+/*订单详细页*/
+table.item_table { width: 95%; margin: 10px auto; border-collapse:collapse; border:dashed 1px #ccc; background:#eef; }
+    table.item_table tr th, table.item_table tr td { padding: 5px; }
+    table.item_table tr th { width: 15%; text-align:right; }
+
+table.appraise_table { border: solid 1px #f2f2f2; width: 812px; margin: 9px; border-collapse: collapse; }
+    table.appraise_table thead tr th { background:#f2f2f2; padding:5px; color:#333; font-weight:normal; text-align:center; }
+
+ul.delivery_info { height:50px; }
+    ul.delivery_info li { float:left; }
+        ul.delivery_info li.fore1, ul.delivery_info li.fore2, ul.delivery_info li.fore3 { width:430px; height:50px; }
+        ul.delivery_info li.fore2,ul.delivery_info li.fore3 { width:125px; text-align:center; line-height:50px; }
+        ul.delivery_info li.fore3 { width:245px; float:right; }
+        ul.delivery_info li.fore1 div.delivery_item { margin:10px; }
+
+div.post_box { width:810px; background:url('../img/appraise_bottom.gif') center bottom no-repeat; }
+    div.post_box div.box_top { background:url('../img/appraise_top.gif') center top no-repeat; height:11px; text-indent:-10000px; overflow:hidden; }
+    table.post_table{ width:750px; margin:10px; }
+        table.post_table tr th, table.post_table tr td { padding:10px 5px; }
+        table.post_table tr th { width: 100px; font-weight: normal; text-align:right; }
+table.post_table tr td input.appraise_input,table.post_table tr td textarea.appraise_input { border:solid 1px #ccc; padding:5px; }
+        table.post_table tr td input.appraise_img { width: 85px; height: 85px; text-align: center; color: #666; border: solid 1px #ccc; background: none; vertical-align:middle; }
+
+ul.img_list { height:85px; margin-right:10px; }
+    ul.img_list li { width:85px; height:85px; margin:5px; border:solid 1px #ccc; overflow:hidden; float:left; position:relative; }
+        ul.img_list li span { width:79px; height:79px; padding:3px; background:#000; opacity:0.4; display:block; position:absolute; left:0px; top:0px; text-align:right; display:none; }
+        ul.img_list li span.hover { display:block; }
+            ul.img_list li span a { color:#fff; }
+        ul.img_list li.upbtn { border:none; }
+        ul.img_list li img,ul.img_list li a img { width: 85px; height: 85px; vertical-align:middle; }
+div.statistic { clear:both; padding-left:10px; color:#333; line-height:32px; }

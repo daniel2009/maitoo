@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.AccountDao">
+
+	<resultMap id="account_result_map" type="com.meitao.model.Account">
+		<id column="user_id" property="userId" javaType="String" />
+		<result column="rmb" property="rmb" javaType="String" />
+		<result column="usd" property="usd" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<association property="user" column="user_id" select="com.meitao.dao.UserDao.getUserById"></association>
+		<collection property="details" column="user_id" select="com.meitao.dao.AccountDetailDao.getAccountDetailByUserId"></collection>
+	</resultMap>
+
+	<resultMap id="credit_result_map" type="com.meitao.model.Credit">
+		<result column="id" property="id" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="address1" property="address1" javaType="String" />
+		<result column="address2" property="address2" javaType="String" />
+		<result column="city" property="city" javaType="String" />
+		<result column="province" property="province" javaType="String" />
+		<result column="zip_code" property="zipCode" javaType="String" />
+		<result column="type" property="type" javaType="String" />
+		<result column="credit_no" property="creditNo" javaType="String" />
+		<result column="credit_security_code" property="creditSecurityCode"
+			javaType="String" />
+		<result column="expire_year" property="expireYear" javaType="String" />
+		<result column="expire_month" property="expireMonth" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+	</resultMap>
+
+	<insert id="insertCredit" parameterType="com.meitao.model.Credit"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		credit_info(user_id,
+		name, address1, address2, city, province,
+		zip_code, type, credit_no,
+		credit_security_code, expire_year,
+		expire_month, modify_date)
+		values(#{userId}, #{name}, #{address1},
+		#{address2}, #{city},
+		#{province}, #{zipCode},
+		#{type}, #{creditNo},
+		#{creditSecurityCode},
+		#{expireYear}, #{expireMonth},
+		#{modifyDate})
+	</insert>
+	
+	<update id="updateCredit" parameterType="com.meitao.model.Credit">
+		update credit_info
+		set name=#{name},
+		address1=#{address1},
+		address2=#{address2},
+		city=#{city},
+		province=#{province},
+		zip_code=#{zipCode},
+		type=#{type},
+		credit_no=#{creditNo},
+		credit_security_code=#{creditSecurityCode},
+		expire_year=#{expireYear},
+		expire_month=#{expireMonth},
+		modify_date=#{modifyDate}
+		where id=#{id}
+	</update>
+
+	<select id="getCreditById" parameterType="java.lang.String"
+		resultMap="credit_result_map">
+		select * from credit_info where id=#{id}
+	</select>
+
+	<select id="getCreditsByUserId" parameterType="java.lang.String"
+		resultMap="credit_result_map">
+		select * from credit_info where user_id=#{userId}
+	</select>
+
+	<insert id="insertOrUpdateAccount" parameterType="com.meitao.model.Account">
+		insert into account(user_id,rmb,usd,create_date,modify_date)
+		values(#{userId}, #{rmb}, #{usd}, #{createDate}, #{modifyDate})
+		on
+		duplicate key update
+		rmb = rmb + #{rmb},
+		usd = usd + #{usd},
+		modify_date=#{modifyDate}
+	</insert>
+	
+	<update id="modifyAccount" parameterType="com.meitao.model.Account">
+		update account
+		set rmb=#{rmb},
+		usd=#{usd},
+		modify_date=#{modifyDate}
+		where user_id=#{userId}
+	</update>
+
+	<delete id="deleteAccountByUserIds">
+		delete from account
+		where user_id in
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+		
+	<delete id="deleteCreditByUserIds">
+		delete from credit_info
+		where user_id in
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="getAccountByUserId" parameterType="java.lang.String" resultMap="account_result_map">
+		select * from account where user_id=#{userId}
+	</select>
+	
+	<update id="rechargeRmb">
+		UPDATE account SET rmb = rmb+#{amount}, modify_date=#{modifyDate} WHERE user_id=#{userId}
+	</update>
+	<select id="checkIfScanPay" resultType="java.lang.Integer">
+		SELECT COUNT(user_id) FROM account WHERE user_id=#{userId} AND modify_date=#{modifyDate}
+	</select>
+</mapper>

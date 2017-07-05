@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.MessageDao">
+
+	<sql id="all_column">message.id,message.user_id,message.state,message.user_name,message.content,message.create_date,message.modify_date,message.parent_id
+	</sql>
+
+	<resultMap id="basic_result_map" type="com.meitao.model.Message">
+		<id column="id" property="id" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="user_name" property="userName" javaType="String" />
+		<result column="content" property="content" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="parent_id" property="parentId" javaType="String" />
+		<result column="groupid" property="groupId" javaType="String" />
+		<collection column="id" property="replyMessages"
+			select="retrieveMessagesByParentId"></collection>
+	</resultMap>
+
+	<insert id="insertMessage" parameterType="com.meitao.model.Message">
+		insert into
+		message(user_id,user_name,content,create_date,modify_date,parent_id,state)
+		values(#{userId},#{userName},#{content},#{createDate},#{modifyDate},#{parentId},#{state})
+	</insert>
+
+	<select id="retrieveMessages" resultMap="basic_result_map">
+		select
+		<include refid="all_column" />
+		from message
+		where message.user_id=#{userId} and message.parent_id='-1'
+		order by message.modify_date desc
+		limit #{index},#{size}
+	</select>
+
+	<select id="retrieveMessagesByParentId" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select
+		<include refid="all_column" />
+		from message
+		where message.parent_id=#{id}
+		order by message.modify_date desc
+	</select>
+
+	<select id="searchMessageByKey" resultMap="basic_result_map">
+		select
+		<include refid="all_column" />
+		from message
+		where message.content like #{key}
+		<if test="state != null and state!=''">
+		 	and state=#{state}
+		</if>
+		<if test="userId != null and userId!=''">
+			and user_id=#{userId}
+		</if>
+		and message.parent_id='-1' 
+		order by message.modify_date desc
+		limit
+		#{index},#{size}
+	</select>
+
+	<select id="count" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(*) from message where message.user_id = #{userId} and
+		message.parent_id='-1'
+	</select>
+
+	<select id="countByKey" resultType="java.lang.Integer">
+		select count(*) from message
+		where message.content like #{key}
+		<if test="state != null and state!=''">
+		 	and state=#{state}
+		</if>
+		<if test="userId != null and userId!=''">
+			and user_id=#{userId}
+		</if>
+		and message.parent_id='-1'
+	</select>
+
+	<update id="updateModifyDate">
+		update message
+		set modify_date=#{date},state=#{state}
+		where id=#{id}
+	</update>
+</mapper>

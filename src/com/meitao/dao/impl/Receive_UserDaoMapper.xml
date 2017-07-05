@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.Receive_UserDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.Receive_User">
+		<id column="id" property="id" javaType="String" />
+		<result column="phone" property="phone" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="address" property="address" javaType="String" />
+		<result column="dist" property="dist" javaType="String" />
+		<result column="city" property="city" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="company" property="company" javaType="String" />
+		<result column="email" property="email" javaType="String" />
+		<result column="zipcode" property="zipcode" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="use_state" property="useState" javaType="String" />
+		<result column="cardurl" property="cardurl" javaType="String" />
+		<result column="cardother" property="cardother" javaType="String" />
+		<result column="cardtogether" property="cardtogether" javaType="String" />
+		<result column="cardid" property="cardid" javaType="String" />
+		<result column="secondName" property="secondName" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="cardlibId" property="cardlibId" javaType="String" />
+		<result column="uploadflag" property="uploadflag" javaType="String" />
+		<result column="cardid_flag" property="cardid_flag" javaType="String" />
+		
+	</resultMap>
+
+	<select id="getById" resultMap="basic_result_map">
+		select * from `receive_users` where id=#{id}
+	</select>
+
+	<insert id="insertReceiveUser" parameterType="com.meitao.model.Receive_User"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		receive_users(phone,name,address,dist,city,state,company,email,zipcode,create_date,modify_date,use_state,cardurl,cardother,cardtogether,cardid,secondName,remark,user_id,cardlibId,uploadflag,cardid_flag)
+		values(#{phone},#{name},#{address},#{dist},#{city},#{state},#{company},#{email},#{zipcode},#{createDate},#{modifyDate},#{useState},#{cardurl},#{cardother},#{cardtogether},#{cardid},#{secondName},#{remark},#{userId},#{cardlibId},#{uploadflag},#{cardid_flag})
+	</insert>
+	
+	
+	<select id="countOfReceiveUser" parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		select count(*) from `receive_users`
+		<where>
+			<if test="info!=null and info!=''">
+				`receive_users`.phone like #{info} or `receive_users`.name like #{info} or `receive_users`.company like #{info} or `receive_users`.email like #{info}
+			</if>
+		</where>
+	</select>
+
+	<select id="searchReceiveUser" resultMap="basic_result_map">
+		select `receive_users`.* from `receive_users`
+		<where>
+			<if test="info!=null and info!=''">
+				`receive_users`.phone like #{info} or `receive_users`.name like #{info} or `receive_users`.company like #{info} or `receive_users`.email like #{info}
+			</if>
+		</where>
+		order by `receive_users`.modify_date desc
+		limit #{index},#{size}
+	</select>
+	
+	<!-- <update id="modifymatchinfo">
+		update`receive_users`
+		set `secondName`=#{secondName},
+		`cardid`=#{cardid},
+		`cardtogether`=#{cardtogether},
+		`modify_date`=#{modifyDate},
+		`remark`=#{remark}
+		where id = #{id}
+	</update> -->
+	<update id="modifymatchinfo">
+		update`receive_users`
+		set `secondName`=#{secondName},
+		`modify_date`=#{modifyDate},
+		`remark`=#{remark},
+		`cardlibId`=#{cardlibId}
+		where id = #{id}
+	</update>
+	
+	<update id="modifyuploadcardinfo">
+		update `receive_users`
+		set 
+		`cardid`=#{cardid},
+		`cardurl`=#{cardurl},
+		`cardother`=#{cardother},
+		`cardtogether`=#{cardtogether},
+		`modify_date`=#{modifyDate},
+		`uploadflag`=#{uploadflag},
+		`cardid_flag`=#{cardid_flag}
+		where id = #{id}
+	</update>
+	
+	<update id="updateRuser" parameterType="com.meitao.model.Receive_User">
+		update `receive_users`
+		set name=#{name}, phone=#{phone} ,
+		address=#{address} ,dist=#{dist} ,
+		city=#{city} ,
+		state=#{state} , zipcode=#{zipcode}
+		, modify_date=#{modifyDate}, 
+		`cardid`=#{cardid},
+		`cardurl`=#{cardurl},
+		`cardother`=#{cardother},
+		`cardtogether`=#{cardtogether},
+		`modify_date`=#{modifyDate},
+		`cardid_flag`=#{cardid_flag}
+		where id=#{id} 
+		<if test="userId!=null and userId!=''">
+			and user_id=#{userId}
+		</if>
+		
+		
+	
+	</update>
+	
+	<update id="updatecardid_flag">
+		update `receive_users`
+		set cardid_flag=#{cardid_flag},
+		modify_date=#{modifyDate}
+		where id=#{id}
+	</update>
+	<select id="get_allneedverfycardid" resultType="java.lang.Integer">
+		select count(`receive_users`.id) from `receive_users`
+		where `receive_users`.name !='' and `receive_users`.name !='null' 
+		and `receive_users`.cardid !='' and `receive_users`.cardid !='null'
+		and `receive_users`.cardtogether !='' and `receive_users`.cardtogether !='null'
+		and `receive_users`.cardid_flag !='1' and `receive_users`.cardid_flag !='2' and `receive_users`.cardid_flag !='-10'
+	</select>
+	
+	<select id="getOneNeedverfyCardid" resultMap="basic_result_map">
+		select * from `receive_users` 
+		where `receive_users`.name !='' and `receive_users`.name !='null' 
+		and `receive_users`.cardid !='' and `receive_users`.cardid !='null'
+		and `receive_users`.cardtogether !='' and `receive_users`.cardtogether !='null'
+		and `receive_users`.cardid_flag !='1' and `receive_users`.cardid_flag !='2' and `receive_users`.cardid_flag !='-10'
+		limit 1
+	</select>
+	
+	
+	
+</mapper>

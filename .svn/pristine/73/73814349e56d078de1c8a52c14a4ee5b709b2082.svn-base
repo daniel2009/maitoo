@@ -1,0 +1,238 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+    pageEncoding="utf-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>全球速递  美国快递公司 专为华人美国购物 海淘 转运</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" href='css/bootstrap.css' type="text/css" media="screen">
+<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/inner.css" type="text/css" media="screen">
+<link rel="stylesheet" href="demo/switcher.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/es-carousel.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/prettyphoto.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/color1.css" type="text/css" id="theme" />
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<!-- CSS STYLE -->
+
+<link rel="stylesheet" href='css/common.css'> 
+<link rel="stylesheet" type="text/css" media="all" href="css/style3.css">
+<link id="main_stylesheet" rel="stylesheet" href='css/indexstyle.css' type="text/css">
+<link rel="stylesheet" type="text/css" href='css/common1.css'>
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css" media="screen" />
+
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css" media="screen" />
+<!-- REVOLUTION BANNER CSS SETTINGS -->
+<link rel="stylesheet" href="css/rs-plugin/settings.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/captions.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/portfolio.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/portfolio-shape.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/elements.css" type="text/css" media="screen">
+<!--[if lt IE 9]>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+  <![endif]-->
+</head>
+<body class="home-page stretched">
+<div id="wrapper">
+		<%@ include file="header.jsp" %>
+			<!--==============================content=================================-->
+
+			<div class="breadcrumb-wrapper">
+				<div class="shadowdrop"></div>
+				<div class="container">
+					<h2>上门取件</h2>
+					<ul class="breadcrumb fright">
+						<li><a href="index.jsp">首页</a> <span class="divider">/</span>
+						</li>
+						<li class="active">上门取件</li>
+					</ul>
+				</div>
+			</div>
+			<div class="container">
+					<div class="span9" style="margin-top: 30px;margin-buttom: 30px;">
+
+
+					<table >
+			<tr>
+				<th><span class="red">*</span>寄件人：</th>
+				<td><input type="text" size="30" name="name"/></td>
+			</tr>
+			<tr>
+				<th><span class="red">*</span>寄件人国家、州：</th>
+				<td>
+					<select  id="usa_province" ></select> 
+					<select id="usa_city" name="province"></select>
+				</td>
+			</tr>
+			<tr>
+				<th><span class="red">*</span>寄件详细地址：</th>
+				<td><input type="text" size="30" name="sadd" /></td>
+			</tr>
+			<tr>
+				<th><span class="red">*</span>寄件人邮编：</th>
+				<td><input type="text" size="30" name="zcode"/>
+				</td>
+			</tr>
+			<tr>
+				<th><span class="red">*</span>寄件人手机：</th>
+				<td><input type="text" size="30" name="phone" />
+				</td>
+			</tr>
+			<tr>
+				<th><span class="red">*</span>包裹个数：</th>
+				<td><input type="text" name="quantity" value="1" size="30"
+					style="width:100px;" />
+				</td>
+			</tr>
+			<tr>
+				<th><span class="red">*</span>货物大概重量(磅)：</th>
+				<td><input type="text" name="weight" value="1.0" size="30"
+					style="width:100px;" />
+				</td>
+			</tr>
+			
+			<tr>
+				<th>&nbsp;</th>
+				<td>
+					<a href="javascript:savesmqj()" class="btn btn-info" data-type="submit">提交</a>
+					&nbsp;&nbsp;&nbsp;&nbsp;
+					<a href="javascript:reset()" class="btn btn-warning" data-type="reset">清空</a>
+				</td>
+			</tr>
+		</table><br/>
+					
+					</div>
+				</div>
+
+ <%@ include file="footer.jsp" %>
+</div>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/usalocation.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/usaarea.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	showusaLocation();
+});
+
+function savesmqj() {
+	var name = $(":text[name='name']").val();
+	var province = $("#usa_city option:checked").text(); // 省份
+	var sadd = $(":text[name='sadd']").val();
+	var phone = $(":text[name='phone']").val();
+	var zipCode = $(":text[name='zcode']").val();
+	var weight = $(":text[name='weight']").val();
+	var quantity = $(":text[name='quantity']").val();
+	var validate = true;
+	if(name==null||name==""){
+		$(":text[name='name']").css({ "border-color": "red" });
+		$(":text[name='name']").change(function(){
+			if($(":text[name='name']").val()!=null)
+				$(":text[name='name']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	
+	if(province=="state"||province==null){
+		$("#usa_city").css({ "border-color": "red" });
+		$("#usa_city").change(function(){
+			if($("#usa_city").text()!=null&&$("#usa_city").text()!="state")
+				$("#usa_city").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	
+	if(sadd==null||sadd==""){
+		$(":text[name='sadd']").css({ "border-color": "red" });
+		$(":text[name='sadd']").change(function(){
+			if($(":text[name='sadd']").val()!=null)
+				$(":text[name='sadd']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	if(phone==null||phone==""){
+		$(":text[name='phone']").css({ "border-color": "red" });
+		$(":text[name='phone']").change(function(){
+			if($(":text[name='phone']").val()!=null)
+				$(":text[name='phone']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	if(zipCode==null||zipCode==""){
+		$(":text[name='zcode']").css({ "border-color": "red" });
+		$(":text[name='zcode']").change(function(){
+			if($(":text[name='zcode']").val()!=null)
+				$(":text[name='zcode']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	if(weight==""||weight==null||isNaN(weight)||weight=="0"){
+		$(":text[name='weight']").css({ "border-color": "red" });
+		$(":text[name='weight']").change(function(){
+			if($(":text[name='weight']").val()!=null&&!isNaN($(":text[name='weight']").val())&&$(":text[name='weight']").val()>0)
+				$(":text[name='weight']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	
+	if(quantity==""||quantity==null||isNaN(quantity)||quantity=="0"){
+		$(":text[name='quantity']").css({ "border-color": "red" });
+		$(":text[name='quantity']").change(function(){
+			if($(":text[name='quantity']").val()!=null&&!isNaN($(":text[name='quantity']").val())&&$(":text[name='quantity']").val()>0)
+				$(":text[name='quantity']").css({ "border-color": "" });
+		});
+		validate = false;
+	}
+	
+	if(!validate){
+		alert("红色框中的信息必须正确填写，才可以提交！");
+		return;
+	}
+	$.ajax({
+		type:"post",
+		url:"call_order/add",
+		data:{
+			"name":name,
+			"province":province,
+			"sadd":sadd,
+			"phone":phone,
+			"zcode":zipCode,
+			"weight":weight,
+			"quantity":quantity,
+			"type":"0"
+		},
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				alert("提交成功");
+				//nav74Click();
+				//window.location.href = "zhengjiadizi.jsp";
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("添加失败，原因是:" + response.message);
+			}
+		}
+	});
+	return false;
+}
+function reset() {
+	$(":text[name='name']").val("");
+	$(":text[name='sadd']").val("");
+	$(":text[name='phone']").val("");
+	$(":text[name='zcode']").val("");
+	$(":text[name='weight']").val("1.0");
+	$(":text[name='quantity']").val("1");
+	return false;
+}
+</script>
+</body>
+</html>

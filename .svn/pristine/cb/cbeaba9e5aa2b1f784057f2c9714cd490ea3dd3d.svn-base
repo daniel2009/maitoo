@@ -1,0 +1,1131 @@
+package com.weiye.controller;
+
+import java.io.File;
+import java.net.URLDecoder;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.weiye.common.composepics.imgcompose;
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.ConsigneeInfoUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ConsigneeInfo;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.User;
+import com.weiye.service.ConsigneeInfoService;
+import com.weiye.service.UserService;
+
+@Controller
+public class ConsigneeInfoController extends BasicController {
+
+	private static final long serialVersionUID = 1455632086294967055L;
+	private static final Logger log = Logger
+			.getLogger(ConsigneeInfoController.class);
+
+	@Resource(name = "consigneeInfoService")
+	private ConsigneeInfoService consigneeInfoService;
+	@Value(value = "${save_card_dir}")
+	private String saveCardDir;
+	@Value(value = "${default_img_size}")
+	private long defaultCardFileSize;
+	@Value(value = "${default_img_type}")
+	private String defaultCardFileType;
+
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+
+	@Resource(name = "userService")
+	private UserService userService;
+
+	@RequestMapping(value = "/admin/consignee/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addConsigneeByAdmin(
+			HttpServletRequest request,
+			@RequestParam(value = "cUserId", required = false) String userId,
+			@RequestParam(value = "cName", required = false) String name,
+			@RequestParam(value = "cProvince", required = false) String province,
+			@RequestParam(value = "cCity", required = false) String city,
+			@RequestParam(value = "cDistrict", required = false) String district,
+			@RequestParam(value = "cStreetAddress", required = false) String sAdd,
+			@RequestParam(value = "cZipCode", required = false) String zcode,
+			@RequestParam(value = "cPhone", required = false) String phone,
+			@RequestParam(value = "cPhone", required = false) String telephone,
+			// @RequestParam(value = "cid", required = false, defaultValue = "")
+			// String cid,
+			@RequestParam(value = "cardidname", required = false, defaultValue = "") String cid,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+		if (!ConsigneeInfoUtil.validateConsigneeName(name)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_NAME_ERROR,
+					"收货人姓名不正确，请重新输入!");
+		}
+
+		if (!ConsigneeInfoUtil.validateProvince(province)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_PROVINCE_ERROR, "省份填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCity(city)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CITY_ERROR,
+					"市填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateDistrict(district)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_DISTRICT_ERROR, "区填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateStreetAddress(sAdd)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_STREET_ADDRESS_ERROR,
+					"街道地址填写不正确，请重新输入！");
+		}
+
+		if ((!StringUtil.isEmpty(zcode))&&(!ConsigneeInfoUtil.validateZipCode(zcode))) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_ZIP_CODE_ERROR, "邮编填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(phone)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateTelephone(telephone)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_TELEPHONE_ERROR, "固定电话填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCardId(cid)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"身份证号码填写错误，请重新填写！");
+		}
+
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator = "";
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+
+		String fileName = null;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		}
+
+		String fileNameother = null;
+		if (fileother != null && fileother.getSize() > 0) {
+			if (fileother.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = fileother.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileNameother = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "other" + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			String temp = originalName.substring(index);
+			try {
+				File file2 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother);
+				fileother.transferTo(file2);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		}
+
+		ConsigneeInfo consigneeInfo = new ConsigneeInfo();
+		consigneeInfo.setUserId(userId);
+		consigneeInfo.setName(name);
+		consigneeInfo.setProvince(province);
+		consigneeInfo.setCity(city);
+		consigneeInfo.setDistrict(district);
+		consigneeInfo.setStreetAddress(sAdd);
+		consigneeInfo.setPhone(phone);
+		consigneeInfo.setTelephone(telephone);
+		consigneeInfo.setZipCode(zcode);
+		consigneeInfo.setCardId(cid);
+		consigneeInfo.setCardUrl(fileName);
+		consigneeInfo.setCardurlother(fileNameother);
+		if ((fileName != null) && (fileNameother != null)) {
+			imgcompose img = new imgcompose();
+			String str1 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileName;
+			String str2 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileNameother;
+			String str3 = this.saveCardDir + File.separator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "together"
+					+ "_" + StringUtil.generateRandomInteger(5);
+			String filecardtemp = str3;
+			str3 = request.getSession().getServletContext().getRealPath("/")
+					+ str3;
+			if (img.createcompics(str1, str2, str3)) {
+				filecardtemp = filecardtemp + ".jpg";
+				consigneeInfo.setCardurltogether(filecardtemp);
+			}
+		}
+
+		try {
+			return this.consigneeInfoService.saveConsigneeInfo(consigneeInfo);
+		} catch (Exception e) {
+			log.error("保存用户收货地址到数据库失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"添加收件人失败，请重新尝试或者联系客服！");
+		}
+	}
+
+	@RequestMapping(value = "/admin/consignee/add_no_pic", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addConsigneeWithNoPicByAdmin(
+			HttpServletRequest request,
+			@RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "from_user_name") String userPhone,
+			@RequestParam(value = "from_user_real_name") String userName,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_NAME) String name,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PROVINCE) String province,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CITY) String city,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_DISTRICT) String district,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_STREET_ADDRESS) String sAdd,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_ZIP_CODE) String zcode,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PHONE) String phone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_TELEPHONE, required = false) String telephone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_ID, required = false, defaultValue = "") String cid) {
+		if (!ConsigneeInfoUtil.validateConsigneeName(name)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_NAME_ERROR,
+					"收货人姓名不正确，请重新输入!");
+		}
+
+		/*if (!ConsigneeInfoUtil.validateProvince(province)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_PROVINCE_ERROR, "省份填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCity(city)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CITY_ERROR,
+					"市填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateDistrict(district)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_DISTRICT_ERROR, "区填写不正确，请重新输入！");
+		}*/
+
+		if (!ConsigneeInfoUtil.validateStreetAddress(sAdd)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_STREET_ADDRESS_ERROR,
+					"街道地址填写不正确，请重新输入！");
+		}
+
+		if ((!StringUtil.isEmpty(zcode))&&(!ConsigneeInfoUtil.validateZipCode(zcode))) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_ZIP_CODE_ERROR, "邮编填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(userPhone)) {
+			return generateResponseObject(ResponseCode.USER_PHONE_ERROR,
+					"用户手机号码填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(phone)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateTelephone(telephone)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_TELEPHONE_ERROR, "固定电话填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCardId(cid)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"2身份证号码填写错误，请重新填写！");
+		}
+
+		String fileName = null;
+
+		ConsigneeInfo consigneeInfo = new ConsigneeInfo();
+		User user = null;
+		try {
+			//user=this.userService.getUserById(id)
+			if(!StringUtil.isEmpty(id))
+			{
+				 ResponseObject<User> obj = this.userService.getUserById(id);
+				 if((obj!=null)&&(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))&&(obj.getData())!=null)
+				 {
+					 user=obj.getData();
+				 }
+				 else
+				 {
+					 user = this.userService.getUserByPhone(userPhone).getData();
+				 }
+			}else
+			{
+				user = this.userService.getUserByPhone(userPhone).getData();
+			}
+		} catch (ServiceException e) {
+			log.error("获取用户信息异常，请重试！");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取用户信息异常，请重试！");
+		}
+		if (user != null) {
+			consigneeInfo.setUserId(user.getId());
+		} else {
+			User u = new User();
+			
+			u.setPhone(StringUtil.isEmpty(userPhone) ? null : userPhone);
+			u.setRealName(userName);
+			u.setNickName(userPhone);
+			u.setType(Constant.USER_TYPE_STORE);
+			String password = "";
+			for (int i = 0; i < 8; i++) {
+				password += (int) (Math.random() * 10);
+			}
+			u.setPassword(password);
+			ResponseObject<Object> obj = null;
+			try {
+				obj = this.userService.addUser(u);
+			} catch (ServiceException e) {
+				log.error("增加新用户信息异常，请重试！");
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"增加新用户信息异常，请重试！");
+			}
+
+			if (obj.getCode() == ResponseCode.SUCCESS_CODE) {
+				Map<String, String> map = (Map<String, String>) obj.getData();
+				String userId = map.get("id");
+				consigneeInfo.setUserId(userId);
+			} else {
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"增加用户信息异常！");
+			}
+		}
+
+		consigneeInfo.setName(name);
+		consigneeInfo.setProvince(province);
+		consigneeInfo.setCity(city);
+		consigneeInfo.setDistrict(district);
+		consigneeInfo.setStreetAddress(sAdd);
+		consigneeInfo.setPhone(phone);
+		consigneeInfo.setTelephone(telephone);
+		consigneeInfo.setZipCode(zcode);
+		consigneeInfo.setCardId(cid);
+		consigneeInfo.setCardUrl(fileName);
+
+		try {
+			return this.consigneeInfoService.saveConsigneeInfo(consigneeInfo);
+		} catch (Exception e) {
+			log.error("保存用户收货地址到数据库失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"添加收件人失败，请重新尝试或者联系客服！");
+		}
+	}
+
+	@RequestMapping(value = "/consignee/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addConsignee(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_NAME) String name,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PROVINCE) String province,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CITY) String city,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_DISTRICT) String district,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_STREET_ADDRESS) String sAdd,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_ZIP_CODE) String zcode,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PHONE) String phone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_TELEPHONE, required = false) String telephone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_ID, required = false, defaultValue = "") String cid,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+		if (!ConsigneeInfoUtil.validateConsigneeName(name)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_NAME_ERROR,
+					"收货人姓名不正确，请重新输入!");
+		}
+
+		/*if (!ConsigneeInfoUtil.validateProvince(province)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_PROVINCE_ERROR, "省份填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCity(city)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CITY_ERROR,
+					"市填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateDistrict(district)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_DISTRICT_ERROR, "区填写不正确，请重新输入！");
+		}*/
+
+		if (!ConsigneeInfoUtil.validateStreetAddress(sAdd)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_STREET_ADDRESS_ERROR,
+					"街道地址填写不正确，请重新输入！");
+		}
+
+		if ((!StringUtil.isEmpty(zcode))&&!ConsigneeInfoUtil.validateZipCode(zcode)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_ZIP_CODE_ERROR, "邮编填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(phone)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateTelephone(telephone)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_TELEPHONE_ERROR, "固定电话填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCardId(cid)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"3身份证号码填写错误，请重新填写！");
+		}
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator;
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+
+		String fileName = null;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+
+			fileName = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		}
+
+		String fileNameother = null;
+		if (fileother != null && fileother.getSize() > 0) {
+			if (fileother.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = fileother.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+
+			index = Math.max(index, 0);
+			fileNameother = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "other" + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			String temp = originalName.substring(index);
+			try {
+				File file2 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother);
+				fileother.transferTo(file2);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		}
+
+		ConsigneeInfo consigneeInfo = new ConsigneeInfo();
+		consigneeInfo.setUserId(userId);
+		consigneeInfo.setName(name);
+		consigneeInfo.setProvince(province);
+		consigneeInfo.setCity(city);
+		consigneeInfo.setDistrict(district);
+		consigneeInfo.setStreetAddress(sAdd);
+		consigneeInfo.setPhone(phone);
+		consigneeInfo.setTelephone(telephone);
+		consigneeInfo.setZipCode(zcode);
+		consigneeInfo.setCardId(cid);
+		consigneeInfo.setCardUrl(fileName);
+		consigneeInfo.setCardurlother(fileNameother);
+		if ((fileName != null) && (fileNameother != null)) {
+			imgcompose img = new imgcompose();
+			String str1 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileName;
+			String str2 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileNameother;
+			String str3 = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "together"
+					+ "_" + StringUtil.generateRandomInteger(5);
+			String filecardtemp = str3;
+			str3 = request.getSession().getServletContext().getRealPath("/")
+					+ str3;
+			if (img.createcompics(str1, str2, str3)) {
+				filecardtemp = filecardtemp + ".jpg";
+				consigneeInfo.setCardurltogether(filecardtemp);
+			}
+		}
+		try {
+			return this.consigneeInfoService.saveConsigneeInfo(consigneeInfo);
+		} catch (Exception e) {
+			log.error("保存用户收货地址到数据库失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"添加收件人失败，请重新尝试或者联系客服！");
+		}
+	}
+
+	@RequestMapping(value = "/consignee/add_no_pic", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addConsigneeWithNoPic(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_NAME) String name,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PROVINCE) String province,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CITY) String city,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_DISTRICT) String district,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_STREET_ADDRESS) String sAdd,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_ZIP_CODE) String zcode,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PHONE) String phone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_TELEPHONE, required = false) String telephone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_ID, required = false, defaultValue = "") String cid) {
+		if (!ConsigneeInfoUtil.validateConsigneeName(name)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_NAME_ERROR,
+					"收货人姓名不正确，请重新输入!");
+		}
+
+		/*if (!ConsigneeInfoUtil.validateProvince(province)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_PROVINCE_ERROR, "省份填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCity(city)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CITY_ERROR,
+					"市填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateDistrict(district)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_DISTRICT_ERROR, "区填写不正确，请重新输入！");
+		}*/
+
+		if (!ConsigneeInfoUtil.validateStreetAddress(sAdd)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_STREET_ADDRESS_ERROR,
+					"街道地址填写不正确，请重新输入！");
+		}
+
+		if ((!StringUtil.isEmpty(zcode))&&!ConsigneeInfoUtil.validateZipCode(zcode)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_ZIP_CODE_ERROR, "邮编填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(phone)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateTelephone(telephone)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_TELEPHONE_ERROR, "固定电话填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCardId(cid)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"4身份证号码填写错误，请重新填写！");
+		}
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+		String fileName = null;
+
+		ConsigneeInfo consigneeInfo = new ConsigneeInfo();
+		consigneeInfo.setUserId(userId);
+		consigneeInfo.setName(name);
+		consigneeInfo.setProvince(province);
+		consigneeInfo.setCity(city);
+		consigneeInfo.setDistrict(district);
+		consigneeInfo.setStreetAddress(sAdd);
+		consigneeInfo.setPhone(phone);
+		consigneeInfo.setTelephone(telephone);
+		consigneeInfo.setZipCode(zcode);
+		consigneeInfo.setCardId(cid);
+		consigneeInfo.setCardUrl(fileName);
+
+		try {
+			return this.consigneeInfoService.saveConsigneeInfo(consigneeInfo);
+		} catch (Exception e) {
+			log.error("保存用户收货地址到数据库失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"添加收件人失败，请重新尝试或者联系客服！");
+		}
+	}
+
+	@RequestMapping(value = "/consignee/del", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> delConsignee(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_ID) String id) {
+		if (!ConsigneeInfoUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_ID_ERROR,
+					"收货地址id不符合规定");
+		}
+		try {
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			return this.consigneeInfoService.deleteConsigneeInfo(id, userId);
+		} catch (Exception e) {
+			log.error("根据收货人id删除信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"删除失败，请重新尝试!");
+		}
+	}
+
+	// kai 20150921 添加身份反面图片处理
+	@RequestMapping(value = "/consignee/modify", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyConsignee(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_ID) String id,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_NAME) String name,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PROVINCE) String province,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CITY) String city,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_DISTRICT) String district,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_STREET_ADDRESS) String sAdd,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_ZIP_CODE) String zcode,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PHONE) String phone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_TELEPHONE, required = false) String telephone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_ID, required = false, defaultValue = "") String cid,
+			@RequestParam(value = "old_file", required = false, defaultValue = "") String oldFilePath,
+			@RequestParam(value = "old_fileother", required = false, defaultValue = "") String oldFilePathother,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+		if (!ConsigneeInfoUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_ID_ERROR,
+					"收件人信息id不正确，请重新尝试！");
+		}
+		if (!ConsigneeInfoUtil.validateConsigneeName(name)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_NAME_ERROR,
+					"收货人姓名不正确，请重新输入!");
+		}
+
+		/*if (!ConsigneeInfoUtil.validateProvince(province)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_PROVINCE_ERROR, "省份填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCity(city)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CITY_ERROR,
+					"市填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateDistrict(district)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_DISTRICT_ERROR, "区填写不正确，请重新输入！");
+		}
+*/
+		if (!ConsigneeInfoUtil.validateStreetAddress(sAdd)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_STREET_ADDRESS_ERROR,
+					"街道地址填写不正确，请重新输入！");
+		}
+
+		if ((!StringUtil.isEmpty(zcode))&&!ConsigneeInfoUtil.validateZipCode(zcode)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_ZIP_CODE_ERROR, "邮编填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(phone)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateTelephone(telephone)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_TELEPHONE_ERROR, "固定电话填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCardId(cid)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"5身份证号码填写错误，请重新填写！");
+		}
+
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator = "";
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+		String fileName = null;
+		boolean togetherflag = false;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+				togetherflag = true;
+				// 删除原来的图片
+				File oldFile = new File(request.getSession()
+						.getServletContext().getRealPath(oldFilePath));
+				if (oldFile.exists()) {
+					try {
+						oldFile.delete();
+					} catch (Exception e) {
+						// ignore
+					}
+				}
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！");
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+
+			if ((oldFilePath == null) || (oldFilePath.equalsIgnoreCase(""))) {
+				fileName = null;
+			} else {
+				// fileName=oldFilePath;
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ oldFilePath);
+				if (file3.exists()) {
+					fileName = oldFilePath;
+				} else {
+					fileName = null;
+				}
+			}
+		}
+
+		String fileNameother = null;
+		if (fileother != null && fileother.getSize() > 0) {
+			if (fileother.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = fileother.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileNameother = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "other" + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file2 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother);
+				fileother.transferTo(file2);
+				togetherflag = true;
+				// 删除原来的图片
+				File oldFile = new File(request.getSession()
+						.getServletContext().getRealPath(oldFilePathother));
+				if (oldFile.exists()) {
+					try {
+						oldFile.delete();
+					} catch (Exception e) {
+						// ignore
+					}
+				}
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！");
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+
+			if ((oldFilePathother == null)
+					|| (oldFilePathother.equalsIgnoreCase(""))) {
+				fileNameother = null;
+			} else {
+				// fileNameother=oldFilePathother;
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ oldFilePathother);
+				if (file3.exists()) {
+					fileNameother = oldFilePathother;
+				} else {
+					fileNameother = null;
+				}
+			}
+		}
+		String cardtogether = null;
+		if (togetherflag == true) {
+			if ((fileName != null) && (fileNameother != null)) {
+				imgcompose img = new imgcompose();
+				String str1 = request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName;
+				String str2 = request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother;
+				String str3 = this.saveCardDir + File.separator + userId + "_"
+						+ StringUtil.generateRandomString(5) + "_" + "together"
+						+ "_" + StringUtil.generateRandomInteger(5);
+				String filecardtemp = str3;
+				str3 = request.getSession().getServletContext()
+						.getRealPath("/")
+						+ str3;
+				if (img.createcompics(str1, str2, str3)) {
+					filecardtemp = filecardtemp + ".jpg";
+					cardtogether = filecardtemp;
+
+				}
+			}
+		}
+
+		ConsigneeInfo consigneeInfo = new ConsigneeInfo();
+		consigneeInfo.setId(id);
+		consigneeInfo.setUserId(userId);
+		consigneeInfo.setName(name);
+		consigneeInfo.setProvince(province);
+		consigneeInfo.setCity(city);
+		consigneeInfo.setDistrict(district);
+		consigneeInfo.setStreetAddress(sAdd);
+		consigneeInfo.setPhone(phone);
+		consigneeInfo.setTelephone(telephone);
+		consigneeInfo.setZipCode(zcode);
+		consigneeInfo.setCardId(cid);
+		consigneeInfo.setCardUrl(fileName);
+		consigneeInfo.setCardurlother(fileNameother);
+		consigneeInfo.setCardurltogether(cardtogether);
+
+		try {
+			return this.consigneeInfoService.modifyConsigneeInfo(consigneeInfo);
+		} catch (Exception e) {
+			log.error("修改用户收货地址信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"修改收货地址信息失败，请重新尝试！");
+		}
+	}
+
+	@RequestMapping(value = "/consignee/modify_no_pic", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyConsigneeNoPic(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_ID) String id,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_NAME) String name,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PROVINCE) String province,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CITY) String city,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_DISTRICT) String district,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_STREET_ADDRESS) String sAdd,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_ZIP_CODE) String zcode,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_PHONE) String phone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_TELEPHONE, required = false) String telephone,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_ID, required = false, defaultValue = "") String cid) {
+		if (!ConsigneeInfoUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_ID_ERROR,
+					"收件人信息id不正确，请重新尝试！");
+		}
+		if (!ConsigneeInfoUtil.validateConsigneeName(name)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_NAME_ERROR,
+					"收货人姓名不正确，请重新输入!");
+		}
+
+		/*if (!ConsigneeInfoUtil.validateProvince(province)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_PROVINCE_ERROR, "省份填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCity(city)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CITY_ERROR,
+					"市填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateDistrict(district)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_DISTRICT_ERROR, "区填写不正确，请重新输入！");
+		}*/
+
+		if (!ConsigneeInfoUtil.validateStreetAddress(sAdd)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_STREET_ADDRESS_ERROR,
+					"街道地址填写不正确，请重新输入！");
+		}
+
+		if ((!StringUtil.isEmpty(zcode))&&!ConsigneeInfoUtil.validateZipCode(zcode)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_ZIP_CODE_ERROR, "邮编填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validatePhone(phone)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateTelephone(telephone)) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_TELEPHONE_ERROR, "固定电话填写不正确，请重新输入！");
+		}
+
+		if (!ConsigneeInfoUtil.validateCardId(cid)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"6身份证号码填写错误，请重新填写！");
+		}
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+		String fileName = null;
+
+		ConsigneeInfo consigneeInfo = new ConsigneeInfo();
+		consigneeInfo.setId(id);
+		consigneeInfo.setUserId(userId);
+		consigneeInfo.setName(name);
+		consigneeInfo.setProvince(province);
+		consigneeInfo.setCity(city);
+		consigneeInfo.setDistrict(district);
+		consigneeInfo.setStreetAddress(sAdd);
+		consigneeInfo.setPhone(phone);
+		consigneeInfo.setTelephone(telephone);
+		consigneeInfo.setZipCode(zcode);
+		consigneeInfo.setCardId(cid);
+		consigneeInfo.setCardUrl(fileName);
+		// consigneeInfo.setCardurlother(fileName);
+
+		try {
+			return this.consigneeInfoService.modifyConsigneeInfo(consigneeInfo);
+		} catch (Exception e) {
+			log.error("修改用户收货地址信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"修改收货地址信息失败，请重新尝试！");
+		}
+	}
+
+	@RequestMapping(value = "/consignee/get_one", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<ConsigneeInfo> getById(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_ID) String id) {
+		if (!ConsigneeInfoUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_ID_ERROR,
+					"收件人信息id不正确，请重新尝试！");
+		}
+		try {
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			return this.consigneeInfoService.getById(id, userId);
+		} catch (Exception e) {
+			log.error("根据收货地址id获取信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取信息出现异常!");
+		}
+	}
+
+	@RequestMapping(value = "/consignee/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<ConsigneeInfo>> searchByName(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false, defaultValue = "") String key,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			pageIndex = Math.max(pageIndex, 1);
+			return this.consigneeInfoService.getByName(userId, key,
+					defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("根据收货地址id获取信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取信息出现异常!");
+		}
+	}
+
+	@RequestMapping(value = "/consignee/all", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<ConsigneeInfo>> getAllConsignee(
+			HttpServletRequest request) {
+		try {
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			ResponseObject<PageSplit<ConsigneeInfo>> tmpResult = this.consigneeInfoService
+					.getByName(userId, null, Integer.MAX_VALUE, 1);
+			if (ResponseCode.SUCCESS_CODE.equals(tmpResult.getCode())
+					&& tmpResult.getData() != null) {
+				List<ConsigneeInfo> infos = tmpResult.getData().getDatas();
+				ResponseObject<List<ConsigneeInfo>> result = new ResponseObject<List<ConsigneeInfo>>(
+						ResponseCode.SUCCESS_CODE);
+				result.setData(infos);
+				return result;
+			} else {
+				return generateResponseObject(tmpResult.getCode(),
+						tmpResult.getMessage());
+			}
+		} catch (Exception e) {
+			log.error("获取用户收货地址信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取用户收货地址信息出现异常!");
+		}
+	}
+
+	// 门市件中的收件人
+	@RequestMapping(value = "/admin/consignee/search_by_emp", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<ConsigneeInfo>> searchByNameOfEmp(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false, defaultValue = "") String key,
+			@RequestParam(value = ParameterConstants.USER_ID, required = false, defaultValue = "") String userId,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		String storeId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if (StringUtil.isEmpty(storeId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+					"您不是门店管理员，不能添加查看该用户的收件人地址");
+		}
+
+		try {
+			// String userId =
+			// StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+
+			pageIndex = Math.max(pageIndex, 1);
+			return this.consigneeInfoService.getByName(userId, key,
+					defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("根据收货地址id获取信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取信息出现异常!");
+		}
+	}
+	
+	@RequestMapping(value = "/consignee/searchbyinfo", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<ConsigneeInfo>> searchByinfo(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false, defaultValue = "") String key,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			
+			 key = URLDecoder.decode(key, "UTF-8");
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			pageIndex = Math.max(pageIndex, 1);
+			return this.consigneeInfoService.getByInfo(userId, key,
+					defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("根据收货地址id获取信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取信息出现异常!");
+		}
+	}
+}

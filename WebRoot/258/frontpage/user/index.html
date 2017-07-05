@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <title>用户中心</title>
+
+    <!-- bootstrap & fontawesome -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css" />
+
+    <!-- page specific plugin styles -->
+    <!-- text fonts -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css" />
+
+    <!-- ace styles -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" />
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" />
+    <![endif]-->
+    <!-- inline styles related to this page -->
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css" type="text/css" />
+    <link href="css/usercenter.css" rel="stylesheet" />
+    <!-- ace settings handler -->
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!-- JQuery -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body class="no-skin" style=" overflow-y:hidden;">
+
+
+    <div class="wrapper">
+        <!-- #section:basics/navbar.layout -->
+        <div id="navbar" class="navbar navbar-default">
+            <script type="text/javascript">
+                try { ace.settings.check('navbar', 'fixed') } catch (e) { }
+            </script>
+
+            <div class="navbar-container" id="navbar-container">
+                <!-- #section:basics/sidebar.mobile.toggle -->
+                <button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler" data-target="#sidebar">
+                    <span class="sr-only">Toggle sidebar</span>
+
+                    <span class="icon-bar"></span>
+
+                    <span class="icon-bar"></span>
+
+                    <span class="icon-bar"></span>
+                </button>
+
+                <!-- /section:basics/sidebar.mobile.toggle -->
+                <div id="navheader" class="navbar-header pull-left" style="width:calc(100% - 120px); text-align:center">
+
+                    <a href="#" class="navtitle">
+                        首页
+                    </a>
+
+                    <a href="#" class="navtitle">
+                        关于我们
+                    </a>
+                    <a href="#" class="navtitle">
+                        渠道说明
+                    </a>
+                    <a href="#" class="navtitle">
+                        新闻公告
+                    </a>
+                    <a href="#" class="navtitle">
+                        找到我们
+                    </a>
+
+                    <a href="#" class="navtitle">
+                        退出
+                    </a>
+
+                </div>
+
+                <!-- #section:basics/navbar.dropdown -->
+                <div class="navbar-buttons navbar-header pull-right" role="navigation">
+                    <ul class="nav ace-nav">
+
+
+                        <!-- #section:basics/navbar.user_menu -->
+                        <li class="light-blue">
+                            <a data-toggle="dropdown" href="../Admin/User/Info/1" class="dropdown-toggle" target="main">
+
+                                <span class="user-info">
+
+                                    用户中心
+                                </span>
+
+                                <i class="ace-icon fa fa-caret-down "></i>
+                            </a>
+
+                            <ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                                <li>
+                                    <a href="#" target="_blank">
+                                        <i class="ace-icon fa fa-cog blue"></i>
+                                        网站首页
+                                    </a>
+                                </li>
+
+
+
+                                <li>
+                                    <a href="#" target="main">
+                                        <i class="ace-icon fa fa-user blue"></i>
+                                        个人信息
+                                    </a>
+                                </li>
+
+                                <li class="divider"></li>
+
+                                <li>
+                                    <a href="javascript:adminlogout()">
+                                        <i class="ace-icon fa fa-power-off blue"></i>
+                                        注销
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- /section:basics/navbar.user_menu -->
+                    </ul>
+                </div>
+
+                <!-- /section:basics/navbar.dropdown -->
+            </div>
+            <!-- /.navbar-container -->
+        </div>
+        <!-- /section:basics/navbar.layout -->
+
+        <div class="main-container" id="main-container">
+            <script type="text/javascript">
+                $(function () {
+                    try { ace.settings.check('main-container', 'fixed') } catch (e) { }
+                });
+            </script>
+
+            <!-- #section:basics/sidebar -->
+            <div id="sidebar" class="sidebar responsive">
+                <script type="text/javascript">
+                    $(function () {
+                        try { ace.settings.check('sidebar', 'fixed') } catch (e) { }
+                    });
+                </script>
+
+
+
+                <ul class="nav nav-list">
+                    <li class="active open">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="menu-icon fa fa-user light-orange"></i>
+                            <span class="menu-text">用户中心</span>
+                            <b class="arrow fa fa-angle-down"></b>
+
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="default.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    用户中心首页
+                                </a>
+                                <b class="arrow"></b>
+                                
+                            </li>
+                            <li>
+                                <a href="userifnoedit.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    修改资料
+                                </a>
+                                <b class="arrow"></b>
+
+                            </li>
+                            <li>
+                                <a href="receiveraddress.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    收件地址
+                                </a>
+                                <b class="arrow"></b>
+
+                            </li>
+                            <li>
+                                <a href="default.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    修改密码
+                                </a>
+                                <b class="arrow"></b>
+
+                            </li>
+                            <li>
+                                <a href="default.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    上门取件
+                                </a>
+                                <b class="arrow"></b>
+
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="menu-icon fa fa-truck light-orange"></i>
+                            <span class="menu-text">转运中心</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="add.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    添加页面模板
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+
+                        </ul>
+                    </li>
+
+                    <li >
+                        <a href="#" class="dropdown-toggle">
+                            <i class="menu-icon fa fa-file-text light-orange"></i>
+                            <span class="menu-text">运单中心</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="add.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    添加页面模板
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+
+                        </ul>
+                    </li>
+
+                </ul>
+                <!-- /.nav-list -->
+                <!-- #section:basics/sidebar.layout.minimize -->
+                <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+                    <i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
+                </div>
+
+                <!-- /section:basics/sidebar.layout.minimize -->
+                <script type="text/javascript">
+                    $(function () {
+                        try { ace.settings.check('sidebar', 'collapsed') } catch (e) { }
+                    })
+                </script>
+            </div>
+
+            <!-- /section:basics/sidebar -->
+            <div class="main-content">
+                <div class="main-content-inner">
+                    <!-- /section:basics/resources.breadcrumbs -->
+                    <div class="page-content" style="padding: 0px;">
+                        <iframe style="width: 100%; height: 100%; margin: 0; padding: 0; border: none;" id="main" name="main" src="default.html"></iframe>
+                    </div>
+                    <!-- /.page-content -->
+                </div>
+            </div>
+            <!-- /.main-content -->
+            <!--<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+                <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+            </a>-->
+        </div>
+        <!-- /.main-container -->
+
+        <div style="position:fixed; bottom:0px; width:100%; color:#fff; font-size:12px; height:30px; line-height:30px; background-color:#435669; text-align:center">
+            usitao.com All rights reserved. 美淘转运 版权所有 © 2016 本网站受国际著作权法和商标法的保护 <a href="" target="_blank">Global Postal Service Inc</a>
+        </div>
+
+    </div>
+
+
+    <!-- basic scripts -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../resources/js/jquery-ui.custom.min.js"></script>
+    <script src="../resources/js/jquery.ui.touch-punch.min.js"></script>
+
+    <!-- ace scripts -->
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace.min.js"></script>
+
+    <script src="../resources/artDialog/dist/dialog-plus-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <script type="text/javascript">
+        function adminlogout() {
+            $.get("../../admin/emp/logout", function (response) {
+                top.location.href = "../admin/login.html";
+            });
+            return false;
+        }
+        $(function () {
+
+
+
+
+            var $frmContent = $('#main');
+            function fixFrmContentSize() {
+                var offset = $frmContent.offset();
+                var top = offset.top;
+                var height = document.documentElement.clientHeight;
+                $frmContent.height(height - top);
+            }
+            fixFrmContentSize();
+            $(window).resize(fixFrmContentSize);
+
+            //增加iframe被嵌套的检测
+            if (window != top) {
+                top.location.href = location.href;
+            }
+
+            //菜单active样式
+            $(".nav-list li").click(function () {
+                var $this = $(this);
+                $this.siblings("li").removeClass("active");
+                $this.addClass('active');
+            });
+
+            $(".mainnav li").hover(
+             function () {
+                 jQuery(this).find("a:first").addClass("acur");
+                 jQuery(this).find(".subnav").show();
+             },
+              function () {
+                  jQuery(this).find("a:first").removeClass("acur");
+                  jQuery(this).find(".subnav").hide();
+              });
+        });
+
+    </script>
+</body>
+</html>

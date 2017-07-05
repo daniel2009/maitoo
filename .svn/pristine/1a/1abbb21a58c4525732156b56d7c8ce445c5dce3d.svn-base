@@ -1,0 +1,57 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+		<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">修改会员密码
+			&nbsp;&nbsp;|&nbsp;&nbsp;
+			<a href="#" id="a_back_user_list_link">返回列表</a></p>
+
+		<div class="box_content">
+			<div class="content_title">修改会员密码</div>
+			<div class="content_text">
+		
+				<div class="tab-content" id="tab2">
+		          <form action="#" method="post" >
+		            <div class="notification information png_bg">
+						<a href="#" class="close">
+							<img src="${pageContext.request.contextPath }/resources/images/icons/cross_grey_small.png" title="关闭" alt="关闭" /></a>
+	      				<div>修改会员密码必须提供您的职工登录密码！而且密码格式均为6到20位的非空字符串！</div>
+	    			</div>
+		            <input type="hidden" name="id" value="${param.id }"/>
+		            <fieldset>
+			            <p>
+			              <label style="display: inline;">&nbsp;&nbsp;&nbsp;新&nbsp;&nbsp;密&nbsp;&nbsp;码：</label>
+			              <input class="text-input small-input" type="password" name="password" maxlength="16"/><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label style="display: inline;">确认新密码：</label>
+			              <input class="text-input small-input" type="password" name="confirm_pwd" maxlength="16"/><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label style="display: inline;">&nbsp;您&nbsp;的&nbsp;密&nbsp;码：</label>
+			              <input class="text-input small-input" type="password" name="empPwd" maxlength="16"/><span class="gl_message">*</span>
+			            </p>
+			            <p style="margin-left: 50px;">
+			              <input id="bt_modify_pwd_user" class="button" type="submit" value="提交" />
+			              <input class="button" type="reset" value="重置">
+			            </p>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+		</div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav34Data();
+	});
+</script>
+</html>

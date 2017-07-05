@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.AccountDetailDao">
+
+	<resultMap id="account_detail_result_map" type="com.meitao.model.AccountDetail">
+		<id column="id" property="id" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="credit_id" property="creditId" javaType="String" />
+		<result column="emp_id" property="empId" javaType="String" />
+		<result column="amount" property="amount" javaType="String" />
+		<result column="currency" property="currency" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="type" property="type" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="emp_name" property="empName" javaType="String" />
+		<result column="emp_store" property="empStore" javaType="String" />
+		<result column="storeId" property="storeId" javaType="String" />
+		<result column="confirm_state" property="confirm_state" javaType="String" />
+		<result column="admin_remark" property="admin_remark" javaType="String" />
+		
+		<association column="credit_id" property="credit"
+			select="com.meitao.dao.AccountDao.getCreditById"></association>
+	</resultMap>
+	<resultMap id="account_detail_result_map2" type="com.meitao.model.AccountDetail">
+		<id column="id" property="id" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="credit_id" property="creditId" javaType="String" />
+		<result column="emp_id" property="empId" javaType="String" />
+		<result column="amount" property="amount" javaType="String" />
+		<result column="currency" property="currency" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="type" property="type" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="emp_name" property="empName" javaType="String" />
+		<result column="emp_store" property="empStore" javaType="String" />
+		<result column="groupid" property="groupId" javaType="String" />
+		<result column="storeId" property="storeId" javaType="String" />
+		<result column="confirm_state" property="confirm_state" javaType="String" />
+		<result column="admin_remark" property="admin_remark" javaType="String" />
+		
+		<association property="user" column="user_id" select="com.meitao.dao.UserDao.getUserById"></association>
+		<association column="credit_id" property="credit"
+			select="com.meitao.dao.AccountDao.getCreditById"></association>
+	</resultMap>
+
+	<insert id="insertAccountDetail" parameterType="com.meitao.model.AccountDetail"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		account_detail(user_id,credit_id,amount,currency,name,type,state,create_date,modify_date,remark,emp_id,emp_name,emp_store,storeId,confirm_state,admin_remark)
+		values
+		(#{userId},#{creditId},#{amount},#{currency},#{name},#{type},#{state},#{createDate},#{modifyDate},#{remark},#{empId},#{empName},#{empStore},#{storeId},#{confirm_state},#{admin_remark})
+	</insert>
+
+	<update id="modifyAccountDetail" parameterType="com.meitao.model.AccountDetail">
+		update
+		account_detail
+		set state=#{state},
+		remark = #{remark},
+		modify_date=#{modifyDate}
+		where id=#{id} and state='0'
+	</update>
+
+	<delete id="deleteAccountDetailByUserIds">
+		delete from account_detail
+		where user_id in
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="getAccountDetailByUserId" parameterType="java.lang.String" resultMap="account_detail_result_map">
+		select * from account_detail where user_id=#{userId} order by `create_date` desc
+	</select>
+
+	<select id="getById" parameterType="java.lang.String" resultMap="account_detail_result_map2">
+		select * from account_detail where id=#{id}
+	</select>
+	
+	<select id="countByKey" resultType="java.lang.Integer">
+		select count(account_detail.id)
+		from account_detail left join users as u on
+		account_detail.user_id=u.id
+		<where>
+			<if test="userId != null and userId != ''">
+				account_detail.user_id=#{userId}
+			</if>
+			<if test="key != null and key != ''">
+				and (account_detail.name like #{key} or account_detail.currency like #{key} or account_detail.remark like #{key})
+			</if>
+			<if test="state != null and state != ''">
+				and account_detail.state = #{state}
+			</if>
+			<if test="type != null and type != ''">
+				and account_detail.type = #{type}
+			</if>
+			<!--  <if test="groupid != null and groupid != ''">
+				and account_detail.groupid = #{groupid}
+			</if>-->
+		</where>
+	</select>
+
+	<select id="searchByKey" resultMap="account_detail_result_map2">
+		select account_detail.*
+		from account_detail left join users as u on
+		account_detail.user_id=u.id
+		<where>
+			<if test="userId != null and userId != ''">
+				account_detail.user_id=#{userId}
+			</if>
+			<if test="key != null and key != ''">
+				and (account_detail.name like #{key} or account_detail.currency like #{key} or account_detail.remark like #{key})
+			</if>
+			<if test="state != null and state != ''">
+				and account_detail.state = #{state}
+			</if>
+			<if test="type != null and type != ''">
+				and account_detail.type = #{type}
+			</if>
+		</where>
+		order by account_detail.modify_date desc, account_detail.state asc
+		limit
+		#{index},#{size}
+	</select>
+	<select id="checkIfScanPayDetail" resultType="java.lang.String">
+		SELECT state FROM account_detail WHERE user_id=#{userId} AND amount=#{amount} AND id=#{id}
+	</select>
+	<select id="checkStateIfPayDetailByRemark" resultType="java.lang.String">
+		SELECT state FROM account_detail WHERE user_id=#{userId} AND amount=#{amount} AND remark=#{remark}
+	</select>
+	<update id="updateStateByPaySuccess">
+		UPDATE account_detail SET state=1, remark='支付成功', modify_date=#{modifyDate} WHERE user_id=#{userId} AND remark=#{remark}
+	</update>
+	
+	<select id="checkStateIfPayDetailByRemarkno" resultMap="account_detail_result_map2">
+		SELECT account_detail.* FROM account_detail WHERE remark=#{remark}
+		limit 1
+	</select>
+	
+	
+	
+	<select id="countByInfo" resultType="java.lang.Integer">
+		select count(account_detail.id)
+		from account_detail left join users as u on
+		account_detail.user_id=u.id
+		<where>
+			<if test="userId != null and userId != ''">
+				account_detail.user_id=#{userId}
+			</if>
+			<if test="info != null and info != ''">
+				and (account_detail.name like #{info} or account_detail.currency like #{info} or account_detail.remark like #{info} or u.phone like #{info} or u.real_name like #{info} or u.email like #{info} 
+				or u.nick_name like #{info} or account_detail.emp_name like #{info} or account_detail.emp_store like #{info})
+			</if>
+			<if test="state != null and state != ''">
+				and account_detail.state = #{state}
+			</if>
+			<if test="type != null and type != ''">
+				and account_detail.type = #{type}
+			</if>
+		</where>
+	</select>
+
+	<select id="searchByInfo" resultMap="account_detail_result_map2">
+		select account_detail.*
+		from account_detail left join users as u on
+		account_detail.user_id=u.id
+		<where>
+			<if test="userId != null and userId != ''">
+				account_detail.user_id=#{userId}
+			</if>
+			<if test="info != null and info != ''">
+				and (account_detail.name like #{info} or account_detail.currency like #{info} or account_detail.remark like #{info} or u.phone like #{info} or u.real_name like #{info} or u.email like #{info} 
+				or u.nick_name like #{info} or account_detail.emp_name like #{info} or account_detail.emp_store like #{info})
+			</if>
+			<if test="state != null and state != ''">
+				and account_detail.state = #{state}
+			</if>
+			<if test="type != null and type != ''">
+				and account_detail.type = #{type}
+			</if>
+		</where>
+		order by account_detail.modify_date desc, account_detail.state asc
+		limit
+		#{index},#{size}
+	</select>
+	
+	<select id="countByInfo_superadmin" resultType="java.lang.Integer">
+		select count(account_detail.id)
+		from account_detail left join users as u on
+		account_detail.user_id=u.id
+		<where>
+			<if test="userId != null and userId != ''">
+				account_detail.user_id=#{userId}
+			</if>
+			<if test="info != null and info != ''">
+				and (account_detail.name like #{info} or account_detail.currency like #{info} or account_detail.remark like #{info} or u.phone like #{info} or u.real_name like #{info} or u.email like #{info} 
+				or u.nick_name like #{info} or account_detail.emp_name like #{info} or account_detail.emp_store like #{info})
+			</if>
+			<if test="state != null and state != ''">
+				and account_detail.state = #{state}
+			</if>
+			<if test="type != null and type != ''">
+				and account_detail.type = #{type}
+			</if>
+			<if test="storeId != null and storeId != ''">
+				and account_detail.storeId = #{storeId}
+			</if>
+			<if test="confirm_state != null and confirm_state != ''">
+				and account_detail.confirm_state= #{confirm_state}
+				
+				
+			</if>
+		</where>
+	</select>
+
+	<select id="searchByInfo_superadmin" resultMap="account_detail_result_map2">
+		select account_detail.*
+		from account_detail left join users as u on
+		account_detail.user_id=u.id
+		<where>
+			<if test="userId != null and userId != ''">
+				account_detail.user_id=#{userId}
+			</if>
+			<if test="info != null and info != ''">
+				and (account_detail.name like #{info} or account_detail.currency like #{info} or account_detail.remark like #{info} or u.phone like #{info} or u.real_name like #{info} or u.email like #{info} 
+				or u.nick_name like #{info} or account_detail.emp_name like #{info} or account_detail.emp_store like #{info})
+			</if>
+			<if test="state != null and state != ''">
+				and account_detail.state = #{state}
+			</if>
+			<if test="type != null and type != ''">
+				and account_detail.type = #{type}
+			</if>
+			<if test="storeId != null and storeId != ''">
+				and account_detail.storeId = #{storeId}
+			</if>
+			<if test="confirm_state != null and confirm_state != ''">
+				and account_detail.confirm_state= #{confirm_state}
+			</if>
+		</where>
+		order by account_detail.modify_date desc, account_detail.state asc
+		limit
+		#{index},#{size}
+	</select>
+	<update id="updateconfirmstate" parameterType="com.meitao.model.AccountDetail">
+		update
+		account_detail
+		set admin_remark=#{admin_remark},
+		confirm_state = #{confirm_state},
+		modify_date=#{modifyDate}
+		where id=#{id} and type=#{type}
+	</update>	
+	
+	
+	<select id="counttype" resultType="java.lang.Integer">
+		select count(account_detail.id)
+		from account_detail
+		where account_detail.type = #{type}
+	</select>
+	
+	<select id="countamount" resultType="java.lang.String">
+		select account_detail.amount
+		from account_detail
+		<where>
+			<if test="type != null and type != ''">
+				account_detail.type = #{type}
+			</if>
+			<if test="state != null and state != ''">
+				and account_detail.state = #{state}
+			</if>
+			<if test="currency != null and currency != ''">
+				and account_detail.currency = #{currency}
+			</if>
+		</where>
+	</select>
+	
+	<select id="countadminamount" resultType="java.lang.String">
+		select account_detail.amount
+		from account_detail
+		<where>
+			<if test="type != null and type != ''">
+				account_detail.type = #{type}
+			</if>
+			<if test="confirm_state != null and confirm_state != ''">
+				and account_detail.confirm_state = #{confirm_state}
+			</if>
+			<if test="currency != null and currency != ''">
+				and account_detail.currency = #{currency}
+			</if>
+		</where>
+	</select>
+</mapper>

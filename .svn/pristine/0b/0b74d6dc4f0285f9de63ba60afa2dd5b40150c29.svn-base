@@ -1,0 +1,21 @@
+package com.weiye.service;
+
+import java.util.List;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.OceanStore;
+import com.weiye.model.ResponseObject;
+
+public interface OceanStoreService {
+
+	ResponseObject<Object> add(OceanStore oceanStore) throws ServiceException;
+
+	ResponseObject<OceanStore> getById(String id) throws ServiceException;
+
+	ResponseObject<Object> modify(OceanStore oceanStore) throws ServiceException;
+
+	ResponseObject<List<OceanStore>> getAll() throws ServiceException;
+
+	ResponseObject<Object> delete(String id) throws ServiceException;
+
+}

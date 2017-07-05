@@ -1,0 +1,309 @@
+package com.weiye.controller;
+
+import java.net.URLDecoder;
+import java.util.Date;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.GonggaoUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Gonggao;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.GonggaoService;
+@Controller
+public class GonggaoController extends BasicController {
+
+	private static final long serialVersionUID = 6582185005680513923L;
+	private static final Logger log = Logger.getLogger(GonggaoController.class);
+	@Resource(name = "gonggaoService")
+	private GonggaoService gonggaoService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+
+	@RequestMapping(value = "/gonggao/add", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Object> addgonggao(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.GONGGAO_TITLE) String title,
+	        @RequestParam(value = ParameterConstants.GONGGAO_CONTENT) String content
+	        //@RequestParam(value = ParameterConstants.gonggao_AUTHOR) String author,
+	       // @RequestParam(value = ParameterConstants.gonggao_RELEASETIME) Date releasetime
+	        ) {
+		System.out.println("=======##############======");
+		//System.out.println(releasetime);
+		// 重新写
+		Gonggao gonggao = new Gonggao();
+		gonggao.setTitle(title);
+		gonggao.setContent(content);
+		//gonggao.setAuthor(author);
+		//gonggao.setReleaseTime(releasetime);
+		try {
+			return this.gonggaoService.saveGonggao(gonggao);
+		} catch (Exception e) {
+			log.error("添加新闻失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加新闻出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/gonggao/modify", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Object> modifygonggao() {
+		Gonggao gonggao = new Gonggao();
+		try {
+			return this.gonggaoService.modifyGonggao(gonggao);
+		} catch (Exception e) {
+			log.error("修改新闻对象失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改新闻出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/gonggao/del", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Object> delgonggao(@RequestParam(value = ParameterConstants.GONGGAO_ID) String id) {
+		if (!GonggaoUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.GONGGAO_ID_ERROR, "参数无效");
+		}
+		try {
+			return this.gonggaoService.deleteGonggao(id);
+		} catch (ServiceException e) {
+			log.error("根据id获取新闻失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除新闻失败");
+		}
+	}
+
+	@RequestMapping(value = "/gonggao/get_one", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Gonggao> getById(@RequestParam(value = ParameterConstants.GONGGAO_ID) String id) {
+		if (!GonggaoUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.GONGGAO_ID_ERROR, "参数无效");
+		}
+
+		try {
+			return this.gonggaoService.getGonggaoById(id);
+		} catch (Exception e) {
+			log.error("根据id获取新闻对象失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻失败，出现异常!");
+		}
+	}
+
+	/*@RequestMapping(value = "/gonggao/search", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<gonggao>> searchByTitle(
+	        @RequestParam(value = ParameterConstants.gonggao_TITLE, required = false, defaultValue = "") String key,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			pageIndex = Math.max(pageIndex, 1);
+			return this.gonggaoService.getgonggaoByKey(key,"", defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取新闻列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻列表失败！");
+		}
+	}*/
+	
+	//查找接口，用于客户端
+	@RequestMapping(value = "/gonggao/search", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Gonggao>> searchpagetbyanyone(HttpServletRequest request,
+	        @RequestParam(value = "key", required = false, defaultValue = "") String key,
+	        @RequestParam(value = "column", required = false, defaultValue = "") String column,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			
+			 key = URLDecoder.decode(key, "UTF-8");
+			pageIndex = Math.max(pageIndex, 1);
+			//return this.gonggaoService.getGonggaoByKey(key, column,defaultPageSize, pageIndex);
+			return this.gonggaoService.getgonggaoByKey(key, column,defaultPageSize, pageIndex);
+			//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻列表失败！");
+		} catch (Exception e) {
+			log.error("获取新闻列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻列表失败！");
+		}
+	}	
+	
+	
+	@RequestMapping(value = "/admin/gonggao/search", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<Gonggao>> searchpageyadmin(HttpServletRequest request,
+	        @RequestParam(value = "key", required = false, defaultValue = "") String key,
+	        @RequestParam(value = "column", required = false, defaultValue = "") String column,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			 key = URLDecoder.decode(key, "UTF-8");
+			pageIndex = Math.max(pageIndex, 1);
+			return this.gonggaoService.getgonggaoByKey(key, column,defaultPageSize, pageIndex);
+			//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻列表失败！");
+		} catch (Exception e) {
+			log.error("获取新闻列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻列表失败！");
+		}
+	}	
+	
+	@RequestMapping(value = "/admin/gonggao/add", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Object> addgonggaobyadmin(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.GONGGAO_TITLE, required = false, defaultValue = "") String title,
+			@RequestParam(value = ParameterConstants.GONGGAO_CONTENT, required = false, defaultValue = "") String content
+			
+	        //@RequestParam(value = ParameterConstants.gonggao_AUTHOR) String author,
+	        //@RequestParam(value = ParameterConstants.gonggao_RELEASETIME) Date releasetime
+	        ) throws Exception {
+		System.out.println("=======##############======");
+		//System.out.println(releasetime);
+		// 重新写
+		
+		
+	
+		
+		
+		Gonggao gonggao = new Gonggao();
+		gonggao.setTitle(title);
+		gonggao.setContent(content);
+		gonggao.setViewcontent(content);
+		
+		String empName = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+		String empId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+		gonggao.setAuthorid(empId);
+		gonggao.setAuthor(empName);
+		gonggao.setRemark(empName+" 创建！");
+		//gonggao.setAuthor(author);
+		//gonggao.setReleaseTime(releasetime);
+		try {
+			return this.gonggaoService.saveGonggao(gonggao);
+			//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加新闻出现异常");
+		} catch (Exception e) {
+			log.error("添加新闻失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加新闻出现异常");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/admin/gonggao/del", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Object> delgonggaobyadmin(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.GONGGAO_IDS) String[] ids) {
+		if ((ids != null) && (ids.length >0)) {
+			for(String id :ids)
+			{
+				if (!GonggaoUtil.validateId(id)) {
+					return generateResponseObject(ResponseCode.GONGGAO_ID_ERROR, "参数无效");
+				}
+			}
+		}
+		try {
+			return this.gonggaoService.deletegonggaobyadmin(ids);
+			//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除新闻失败");
+		} catch (ServiceException e) {
+		//} catch (Exception e) {
+			log.error("根据id获取新闻失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除新闻失败");
+		}
+	}
+	@RequestMapping(value = "/gonggao/getonegonggao", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Gonggao> anyonegetById(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.GONGGAO_ID) String id) {
+		if (!GonggaoUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.GONGGAO_ID_ERROR, "参数无效");
+		}
+
+		try {
+			//return this.gonggaoService.GetGonggaoById(id);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻失败，出现异常!");
+		} catch (Exception e) {
+			log.error("根据id获取新闻对象失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻失败，出现异常!");
+		}
+	}
+	
+	@RequestMapping(value = "/admin/gonggao/get_one", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Gonggao> admingetById(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.GONGGAO_ID) String id) {
+		if (!GonggaoUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.GONGGAO_ID_ERROR, "参数无效");
+		}
+
+		try {
+			return this.gonggaoService.getGonggaoById(id);
+			//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻失败，出现异常!");
+		} catch (Exception e) {
+			log.error("根据id获取新闻对象失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻失败，出现异常!");
+		}
+	}
+
+	@RequestMapping(value = "/admin/gonggao/modify", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Object> modifygonggaobyadmin(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.GONGGAO_TITLE, required = false, defaultValue = "") String title,
+			@RequestParam(value = ParameterConstants.GONGGAO_CONTENT, required = false, defaultValue = "") String content,
+			@RequestParam(value = ParameterConstants.GONGGAO_ID, required = false, defaultValue = "") String id
+	        ) throws Exception {
+		
+		
+		if (!GonggaoUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.GONGGAO_ID_ERROR, "参数无效");
+		}
+		Gonggao gonggao = new Gonggao();
+		gonggao.setId(id);
+		gonggao.setContent(content);
+		gonggao.setViewcontent(content);
+		gonggao.setTitle(title);
+		String empName = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+		gonggao.setRemark(empName+" 修改!");
+		
+		String date = DateUtil.date2String(new Date());// 修改时间
+		gonggao.setModifytime(date);
+		try {
+			return this.gonggaoService.modifyGonggao(gonggao);
+			//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改新闻出现异常");
+		} catch (Exception e) {
+			log.error("修改新闻对象失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改新闻出现异常");
+		}
+	}
+	
+	//查找接口，用于客户端
+		@RequestMapping(value = "/gonggao/search_size", method = { RequestMethod.POST, RequestMethod.GET })
+		@ResponseBody
+		public ResponseObject<PageSplit<Gonggao>> searchpagetbyanyonesize(HttpServletRequest request,
+		        @RequestParam(value = "key", required = false, defaultValue = "") String key,
+		        @RequestParam(value = "column", required = false, defaultValue = "") String column,
+		        @RequestParam(value = "size", required = false, defaultValue = "") String size,
+		        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+			try {
+				
+				 key = URLDecoder.decode(key, "UTF-8");
+				pageIndex = Math.max(pageIndex, 1);
+				if(StringUtil.isEmpty(size))
+				{
+					size=Integer.toString(defaultPageSize);
+				}
+				//return this.gonggaoService.getGonggaoByKey(key, column,defaultPageSize, pageIndex);
+				return this.gonggaoService.getgonggaoByKey(key, column,Integer.parseInt(size), pageIndex);
+				//return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻列表失败！");
+			} catch (Exception e) {
+				log.error("获取新闻列表失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取新闻列表失败！");
+			}
+		}	
+}

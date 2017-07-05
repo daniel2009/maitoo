@@ -1,0 +1,31 @@
+package com.weiye.service;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.PageSplit;
+import com.weiye.model.Product;
+import com.weiye.model.ProductRecord;
+import com.weiye.model.ResponseObject;
+
+public interface ProductRecordService {
+
+	ResponseObject<Object> updateComment(ProductRecord productRecord) throws ServiceException;
+
+	ResponseObject<ProductRecord> findById(ProductRecord productRecord) throws ServiceException;
+
+	ResponseObject<Object> audit(ProductRecord productRecord) throws ServiceException;
+
+	ResponseObject<PageSplit<ProductRecord>> findByKey(ProductRecord productRecord, String dateStart, String dateEnd, int pageIndex, int defaultPageSize) throws ServiceException;
+
+	ResponseObject<PageSplit<ProductRecord>> findByKeyAndWithComment(ProductRecord productRecord, String dateStart, String dateEnd, int pageIndex, int defaultPageSize) throws ServiceException;
+
+	ResponseObject<Object> addByUser(ProductRecord productRecord) throws ServiceException;
+
+	ResponseObject<Object> delete(ProductRecord productRecord) throws ServiceException;
+
+	ResponseObject<Object> updateByUser(ProductRecord productRecord) throws ServiceException;
+
+	ResponseObject<String[]> getAllStateCount() throws ServiceException;
+
+	ResponseObject<Integer> countPurchase(Product product) throws ServiceException;
+
+}

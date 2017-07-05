@@ -1,0 +1,24 @@
+package com.weiye.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.model.Channel;
+
+public interface ChannelDao {
+	public Channel getChannelById(String id) throws Exception;
+	public int insertChannel(Channel channel) throws Exception;
+
+	public List<Channel> getByWarhouseId(@Param("warehouseId") String warehouseId, @Param("state") String state) throws Exception;
+
+	//public String getById(@Param("warehouseId") String warehouseId,String id) throws Exception;
+
+	public int modifyChannel(Channel channel) throws Exception;;
+	
+	public int insertChannelByList(List<Channel> list) throws Exception;
+	
+	public List<Channel> getByWarhouseIdandid(@Param("warehouseId") String warehouseId,@Param("id") String id, @Param("state") String state) throws Exception;
+	
+
+}

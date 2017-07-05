@@ -1,0 +1,20 @@
+package com.weiye.service;
+
+import java.util.List;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ErrorOrderInfo;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+
+
+public interface ErrorOrderInfoService {
+	public ResponseObject<Object> saveErrorOrderInfo(ErrorOrderInfo info) throws ServiceException;
+
+	public ResponseObject<Object> deleteErrorOrderInfos(List<String> eids) throws ServiceException;
+
+	public ResponseObject<Object> modifyErrorOrderInfo(ErrorOrderInfo info) throws ServiceException;
+
+	public ResponseObject<PageSplit<ErrorOrderInfo>> searchByOrderId(String orderId, int pageSize, int pageNow)
+	        throws ServiceException;
+}

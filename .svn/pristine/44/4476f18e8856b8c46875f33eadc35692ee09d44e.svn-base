@@ -1,0 +1,361 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="oid"/>
+	<input type="hidden" name="pn" value="1"/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">转运自提</p>
+
+		<div class="box_content">
+			<div class="content_title">转运自提</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u31" style="padding-top: 5px;">
+						<div id="u310">
+							<form action="">
+								运单号：<input class="text-input small-input" type="text" id="orderId" name="oid" maxlength="16" />
+								<input class="button" type="button" value="搜索" onclick="javascript: searchTakeBySelf();" />
+							</form>
+							<section id="orderSection" style="display: none;">
+								<input type="hidden" id="id">
+					            <fieldset>
+					            	<p>
+						              <label style="display: inline;">运单号：</label>
+						              <label style="display: inline;" id="u_d_id"></label><br/>
+						              <label style="display: inline;">运单类型：</label>
+						              <label style="display: inline;" id="u_ordertype">&nbsp;</label>
+						            </p>
+						            <hr/>
+					            	<p>
+						              <label style="display: inline;">发件人信息：</label>
+						              <label style="display: inline;" id="from_user_info">&nbsp;</label>
+						            </p>
+						            <hr/>
+					            	<p>
+						              <label style="display: inline;">收件人信息：</label>
+						              <label style="display: inline;" id="to_user_info">&nbsp;</label>
+						            </p>
+						            <hr/>
+					            	<p>
+						              <label style="display: inline;">包裹商品信息：</label>
+						              <label style="display: inline;" id="commodify_info">&nbsp;</label><br/>
+						              <label style="display: inline;">品牌：</label>
+						              <label style="display: inline;" id="commodify_brands">&nbsp;</label>
+						            </p>
+						           
+						            <hr/>
+					            	<p>
+						              <label style="display: inline;">费用信息：</label>
+						              <label style="display: inline;" id="money_info">&nbsp;</label>
+						            </p>
+						            
+						             <hr/>
+					            	
+					            	<p >
+						              <label style="display: inline;">其它信息：</label>
+						              <label style="display: inline;" id="otherall_info">&nbsp;</label>
+						            </p>
+						            
+						             <hr/>
+					            	
+					            	<p >
+						              <label style="display: inline;">备注信息：</label>
+						              <label style="display: inline;" id="remark_info">&nbsp;</label>
+						            </p>
+						            
+						            <hr/>
+					            	<p>
+						              <label style="display: inline;">路由信息：</label>
+						              <label style="display: inline;" id="route_info">&nbsp;</label>
+						            </p>
+						            <hr/>
+					            </fieldset>
+					            <p style="margin-left: 50px;">
+									<input class="button" type="button" id="button" onclick="javascript: takeBySelf();" value="领取包裹" disabled/>&nbsp;&nbsp;
+									<label id="disabledMessage" style="color: #f00;"></label>
+								</p>
+					            <div class="clear"></div>
+					            <!-- End .clear -->
+				          </section>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+     </div>
+</body>
+<script type="text/javascript">
+	function takeBySelf(){
+		$.ajax({
+			type : "get",
+			url : "../admin/order/takeBySelf",
+			data : {
+				id : document.getElementById("id").value
+			},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					alert("操作成功");
+					nav_takeBySelf_click();
+				} else if (code == '607') {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("根据id获取转运单信息失败,失败原因是：" + response.message);
+					nav_takeBySelf_click();
+				}
+			}
+		});
+	}
+	function searchTakeBySelf(){
+		document.getElementById("u_d_id").innerHTML = document.getElementById("orderId").value;
+		document.getElementById("orderSection").style.display = "block";
+		$.ajax({
+			type : "get",
+			url : admin_order_route_search_url,
+			data : {
+				"oid" : document.getElementById("orderId").value
+			},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200" && response.data != null) {
+					str = "<table><col width='100px'/><col width='120px'/><col width='200px'/><tr><th>状态</th><th>状态说明</th><th>时间</th><th>备注</th></tr>";
+					for ( var key in response.data) {
+						var value = response.data[key];
+						$.each(value, function() {
+							str += "<tr>";
+							str += "<td>" +this.state  + "</td>";
+							str += "<td>" + this.stateRemark + "</td>";
+							str += "<td>" + this.date + "</td>";
+							str += "<td>" + this.remark + "</td>";
+							str += "</tr>";
+						});
+					}
+					str += "</table>";
+					$("#route_info").html(str);
+				} else if (code == '607') {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("根据id获取转运单信息失败,失败原因是：" + response.message);
+					nav_takeBySelf_click();
+				}
+			}
+		});
+		$.ajax({
+			type : "get",
+			url : admin_order_get_one_url,
+			data : {
+				"oid" : document.getElementById("orderId").value
+			},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200" && response.data != null) {
+
+					var str = "";
+					if((response.data.user!=null)&&(response.data.user!="null")&&(response.data.user!="")&&(response.data.user!="undefined"))
+					{
+						str += response.data.user.id;
+						str += "&nbsp;&nbsp;";
+						str += response.data.user.nickName;
+						str += "&nbsp;&nbsp;";
+						str += response.data.user.realName;
+						str += "&nbsp;&nbsp;";
+						str += response.data.user.phone;
+						$("#from_user_info").html(str);
+					}
+					else
+					{
+						
+						str += response.data.senduserName;
+						str += "&nbsp;&nbsp;";
+						str += response.data.senduserphone;
+						$("#from_user_info").html(str);
+					}
+					str = "";
+					str += response.data.cName;
+					str += "&nbsp;&nbsp;";
+					str += response.data.cPhone;
+					str += "&nbsp;&nbsp;";
+					str += response.data.cZipCode;
+					str += "&nbsp;&nbsp;&nbsp;";
+					str += response.data.cProvince;
+					str += "&nbsp;&nbsp;";
+					str += response.data.cCity;
+					str += "&nbsp;&nbsp;";
+					str += response.data.cDistrict;
+					str += "&nbsp;&nbsp;";
+					str += response.data.cStreetAddress;
+					$("#to_user_info").html(str);
+
+					str = "";
+					var str1="";
+					if((response.data.commodityThirdList!=null)&&(response.data.commodityThirdList!="undefined")&&(response.data.type=="7"))
+					{
+						str=response.data.commodityThirdList;
+						str1=response.data.thirdBrands;
+						
+					}
+					else
+					{
+						$.each(response.data.details, function() {
+							str += this.ctype + ":" + this.quantity + ";";
+						});
+					}
+					$("#commodify_info").html(str);
+					$("#commodify_brands").html(str1);
+
+					str = "";
+					str += "重量(lb):" + response.data.weight;
+					str += "&nbsp;&nbsp;重量(KG):" + response.data.weightKg;
+					str += "&nbsp;&nbsp;关税:" + response.data.tariff;
+					str += "&nbsp;&nbsp;OR:" + response.data.or;
+					str += "&nbsp;&nbsp;其他费用:" + response.data.other;
+					str += "&nbsp;&nbsp;保险金:" + response.data.premium;
+					
+					if((response.data.commodityThirdList!=null)&&(response.data.commodityThirdList!="undefined")&&(response.data.type=="7"))
+					{
+						str += "&nbsp;&nbsp;基本费用:" + response.data.baseMoney;
+					}
+					str += "&nbsp;&nbsp;总费用：" + response.data.totalMoney;
+					$("#money_info").html(str);
+					
+					str="";
+					if((response.data.commodityThirdList!=null)&&(response.data.commodityThirdList!="undefined")&&(response.data.type=="7"))
+					{
+						str="收件日期："+response.data.thirdCreateDate+"&nbsp;&nbsp;"+"航班号："+response.data.flight+"&nbsp;&nbsp;"+"装箱号："+response.data.boxNo
+						+"&nbsp;&nbsp;"+"是否付款:";
+						if(response.data.payOrNot=="1")//已付
+						{
+							str=str+"已付";
+						}
+						else if(response.data.payOrNot=="0")
+						{
+							str=str+"未付";
+						}
+						else
+						{
+							str=str+"不确定("+response.data.payOrNot+")";
+						}
+						
+						str=str+"&nbsp;&nbsp;";
+						str=str+"发件人:"+response.data.senduserName;
+						str=str+"&nbsp;&nbsp;";
+						str=str+"快递公司:"+response.data.expressName;
+						str=str+"&nbsp;&nbsp;";
+						str=str+"收件人拼音:"+response.data.NamePinyi;
+						str=str+"&nbsp;&nbsp;";
+						str=str+"是否有身份证:"+response.data.cardOrNot;
+						str=str+"&nbsp;&nbsp;";
+						str=str+"导入备注:"+response.data.importRemark;
+						
+						$("#otherall_info").html(str);
+					}
+					else
+					{
+						str="航班号："+response.data.flight;
+						str=str+"&nbsp;&nbsp;";
+						str=str+"快递公司:"+response.data.expressName;
+						str=str+"&nbsp;&nbsp;";
+						str=str+"收件人拼音:"+response.data.NamePinyi;
+						
+
+						
+						$("#otherall_info").html(str);
+					}
+					$("#otherall_info").html(response.data.remark);
+					
+					if(response.data.type=="7")
+					{
+						$("#u_ordertype").html("第三方运单");
+					}
+					else
+					{
+						$("#u_ordertype").html("系统运单");
+					}
+					
+					
+					str = "";
+					if (response.data.mail == "0") {
+						str = "邮包";
+					} else if (response.data.mail == "1") {
+						str = "电商";
+					} else if (response.data.mail == "2") {
+						str = "快件";
+					} else {
+						str = this.mail;
+					}
+					$("#mail_info").html(str);
+					if(response.data.state != "2"){
+						document.getElementById("disabledMessage").innerHTML = "目前运单的状态并非为门店包裹入库，请等待直到其已入库，或联系管理员";
+						document.getElementById("button").disabled = true;
+					}else{
+						document.getElementById("id").value = response.data.id;
+						document.getElementById("button").disabled = false;
+					}
+				} else {
+					alert("获取运单详细信息失败，原因是:" + response.message);
+				}
+			}
+		});
+		/**
+		$.ajax({
+			type : "get",
+			url : admin_order_get_one_url,
+			data : {
+				"oid" : "WY15008261US"//document.getElementById("orderId").value
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					var order = response.data;
+					if (order != null) {
+						document.getElementById("orderSection").style.display = "block";
+						alert(order.width);
+						$("#warehouseName").html(order.warehouse);
+						$("#channelsName").html(order.channel);
+						$("#weight").html(order.weight);
+						$("#width").html(order.width);
+						$("#length").html(order.length);
+						$("#height").html(order.height);
+						$("#tariff").html(order.tariff);
+						$("#premium").html(order.premium);
+						$("#other").html(order.other);
+						$("#parcelValue").html(order.parcelValue);
+						$("#mail").html(order.mail);
+						$("#totalmoney").html(order.totalmoney);
+						$("#remark").html(order.remark);
+						$("#cName").html(order.cName);
+						$("#cProvince").html(order.cProvince);
+						$("#cCity").html(order.cCity);
+						$("#cDistrict").html(order.cDistrict);
+						$("#cStreetAddress").html(order.cStreetAddress);
+						$("#cPhone").html(order.cPhone);
+						$("#cZipCode").html(order.cZipCode);
+						$("#cardid").html(order.cardid);
+						$("#cardurl").attr("src", order.cardurl);
+						$("#cardurlother").attr("src", order.cardurlother);
+						$("#cardurltogether").attr("src", order.cardurltogether);
+					} else {
+						document.getElementById("orderSection").style.display = "none";
+						alert("没有对应id的运单记录!");
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("获取运单详情失败，失败原因是：" + response.message);
+				}
+			}
+		});
+		**/
+	}
+</script>
+</html>

@@ -1,0 +1,17 @@
+/**
+ * 新闻公告接口
+ * 张敬琦
+ * 2015-01-30
+ */
+
+package com.weiye.controller;
+
+public class NewsGonggaoController extends BasicController {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5996102292339581009L;
+	
+
+}

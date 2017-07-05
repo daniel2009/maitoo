@@ -1,0 +1,7 @@
+package com.weiye.service;
+
+
+public interface CommodtiyService
+{
+  
+}

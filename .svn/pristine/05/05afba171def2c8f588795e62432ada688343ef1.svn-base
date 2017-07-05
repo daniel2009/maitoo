@@ -1,0 +1,147 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head></head>
+
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">添加退货</p>
+		<div class="jqmDialog jqmdWide"></div>
+		<form id="form" enctype="multipart/form-data" method="post">
+			<table class="userTable">
+				<tr>
+					<th>手续费：</th>
+					<td>$<label id="returnFee"></label></td>
+				</tr>
+				<tr>
+					<th>转运过来的费用：</th>
+					<td>$<label id=""></label></td>
+				</tr>
+				<tr>
+					<th><span class="red">*</span>转运单号：</th>
+					<td><input type="text" size="30" id="transhipmentId" name="transhipmentId" onchange="getTranshipmentInfo(this.value);" readonly/><label style="color:red;" id="transhipmentIdMessage" hidden>你无此运单</label></td>
+				</tr>
+				<tr>
+					<th><span class="red">*</span>包裹单号：</th>
+					<td><input type="text" size="30" id="packageNo" name="packageNo" readonly/></td>
+				</tr>
+				<tr>
+					<th><input type="checkbox" id="checkbox" onchange="changeReceipt();"><input type="text" name="receipt" style="display: none;" value="0" readonly></th>
+					<td>是否有免邮费凭证</td>
+				</tr>
+				<tr>
+					<th>电话：</th>
+					<td><input type="text" size="100" id="phone" name="phone" /></td>
+				</tr>
+				<tr>
+					<th><span class="red" id="required1">*</span>地址：</th>
+					<td><input type="text" size="100" name="address" /></td>
+				</tr>
+				<tr>
+					<th><span class="red">*</span>备注：</th>
+					<td><textarea rows="3" cols="20" class="text-input" name="remark" maxlength="200" style="width:300px" required></textarea>
+					</td>
+				</tr>
+				<tr id="required2" hidden>
+					<th>证据图：</th>
+					<td>
+						<span class="red" >*</span><input type="file" name="picture1">
+						<input type="file" name="picture2">
+						<input type="file" name="picture3">
+						<input type="file" name="picture4">
+						<input type="file" name="picture5">
+					</td>
+				</tr>
+			</table>
+		</form>
+		<div class="center">
+			<input type="button" value="提交申请" class="combtn" onclick="add()"/>
+		</div>
+	</div>
+</body>
+<script>
+	$("#main-content").ready(function(){
+		var sessionStorage = window.sessionStorage;
+		var transhipmentId = sessionStorage.getItem("transhipmentId");
+		sessionStorage.removeItem("transhipmentId");
+		if(transhipmentId != null && transhipmentId != ""){
+			getTranshipmentInfo(transhipmentId);
+		}
+		$.ajax({
+			type: "get",
+			url: "../globalArgs/getReturnPackageReturnFee",
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var data = response.data;
+					if(data != null){
+						document.getElementById("returnFee").innerHTML = data;
+					}
+				}else{
+					alert("审核失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function getTranshipmentInfo(id){
+		$.ajax({
+			type: "get",
+			url: "../user/transhipment/getById",
+			data :{
+				id : id
+			},
+			success: function(response){
+				var data = response.data;
+				if(data != null){
+					document.getElementById("transhipmentId").value = data.id;
+					document.getElementById("packageNo").value = data.transitNo;
+					document.getElementById("transhipmentIdMessage").hidden = true;
+				}else{
+					document.getElementById("transhipmentIdMessage").hidden = false;
+				}
+			}
+		});
+	}
+	function changeReceipt(){
+		if(document.getElementById("checkbox").checked){
+			document.getElementById("required1").hidden = true;
+			document.getElementById("required2").hidden = false;
+			document.getElementsByName("receipt")[0].value="1";
+		}else{
+			document.getElementById("required1").hidden = false;
+			document.getElementById("required2").hidden = true;
+			document.getElementsByName("receipt")[0].value="0";
+		}
+	}
+	function add(){
+		var httpRequest = new XMLHttpRequest();
+		var url = "../user/returnPackage/add";
+		httpRequest.onreadystatechange = function(){
+			if(4 == httpRequest.readyState){
+				if(200 == httpRequest.status){
+					var response = eval("(" + httpRequest.responseText + ")");
+					var code = response.code;
+					if("200" == code){
+						alert("添加成功");
+						nav14Click();
+					}else if("607" == code){
+						alert("您尚未登录或登录已失效");
+						window.location.href = "login.jsp";
+					}else{
+						alert("添加失败，失败原因:" + response.message);
+					}
+					return false;
+				}
+			}
+		};
+		httpRequest.open("post", url, true);
+		httpRequest.send(new FormData(document.getElementById("form")));
+		return false;
+	}
+	
+</script>
+</html>
+
+

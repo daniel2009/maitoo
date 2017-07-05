@@ -1,0 +1,295 @@
+﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">海淘推荐</p>
+
+		<div class="box_content">
+			<div class="content_title">海淘推荐管理</div>
+			<div class="content_text">
+			<div class="tab-content default-tab" id="tab1">
+				<div  style="margin-left: 80%;margin-top: 20px;">
+							<span>
+								<a href="javascript:addOceanStoreDlg()">添加海淘推荐</a>
+							</span>
+						</div>
+						<div style="clear: both;">
+				</div>
+					
+
+				<table style="width: 100%">
+					<thead>
+						<tr>
+							<th>海淘名</th>
+							<th>链接地址</th>
+							<th>海淘内容</th>
+							<th>海涛图片</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					
+					<tbody id="tbody">
+						<tr><td colspan='4'>请先选择海淘推荐</td></tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		$.ajax({
+			type: "get",
+			url: admin_ocean_store_all_url,
+			success:function(response){
+				var code = response.code;
+				if("200"==code){
+					var list = response.data;
+					if(list.length > 0){
+						var tbody = document.getElementById("tbody");
+						tbody.innerHTML = "";
+						for(var i = 0; i<list.length; i++){
+							var string = "";
+    						string += "<td><input type='text' id='oceanStore_name_"+list[i].id+"' value='" + list[i].name + "'></td><td><input type='text' id='oceanStore_url_"+list[i].id+"' value='" + list[i].url + "'></td><td><textarea id='oceanStore_note_"+list[i].id+"' style='width:89%;'>" + list[i].note + "</textarea></td>";
+    						string += "<td><img src='"+baseUrl+list[i].imgUrl+"'><input type='text' id='oceanStore_imgUrl_"+list[i].id+"' value='" + list[i].imgUrl + "' style='display:none;' readonly='true'><br/><input type='file' id='oceanStore_picture_"+list[i].id+"'></td>";
+    						string += "<td><a href='javascript:modifyOceanStore("+list[i].id+");'>修改</a>|<a href='javascript:deleteOceanStore("+list[i].id+");'>删除</a></td>";
+    						var tr = document.createElement("tr");
+    						tr.id = "oceanStore_"+list[i].id;
+    						tr.innerHTML = string;
+    						tbody.appendChild(tr);
+    					}
+					}
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("获取仓库数据失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function modifyOceanStore(id){
+		var name = document.getElementById("oceanStore_name_"+id).value;
+		var url = document.getElementById("oceanStore_url_"+id).value;
+		var note = document.getElementById("oceanStore_note_"+id).value;
+		var imgUrl = document.getElementById("oceanStore_imgUrl_"+id).value;
+		var picture = document.getElementById("oceanStore_picture_"+id);
+		if(""==name){
+			alert("名称不能为空");
+			return false;
+		}
+		var formData = new FormData();
+		formData.append("id", id);
+		formData.append("name", name);
+		formData.append("note", note);
+		formData.append("url", url);
+		if(picture.value == ""){
+			formData.append("imgUrl", imgUrl);
+			formData.append("picture", null);
+		}else{
+			formData.append("imgUrl", "");
+			formData.append("picture", picture.files[0]);
+		}
+		var httpRequest = new XMLHttpRequest();
+		var url = admin_ocean_store_modify_url;
+		httpRequest.onreadystatechange = function(){
+			if(4 == httpRequest.readyState){
+				if(200 == httpRequest.status){
+					alert("修改成功");
+					nav95Click();
+				}
+			}
+		};
+		httpRequest.open("post", url, true);
+		httpRequest.send(formData);
+		return false;
+	}
+	function deleteOceanStore(id){
+		if(confirm("确认删除吗?")){
+			$.ajax({
+				type:"post",
+				url:admin_ocean_store_delete_url,
+				data:"id="+id,
+				success:function(response){
+					var code = response.code;
+					if("200"==code){
+						alert("删除成功");
+						nav95Click();
+					}else if("607" == code){
+						alert("您尚未登录或登录已失效！");
+						logout();
+					}else{
+						alert("获取仓库数据失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	}
+	
+	function addOceanStoreDlg() {
+		var msgw, msgh, msgbg, bordercolor, titlecolor, titlebg;
+		var form = document.createElement("form");
+		form.style.width="300px";
+		form.style.marginLeft="130px";
+		form.enctype="multipart/form-data";
+		form.method="post";
+		form.innerHTML += "<p><label style='display:inline;'>名称:</label><input class='text-input' type='text' name='name' maxlength='20' required><span class='gl_message'>*</span></p>";
+		form.innerHTML += "<p><label style='display:inline;'>链接地址:</label><input class='text-input' type='text' name='url'></p>";
+		form.innerHTML += "<p><label style='display:inline;'>内容:</label><textarea class='text-input' type='text' name='note'></textarea></p>";
+		form.innerHTML += "<p><label style='display:inline;'>图片:</label><input type='file' name='picture'></p>";
+		form.innerHTML += "<p style='margin-left:50px;'><input class='button' type='submit' id='bt_add_oceanStore' value='提交'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class='button' type='reset' value='重置'></p>";
+		
+	    //弹出窗口设置
+	    msgw = 510;   //窗口宽度
+	    msgh = 400;   //窗口高度
+	    msgbg = "#FFF";    //内容背景
+	    bordercolor = "#000"; //边框颜色
+	    titlecolor = "#FFF"; //标题颜色
+	    titlebg = "#369";   //标题背景
+	    //遮罩背景设置
+	    var sWidth, sHeight;
+	    sWidth = screen.availWidth;
+	    sHeight = document.body.scrollHeight;
+	    //创建遮罩背景
+	    var maskObj = document.createElement("div");
+	    maskObj.setAttribute('id', 'maskdiv');
+	    maskObj.style.position = "absolute";
+	    maskObj.style.top = "0";
+	    maskObj.style.left = "0";
+	    maskObj.style.background = "#777";
+	    maskObj.style.filter = "Alpha(opacity=30);";
+	    maskObj.style.opacity = "0.3";
+	    maskObj.style.width = sWidth + "px";
+	    maskObj.style.height = sHeight + "px";
+	    maskObj.style.zIndex = "10000";
+	    document.body.appendChild(maskObj);
+	    //创建弹出窗口
+	    var msgObj = document.createElement("div");
+	    msgObj.setAttribute("id", "msgdiv");
+	    msgObj.style.position = "absolute";
+	    msgObj.style.top = (screen.availHeight - msgh) / 4 + "px";
+	    msgObj.style.left = (screen.availWidth - msgw) / 2 + "px";
+	    //msgObj.style.top = (screen.availHeight - msgh) / 4 + "px";
+	    //msgObj.style.left = (screen.availWidth - msgw) / 2 + "px";
+	    msgObj.style.width = msgw + "px";
+	    msgObj.style.height = msgh + "px";
+	    msgObj.style.fontSize = "12px";
+	    msgObj.style.background = msgbg;
+	    msgObj.style.border = "1px solid " + bordercolor;
+	    msgObj.style.zIndex = "10001";
+	    //创建标题
+	    var thObj = document.createElement("div");
+	    thObj.setAttribute("id", "msgth");
+	    thObj.className = "DragAble";
+	    thObj.style.cursor = "move";
+	    thObj.style.padding = "10px 6px";
+		
+	    thObj.style.color = titlecolor;
+	    thObj.style.background = titlebg;
+	    var titleStr = "<a title='Close' style='cursor:pointer;float:right;cursor:default;color: #FFF000' onclick='CloseMsg()'>取消</a>" + "<span>海淘推荐添加</span>";
+	    thObj.innerHTML = titleStr;
+	    //创建内容
+	    var bodyObj = document.createElement("div");
+	    bodyObj.setAttribute("id", "msgbody");
+	    bodyObj.style.padding = "10px";
+	    bodyObj.style.lineHeight = "1.5em";
+	    bodyObj.appendChild(form);
+	    //bodyObj.innerHTML = con;
+	    
+	    //var txt = document.createTextNode(content)
+	    //bodyObj.appendChild(txt);
+	    //生成窗口
+	    document.body.appendChild(msgObj);
+	    document.getElementById("msgdiv").appendChild(thObj);
+	    document.getElementById("msgdiv").appendChild(bodyObj);
+	    
+	    $("#bt_add_oceanStore").click(function(){
+			var formdata = new FormData(form);
+			submitAddOceanStore(formdata);
+		});
+		
+		
+	}
+	
+	function submitAddOceanStore(formdata) {
+		$("#bt_add_oceanStore").attr("disabled", true);
+		var httpRequest = new XMLHttpRequest();
+		var url = admin_ocean_store_add_url;
+		httpRequest.onreadystatechange = function(){
+			if(4 == httpRequest.readyState){
+				if(200 == httpRequest.status){
+					var response = eval("(" + httpRequest.responseText + ")");
+					var code = response.code;
+					if("200" == code){
+						alert("添加成功");
+						CloseMsg();
+						nav95Click();
+					}else if("607" == code){
+						alert("您尚未登录或登录已失效");
+						logout();
+					}else{
+						alert("添加失败，失败原因:" + response.message);
+					}
+					return false;
+				}
+			}
+		};
+		httpRequest.open("post", url, true);
+		httpRequest.send(formdata);
+		return false;
+	}
+	
+	function CloseMsg() {
+	    //移除对象
+	    document.body.removeChild(document.getElementById("maskdiv"));
+	    document.getElementById("msgdiv").removeChild(document.getElementById("msgth"));
+	    document.getElementById("msgdiv").removeChild(document.getElementById("msgbody"));
+	    document.body.removeChild(document.getElementById("msgdiv"));
+	}
+	//拖动窗口
+	var ie = document.all;
+	var nn6 = document.getElementById && !document.all;
+	var isdrag = false;
+	var y, x;
+	var oDragObj;
+
+	function moveMouse(e) {
+	    if (isdrag) {
+	        oDragObj.style.top = (nn6 ? nTY + e.clientY - y : nTY + event.clientY - y) + "px";
+	        oDragObj.style.left = (nn6 ? nTX + e.clientX - x : nTX + event.clientX - x) + "px";
+	        return false;
+	    }
+	}
+
+	function initDrag(e) {
+	    var oDragHandle = nn6 ? e.target : event.srcElement;
+	    var topElement = "HTML";
+	    while (oDragHandle.tagName != topElement && oDragHandle.className != "DragAble") {
+	        oDragHandle = nn6 ? oDragHandle.parentNode : oDragHandle.parentElement;
+	    }
+	    if (oDragHandle.className == "DragAble") {
+	        isdrag = true;
+	        oDragObj = oDragHandle.parentNode;
+	        nTY = parseInt(oDragObj.style.top);
+	        y = nn6 ? e.clientY : event.clientY;
+	        nTX = parseInt(oDragObj.style.left);
+	        x = nn6 ? e.clientX : event.clientX;
+	        document.onmousemove = moveMouse;
+	        return false;
+	    }
+	}
+	document.onmousedown = initDrag;
+	document.onmouseup = new Function("isdrag=false");
+	
+	
+</script>
+</html>

@@ -1,0 +1,415 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0021)http://www.xlobo.com/ -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script type="text/javascript" charset="utf-8" async="" src="http://hb.crm2.qq.com/?nameAccount=4006812520&uid=5868861440&cb=JSONP_CALLBACK_45_68"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/saved_resource"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/saved_resource(1)"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/saved_resource(2)"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/saved_resource(3)"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/crmqq.php"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/crmqq.php"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/contains.js"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/localStorage.js"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/Panel.js"></script>
+    <title>阳光国际快递</title>
+    
+	<link rel="stylesheet" type="text/css" href="./shining_files/bootstrap.css">
+
+    <link href="./shining_files/reset.css" rel="stylesheet">
+<link href="./shining_files/site.css" rel="stylesheet">
+
+   <script async="" src="./shining_files/analytics.js"></script><script src="./shining_files/Ymt.min.js"></script>
+<script src="./shining_files/jquery-1.5.2.min.js"></script>
+
+
+    <script type="text/javascript">
+        $(function () {
+            $(".textscroll-1").html("");
+            $(".textscroll-2").html("");
+            $(".textscroll-3").html("");
+            $(".scroll-right").html("");
+
+            $('#searchinput').focus(function () {
+                if ($(this).attr('ToolsTip') == $(this).val()) {
+                    $(this).val('');
+                }
+            }).blur(function () {
+                if ($(this).val() == '') {
+                    $(this).addClass('gray-input');
+                    $(this).val($(this).attr('ToolsTip'));
+                } else {
+                    $(this).removeClass('gray-input');
+                }
+            });
+        });
+
+        function checkCode() {
+            $("#spanError").css("display", "none");
+
+            var code = $("#searchinput").val();
+            if (code == null) {
+                $("#spanError").css("display", "block");
+                alert("面单号不存在");
+            } else {
+                this.document.location = "/route.jsp?oid=" + escape(code);
+            }
+        }
+
+        function BillCodeOnKeyDown(obj, event) {
+            // 输入回车时，焦点转移同一行的重量输入框
+            if (event.keyCode == '13') {
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
+
+                checkCode();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="xlobo_hd">
+        <div class="ly_in">
+            <!--<h1><a href="./shining_files/阳光国际快递.html">阳光国际速递</a></h1>-->
+            <img src="./shining_files/shining_logo.jpg">
+            <div class="main_nav">
+                <ul class="main_nav_list">
+                    <li class="cur"><a href="./index.html">首页</a></li>
+                    <li><a href="./pricing.html">收费标准</a></li>
+                    <li><a href="./about_us">关于我们</a></li>
+                    <li><a href="./location.html">地点</a></li>
+		    <li><a href="./../newsandgonggao.jsp"  target="_blank">新闻公告</a></li>
+                    <li><a href="./../register.html">注册</a></li>
+                    <li><a href="./../login.jsp">登陆</a></li>
+                    <li><a href="./../shangchuan.jsp" target="_blank">上传ID</a></li>
+                </ul>
+            </div>
+            
+
+<!--<div class="user_opt">
+               <span id="toEnglish_showenUrl">
+                   
+                <a style="cursor: pointer" href="http://en.xlobo.com/default.aspx">English</a>
+               </span>
+                 <a style="cursor: pointer" onclick="gocn(&#39;/Public/Login.aspx&#39;)">登录</a> 
+                <a style="cursor: pointer" onclick="gocn(&#39;/Account/Certification/SelectCertCountry.aspx&#39;)">注册</a> 
+            </div>-->
+
+
+<script>
+    function gocn(url) {
+        
+    $.ajax({
+        url: "/api/changelanguageapi/ChangeLanguageToCn",
+        type: 'post',
+
+        contentType: 'application/json',
+        success: function (result) {
+            location.href = url;
+        }
+    });
+    }
+</script>
+            
+        </div>
+    </div>
+
+    <div class="main">
+        <!-- focus S -->
+        <!-- focus S -->
+	<div class="focus_box" id="focus_box" style="position: relative;">
+		<ul class="pic_list">
+			<li class="p1" style="position: absolute; left: 0px; top: 0px; opacity: 0; z-index: 0;">
+				<!--<div class="ly_in">
+					<div class="xlobo_focus">
+						<h2>阳光国际速递</h2>
+						<dl class="xlobo_sprial">
+                        <br/>
+							<dt>稳定时效</dt>
+                            <dt>安全快捷</dt>
+                            <dt>安全快捷</dt>
+							<!--<dd>安全快捷</dd>
+							<dd>xxxxxxxxx</dd>
+							<dd>xxxxxxxxx</dd>
+							<dd>xxxxxxxxx</dd>
+							<dd>xxxxxxxxx</dd>
+						</dl>
+						<span class="xlobo_focus_sure"><a href="http://www.xlobo.com/Account/Certification/SelectCertCountry.aspx" target="_blank">现在注册<s></s></a></span>
+					</div>
+				</div>-->
+			</li>
+			<li class="p2" style="opacity: 0; z-index: 0; position: absolute; left: 0px; top: 0px;">
+				<!--<div class="ly_in">
+					<div class="xlobo_focus">
+						<h2>阳光国际速递</h2>
+						<p class="vice_standard">xxxxxxxx</p>
+						<p>xxxxxxxx</p>
+						<span class="xlobo_focus_sure"><a href="http://www.xlobo.com/Account/Certification/SelectCertCountry.aspx" target="_blank">现在注册<s></s></a></span>
+					</div>
+				</div>-->			
+			</li>
+			<li class="p3" style="opacity: 0; z-index: 0; position: absolute; left: 0px; top: 0px;">
+				<!--<div class="ly_in">
+					<div class="xlobo_focus">
+						<h2>阳光国际速递</h2>
+						<p class="vice_standard">xxxxxxxxx</p>
+						<p>xxxxxxxx</p>
+						<span class="xlobo_focus_sure"><a href="http://www.xlobo.com/Account/Certification/SelectCertCountry.aspx" target="_blank">现在注册<s></s></a></span>
+					</div>
+				</div>-->			
+			</li>
+			<li class="p4" style="opacity: 1; z-index: 1; position: absolute; left: 0px; top: 0px;">
+				<!--<div class="ly_in">
+					<div class="xlobo_focus">
+						<h2>阳光国际速递</h2>
+						<p class="vice_standard">xxxxxxx</p>
+						<p>xxxxxxxx</p>
+						<span class="xlobo_focus_sure"><a href="http://www.xlobo.com/Account/Certification/SelectCertCountry.aspx" target="_blank">现在注册<s></s></a></span>
+					</div>
+				</div>	-->		
+			</li>
+		</ul>
+		<ul class="number_list">
+			<li class="">1</li>
+			<li class="">2</li>
+			<li class="">3</li>
+			<li class="on">4</li>
+		</ul>
+	</div>
+    <!-- focus E -->
+        <!-- focus E -->
+        <div class="ly_in index_content">
+        	<div class="row">
+        		<div class="col-xs-4">
+                <div class="query_con query_order">
+                 
+                    
+                    
+                     <input id="searchinput" type="text" value="请输入包裹运单号跟踪状态" toolstip="请输入包裹运单号跟踪状态" onkeydown=" BillCodeOnKeyDown(this, event); ">
+                    <a class="query_btn" href="javascript:void(0)" title="查询运单" onclick=" checkCode(); ">开始查询<s></s></a>
+                </div>
+                <br/>
+                <br/>
+                <div class="bd">
+				<!--<ul class="solut_list" style="height: 0px;width: 500px;">
+				  <li class="sl1" style="padding-left: 15px; width: 215px;">
+					  <h3><a href="#">国际配送</a></h3>
+					  <p><a href="#"><i></i>丰富的全球航空路线</a></p>
+					  <p><a href="#"><i></i>稳定的国际配送服务</a></p>
+					  <p><a href="#"><i></i>本地化客户服务团队</a></p>
+					  <s><a href="#"></a></s>
+				  </li>
+				  <li class="sl2" style="padding-left: 0px; width: 200px;">
+					  <h3><a href="#">海外仓储</a></h3>
+					  <p><a href="#"><i></i>遍布全球的服务网点
+</a></p>
+					  <p><a href="#"><i></i>专业的电商仓储服务</a></p>
+					  <p><a href="#"><i></i>高效的配货包装服务</a></p>
+                      <s><a href="#"></a></s>
+				  </li>
+				  <li class="sl3" style="padding-left: 15px; width: 215px;">
+					  <h3><a href="#">保税物流</a></h3>
+					  <p><a href="#"><i></i>中国各大保税试点区域布局</a></p>
+					  <p><a href="#"><i></i>跨境电商保税进口服务</a></p>
+					  <s><a href="#"></a></s>
+				  </li>
+				  <li class="sl4" style="padding-left: 0px;width: 200px;">
+					  <h3><a href="#">关务辅导</a></h3>
+					  <p><a href="#"><i></i>海外出口申报服务</a></p>
+					  <p><a href="#"><i></i>中国入境申报咨询</a></p>
+					  <p><a href="#"><i></i>口岸政策舆情解读</a></p>
+                      <s><a href="#"></a></s>
+				  </li>
+				</ul>-->
+			</div>
+               <!-- <div class="serv_opt">
+                    <ul class="serv_opt_list">
+                        <li class="so1"><a href="http://www.xlobo.com/Public/UserDeclare.aspx"><i></i>提交身份证明</a></li>
+                        <li class="so2"><a href="http://www.xlobo.com/public/Query.aspx"><i></i>在线缴税</a></li>
+                        <li class="so3"><a href="http://www.xlobo.com/Public/resourcedownload.aspx"><i></i>关务咨询</a></li>
+                        <li class="so4"><a href="javascript:;" id="onLineService"><i></i>在线客服</a></li>
+                    </ul>
+                </div>-->
+            <!--<div class="xlobo_notice">
+				<h3>贝海公告</h3>
+              <span style="color:#888; line-height:22px;">
+贝海国际官方微信上线通知
+<br>
+ 
+为了提升用户体验，让大家享受更轻松更便捷的服务，贝海国际速递开通微信服务号啦！<br>
+ 
+查找方法：
+ 
+打开微信在查找公众号中搜索“<strong style="color:#C48F41">贝海国际速递</strong>”或者“<strong style="color:#C48F41">XloboEX</strong>”。<br>
+ 
+
+ 
+ 
+全心全意！只为您放心满意！
+</span>
+			</div>-->
+                </div>
+            <!-- 全球抵达中国的跨境物流解决方案 S -->
+           <div class="col-xs-5" style="height: 300px;">
+           <div class="solut_box">
+           <div class="row" style="height: 50px;">
+           	<h1> </h1>
+           </div>
+			<div class="hd">
+				<h2>
+</h2>
+			</div>
+			<div class="bd">
+				<ul class="solut_list">
+                <div class="row">
+				  <li class="sl1" style="padding-left: 75px; width: 215px;">
+					  <h3><a href="#">国际配送</a></h3>
+					  <p><a href="#"><i></i>丰富的全球航空路线</a></p>
+					  <p><a href="#"><i></i>稳定的国际配送服务</a></p>
+					  <p><a href="#"><i></i>本地化客户服务团队</a></p>
+					  <s><a href="#"></a></s>
+				  </li>
+				  <li class="sl2" style="padding-left: 75px;width: 200px;">
+					  <h3><a href="#">海外仓储</a></h3>
+					  <p><a href="#"><i></i>遍布全球的服务网点
+</a></p>
+					  <p><a href="#"><i></i>专业的电商仓储服务</a></p>
+					  <p><a href="#"><i></i>高效的配货包装服务</a></p>
+                      <s><a href="#"></a></s>
+				  </li>
+                  </div>
+                  <div class="row">
+				  <li class="sl3" style="padding-left: 75px;width: 215px;">
+					  <h3><a href="#">保税物流</a></h3>
+					  <p><a href="#"><i></i>中国各大保税试点区域</a></p>
+					  <p><a href="#"><i></i>跨境电商保税进口服务</a></p>
+					  <s><a href="#"></a></s>
+				  </li>
+				  <li class="sl4" style="padding-left: 85px;width: 200px;">
+					  <h3><a href="#">关务辅导</a></h3>
+					  <p><a href="#"><i></i>海外出口申报服务</a></p>
+					  <p><a href="#"><i></i>中国入境申报咨询</a></p>
+					  <p><a href="#"><i></i></a></p>
+                      <s><a href="#"></a></s>
+				  </li>
+                  </div>
+				</ul>
+			</div>
+            </div>
+            </div>
+            <div class="col-xs-3" style="background-color:#e8e8e8; height=300px;"><div class="solut_box" style="height: 300px;">
+			<div class="hd">
+				<h2>最新阳光资讯</h2>
+                <p><a href="./news.html">[2015-07-15]热烈欢庆阳光国际速递成立</a></p>
+                <p><a href="#">[2015-07-22]热烈庆祝洛杉矶分公司新仓库投入使用</a></p>
+			</div>
+			
+            </div></div>
+            </div>
+		</div>
+
+
+            
+            <!-- 查询,公告 E -->
+        </div>
+    </div>
+    
+    
+ <div class="friend_box">
+    <div class="ly_in"> <span class="friend_tit">合作伙伴：</span>
+        <ul class="friend_list" style="width:1100px">
+            <li><a href="http://www.ymatou.com/" target="_blank"><img src="./shining_files/8.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.jd.com/" target="_blank"><img src="./shining_files/f2.jpg" width="148" height="58" alt=""></a></li>
+            <li><a href="http://g.taobao.com/" target="_blank"><img src="./shining_files/5.png" width="148" height="58" alt=""></a></li>
+            
+            <li><a href="http://tmall.hk/" target="_blank"><img src="./shining_files/f4.jpg" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.suning.com/" target="_blank"><img src="./shining_files/f5.jpg" width="148" height="58" alt=""></a></li>
+         
+            <li><a href="http://www.redbaby.com.cn/" target="_blank"><img src="./shining_files/f1.jpg" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.ckair.com/" target="_blank"><img src="./shining_files/1.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.airchinacargo.com/" target="_blank"><img src="./shining_files/2.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.ontrac.com/" target="_blank"><img src="./shining_files/3.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.csair.com/" target="_blank"><img src="./shining_files/4.png" width="148" height="58" alt=""></a></li>
+            
+            <li><a href="http://www.chinapost.com.cn/" target="_blank"><img src="./shining_files/7.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.fedex.com/us/" target="_blank"><img src="./shining_files/6.png" width="148" height="58" alt=""></a></li>
+        </ul>
+    </div>
+</div>
+  
+<div class="xlobo_ft">
+    <div class="ly_in">
+       
+        
+        <div class="global_site"> <span>联系我们：</span>
+            <ul class="global_site_list">
+                <li class="st1"><i></i><a href="./location.html">地址：18513 Gale Ave. City of Industry CA 91748</a></li>
+                <li class="st2"><i></i><a href="#" target="_blank">联系电话：(310)997-0057</a></li>
+                <li class="st3"><i></i><a href="#" target="_blank">Email(电子邮箱)：info@shiningexpress.com</a></li>
+                <li class="st4"><i></i><a href="#" target="_blank"></a></li>
+                
+               
+            </ul>
+        </div>
+
+       
+       
+        <div class="copy_right">
+            <p>
+            
+           
+                <a href="#" target="_blank">帮助及问答</a>
+                <a href="#" target="_blank">资源下载</a>
+                <a href="#" target="_blank">加盟合作</a>
+                <a href="#" target="_blank">服务协议</a>
+
+          
+                
+            </p>
+            <p>Copyright © 2015 Webxury Inc. All Rights Reserved.</p>
+        </div>
+    </div>
+</div>
+    
+
+
+
+
+      <script src="./shining_files/main.js"></script>
+<script src="./shining_files/changeLang.js"></script>
+
+  
+
+
+    <script type="text/javascript">
+        $(function () {
+            $("#online-wx").bind({
+                mouseenter: function () {
+                    $(this).find('.tooltips').css('visibility', 'visible');
+                    return false;
+                },
+                mouseleave: function () {
+                    $(this).find('.tooltips').css('visibility', 'hidden');
+                    return false;
+                }
+            });
+
+            $("input[type=text],input[type=password],textarea").orgtxt("cur");
+        })
+    </script>
+    <!--[if IE 6]><script type="text/javascript" src="/Scripts/dd_png.js"> </script>
+<script type="text/javascript">
+    DD_belatedPNG.fix('.png');
+</script><![endif]-->
+
+ 
+
+    
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-47831769-1', 'xlobo.com');
+        ga('send', 'pageview');
+
+    </script>
+    
+    
+    
+
+
+
+
+</body></html>

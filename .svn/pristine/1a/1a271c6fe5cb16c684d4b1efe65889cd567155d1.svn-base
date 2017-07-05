@@ -1,0 +1,139 @@
+package com.weiye.controller;
+
+import java.util.Arrays;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.ErrorTranshipmentInfoUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.model.ErrorTranshipmentBillInfo;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.TranshipmentBill;
+import com.weiye.service.ErrorTranshipmentBillService;
+import com.weiye.service.TranshipmentBillService;
+
+@Controller
+public class ErrorTranshipmentBillController extends BasicController {
+
+	private static final long serialVersionUID = -8158555007757915055L;
+	private static final Logger log = Logger.getLogger(ErrorTranshipmentBillController.class);
+
+	@Resource(name = "errorTranshipmentBillService")
+	private ErrorTranshipmentBillService errorTranshipmentBillService;
+	@Resource(name = "transhipmentBillService")
+	private TranshipmentBillService transhipmentBillService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+
+	@RequestMapping(value = "/admin/error/transh/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addErrorTranshipmentBillInfo(HttpServletRequest request,
+	        ErrorTranshipmentBillInfo info) {
+		// check the error transh info
+		if (info == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		if (!ErrorTranshipmentInfoUtil.validateContent(info.getContent())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "异常件的提交内容长度不能超多200个字符！");
+		}
+		if (!ErrorTranshipmentInfoUtil.validateParentId(info.getParentId())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "回复异常件时候父id格式错误");
+		}
+
+		// 校验预订单信息
+		if (!StringUtil.isEmpty(info.getTranshId())) {
+			try {
+				TranshipmentBill bill = this.transhipmentBillService.getById(info.getTranshId()).getData();
+				if (bill == null) {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "数据库中没有对应id的预报订单信息，预报订单号为："
+					        + info.getTranshId());
+				} else {
+					if (Constant.TRANSHIPMENT_STATE1.equals(bill.getState())
+					        /*|| Constant.TRANSHIPMENT_STATE3.equals(bill.getState())*/) {
+						// pass
+					} else {
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "预订单必须处于未入库状态才可以添加异常信息");
+					}
+				}
+			} catch (Exception e) {
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取预报订单信息出现异常");
+			}
+		}
+
+		try {
+			String empName = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+			info.setEmpName(empName);
+			return this.errorTranshipmentBillService.saveErrorTranshipmentBillInfo(info);
+		} catch (Exception e) {
+			log.error("保存异常件信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "保存异常件信息出现异常，详细异常：" + e.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "/admin/error/transh/del", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> deleteErrorTranshipmentBillInfo(@RequestParam(value = "eid") String[] eid) {
+		if (eid == null || eid.length == 0) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		try {
+			return this.errorTranshipmentBillService.deleteErrorTranshipmentBillInfos(Arrays.asList(eid));
+		} catch (Exception e) {
+			log.error("删除异常件失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除异常件出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/admin/error/transh/modify_state", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyErrorTranshipmentBillInfoState(ErrorTranshipmentBillInfo info) {
+		if (info == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (StringUtil.isEmpty(info.getId())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "异常件id不能为空");
+		}
+
+		if (StringUtil.isEmpty(info.getState())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "异常件状态值只能是0或者1，不能为空！");
+		}
+
+		try {
+			return this.errorTranshipmentBillService.modifyErrorTranshipmentBillInfo(info);
+		} catch (Exception e) {
+			log.error("修改预订单状态失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改预订单状态出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/admin/error/transh/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<ErrorTranshipmentBillInfo>> searchAll(
+	        HttpServletRequest request,
+	        @RequestParam(value = "tid", required = false, defaultValue = "") String tid,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			pageIndex = Math.max(pageIndex, 1);
+			return this.errorTranshipmentBillService.searchByTranshipmentId(tid, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取异常预报单列表出现异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取异常预报单列表出现异常!");
+		}
+	}
+}

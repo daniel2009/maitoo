@@ -1,0 +1,380 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">全部运单</p>
+		<div class="box_content">
+			<div class="content_title">待认领列表</div>
+			<div class="content_text">
+				<div class="tab_box">
+					<div class="query">
+						认领关键字：<input type="text" id="nameCondition1" maxlength="16" />
+						<a name="a_search_link" class="btn" style="background: #007FFF;color: #FFFFFF;display:inline">查询</a>
+					</div>
+					<table id="datatable" class="table">
+						<thead>
+							<tr>
+								<th style="width:30px">包裹单号</th>
+								<th style="width:60px">认领标题</th>
+								<th style="width:100px">认领内容</th>
+								<th style="width:110px">图片1</th>
+								<th style="width:110px">图片2</th>
+								<th style="width:110px">图片3</th>
+								<th style="width:60px">收件人</th>
+								<th style="width:60px">收件人电话</th>
+								<th style="width:70px">创建日期</th>
+								<th style="width:30px;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colspan="12" align="right">共<span id="trsize">0</span>条
+									<a id="first_page" href="1" name="to_page">首页</a> | <a
+									id="pre_page" name="to_page">上一页</a> | <input type="text"
+									class="bor" size="2" /> /<span id="tpsize">0</span>| <a
+									id="next_page" name="to_page">下一页</a> | <a id="last_page"
+									name="to_page">未页</a>&nbsp;&nbsp;
+								</td>
+								
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+			
+			<div class="content_title">已认领列表&nbsp;&nbsp;<a href="#" onclick="javascript: forwardPage('claimPackage', 4);">有问题<span style="margin: 0 3px; color: #f00;">(<label id="countClaimPackageState4">0</label>)</span></a></div>
+			
+			<div class="content_text">
+				<div class="tab_box">
+					<div class="query">
+						<form id="searchSelfForm">
+							认领关键字：<input type="text" name="nameCondition" maxlength="16" />
+							<select id="stateSelectSelf" name="state" onchange="javascript: searchSelf();">
+								<option value="" selected>全部</option>
+								<option value="1">通过</option>
+								<option value="2">失败</option>
+								<option value="3">待审</option>
+								<option value="4">不通过</option>
+							</select>
+							<a name="a_search_link_self" class="btn" style="background: #007FFF;color: #FFFFFF;display:inline">查询</a>
+						</form>
+					</div>
+					<table id="datatableSelf" class="table">
+						<thead>
+							<tr>
+								<th style="width:30px">包裹单号</th>
+								<th style="width:60px">认领标题</th>
+								<th style="width:100px">认领内容</th>
+								<th style="width:110px">图片1</th>
+								<th style="width:110px">图片2</th>
+								<th style="width:110px">图片3</th>
+								<th style="width:60px">审核信息</th>
+								<th style="width:70px">回复日期</th>
+								<th style="width:30px;">状态</th>
+								<th style="width:30px;">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colspan="12" align="right">
+									共<span id="trsizeSelf">0</span>条
+									<a id="first_pageSelf" href="1" name="to_page">首页</a> | 
+									<a id="pre_pageSelf" name="to_page">上一页</a> | 
+									<input type="text" class="bor" size="2" /> /
+									<span id="tpsizeSelf">0</span>| 
+									<a id="next_pageSelf" name="to_page">下一页</a> | 
+									<a id="last_pageSelf" name="to_page">未页</a>&nbsp;&nbsp;
+								</td>
+								
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<script>
+	function searchSelf(){
+		var forwardState = window.sessionStorage.getItem("searchState");
+		window.sessionStorage.clear();
+		if(null != forwardState){
+			$("#stateSelectSelf").val(forwardState);
+		}
+		var formData = new FormData(document.getElementById("searchSelfForm"));
+		loadSelfClaimPackageList(formData);
+	}
+	$("#main-content").ready(function() {
+		loadClaimPackageList("", 1);
+		searchSelf();
+		$("a[name='a_search_link']").click(function(){
+			var nameCondition = $("#nameCondition1").val();
+			var pn = "1";
+			loadClaimPackageList(nameCondition,pn);
+			return false;
+		});
+
+		// 设置点击跳转链接的事件
+		$("#datatable tfoot a[name='to_page']").click(function() {
+			// 跳页
+				var pn = $(this).attr("href");
+				var nameCondition = $("#nameCondition1").val();
+				loadClaimPackageList(nameCondition,pn);
+				return false;
+			});
+
+		$("#datatable tfoot input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var nameCondition = $("#nameCondition1").val();
+					loadClaimPackageList(nameCondition,pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+		
+		/**
+		* self
+		*/
+		$("a[name='a_search_link_self']").click(function(){
+			var formData = new FormData(document.getElementById("searchSelfForm"));
+			loadSelfClaimPackageList(formData);
+			return false;
+		});
+
+		// 设置点击跳转链接的事件
+		$("#datatableSelf tfoot a[name='to_page']").click(function() {
+			// 跳页
+			var pn = $(this).attr("href");
+			var formData = new FormData(document.getElementById("searchSelfForm"));
+			formData.append("pageIndex", pn);
+			loadSelfClaimPackageList(formData);
+			return false;
+			});
+
+		$("#datatableSelf tfoot input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var formData = new FormData(document.getElementById("searchSelfForm"));
+					formData.append("pageIndex", pn);
+					loadSelfClaimPackageList(formData);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	});
+
+	function loadClaimPackageList(nameCondition, page){
+		$.ajax({
+			type:"get",
+			url: "../user/claimPackage/notClaimed",
+			data:{
+				"nameCondition" : nameCondition,
+				"pageIndex":page
+			},
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					if (response.data != null) {
+						showClaimPackageList(response.data.datas);
+						showpagesplit(response.data);
+					} else {
+						showClaimPackageList(null);
+						showpagesplit(null);
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("获取运单记录信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function showpagesplit(pageSplit) {
+		var rowCount = 0;
+		var pageNow = 0;
+		var pageCount = 0;
+		if (pageSplit != null) {
+			rowCount = pageSplit.rowCount;
+			pageNow = pageSplit.pageNow;
+			pageCount = pageSplit.pageCount;
+		}
+		$("#trsize").html(rowCount);
+		$("#tpsize").html(pageCount);
+		$("#first_page").attr("href","1");
+		$("#pre_page").attr("href", pageNow - 1);
+		$("#next_page").attr("href",pageNow + 1);
+		$("#last_page").attr("href", pageCount);
+	}
+	function showClaimPackageList(list){
+		$("#datatable tbody").html("");
+		if (list != null && list.length > 0) {
+			$.each(list,function(){
+				var string = "";
+				string += "<tr id='" + this.id + "'>";
+				string += "<td>" + this.id + "</td>";
+				string += "<td style='word-break: break-all'>" +  this.title + "</td>";
+				string += "<td style='word-break: break-all'>" + this.content + "</td>";
+				string += "<td><img style='max-width:150px; max-height: 150px;' src='"+ baseUrl + this.pic1 + "'></td>";
+				string += "<td><img style='max-width:150px; max-height: 150px;' src='"+ baseUrl + this.pic2 + "'></td>";
+				string += "<td><img style='max-width:150px; max-height: 150px;' src='"+ baseUrl + this.pic3 + "'></td>";
+				string += "<td>" + this.revName + "</td>";
+				string += "<td>" + this.baoguoPhone + "</td>";
+				string += "<td>" + this.createDate + "</td>";
+				string += "<td><a href='javascript: claimByUser("+this.id+")'>认领</a></td>";
+				string += "</tr>";
+				$("#datatable tbody").append(string);
+			});
+		}
+	}
+	function claimByUser(id){
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("claimPackageId", id);
+		$("#main-content").load("../user/claimPackageClaim.jsp");
+		return false;
+	}
+	
+	/**
+	self start
+	**/
+	function loadSelfClaimPackageList(formData){
+		$.ajax({
+			type:"post",
+			url: "../user/claimPackage/self",
+			data : formData,
+			processData : false,
+			contentType : false,
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					if (response.data != null) {
+						showClaimPackageListSelf(response.data.datas);
+						showpagesplitSelf(response.data);
+					} else {
+						showClaimPackageListSelf(null);
+						showpagesplitSelf(null);
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("获取运单记录信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function showpagesplitSelf(pageSplit) {
+		var rowCount = 0;
+		var pageSize = 0;
+		var pageNow = 0;
+		var pageCount = 0;
+		if (pageSplit != null) {
+			rowCount = pageSplit.rowCount;
+			pageSize = pageSplit.pageSize;
+			pageNow = pageSplit.pageNow;
+			pageCount = pageSplit.pageCount;
+		}
+		$("#trsizeSelf").html(rowCount);
+		$("#tpsizeSelf").html(pageCount);
+		$("#first_pageSelf").attr("href","1");
+		$("#pre_pageSelf").attr("href", pageNow - 1);
+		$("#next_pageSelf").attr("href",pageNow + 1);
+		$("#last_pageSelf").attr("href", pageCount);
+	}
+	function showClaimPackageListSelf(list){
+		$("#datatableSelf tbody").html("");
+		if (list != null && list.length > 0) {
+			$.each(list,function(){
+				var string = "";
+				string += "<tr id='" + this.id + "'>";
+				string += "<td>" + this.renlingBaoguo.id + "</td>";
+				string += "<td style='word-break: break-all'>" + this.renlingBaoguo.title + "</td>";
+				string += "<td style='word-break: break-all'>" + this.renlingBaoguo.content + "</td>";
+				string += "<td><img style='max-width:150px; max-height: 150px;' src='"+ baseUrl + this.renlingBaoguo.pic1 + "'></td>";
+				string += "<td><img style='max-width:150px; max-height: 150px;' src='"+ baseUrl + this.renlingBaoguo.pic2 + "'></td>";
+				string += "<td><img style='max-width:150px; max-height: 150px;' src='"+ baseUrl + this.renlingBaoguo.pic3 + "'></td>";
+				string += "<td>" + this.auditRemark + "</td>";
+				string += "<td>" + this.modifyDate + "</td>";
+				var state;
+				if(this.state == 1){//approved
+					state = "审核通过";
+				}else if(this.state == 4){//fail
+					var reClaimOver = '"再次认领"';
+					var reClaimOut = '"审核不过"';
+					state = "<a href='javascript:reClaimByUser("+this.id+");' onmouseover='javascript: this.innerHTML="+reClaimOver+"' onmouseout='javascript: this.innerHTML="+reClaimOut+"'>审核不过</a>";
+				}else if(this.state == 2){
+					state = "认领终止";
+				}else{//audit
+					state = "审核中";
+				}
+				string += "<td>"+ state +"</td>";
+				var operation = "<a href='javascript: readClaim("+this.id+")'>查看</a>|";
+				if(this.state != 1 ){//approved
+					operation += "<a href='javascript: deleteByUser("+this.id+")'>删除</a>";
+				}
+				string += "<td>" + operation + "</td>";
+				string += "</tr>";
+				$("#datatableSelf tbody").append(string);
+			});
+		}
+	}
+	function reClaimByUser(id){
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("claimPersonId", id);
+		$("#main-content").load("../user/claimPackageReClaim.jsp");
+		return false;
+	}
+	function deleteByUser(id){
+		if(window.confirm("确认删除吗?")){
+			$.ajax({
+				type:"get",
+				url: "../user/claimPerson/delete",
+				data:{
+					"id" : id
+				},
+				success:function(response) {
+					var code = response.code;
+					if (code == "200") {
+						nav15Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						// 失败
+						alert("删除记录信息失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+	}
+	function readClaim(id){
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("claimPersonId", id);
+		sessionStorage.setItem("readonly", 1);
+		$("#main-content").load("../user/claimPackageReClaim.jsp");
+		return false;
+	}
+</script>
+</body>
+
+</html>

@@ -1,0 +1,87 @@
+package com.weiye.model.temp;
+
+
+public class ImportOrder {
+	private static final long serialVersionUID = -6982124953516666L;
+	private String orderId;
+	private String state;
+	private String batchId;
+	private String flight;
+	private String thirdPNS; // 第三方快递公司
+	private String thirdNo; // 第三方快递单号
+	private String stateremark;
+	private String stateResult;//修改状态的结果描述
+	private String seataxno;//海关号，上传时可能会涉及到此单号
+
+	public String getSeataxno() {
+		return seataxno;
+	}
+
+	public void setSeataxno(String seataxno) {
+		this.seataxno = seataxno;
+	}
+
+	public String getStateResult() {
+		return stateResult;
+	}
+
+	public void setStateResult(String stateResult) {
+		this.stateResult = stateResult;
+	}
+
+	public String getStateremark() {
+		return stateremark;
+	}
+
+	public void setStateremark(String stateremark) {
+		this.stateremark = stateremark;
+	}
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getBatchId() {
+		return batchId;
+	}
+
+	public void setBatchId(String batchId) {
+		this.batchId = batchId;
+	}
+
+	public String getFlight() {
+		return flight;
+	}
+
+	public void setFlight(String flight) {
+		this.flight = flight;
+	}
+
+	public String getThirdPNS() {
+		return thirdPNS;
+	}
+
+	public void setThirdPNS(String thirdPNS) {
+		this.thirdPNS = thirdPNS;
+	}
+
+	public String getThirdNo() {
+		return thirdNo;
+	}
+
+	public void setThirdNo(String thirdNo) {
+		this.thirdNo = thirdNo;
+	}
+}

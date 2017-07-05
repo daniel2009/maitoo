@@ -1,0 +1,378 @@
+package com.weiye.dao;
+
+import java.util.List;
+
+
+
+
+
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.model.Order;
+import com.weiye.model.temp.ExportOrder;
+
+public interface OrderDao {
+	/**
+	 * 插入运单到数据库中
+	 * 
+	 * @param order
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertOrder(Order order) throws Exception;
+	public int insertthirdOrder(Order order) throws Exception;//插入第三方订单
+	
+	/**
+	 * 插入一个空运单到数据库中
+	 * 
+	 * @param order
+	 * @return
+	 * @throws Exception
+	 */
+	public int insertEmptyOrders(Order order) throws Exception;
+	
+	/**
+	 * 根据运单数据id主键获取运单记录对象
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public Order getById(String id) throws Exception;
+
+	/**
+	 * 根据运单id获取运单记录
+	 * 
+	 * @param orderId
+	 * @return
+	 * @throws Exception
+	 */
+	public Order getByOrderId(@Param("orderId") String orderId) throws Exception;
+
+	/**
+	 * 根据转运单id主键集合获取记录对象
+	 * 
+	 * @param list
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Order> getByTranshipmentIds(List<String> list) throws Exception;
+
+	/**
+	 * 根据运单状态和运单的航班信息获取运单对象
+	 * 
+	 * @param state
+	 *            运单状态
+	 * @param flight
+	 *            运单航班信息
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Order> getOrderByStateAndFlight(@Param("state") String state, @Param("flight") String flight)
+	        throws Exception;
+
+	/**
+	 * 根据运单主键集合获取运单记录
+	 * 
+	 * @param list
+	 *            运单主键集合
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Order> getOrderByIds(List<String> list) throws Exception;
+
+	/**
+	 * 根据运单号获取运单记录
+	 * 
+	 * @param list
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Order> getOrderByOrderIds(List<String> list) throws Exception;
+	/**
+	 * 根据运单号获取receiver
+	 * 
+	 * @param list
+	 * @return
+	 * @throws Exception
+	 */
+	//public List<Order> getRecvNameByOrderId(List<String> list) throws Exception;	
+	
+	/**
+	 * 根据运单号获取导出运单记录
+	 * //kai 20150915
+	 * @param list
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ExportOrder> getExportOrderByOrderIds(List<String> list) throws Exception;
+
+	/**
+	 * 根据会员id获取运单数目
+	 * 
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	public int countOfUserId(@Param("userId") String userId) throws Exception;
+
+	/**
+	 * 根据会员id分页获取运单数据
+	 * 
+	 * @param userId
+	 * @param index
+	 * @param size
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Order> searchByUserId(@Param("userId") String userId, @Param("index") int index, @Param("size") int size)
+	        throws Exception;
+
+	/**
+	 * 根据门店id获取运单数目
+	 * 
+	 * @param storeId
+	 * @return
+	 * @throws Exception
+	 */
+	public int countOfMsjOrder(@Param("storeId") String storeId,@Param("typekey") String typekey) throws Exception;
+	
+
+	/**
+	 * 根据门店id获取运单的分页数据
+	 * 
+	 * @param storeId
+	 * @param index
+	 * @param size
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Order> searchMsjOrders(@Param("storeId") String storeId,@Param("typekey") String typekey, @Param("index") int index,
+	        @Param("size") int size) throws Exception;
+	
+	
+	/**
+	 * 根据门店id获取空运单数目
+	 * 
+	 * @param storeId
+	 * @return
+	 * @throws Exception
+	 */
+	public int countOfEmptyOrder(@Param("storeId") String storeId,@Param("orderKey") String orderKey) throws Exception;
+	/**
+	 * 根据门店id获取空运单的分页数据
+	 * 
+	 * @param storeId
+	 * @param index
+	 * @param size
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Order> searchEmptyOrders(@Param("storeId") String storeId,@Param("orderKey") String orderKey, @Param("index") int index,
+	        @Param("size") int size) throws Exception;
+
+	public int countOfWebOrder(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("column") String column, @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("state") String state,@Param("typekey") String typekey,@Param("storeId") String storeId) throws Exception;
+	
+	public int countOfWebOrderbelonguser(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("state") String state,@Param("typekey") String typekey,@Param("storeId") String storeId) throws Exception;
+	
+	public List<Order> searchWebOrdersbelonguser(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("index") int index, @Param("size") int size, @Param("state") String state,@Param("typekey") String typekey,@Param("storeId") String storeId) throws Exception;
+		
+	public int countOfWebOrderincludewidcid(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("column") String column, @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("state") String state,@Param("typekey") String typekey,@Param("wid") String wid,@Param("cid") String cid) throws Exception;
+	
+	public int countOfWebOrderincludewidcidbyownuser(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("state") String state,@Param("typekey") String typekey,@Param("wid") String wid,@Param("cid") String cid) throws Exception;
+	
+	public int countOfWebOrderincludenopay(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("state") String state,@Param("wid") String wid,@Param("cid") String cid) throws Exception;
+	
+
+	public List<Order> searchWebOrders(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("column") String column, @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("index") int index, @Param("size") int size, @Param("state") String state,@Param("typekey") String typekey,@Param("storeId") String storeId) throws Exception;
+	
+	public List<Order> searchWebOrdersincludewidcid(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("column") String column, @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("index") int index, @Param("size") int size, @Param("state") String state,@Param("typekey") String typekey,@Param("wid") String wid,@Param("cid") String cid) throws Exception;
+
+	public List<Order> searchWebOrdersincludewidcidbyownuser(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("index") int index, @Param("size") int size, @Param("state") String state,@Param("typekey") String typekey,@Param("wid") String wid,@Param("cid") String cid) throws Exception;
+	
+	public List<Order> searchcountOfWebOrderincludenopay(@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("index") int index, @Param("size") int size, @Param("state") String state,@Param("wid") String wid,@Param("cid") String cid) throws Exception;
+	
+	
+	
+	public int countOfSearchKeys(@Param("orderId") String oid, @Param("key") String key,
+	        @Param("column") String column, @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("userId") String userId, @Param("state") String state,@Param("typekey") String typekey,@Param("storeId") String storeId) throws Exception;
+
+	public List<Order> searchByKeys(@Param("orderId") String oid, @Param("key") String key,
+	        @Param("column") String column, @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("userId") String userId, @Param("index") int index, @Param("size") int size,
+	        @Param("state") String state,@Param("typekey") String typekey,@Param("storeId") String storeId) throws Exception;
+	
+	public int countOfSearchLike(@Param("userId") String userId,@Param("query") String query, @Param("type") String type) throws Exception;
+	
+	public List<Order> searchByLike(@Param("userId") String userId,@Param("query") String query, @Param("type") String type, @Param("index") int index, @Param("size") int size) throws Exception;
+	
+	/**
+	 * 根据记录id删除记录和运单的状态
+	 * 
+	 * @param ids
+	 * @param states
+	 * @return
+	 * @throws Exception
+	 */
+	public int deleteByOrderIds(@Param("ids") List<String> ids, @Param("states") List<String> states) throws Exception;
+
+	public int modifyOrderFlight(@Param("id") String id, @Param("flight") String flight, @Param("date") String date)
+	        throws Exception;
+
+	public int modifyOrder(Order order) throws Exception;
+	
+	public int modifyEmptyOrder(Order order) throws Exception;
+	
+	//使用新有空运单修改方法
+	public int modifyemptyOrder_new(Order order) throws Exception;
+	
+	
+
+	public int modifyMultiOrderStateAndFlight(@Param("list") List<String> list, @Param("state") String state,
+	        @Param("flight") String flight, @Param("date") String date, @Param("thridpns") String thridpns, @Param("thridno") String thridno) throws Exception;
+	
+	public int modifyOrderStatebyflightno(@Param("flight") String flight, @Param("state") String state, @Param("date") String date) throws Exception;
+	public int modifyOrderflightnobyflightno(@Param("flight") String flight,@Param("newflight") String newflight, @Param("date") String date) throws Exception;
+	
+	public List<Order> searchordersbyflight(@Param("flight")String flight);
+
+	public int modifyOrderStateOfExcel(List<Order> list) throws Exception;
+
+	public int modifyOrderPay(@Param("list") List<String> ids, @Param("payDate") String payDate,
+	        @Param("state") String state) throws Exception;
+
+	public List<ExportOrder> getExportOrderByCreateData(@Param("sdate") String sdate, @Param("edate") String edate)
+	        throws Exception;
+	
+	public List<ExportOrder> getExportToMeitaoOrder(@Param("wid") String wid,@Param("orderId") String orderId, @Param("key") String key,
+	        @Param("column") String column, @Param("sdate") String sdate, @Param("edate") String edate,
+	        @Param("state") String state) throws Exception;
+
+	
+
+	/**
+	 * 根据运单id获取导出运单记录
+	 * 
+	 * @param orderId
+	 * @return
+	 * @throws Exception
+	 */
+	public ExportOrder getByExportOrderId(@Param("orderId") String orderId,@Param("wid") String wid) throws Exception;
+	
+	/**
+	 * 根据运单记录的主键id修改字段运单id的值
+	 * 
+	 * @param id
+	 *            主键id
+	 * @param orderId
+	 *            运单id
+	 * @return
+	 * @throws Exception
+	 */
+	public int modifyOrderId(@Param("id") String id, @Param("orderId") String orderId) throws Exception;
+
+	/**
+	 * 根据运单记录的主键id修改字段运单id的值
+	 * 
+	 * @param id
+	 *            主键id
+	 * @param totalMoney
+	 *            总价钱
+	 * @return
+	 * @throws Exception
+	 */        
+	public int modifyTotalMoneyByOrderId(@Param("id") String id, @Param("totalMoney") String totalMoney) throws Exception;
+
+	/**
+	 * 获取运单号在soid和eoid之间的而且运单状态为state的运单，最多返回size个运单。
+	 * 
+	 * @param soid
+	 * @param eoid
+	 * @param state
+	 * @param size
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Order> getOrderOfOrderId(@Param("soid") String soid, @Param("eoid") String eoid,
+	        @Param("state") String state, @Param("size") int size) throws Exception;
+
+	/**
+	 * 获取数据库中空运单的个数
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public int getRetailOrderCount() throws Exception;
+	
+	public int updateEmptyOrder(Order order) throws Exception;
+
+	public int modifyCardIdAndUrl(@Param("orderId")String orderId, @Param("cardId")String cardId, @Param("cardUrl")String cardUrl, @Param("cardurlother")String cardurlother, @Param("cardurltogether")String cardurltogether) throws Exception; 
+	
+	//kai 20150911
+	public int modifyOrderbyuser(Order order) throws Exception;
+	
+	//kai 20150911
+	public int modifyOrderurlonly(Order order) throws Exception;
+	public int modifyOrderonlineadmin(Order order) throws Exception;
+	public List<Order> searchinsertcardurlinfo(@Param("orderId")String orderId, @Param("cname")String cname,@Param("cphone")String cphone) throws Exception;
+	public int modifyOrderflightnobyorderids(@Param("list") List<String> list, @Param("state") String state,@Param("flight") String flight,
+	        @Param("date") String date) throws Exception;
+	
+	public int modifyOrderflightnobyorderid(@Param("orderId") String orderId, @Param("state") String state,@Param("flight") String flight,
+	        @Param("date") String date,@Param("storeId") String storeId) throws Exception;
+	
+	public List<Order> searchbyflyno(@Param("flight") String flight) throws Exception;
+
+	public Order getOrderbyorderidandwid(@Param("orderId")String orderId,@Param("wid") String wid);
+	
+	public List<Order> getOrderbyseanoandwid(@Param("seaNo")String seaNo,@Param("wid") String wid);
+	
+	public int updatePayPosition(@Param("id") String id, @Param("payToChina") String payToChina, @Param("payChangeWarehouse")String payChangeWarehouse) throws Exception;
+	public int updateState(@Param("id")String id, @Param("state")String state, @Param("modifyDate")String modifyDate) throws Exception;
+	
+	public int countByAfterState(Order order) throws Exception;
+	public List<Order> findByAfterState(@Param("order")Order order, @Param("firstResult")int firstResult, @Param("pageSize")int pageSize) throws Exception;
+
+    
+	public int modifyComdityCostByOrderId(@Param("id") String id, @Param("CommodityCost") String CommodityCost) throws Exception;
+	
+	//public int modifyOrderStateOfExcelbyadmin(@Param("orderId")String orderId,@Param("state") String state,@Param("thirdNo") String thirdNo,@Param("modifyDate") String modifyDate,@Param("thirdPNS") String thirdPNS,@Param("flight") String flight);
+	public int modifyOrderStateOfExcelbyadmin(Order order);
+	public int modifyOrderSeaNoOfExcelbyadmin(Order order);
+	public int modifyOrderStateOfExcelbyseano(Order order);
+	
+	public int countOfordersbyorderid(@Param("orderId") String orderId);
+	
+	
+	public int countOfordersbyorderidandwin(@Param("orderId") String orderId,@Param("wid") String wid);
+
+	public Order getByOrderIdonlyorder(@Param("orderId") String orderId,@Param("storeId") String storeId);
+	
+	public int countOfflights(@Param("flight") String flight);
+	//获取只有运单信息的
+	public Order getByOrderIdonlyfororder(@Param("orderId") String orderId,@Param("storeId") String storeId);
+	
+	
+}

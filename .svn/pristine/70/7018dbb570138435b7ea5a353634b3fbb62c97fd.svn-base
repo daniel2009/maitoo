@@ -1,0 +1,1378 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">包裹预报</p>
+		<div>
+			<div class="hint">预报包裹是当您在购物网站订单成功后，获得购物网站通过邮箱发送的确认发货单号。预报给我们会提高仓储收发包裹管理，更加高效地处理您的包裹，如果您未计划对包裹做准确预报，可能会影响您的包裹处理速度。</div>
+			<div class="red ml10">注：*为必填项。</div>
+			<input style="display: none;" id="useIdcardText" readonly>
+			
+			<form action="" id="submit_tran_order_pic" method="post"
+					enctype="multipart/form-data">
+			<table class="userTable">
+				<!-- <tr>
+					<th class="area_tit" colspan="2">第一步：选择收件仓库</th>
+				</tr>
+				<tr>
+					<th valign="top"><span class="red">*</span>到货仓库：</th>
+					<td>
+						<select name="wid">
+							<option>请选择到货仓库</option>
+						</select> 
+						<span class="warn" style="color:Red;display:none;">请选择仓库！</span>
+						<div id="houseinfo" style="display: none; line-height: 22px; color: #009"></div>
+						<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;预计货到日期：</label>
+						<input name="eta" type="text" id="sd" onclick="setDate()" placeholder="格式：yyyy-mm-dd"/>
+					</td>
+					
+					
+				</tr> -->
+				<!-- <tr>
+					<th valign="top"><span class="red">*</span>期望操作：</th>
+					<td id="hengxiang"><span> 
+					<input type="radio" name="expect" value="0"checked="checked" /> <label>未定</label>
+					<input type="radio" name="expect" value="1" /> <label>原箱转运</label> 
+					<input type="radio" name="expect" value="2" /><label>合箱</label> 
+					<input type="radio" name="expect" value="3" /> <label>分箱</label>
+					</span> &nbsp; <span class="gray">请尽量准确选择即将操作的类型，以便快速处理您的包裹。</span></td>
+				</tr> -->
+				<tr>
+					<th class="area_tit" colspan="6">1、选择快递公司，填写运单号（请勿重复提交相同的单号，正确的填写可以帮我们正确地识别您的包裹）</th>
+				</tr>
+				<tr>
+					<th valign="top"><span class="red"></span>快递公司:</th>
+					<td><input type="text" name="tcompany" size="30"
+						style="width:120px;" placeholder="填写运单公司" /></td>
+				</tr>
+				<tr>
+					<th valign="top"><span class="red">*</span>包裹运单号:</th>
+					<td><input type="text" name="tno" size="30"
+						style="width:120px;" placeholder="填写运单号" /></td>
+
+				</tr>
+
+				<tr>
+					<th class="area_tit" colspan="6">2、转运类型(不同类型的转运，转动速度不同，操作方式也不一样，请注意选择)</th>
+				</tr>
+				<tr>
+					<th valign="top"><span class="red">*</span>转运方式:</th>
+					<td><input type="radio" name="expecttype" value="0"
+						checked="checked" onclick="choosetype()" /> <label>普通转运</label>&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="radio" name="expecttype" value="1"
+						onclick="choosetype()" /><label>极速转运</label></td>
+				</tr>
+
+				<tr id="quickwaytr_title">
+					<th class="area_tit" colspan="6">3、极速转运收件人地址填写！&nbsp&nbsp&nbsp&nbsp<span
+						style="color:blue;"><input type="checkbox"
+							id="addressheetid" name="addressheet" value="0"
+							onclick="addressheetshow()" /> 引用收件地址薄</span></th>
+				</tr>
+
+				<tr id="addressheetshow" style="display:none;">
+					<td class="align_left" colspan="6">
+
+
+
+
+
+
+						<table id="cdatatable" class="mtable">
+							<thead>
+								<tr>
+									<td align="center">选择</td>
+									<td>收货人</td>
+									<td>电话</td>
+
+									<td colspan="4">详细地址</td>
+									<td>身份证</td>
+									<td align="center">身份证正面图</td>
+									<td align="center">身份证反面图</td>
+									<td align="center">身份证合成图</td>
+								</tr>
+							</thead>
+
+							<tbody>
+
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="11" align="center">共<span id="trsize">0</span>条
+										<a id="first_page" href="1" name="to_page">首页</a> | <a
+										id="pre_page" name="to_page">上一页</a> | <input type="text"
+										class="bor" size="2" style="width:20px;height:10px;" /> /<span
+										id="tpsize">0</span>| <a id="next_page" name="to_page">下一页</a>
+										| <a id="last_page" name="to_page">未页</a>
+									</td>
+								</tr>
+							</tfoot>
+
+						</table>
+
+					</td>
+				</tr>
+
+
+				<tr id="quickwaytr_context1">
+					<td class="align_right"><span class="red">*</span>收件人：</td>
+					<td class="align_left"><input name="cName" type="text"
+						maxlength="10" /></td>
+				</tr>
+				<tr id="quickwaytr_context2">
+					<td class="align_right"><span class="red">*</span>收货地址：</td>
+					<td class="align_left"><input type="hidden" name="province" />
+						<input type="hidden" name="city" /> <input type="hidden"
+						name="dist" /> <select id="loc_province" style="width:150px">
+					</select> / <select id="loc_city" style="width:150px">
+					</select> / <select id="loc_town" style="width:150px">
+					</select>&nbsp;&nbsp;禁用<input type="checkbox" name="use_pct" id="use_pct" value=""></td>
+				</tr>
+				<tr id="quickwaytr_context3">
+					<td class="align_right"><span class="red">*</span>详细地址：</td>
+					<td class="align_left"><input type="text"
+						name="cStreetAddress" maxlength="36" />
+					</td>
+				</tr>
+				<tr id="quickwaytr_context4">
+					<td class="align_right"><span class="red">*</span>手机：</td>
+					<td class="align_left"><input name="cPhone" type="text"
+						maxlength="12" /></td>
+				</tr>
+				<tr id="quickwaytr_context5">
+					<td class="align_right">邮编：</td>
+					<td class="align_left"><input name="cZipCode" type="text"
+						maxlength="10" /></td>
+				</tr>
+				<tr id="quickwaytr_context6">
+					<td class="align_right"><span class="red"></span>身份证号：</td>
+					<td class="align_left"><input name="cardidname" type="text"
+						maxlength="18" /></td>
+				</tr>
+				<tr id="quickwaytr_context7">
+					<td class="align_right"><span class="red">*</span>上传身份证正面图片：</td>
+					<td class="align_left"><input id="cardpicid" name="file"
+						type="file" /> (上传支持JPG，PNG，BMP等图片格式，最大不超过4MB)</td>
+				</tr>
+				<tr id="quickwaytr_context8">
+					<td class="align_right"><span class="red">*</span>上传身份证反面图片：</td>
+					<td class="align_left"><input id="cardpicidother"
+						name="fileother" type="file" /> (上传支持JPG，PNG，BMP等图片格式，最大不超过4MB)</td>
+				</tr>
+				<tr type="display:none;">
+					<td style="display:none;"><input type="text" name="idurlcard"
+						style="width:120px;display:none;" /></td>
+					<td style="display:none;"><input type="text"
+						name="idurlcardother" style="width:120px;display:none;" /></td>
+					<td style="display:none;"><input type="text"
+						name="idurlcardtogether" style="width:120px;display:none;" /></td>
+				</tr>
+
+
+
+				<tr id="showcardpicid" style="display:none;">
+					<td class="align_right">身份证正面图预览:</td>
+					<td class="align_left"><a href="" target="_blank"
+						id="imacardurlid"><img width="150px" height="150px" src=""></a></td>
+				</tr>
+				<tr id="showcardpicidother" style="display:none;">
+					<td class="align_right">身份证反面图预览:</td>
+					<td class="align_left"><a href="" target="_blank"
+						id="imacardurlidother"><img width="150px" height="150px"
+							src=""></a></td>
+				</tr>
+				</tr>
+				<tr id="showcardpicidtogether" style="display:none;">
+					<td class="align_right">身份证合成图预览:</td>
+					<td class="align_left"><a href="" target="_blank"
+						id="imacardurlidtogether"><img width="150px" height="150px"
+							src=""></a></td>
+				</tr>
+				<tr >
+					<th class="area_tit" colspan="6"><span id="remarktit_num">3</span>、请填写备注信息，可填写你期望操作的任何内容，越清楚越有利于转运!</th>
+				</tr>
+				<tr style="">
+					<td class="align_right">备注:</td>
+					<td class="align_left" colspan="3"><textarea rows="3" cols="20" class="text-input" name="remark" maxlength="200" styp="width:300px"></textarea></td>
+				</tr>
+				<!-- 
+			 <tr id="showcardpicid" style="display:none;">
+					<td class="align_right" colspan="6">身份证正面图预览:</td>
+					<td class="align_left">
+					
+					<a href=""
+						target="_blank" id="imacardurlid"><img width="150px"
+							height="150px" src=""></a>
+					</td>
+
+				</tr> 
+				<tr id="showcardpicidother" style="display:none;">
+					<td class="align_right" colspan="6">身份证反面图预览:
+					</td>
+					<td class="align_left">
+					<a href=""
+						target="_blank" id="imacardurlidother"><img width="150px"
+							height="150px" src=""></a>
+					</td>
+
+				</tr>
+				<tr id="showcardpicidtogether" style="display:none;">
+					<td class="align_right" colspan="6">身份证合成图预览:</td>
+					<td class="align_left">
+					<a href=""
+						target="_blank" id="imacardurlidtogether"><img width="150px"
+							height="150px" src=""></a>
+					</td>
+
+				</tr>
+
+ -->
+				<!-- <tr>
+					<th><span class="red">*</span>估价/包裹价值：</th>
+					<td>
+						<span class="symbol"></span> 
+						<input type="text" value="0" size="30" style="width:65px;" />
+						<span class="gray">（此项为可选项，如不填，请保持为默认值0）</span>
+					</td>
+				</tr> 
+				<tr>
+					<th><span class="red">*</span>重量：</th>
+					<td>
+						<input type="text" value="0" size="30" style="width:65px;" />
+						<span class="gray">（此项为可选项，如不填，请保持为默认值0）</span>
+					</td>
+				</tr>-->
+				<!-- 
+				<tr>
+					<th class="area_tit" colspan="2">第三步：包裹内物品名称</th>
+				</tr> -->
+				<!--<tr>
+					<th>订单号：</th>
+					<td><select>
+							<option value="0">请选择购物网站</option>
+							<option value="Amazon">Amazon</option>
+							<option value="Ebay">Ebay</option>
+
+					</select> - <input type="text" size="30" style="width:100px;" />
+						<span class="gray">（购物网站及订单号，可为空）</span>
+					</td>
+				</tr>  
+				<tr>
+					<th><span class="red">*</span>尺寸：</th>
+					<td><input type="text" value="0" size="30" style="width:65px;" />
+						 × <input type="text" value="0" size="30" style="width:65px;" />
+						 × <input type="text" value="0" size="30" style="width:65px;" />
+						 <span class="gray">（此项为可选项，如不填，请保持为默认值0）</span>
+					</td>
+				</tr>
+					-->
+				<!-- <tr>
+					<th ><span class="red">*</span><a href="#" id="a_add_commodify_info" class="btn" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">+添加商品</a></th>
+					<td id="commodify_div">
+						<div>
+						<label>商品类别：</label> 
+						<select name="commodityName" style="width:150px"><option>请先选择到货仓库</option></select>&nbsp;&nbsp;包裹详情：<input type="text"  name="commodifyxiangqing" placeholder="填写具体物品信息" style="width:160px" maxlength="50" />&nbsp;&nbsp;商品数量：<input type="text"  name="commodifyQuantity" style="width:30px" value="1" maxlength="5" />&nbsp;&nbsp;<a href="#" name="a_delete_commodify_info">删除</a>
+						</div>
+						
+					</td>
+
+				</tr>
+				<tr>
+				<td colspan="2" align="center">
+					<div class="red">（您需要填写至少一项的商品信息，为了保证您的权益，请尽量完整填写。）</div>
+					</td>
+					</tr>
+				<tr>
+					<th class="area_tit" colspan="2">第四步：包裹预期发货说明</th>
+				</tr>
+				<tr>
+					<th>备注：</th>
+					<td><textarea name="remark" rows="2" cols="20" rows="0" cols="0" style="height:50px;width:360px;"></textarea>
+					</td>
+				</tr>
+
+				<tr>
+					<th class="area_tit" colspan="2">第五步：提交预报后，仓库管理员收到包裹，进入入库，入库后您可以包裹记录中查看您的包裹，并可以对包裹进入分箱，合箱，直接转运，退货等操作来管理您的包裹</th>
+				</tr> -->
+
+			</table>
+			</form>
+			<div class="hint2">
+				客户委托承运的物品必须符合中华人民共和国法律法规要求。货物按照海关要求缴纳行邮税。请参阅：<a href="#">免税条件与包裹规定</a>，<a
+					href="#">行邮税率表</a>，<a href="#">禁运禁限运品表</a>。
+			</div>
+
+			<div class="center">
+				<input type="submit" value="提交预报" class="combtn"
+					onclick="dhyb_click()" />&nbsp;&nbsp; <a href="#">同意本站转运协议</a>&nbsp<input
+					type="checkbox" name="protocol_name" value="0" checked="checked" />
+			</div>
+
+		</div>
+	</div>
+<!-- 不要删除这个div -->
+<div id="tmpmsgdiv2" style="display:none;">
+</div>
+</body>
+<script src="./shining_files/jquery-1.5.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/jquery.form.js"></script> 
+
+<script type="text/javascript">
+	$("#main-content")
+			.ready(
+					function() {
+
+						
+						// 获取用户数据,判断用户是否能够提交预报
+						$.ajax({
+							type:"get",
+							url:user_get_self_url,
+							success:function(response) {
+								var code = response.code;
+								if (code == "200") {
+									var data = response.data;
+									
+									if((data.realName=="")||(data.realName=="null")||(data.realName==null)||(data.realName=="undefined"))
+									{
+										alert("请先填写完整的个人资料，才能够进行包裹预报!(至少包含联系电话和姓名)");
+										nav73Click();
+									}
+									if((data.phone=="")||(data.phone=="null")||(data.phone==null)||(data.phone=="undefined"))
+									{
+										alert("请先填写完整的个人资料，才能够进行包裹预报!(至少包含联系电话和姓名)");
+										nav73Click();
+									}
+								
+								} else if ("607" == code) {
+									alert("您尚未登录或登录已失效！");
+									logout();
+								} else {
+									// 失败
+									alert("获取会员信息失败，原因是:" + response.message);
+								}
+							}
+						});
+						
+						
+						
+						
+						// 设置操作action
+						$("#a_add_commodify_info").click(function() {
+							addCommodifyInfoInputDiv();
+							return false;
+						});
+						// 获取仓库列表
+						$
+								.ajax({
+									type : "get",
+									url : user_warehouse_all_url,
+									success : function(response) {
+										var code = response.code;
+										if (code == "200") {
+											if (response.data == null
+													|| response.data.length == 0) {
+												// 没有数据
+											} else {
+												$
+														.each(
+																response.data,
+																function() {
+																	var str = '<option value="' + this.id + '">'
+																			+ this.name
+																			+ '</option>';
+																	$(
+																			"select[name='wid']")
+																			.append(
+																					str);
+																	$(
+																			"select[name='wid']")
+																			.change(
+																					loadCommoditySelectOption);
+																});
+											}
+										} else if ("607" == code) {
+											alert("您尚未登录或登录已失效！");
+											logout();
+										} else {
+											// 失败
+											// alert("获取仓库数据失败，原因是:" + response.message);
+										}
+									}
+								});
+						
+						
+						/*
+						 * kai 20151029
+						 * 添加禁用省请市区事件
+						 * */
+						$("#use_pct").click(function() {
+							
+							if($("#use_pct").is(':checked')==true)
+							{
+								$("#loc_province").attr("disabled","disabled");
+								$("#loc_city").attr("disabled","disabled");
+								$("#loc_town").attr("disabled","disabled");
+								
+							}
+							else
+							{
+								$("#loc_province").removeAttr("disabled");
+								$("#loc_city").removeAttr("disabled");
+								$("#loc_town").removeAttr("disabled");
+							}
+						});
+
+						//kai 20150923
+						var temp = $("input[name='expecttype']:checked").val();
+						if (temp == 0)//普通转运
+						{
+							$("#addressheetshow").hide();
+							$("#quickwaytr_title").hide();
+
+							quickwaytr_context_hide();
+							document.getElementById("addressheetid").checked = false;
+						} else if (temp == 1)//极速转运
+						{
+							$("#quickwaytr_title").show();
+							quickwaytr_context_show();
+						} else {
+
+						}
+
+						$.ajax({
+							type : "get",
+							url : "../user/globalArgs/getUseIdCard",
+							success : function(response){
+								var code = response.code;
+								if("200" == code){
+									document.getElementById("useIdcardText").value = response.data;
+								} else if ("607" == code) {
+									alert("您尚未登录或登录已失效！");
+									logout();
+								} else {
+									// 失败
+									// alert("获取仓库数据失败，原因是:" + response.message);
+								}
+							}
+						});
+					});
+
+	function loadCommoditySelectOption() {
+		var wid = $("select[name='wid']").val();
+		if (wid == "请选择到货仓库" || wid == null) {
+			$("select[name='commodityName']").empty();
+			$("#commodify_div").css("display", "none");
+			return;
+		}
+
+		$
+				.ajax({
+					post : "get",
+					url : commodity_all_url,
+					data : {
+						"wid" : wid
+					},
+					success : function(response) {
+						var code = response.code;
+						if ("200" == code) {
+							//showCommodityList(response.data);;
+							var str = "";
+							$
+									.each(
+											response.data,
+											function() {
+												str += "<option value='" + this.id+"'  price='" + this.price+"' msPrice='" + this.msPrice+"' >"
+														+ this.name
+														+ "</option>";
+											});
+							$("select[name='commodityName']").html(str);
+							$("#commodify_div").css("display", "block");
+						} else if ("607" == code) {
+							alert("您尚未登录或登录已失效！");
+							logout();
+						}
+					}
+				});
+	}
+
+	function addCommodifyInfoInputDiv() {
+		var commodity = $("select[name='commodityName']").html();
+		var str = '<div><label>商品类别：</label> <select name="commodityName"style="width:150px">'
+				+ commodity + '</select>';
+		str += '&nbsp;&nbsp;包裹详情：<input type="text"  name="commodifyxiangqing" placeholder="填写具体物品信息" style="width:160px" maxlength="50" />';
+		str += '&nbsp;&nbsp;商品数量：<input type="text"  name="commodifyQuantity" style="width:30px" value="1" maxlength="5" />';
+		str += '&nbsp;&nbsp;<a href="#" name="a_delete_commodify_info">删除</a>';
+		str += '</div>';
+
+		$("#commodify_div").append(str);
+		$("a[name='a_delete_commodify_info']").click(function() {
+
+			if ($("a[name='a_delete_commodify_info']").length > 1)
+				$(this).parent().remove();
+			return false;
+		});
+	}
+
+	function setDate() {
+		WdatePicker({
+			minDate : '%y-%M-%d'
+		});
+		if ($(":text[name='eta']").val() != null)
+			$(":text[name='eta']").css({
+				"border-color" : ""
+			});
+	}
+
+	
+	// kai 20150925 创建提交包含图片的运单信息
+	function submittranhavepicurl() {
+		$("#submit_tran_order_pic").ajaxSubmit({
+			type : "post",
+			url : "../transh/submit_tran_order_pics",
+			success : function(data) {
+				// alert(data);
+				$("#tmpmsgdiv2").html(data);
+				var str = $("#tmpmsgdiv2 pre").html();
+
+				var obj = $.parseJSON(str);
+
+				var code = obj.code;
+
+				if (code == "200") {
+					alert("提交成功!");
+
+					nav21Click();
+
+				} else if (code == "607") {
+					alert("您尚未登录或登录已失效！");
+					$(":text[name='cardpicid']").val("");// 已经重新上传，清空原有的图片
+					logout();
+				} else {
+					alert("提交网上置件信息失败，原因是:" + response.message);
+					$(":text[name='cardpicid']").val("");// 已经重新上传，清空原有的图片
+				}
+				return false;
+			},
+			error : function(XmlHttpRequest, textStatus, errorThrown) {
+				alert("操作失败");
+				$(":text[name='idurlcard']").val("");// 已经重新上传，清空原有的图片
+				return false;
+			}
+		});
+	}
+
+
+	
+	//提交转运预报接口
+	function dhyb_click() {
+		var tcompany = $(":text[name='tcompany']").val();//转运公司名称
+		var tno = $(":text[name='tno']").val();//转运公司快递号
+		var remark = $("textarea[name='remark']").val();
+		var validate = true;
+		//转运公司名称选填
+		/*if (tcompany == "" || tcompany == null) {
+			$(":text[name='tcompany']").css({
+				"border-color" : "red"
+			});
+			$(":text[name='tcompany']").change(function() {
+				if ($(":text[name='tcompany']").val() != null)
+					$(":text[name='tcompany']").css({
+						"border-color" : ""
+					});
+			});
+			validate = false;
+		}*/
+		
+		if (tno == "" || tno == null) {
+			$(":text[name='tno']").css({
+				"border-color" : "red"
+			});
+			$(":text[name='tno']").change(function() {
+				if ($(":text[name='tno']").val() != null)
+					$(":text[name='tno']").css({
+						"border-color" : ""
+					});
+			});
+			validate = false;
+		}
+
+		
+
+		var str = '"transitNo":"' + tno + '",' + '"transitCompany":"'
+				+ tcompany + '",' + '"remark":"' + remark +'"';
+		
+		
+		var bgyb_type = $("input[name='expecttype']:checked").val();
+		var picflag=0;
+		
+		if(bgyb_type==0)//普通转运
+		{
+			
+			var protocol=$("input[name='protocol_name']").is(':checked');
+			if(protocol==false)
+			{
+				alert("提交前,请认真阅读本站转运协议,并勾选\" 同意本站转运协议\",再进行提交! ");
+				return false;
+			}
+			 str =str+ ',"transitType":"' + bgyb_type + '"';
+		}
+		else if(bgyb_type==1)//极速转运
+		{
+			//读取收件人信息
+			
+			
+			
+			var cName = $(":text[name='cName']").val();
+			
+			
+			var cProvince = $("#loc_province option:checked").text();
+			var cCity = $("#loc_city option:checked").text();
+			var cDistrict = $("#loc_town option:checked").text();
+			var cStreetAddress = $(":text[name='cStreetAddress']").val();
+			
+			
+			
+			var cZipCode = $(":text[name='cZipCode']").val();
+			var cPhone = $(":text[name='cPhone']").val();
+
+			
+
+			var cardid = $(":text[name='cardidname']").val();// 身份证号
+			var cardurl = $(":text[name='idurlcard']").val();// 原有地址中包含的身份证图片链接
+			// alert(cardurl);
+			cardurl = encodeURI(cardurl);
+			var cardurlother = $(":text[name='idurlcardother']").val();// 原有地址中包含的身份证图片链接
+			 //alert(cardurlother);
+			 cardurlother = encodeURI(cardurlother);
+			var cardurltogether = $(":text[name='idurlcardtogether']").val();// 原有地址中包含的身份证图片链接
+			// alert(cardurltogether);
+			 cardurltogether = encodeURI(cardurltogether);
+			// alert(cardurl);
+			
+		//	var wid = $("select[name='warehouse']").val();
+	//		var cid=$("select[name='channelidname']").val();
+			
+			
+			var validate = true;
+			if (cName == "" || cName == null) {
+				$(":text[name='cName']").css({
+					"border-color" : "red"
+				});
+				$(":text[name='cName']").change(function() {
+					if ($(":text[name='cName']").val() != null)
+						$(":text[name='cName']").css({
+							"border-color" : ""
+						});
+				});
+				validate = false;
+			}
+			
+			if($("#use_pct").is(':checked')==true)//禁止使用
+			{
+				cProvince="";
+				cCity="";
+				cDistrict="";
+			}
+			else
+			{
+				if (cProvince == "" || cProvince == null) {
+					$(":text[name='cProvince']").css({
+						"border-color" : "red"
+					});
+					$(":text[name='cProvince']").change(function() {
+						if ($(":text[name='cProvince']").val() != null)
+							$(":text[name='cProvince']").css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+	
+				if (cCity == "" || cCity == null) {
+					$(":text[name='cCity']").css({
+						"border-color" : "red"
+					});
+					$(":text[name='cCity']").change(function() {
+						if ($(":text[name='cCity']").val() != null)
+							$(":text[name='cCity']").css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+	
+				if (cDistrict == "" || cDistrict == null) {
+					$(":text[name='cDistrict']").css({
+						"border-color" : "red"
+					});
+					$(":text[name='cDistrict']").change(function() {
+						if ($(":text[name='cDistrict']").val() != null)
+							$(":text[name='cDistrict']").css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+			}
+			if (cStreetAddress == "" || cStreetAddress == null) {
+				$(":text[name='cStreetAddress']").css({
+					"border-color" : "red"
+				});
+				$(":text[name='cStreetAddress']").change(function() {
+					if ($(":text[name='cStreetAddress']").val() != null)
+						$(":text[name='cStreetAddress']").css({
+							"border-color" : ""
+						});
+				});
+				validate = false;
+			}
+
+			
+			
+			/*	if (cardid == "" || cardid == null) {
+				$(":text[name='cardidname']").css({
+					"border-color" : "red"
+				});
+				$(":text[name='cardidname']").change(function() {
+					if ($(":text[name='cardidname']").val() != null)
+						$(":text[name='cardidname']").css({
+							"border-color" : ""
+						});
+				});
+				validate = false;
+			}
+			if (cZipCode == "" || cZipCode == null) {
+				$(":text[name='cZipCode']").css({
+					"border-color" : "red"
+				});
+				$(":text[name='cZipCode']").change(function() {
+					if ($(":text[name='cZipCode']").val() != null)
+						$(":text[name='cZipCode']").css({
+							"border-color" : ""
+						});
+				});
+				validate = false;
+			}*/
+			if (cPhone == "" || cPhone == null) {
+				$(":text[name='cPhone']").css({
+					"border-color" : "red"
+				});
+				$(":text[name='cPhone']").change(function() {
+					if ($(":text[name='cPhone']").val() != null)
+						$(":text[name='cPhone']").css({
+							"border-color" : ""
+						});
+				});
+				validate = false;
+			}
+
+			$(":hidden[name='province']").val(cProvince);
+			$(":hidden[name='city']").val(cCity);
+			$(":hidden[name='dist']").val(cDistrict);
+			
+			 str =str+ ',"cName":"' + cName + '",' + '"cProvince":"' + cProvince + '",'
+					+ '"cCity":"' + cCity + '",' + '"cDistrict":"' + cDistrict + '",'
+					+ '"cZipCode":"' + cZipCode + '",' + '"cPhone":"' + cPhone + '",'+ '"transitType":"' + bgyb_type + '",'
+					+ '"cardid":"' + cardid + '",'+ '"cardurlother":"' + cardurlother + '",'+ '"cardurltogether":"' + cardurltogether + '",'
+					+ '"cardurl":"' + cardurl  
+					+ '",' + '"cStreetAddress":"'
+					+ cStreetAddress + '"';
+			 
+			 
+			 if($("#useIdcardText").val() == "1"){//表示必上传身份证
+				 
+					 if(cardid=="")
+					{
+						 alert("必须填写身份证号!");
+							return false;
+					}
+			 }
+			
+				var file = $(":file[name='file']").val();//身份证正面图片上传
+				if ((file == null || file == ''))
+				{
+					if($("#useIdcardText").val() == "1"){//表示必上传身份证
+						if((cardurl=="")||(cardurl==null)||(cardurl=="null"))
+						{
+							alert("必须上传身份证正面图!");
+							return false;
+						}
+					}
+					
+				}
+				else
+				{
+					picflag=1;
+				}
+				
+				var fileother = $(":file[name='fileother']").val();//身份证正面图片上传
+				if ((fileother == null || fileother == ''))
+				{
+					if($("#useIdcardText").val() == "1"){//表示必上传身份证
+						
+					
+						if((cardurlother=="")||(cardurlother==null)||(cardurlother=="null"))
+						{
+							alert("必须上传身份证反面图!");
+							return false;
+						}
+					}
+				}
+				else
+				{
+					picflag=1;
+				}
+			
+			
+			var protocol=$("input[name='protocol_name']").is(':checked');
+			if(protocol==false)
+			{
+				alert("提交前,请认真阅读本站转运协议,并勾选\" 同意本站转运协议\",再进行提交! ");
+				return false;
+			}
+			
+			
+			
+			
+			
+		}
+		else
+		{
+			alert("转运类型选择出错!");
+		}
+		
+		
+		if (!validate) {
+			alert("红色框中的信息必须填写，才可以预报！");
+			return false;
+		}
+
+		//包含图片的处理方式
+		if(((picflag!=0)&&(bgyb_type==1)))
+		{
+			
+			submittranhavepicurl();
+			return false;
+		}/*else if(((bgyb_type==1) && $("#useIdCardText").val()!="1")){
+			$("#submit_tran_order_pic").ajaxSubmit({
+				type : "post",
+				url : "../transh/submit_tran_order_pics",
+				success : function(data) {
+					// alert(data);
+					$("#tmpmsgdiv2").html(data);
+					var str = $("#tmpmsgdiv2 pre").html();
+
+					var obj = $.parseJSON(str);
+
+					var code = obj.code;
+
+					if (code == "200") {
+						alert("提交成功!");
+
+						nav21Click();
+
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						$(":text[name='cardpicid']").val("");// 已经重新上传，清空原有的图片
+						logout();
+					} else {
+						alert("提交网上置件信息失败，原因是:" + response.message);
+						$(":text[name='cardpicid']").val("");// 已经重新上传，清空原有的图片
+					}
+					return false;
+				},
+				error : function(XmlHttpRequest, textStatus, errorThrown) {
+					alert("操作失败");
+					$(":text[name='idurlcard']").val("");// 已经重新上传，清空原有的图片
+					return false;
+				}
+			});
+			return false;
+		}*/
+
+
+
+		var obj = $.parseJSON("{" + str + "}");
+
+		$.ajax({
+			type : "post",
+			url : transh_add_url,
+			data : obj,
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					alert("操作成功");
+					nav21Click();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("操作失败，失败原因是:" + response.message);
+				}
+			}
+		});
+		return false;
+	}
+
+	//新转运流程添加内容
+	loadshouhuodizhiinfo_bgyb("1");
+	showLocation();
+	showusaLocation();
+	// 点击跳转事件，用于置单地址
+	$("#cdatatable tfoot a").click(function() {
+		// 跳页
+		var pn = $(this).attr("href");
+		loadshouhuodizhiinfo_bgyb(pn);
+		return false;
+	});
+
+	function addressheetshow() {
+		if (document.getElementById("addressheetid").checked == true) {
+			//alert("选中");
+			$("#addressheetshow").show();
+			//return true;
+		} else {
+			//alert("im");
+			///return false;
+			$("#addressheetshow").hide();
+		}
+	}
+
+	function quickwaytr_context_show() {
+		$("#quickwaytr_context1").show();
+		$("#quickwaytr_context2").show();
+		$("#quickwaytr_context3").show();
+		$("#quickwaytr_context4").show();
+		$("#quickwaytr_context5").show();
+		$("#quickwaytr_context6").show();
+		$("#quickwaytr_context7").show();
+		$("#quickwaytr_context8").show();
+
+	}
+	function quickwaytr_context_hide() {
+		$("#quickwaytr_context1").hide();
+		$("#quickwaytr_context2").hide();
+		$("#quickwaytr_context3").hide();
+		$("#quickwaytr_context4").hide();
+		$("#quickwaytr_context5").hide();
+		$("#quickwaytr_context6").hide();
+		$("#quickwaytr_context7").hide();
+		$("#quickwaytr_context8").hide();
+		$("#showcardpicid").attr("style",
+		"display:none");
+		$("#showcardpicidother").attr("style",
+		"display:none");
+		$("#showcardpicidtogether").attr("style",
+		"display:none");
+
+	}
+
+	function choosetype() {
+		var temp = $("input[name='expecttype']:checked").val();
+		if (temp == 0)//普通转运
+		{
+			$("#addressheetshow").hide();//隐藏地址表格
+			$("#quickwaytr_title").hide();//隐藏极速转运标题
+
+			quickwaytr_context_hide();//隐藏极速转运标题
+			document.getElementById("addressheetid").checked = false;
+			$("#remarktit_num").html("3");
+		} else if (temp == 1)//极速转运
+		{
+			$("#quickwaytr_title").show();
+			quickwaytr_context_show();
+			$("#remarktit_num").html("4");
+		} else {
+
+		}
+	}
+
+	//用于包裹预报的地址添加 
+	function loadshouhuodizhiinfo_bgyb(pn) {
+		// alert("4444444");
+		$.ajax({
+			type : "get",
+			url : consignee_search_url,
+			data : {
+				"pageIndex" : pn
+			},
+			success : function(response) {
+				var code = response.code;
+				// alert(response);
+				if (code == "200") {
+					if (response.data != null) {
+						showsjrdzlist_bgyb(response.data.datas);
+						showpagesplit_bgyb(response.data);
+					} else {
+						showsjrdzlist_bgyb(null);
+						showpagesplit_bgyb(null);
+					}
+					// aftershow();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("获取会员信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+
+	//kai 20150921 modify
+	function showsjrdzlist_bgyb(list) {
+		// $("#sjdztable tbody").html("");
+
+		$("#cdatatable tbody").html("");
+		var str22 = '<tr style="display:none"><td><input type="radio" name="cid" value="-1"/></td></tr>';
+		$("#cdatatable tbody :radio").first().attr("checked", true);
+		$("#cdatatable tbody").append(str22);
+		var flag = 0;
+
+		if (list != null && list.length > 0) {
+			/*
+			 * $.each(list,function() { var str = "<tr>"; str += "<td>" +
+			 * this.id + "</td>"; str += "<td><a href='" + this.id + "'
+			 * name='a_detail_link'>"+ this.name + "</a></td>"; str += "<td>" +
+			 * this.phone + "</td>"; str += "<td>" + this.province + "/" +
+			 * this.city+ "/" + this.district + "</td>"; str += "<td>" +
+			 * this.streetAddress + "</td>"; str += "<td>" + this.cardId + "</td>";
+			 * if (this.cardUrl == null || this.cardUrl == '') { str += "<td>无</td>"; }
+			 * else { var url = this.cardUrl; url = baseUrl+url; str += "<td><a
+			 * href='" + url + "' target='_blank'><img width='30px' height='30px'
+			 * src='" + url + "'/></a></td>"; } str += "<td><a href='" +
+			 * this.id + "' name='a_modify_sjdz_link'>修改</a>|<a href='" + this.id + "'
+			 * name='a_del_sjdz_link'>删除</a></td></tr>"; $("#cdatatable
+			 * tbody").append(str); });
+			 */
+
+			// $.each(response.data, function(){
+			$
+					.each(
+							list,
+							function() {
+								var str = "<tr>";
+								str += '<td align="center"><input type="radio" name="cid" value="'
+										+ this.id + '"/></td>';
+								str += '<td name="conName">' + this.name
+										+ '</td>';
+								str += '<td name="conPhone">' + this.phone
+										+ '</td>';
+
+								str += '<td  colspan="4">' + this.province
+										+ '&nbsp;' + this.city + '&nbsp;'
+										+ this.district + '&nbsp;'
+										+ this.streetAddress + '</td>';
+								str += '<td name="conProvince" style="display:none">'
+										+ this.province + '</td>';
+								str += '<td name="conCity" style="display:none">'
+										+ this.city + '</td>';
+								str += '<td name="conDistrict" style="display:none">'
+										+ this.district + '</td>';
+								str += '<td name="conStreetAddress" style="display:none">'
+										+ this.streetAddress + '</td>';
+								str += '<td name="conZipCode" style="display:none">'
+										+ this.zipCode + '</td>';
+								str += '<td name="conCardUrl" style="display:none">'
+										+ this.cardUrl + '</td>';
+								str += '<td name="conCardUrlother" style="display:none">'
+										+ this.cardurlother + '</td>';
+								str += '<td name="conCardUrltogether" style="display:none">'
+										+ this.cardurltogether + '</td>';
+								str += '<td name="conCardId">' + this.cardId
+										+ '</td>';
+								if (this.cardUrl == null || this.cardUrl == '') {
+									str += "<td align='center'>无</td>";
+								} else {
+									var url = this.cardUrl;
+									url = baseUrl + url;
+									str += "<td align='center'><a href='"
+											+ url
+											+ "'  target='_blank'><img width='30px' height='30px' src='"
+											+ url + "'/></a></td>";
+								}
+
+								if (this.cardurlother == null
+										|| this.cardurlother == '') {
+									str += "<td align='center'>无</td>";
+								} else {
+									var url = this.cardurlother;
+									url = baseUrl + url;
+									str += "<td align='center'><a href='"
+											+ url
+											+ "'  target='_blank'><img width='30px' height='30px' src='"
+											+ url + "'/></a></td>";
+								}
+
+								if (this.cardurltogether == null
+										|| this.cardurltogether == '') {
+									str += "<td align='center'>无</td>";
+								} else {
+									var url = this.cardurltogether;
+									url = baseUrl + url;
+									str += "<td align='center'><a href='"
+											+ url
+											+ "'  target='_blank'><img width='30px' height='30px' src='"
+											+ url + "'/></a></td>";
+								}
+
+								str += '</tr>';
+								$("#cdatatable tbody").append(str);
+								if (flag == 0)// 列出第一个
+								{
+									/*
+									 * $(":text[name='cName']").val(this.name);
+									 * $(":text[name='cPhone']").val(this.phone);
+									 * $(":text[name='cCardID']").val(this.cardId);
+									 * $(":text[name='cProvince']").val(this.province);
+									 * $(":text[name='cCity']").val(this.city);
+									 * $(":text[name='cDistrict']").val(this.district);
+									 * $(":text[name='cStreetAddress']").val(this.streetAddress);
+									 * $(":text[name='cZipCode']").val(this.zipCode);
+									 * $(":text[name='idurlcard']").val(this.cardUrl);
+									 */
+								}
+
+								flag = flag + 1;
+							});
+			$(":radio[name='cid']").click(
+					function() {
+						// alert($(this).parent().parent().find("a[name='conName']").html());
+						$(":text[name='cName']").val(
+								$(this).parent().parent().find(
+										"td[name='conName']").html());
+						
+						/*
+						$(":text[name='cProvince']").val(
+								$(this).parent().parent().find(
+										"td[name='conProvince']").html());
+						$(":text[name='cCity']").val(
+								$(this).parent().parent().find(
+										"td[name='conCity']").html());
+						$(":text[name='cDistrict']").val(
+								$(this).parent().parent().find(
+										"td[name='conDistrict']").html());
+						*/
+						
+						
+						
+						var province1=$(this).parent().parent().find("td[name='conProvince']").html();
+						
+						if((province1==null)||(province1=="")||(province1=="undefined"))
+						{
+							//$("select[name='loc_province']").val("");
+							//$("#loc_province").val("省份");
+							//$("#loc_city").val("");
+							//$("#loc_town").val("");
+							//$('#loc_province option[value=""]').attr("selected",true);
+							
+							var a = document.getElementById("loc_province");
+							a.options[0].selected = true;
+							a = document.getElementById("loc_city");
+							a.options[0].selected = true;
+							a = document.getElementById("loc_town");
+							a.options[0].selected = true;
+						}
+						else
+						{
+							
+						
+						
+							$("#loc_province option[name="
+											+ $(this).parent().parent().find(
+													"td[name='conProvince']").html()).attr(
+									'selected', true);
+	
+							var loc = new Location();
+							var title = [ '省份', '地级市', '市、县、区' ];
+							$.each(title, function(k, v) {
+								title[k] = '<option value="">' + v + '</option>';
+							});
+							$('#loc_city').empty();
+							$('#loc_city').append(title[1]);
+							loc.fillOption('loc_city', '0,' + $('#loc_province').val());
+							$('#loc_town').empty();
+							$('#loc_town').append(title[2]);
+	
+							$("#loc_city option[name="
+											+ $(this).parent().parent().find(
+													"td[name='conCity']").html()).attr(
+									'selected', true);
+							$('#loc_town').empty();
+							$('#loc_town').append(title[2]);
+							loc.fillOption('loc_town', '0,' + $('#loc_province').val()
+									+ ',' + $('#loc_city').val());
+							$("#loc_town option[name="
+											+ $(this).parent().parent().find(
+													"td[name='conDistrict']").html()).attr(
+									'selected', true);
+						
+						}
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						$(":text[name='cStreetAddress']").val(
+								$(this).parent().parent().find(
+										"td[name='conStreetAddress']").html());
+						$(":text[name='cZipCode']").val(
+								$(this).parent().parent().find(
+										"td[name='conZipCode']").html());
+						$(":text[name='cPhone']").val(
+								$(this).parent().parent().find(
+										"td[name='conPhone']").html());
+						$(":text[name='cardidname']").val(
+								$(this).parent().parent().find(
+										"td[name='conCardId']").html());
+
+						$(":text[name='idurlcard']").val(
+								$(this).parent().parent().find(
+										"td[name='conCardUrl']").html());
+						var cardurl1 = $(this).parent().parent().find(
+								"td[name='conCardUrl']").html();
+						// $(":file[name='file']").val(
+						// $(this).parent().parent()
+						// .find("td[name='conCardUrl']").html());
+						if ((cardurl1 != "") && (cardurl1 != "null")
+								&& (cardurl1 != "无"))// 地址中包含有身份证图片，显示出来
+						{
+							// alert(cardurl1);
+							$("#showcardpicid").attr("style", "");
+							$(":text[name='idurlcard']").val(cardurl1);
+							cardurl1 = getRootPath() + cardurl1;
+							$("#imacardurlid").attr("href", cardurl1);
+							$("#imacardurlid img").attr("src", cardurl1);
+
+						} else {
+							$("#showcardpicid").attr("style", "display:none");
+
+							$(":text[name='idurlcard']").val("");// 已经重新上传，清空原有的图片
+						}
+
+						$(":file[name='file']").val("");// 清空原来选择过上传的图片
+
+						cardurl1 = $(this).parent().parent().find(
+								"td[name='conCardUrlother']").html();
+						if ((cardurl1 != "") && (cardurl1 != "null")
+								&& (cardurl1 != "无"))// 地址中包含有身份证图片，显示出来
+						{
+							// alert(cardurl1);
+							$("#showcardpicidother").attr("style", "");
+							$(":text[name='idurlcardother']").val(cardurl1);
+							cardurl1 = getRootPath() + cardurl1;
+							$("#imacardurlidother").attr("href", cardurl1);
+							$("#imacardurlidother img").attr("src", cardurl1);
+
+						} else {
+							$("#showcardpicidother").attr("style",
+									"display:none");
+
+							$(":text[name='idurlcardother']").val("");// 已经重新上传，清空原有的图片
+						}
+
+						$(":file[name='fileother']").val("");// 清空原来选择过上传的图片
+
+						//提取合成图
+						cardurl1 = $(this).parent().parent().find(
+								"td[name='conCardUrltogether']").html();
+						if ((cardurl1 != "") && (cardurl1 != "null")
+								&& (cardurl1 != "无"))// 地址中包含有身份证图片，显示出来
+						{
+
+							$(":text[name='idurlcardtogether']").val(cardurl1);
+
+						} else {
+
+							$(":text[name='idurlcardtogether']").val("");// 已经重新上传，清空原有的图片
+						}
+
+					});
+			// 当上传图片时，用于实时隐藏原地址薄中的图片
+			$("#cardpicid").on("change", function() {
+				//alert("555");
+				var picValue = $(":file[name='file']").val();
+				//alert(picValue);
+				if ((picValue != null) && ("" != picValue)) {// 包含图片,要单独处理
+					$("#showcardpicid").attr("style", "display:none");
+
+					//$(":text[name='idurlcard']").val("");// 已经重新上传，清空原有的图片
+
+				} else {
+					var url2 = $(":text[name='idurlcard']").val();
+
+					//alert(url2);
+					if ((url2 != null) && (url2 != "") && (url2 != "null")) {
+						$("#showcardpicid").attr("style", "");
+						var cardurl1 = getRootPath() + url2;
+
+						$("#imacardurlid").attr("href", cardurl1);
+						$("#imacardurlid img").attr("src", cardurl1);
+
+					}
+				}
+				// $("#imacardurlid").attr("href",$("#cardpicid").val());
+				// $("#imacardurlid img").attr("src",$("#cardpicid").val());
+			});
+
+			// 当上传图片时，用于实时隐藏原地址薄中的图片
+			$("#cardpicidother").on("change", function() {
+				//alert(666);
+				var picValue = $(":file[name='fileother']").val();
+				if ((picValue != null) && ("" != picValue)) {// 包含图片,要单独处理
+					$("#showcardpicidother").attr("style", "display:none");
+
+					//	$(":text[name='idurlcardother']").val("");// 已经重新上传，清空原有的图片
+
+				} else {
+					var url2 = $(":text[name='idurlcardother']").val();
+					if ((url2 != null) && (url2 != "") && (url2 != "null")) {
+						$("#showcardpicidother").attr("style", "");
+						var cardurl1 = getRootPath() + url2;
+						$("#imacardurlidother").attr("href", cardurl1);
+						$("#imacardurlidother img").attr("src", cardurl1);
+
+					}
+				}
+				// $("#imacardurlid").attr("href",$("#cardpicid").val());
+				// $("#imacardurlid img").attr("src",$("#cardpicid").val());
+			});
+
+		}
+	}
+
+	function showpagesplit_bgyb(pageSplit) {
+		var rowCount = 0;
+		var pageSize = 0;
+		var pageNow = 0;
+		var pageCount = 0;
+		if (pageSplit != null) {
+			rowCount = pageSplit.rowCount;
+			pageSize = pageSplit.pageSize;
+			pageNow = pageSplit.pageNow;
+			pageCount = pageSplit.pageCount;
+		}
+		$("#trsize").html(rowCount);
+		$("#tpsize").html(pageCount);
+		$("#first_page").attr("href", "1");
+		$("#pre_page").attr("href", pageNow - 1);
+		$("#next_page").attr("href", pageNow + 1);
+		$("#last_page").attr("href", pageCount);
+	}
+	// 用于显示网上置单历史记录的分页
+</script>
+
+
+</html>
+
+

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.OrderDetailDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.OrderDetail">
+		<result column="order_id" property="orderId" javaType="String" />
+		<result column="transhipment_id" property="transhipmentId"
+			javaType="String" />
+		<result column="commodity_id" property="commodityId" javaType="String" />
+		<result column="quantity" property="quantity" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="weight" property="weight" javaType="String" />
+		<result column="tariff" property="tariff" javaType="String" />
+		<result column="or" property="or" javaType="String" />
+		<result column="other" property="other" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="type" property="ctype" javaType="String"/>
+		<result column="t_no" property="transhipNo" javaType="String"/>
+		<result column="xiangqing" property="xiangqing" javaType="String"/>
+		<result column="brands" property="brands" javaType="String"/>
+		<result column="jwweight" property="jwweight" javaType="String"/>
+		
+		
+	</resultMap>
+	<resultMap id="export_orderdetail_resultsum_map" type="com.weiye.model.SumCommodity">
+		<result column="commodity_id" property="commodityid" javaType="String" />
+		<result column="commodityname" property="commodityname" javaType="String" />
+		<result column="sumquantity" property="sumquantity" javaType="String" />
+		<result column="sumsjweight" property="sumsjweight" javaType="String" />
+		<!--  <result column="sumjfweight" property="sumjfweight" javaType="String" />-->
+	</resultMap>
+
+	<insert id="insertOrderDetail" parameterType="com.weiye.model.OrderDetail">
+		insert into
+		`order_detail` (`order_id`, `transhipment_id`, `commodity_id`, `quantity`, `name`,
+		`weight`, `tariff`, `or`, `other`, `remark`,`sjweight`,`xiangqing`,`brands`,`jwweight`)
+		values
+		<foreach collection="list" item="detail" separator=",">
+			(#{detail.orderId},#{detail.transhipmentId}, #{detail.commodityId}, #{detail.quantity}, #{detail.name},
+			#{detail.weight},#{detail.tariff}, #{detail.or}, #{detail.other}, #{detail.remark},#{detail.sjweight},#{detail.xiangqing},#{detail.brands},#{detail.jwweight})
+		</foreach>
+	</insert>
+	
+	<select id="getAllByOrderId" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select `order_detail`.*,c.name as type,tb.transit_no as t_no
+		from `order_detail` left join `commodity` as c on c.id=`order_detail`.commodity_id
+		left join `transhipment_bill` as tb on tb.id =`order_detail`.transhipment_id
+		where `order_detail`.`order_id`=#{orderId}
+	</select>
+	<select id="getExportOrdersGather" parameterType="java.lang.String"
+		resultMap="export_orderdetail_resultsum_map">
+			select  commodity_id,Max(commodity.`name`) as commodityname,SUM(quantity) as sumquantity,SUM(sjweight) as sumsjweight from  order_detail
+			RIGHT JOIN commodity
+				on commodity.id=order_detail.commodity_id
+ 				where
+			order_id in (select order_id from `order` where flight = #{flight})
+			group by commodity_id;
+	</select>
+	
+	<!--add by chenkanghua -->
+	<select id="exportOrdersGather" parameterType="java.lang.String"
+		resultMap="export_orderdetail_resultsum_map">
+			select  commodity_id,Max(commodity.`name`) as commodityname,SUM(quantity) as sumquantity,SUM(sjweight) as sumsjweight from  order_detail
+			RIGHT JOIN commodity 
+				on commodity.id=order_detail.commodity_id
+ 				where
+			order_id in (select order_id from `order` 
+
+				<where>
+					<choose>
+						<when test="orderId!=null and orderId!=''">
+							`order`.order_id like #{orderId}
+						</when>
+						<otherwise>
+							<if test="column!=null and column!='' and key!=null and key!=''">
+								${column} like #{key}
+							</if>
+							<if test="sdate!=null and sdate!=''">
+								and `order`.`create_date` <![CDATA[>=]]>
+								#{sdate}
+							</if>
+							<if test="edate!=null and edate!=''">
+								and `order`.`create_date` <![CDATA[<=]]>
+								#{edate}
+							</if>
+							<if test="wid!=null and wid!=''">
+								and `order`.`warehouse_id` = #{wid}
+							</if>
+							<choose>
+								<when test="state!=null and state!=''">
+									and `order`.`state`= #{state}
+								</when>
+								<otherwise>
+									and `order`.`state`!='-1'
+								</otherwise>
+							</choose>
+						</otherwise>
+					</choose>
+			</where>
+ 		)group by commodity_id;
+	</select>
+	
+	<delete id="deleteByOrderIds">
+		delete from `order_detail`
+		where `order_id` in
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

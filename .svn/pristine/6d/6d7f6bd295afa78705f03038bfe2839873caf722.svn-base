@@ -1,0 +1,86 @@
+var frontpage_ready_flag=false;//设定数据准备完成标志
+//定义全局变量参数
+ var s_logo_big="";
+ var s_small_logo="";
+ var s_support_email="";
+ var s_support_address="";
+ var s_support_phone="";
+ var s_support_2code="";
+ var s_support_qq="";
+ var s_support_weixin="";
+ var s_foot_about_content="";
+ var s_company_name_show="";
+ var s_sales_address="";
+ var s_sales_phone="";
+ var s_sales_email="";
+ var s_banner_float_font_code="";//悬浮在banner上的字体代码
+ var s_banner_background_pic1="";//banner的图片1
+ var s_banner_background_pic2="";//banner的图片2
+ var s_banner_background_pic3="";//banner的图片3
+ var s_banner_background_pic4="";//banner图片4
+ var s_middle_contect_sub_title1="";
+ var s_middle_contect_sub_title2="";
+ var s_middle_contect_sub_title3="";
+ var s_middle_contect_sub_content1="";
+ var s_middle_contect_sub_content2="";
+ var s_middle_contect_sub_content3="";
+ var s_middle_contect_sub_content1="";
+ var s_middle_contect_sub_content2="";
+ var s_middle_contect_sub_content3="";
+ var s_middle_contect_title="";
+ function loadGlobalfrontpageArgs(functioncallback){
+	 //var args="logo_big,"
+	var flags="logo_big,small_logo,support_email,support_address,support_phone,support_2code,support_qq,support_weixin,foot_about_content,company_name_show,sales_address,sales_phone,sales_email";
+		flags+=",banner_float_font_code,banner_background_pic1,banner_background_pic2,banner_background_pic3,banner_background_pic4";
+		flags+=",middle_contect_sub_title1,middle_contect_sub_title2,middle_contect_sub_title3,middle_contect_sub_content1,middle_contect_sub_content2,middle_contect_sub_content3,middle_contect_title";
+		
+	 $.ajax({
+			type: "post",
+			url: "../../globalargs/getcontents",
+			data : {
+				"flags" : flags
+			},
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var data = response.data;
+					if(data != null){
+						s_logo_big=data[0];
+						s_small_logo=data[1];
+						s_support_email=data[2];
+						s_support_address=data[3];
+						s_support_phone=data[4];
+						s_support_2code=data[5];
+						s_support_qq=data[6];
+						s_support_weixin=data[7];
+						s_foot_about_content=data[8];
+						s_company_name_show=data[9];
+						s_sales_address=data[10];
+						s_sales_phone=data[11];
+						s_sales_email=data[12];
+						s_banner_float_font_code=data[13];
+						s_banner_background_pic1=data[14];
+						s_banner_background_pic2=data[15];
+						s_banner_background_pic3=data[16];
+						s_banner_background_pic4=data[17];
+						
+						s_middle_contect_sub_title1=data[18];
+						s_middle_contect_sub_title2=data[19];
+						s_middle_contect_sub_title3=data[20];
+						s_middle_contect_sub_content1=data[21];
+						s_middle_contect_sub_content2=data[22];
+						s_middle_contect_sub_content3=data[23];
+						s_middle_contect_title=data[24];
+						
+						frontpage_ready_flag=true;
+						//alert(frontpage_ready_flag);
+						if(functioncallback!=null)
+						{
+							//alert(functioncallback);
+							functioncallback();//表示确认完成之后调用的函数，不是参数
+						}
+					}
+				}
+			}
+		});
+ }	

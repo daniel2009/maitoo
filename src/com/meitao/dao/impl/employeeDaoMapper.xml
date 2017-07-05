@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.EmployeeDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.Employee">
+		<id column="id" property="id" javaType="String" />
+		<result column="account" property="account" javaType="String" />
+		<result column="password" property="password" javaType="String" />
+		<result column="store_id" property="storeId" javaType="String" />
+		<result column="store_name" property="storeName" javaType="String" />
+		<result column="sign_date" property="signDate" javaType="String" />
+		<result column="phone" property="phone" javaType="String"/>
+		<result column="pic_url" property="picUrl" javaType="String"/>
+		<result column="groupid" property="groupId" javaType="String"/>
+		<result column="superadmin" property="superadmin" javaType="String"/>
+		<result column="storeMaster" property="storeMaster" javaType="String"/>
+		
+		
+		
+		<collection property="authority" column="id" select="com.meitao.dao.AuthorityDao.selectAuthority_ul"></collection>
+	</resultMap>
+
+	<select id="getEmployeeByAccount" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from employees where account=#{account}
+	</select>
+
+	<select id="getEmployeeById" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from employees where id=#{id} 
+	</select>
+
+	<select id="searchAllEmployee" resultMap="basic_result_map">
+		select *
+		from employees
+		where groupid=#{groupid}
+		order by sign_date asc
+		limit #{index},#{size}
+	</select>
+
+	<select id="count" resultType="java.lang.Integer">
+		select count(*) from employees
+	</select>
+
+	<insert id="insertEmployee" parameterType="com.meitao.model.Employee" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		employees(account,password,store_id,store_name, sign_date, pic_url, phone,groupid,storeMaster)
+		values(#{account},#{password},#{storeId},#{storeName},#{signDate}, #{picUrl}, #{phone},#{groupId},#{storeMaster})
+	</insert>
+
+	<update id="updateEmployee" parameterType="com.meitao.model.Employee">
+		update employees
+		set
+		<if test="picUrl!=null and picUrl!=''">
+		pic_url=#{picUrl},
+		</if>
+		<if test="password!=null and password!=''">
+		password=#{password},
+		</if>
+		<if test="storeMaster!=null and storeMaster!=''">
+		storeMaster=#{storeMaster},
+		</if>
+		store_id=#{storeId},
+		store_name=#{storeName},
+		phone=#{phone}
+		where id=#{id}
+	</update>
+
+	<update id="updatePassword">
+		update employees
+		set password=#{password}
+		where
+		id=#{id} and password=#{oldpwd}
+	</update>
+
+	<delete id="deleteEmployee" parameterType="java.lang.String">
+		delete from employees
+		where id=#{id}
+	</delete>
+	
+	
+	<delete id="deleteEmployeebystoreId" parameterType="java.lang.String">
+		delete from employees
+		where employees.store_id=#{storeId} and employees.superadmin!='1'
+	</delete>
+	
+	
+	<select id="searchAllbyadmin" resultMap="basic_result_map">
+		select *
+		from employees
+		<where>
+			<if test="id!=null and id!=''">
+				id=#{id}
+			</if>
+			<if test="keyword!=null and keyword!=''">
+				and (store_name like #{keyword} or phone like #{keyword} or account like #{keyword})
+			</if>
+			<if test="storeId!=null and storeId!=''">
+				and store_id=#{storeId}
+			</if>
+		</where>
+		order by sign_date asc
+		limit #{index},#{size}
+	</select>
+
+	<select id="countbyadmin" resultType="java.lang.Integer">
+		select count(*) from employees
+		<where>
+			<if test="id!=null and id!=''">
+				id=#{id}
+			</if>
+			<if test="keyword!=null and keyword!=''">
+				and (store_name like #{keyword} or phone like #{keyword} or account like #{keyword})
+			</if>
+			<if test="storeId!=null and storeId!=''">
+				and store_id=#{storeId}
+			</if>
+		</where>
+	</select>
+</mapper>

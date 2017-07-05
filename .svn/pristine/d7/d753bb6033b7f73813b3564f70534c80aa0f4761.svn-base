@@ -1,0 +1,247 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">退货信息列表</p>
+
+		<div class="box_content">
+			<div class="content_title">
+				退货信息列表
+				<a href="#" onclick="javascript: searchState(0);">未处理<span style="margin: 0 3px; color: #f00;">(<label id="countReturnPackageState0">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(1);">已处理<span style="margin: 0 3px; color: #f00;">(<label id="countReturnPackageState1">0</label>)</span></a>
+				<a href="#" onclick="javascript: searchState(2);">有问题<span style="margin: 0 3px; color: #f00;">(<label id="countReturnPackageState2">0</label>)</span></a>
+			</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u51" style="padding-top: 5px;">
+						<div id="u510">
+						<form id="searchIdForm">
+							&nbsp;&nbsp;&nbsp;退货单号：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" class="text-input" size="15" name="id"/>
+							<input class="button" type="button" value="搜索" onclick="javascript: searchId();" />
+						</form><br/>
+						<form id="searchForm">
+							&nbsp;&nbsp;
+							创建日期：
+							<input  type="text" class="text-input Wdate" size="10" name="createDateStart" id="sd" onClick="WdatePicker()"/>
+							~
+							<input  type="text" class="text-input Wdate" size="10" name="createDateEnd" id="ed" onClick="WdatePicker()"/>
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							关键字：
+							<input class="text-input" size="10" type="text" name="key" maxlength="16"/>
+							<select class="text-input" name="type">
+								<option value="0">全部</option>
+								<option value="1">申请人id</option>
+								<option value="2">包裹号</option>
+								<option value="3">地址</option>
+							</select>
+							<select name="state" class="text-input">
+								<option value="-1" selected="selected">请选择状态</option>
+								<option value="0">未处理</option>
+				              	<option value="1">已处理</option>
+				              	<option value="2">有问题</option>
+				            </select>
+							<input class="button" type="button" value="高级搜索" onclick="javascript: search();"/>
+						</form>
+						</div>
+						
+						
+				
+						
+						
+						<div style="clear: both;"></div>
+						
+					</div>
+					<table style="width: 100%">
+						<col width="50px" />
+						<col width="100px" />
+						<col width="100px" />
+						<col width="50px" />
+						<col width="50px" />
+						<col />
+						<col width="150px" />
+						<col width="50px" />
+						<col width="150px" />
+						<col width="50px" />
+						 
+						<thead>
+							<tr>
+								<th>退货单号</th>
+								<th>申请人</th>
+								<th>包裹号</th>
+								<th>价格</th>
+								<th>回执单</th>
+								<th>地址</th>
+								<th>创建日期</th>
+								<th>状态</th>
+								<th>员工回应</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td id="pagination" colspan="5" style="text-align: right;">共<span id="trsize">0</span>条
+									<a id="first_page" href="1" name="to_page">首页</a> |
+									<a id="pre_page" name="to_page">上一页</a> |
+									<input type="number" class="bor" style="width: 50px;" min="0" step="1" /> / <span id="tpsize">0</span>|
+									<a id="next_page" name="to_page">下一页</a> |
+									<a id="last_page" name="to_page">未页</a>&nbsp;&nbsp;
+								</td>
+							</tr>
+						</tfoot>
+						<tbody id="tbody">
+							<tr>
+								<td style="text-align: left;" colspan="10">
+									<span>&nbsp;&nbsp;对不起，没有找到对应的退货信息!</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		search();
+		var state = window.sessionStorage.getItem("searchState");
+		if(null != state){
+			searchState(state);
+		}
+		window.sessionStorage.clear();
+		getAllStateCount("returnPackage");//nav1.js
+		$("#pagination a[name='to_page']").click(function() {
+			var pn = $(this).attr("href");
+			var formData = new FormData(document.getElementById("searchForm"));
+			formData.append("pageIndex", pn);
+			loadReturnPackageList(formData);
+			return false;
+		});
+
+		$("#pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var formData = new FormData(document.getElementById("searchForm"));
+					formData.append("pageIndex", pn);
+					loadReturnPackageList(formData);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	});
+	function loadReturnPackageList(formData){
+		$.ajax({
+			type : "post",
+			url : "../admin/returnPackage/search",
+			data : formData,
+			processData : false,
+			contentType : false,
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if (response.data == null) {
+						showReturnPackageList(null);
+						showReturnPackagePage(null);
+					} else {
+						showReturnPackageList(response.data.datas);
+						showReturnPackagePage(response.data);
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					var info = "<td style='text-align: left;' colspan='12'><span>&nbsp;&nbsp;获取运单列表信息失败!</span></td>";
+					$("#tab1 table tbody").html(info);
+				}
+				return false;
+			}
+		});
+	}
+	function showReturnPackageList(list) {
+		var string = "";
+		$("#tbody").html(string);
+		if (list != null) {
+			$.each(list, function() {
+				string += "<tr>";
+				string += "<td>" + this.id + "</td>";
+				string += "<td>" + this.userId + "</td>";
+				string += "<td>" + this.packageNo + "</td>";
+				string += "<td>" + this.shippingFee + "</td>";
+				if("1" == this.receipt){
+					string += "<td>有</td>";
+				}else{
+					string += "<td>无</td>";
+				}
+				string += "<td>" + this.address + "</td>";
+				string += "<td>" + this.createDate + "</td>";
+				var state = "未处理";
+				if(this.state == "1"){
+					state = "已处理";
+				}else if(this.state == "2"){
+					state = "有问题";
+				}
+				string += "<td>" + state + "</td>";
+				string += "<td>" + this.empRemark + "</td>";
+				if(this.state == "1"){
+					string += "<td>已处理</td>";
+				}else{
+					string += "<td><a onclick='javascript:audit(" + this.id + ");'>审核</a></td>";
+				}
+				string += "</tr>";
+			});
+			
+		} else {
+			if (string == null || string == '') {
+				string = "<tr><td style='text-align: left;' colspan='9'><span>&nbsp;&nbsp;对不起，没有找到对应的退货信息!</span></td></tr>";
+			}
+		}
+		$("#tbody").html(string);
+	}
+
+	function showReturnPackagePage(pageSplit) {
+		var rowCount = 0;
+		var pageNow = 0;
+		var pageCount = 0;
+		if (pageSplit != null) {
+			rowCount = pageSplit.rowCount;
+			pageNow = pageSplit.pageNow;
+			pageCount = pageSplit.pageCount;
+		}
+
+		$("#trsize").html(rowCount);
+		$("#tpsize").html(pageCount);
+		$("#first_page").attr("href","1");
+		$("#pre_page").attr("href", pageNow - 1);
+		$("#next_page").attr("href",pageNow + 1);
+		$("#last_page").attr("href", pageCount);
+		
+	}
+	function searchId(){
+		var formData = new FormData(document.getElementById("searchIdForm"));
+		loadReturnPackageList(formData);
+	}
+	function search(){
+		var formData = new FormData(document.getElementById("searchForm"));
+		loadReturnPackageList(formData);
+	}
+	function audit(returnPackageId){
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("returnPackageId", returnPackageId);
+		$("#main-content").load("../admin/returnPackageAudit.jsp");
+		return false;
+	}
+	function searchState(state){
+		$("select[name=state]").val(state);
+		search();
+	}
+</script>
+</html>

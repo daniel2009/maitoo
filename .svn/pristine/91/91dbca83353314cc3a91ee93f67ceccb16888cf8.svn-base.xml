@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.SeaprintDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.Seaprint">
+		<id column="id" property="id" javaType="String" />
+		<result column="seaprintno" property="seaprintno" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="warehouse_Id" property="warehouseId" javaType="String" />
+		
+	</resultMap>
+
+	<insert id="insertSeaprint" parameterType="com.weiye.model.Seaprint"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		seaprint(seaprintno,create_date,modify_date,remark,warehouse_Id)
+		values(#{seaprintno},#{createDate},#{modifyDate},#{remark},#{warehouseId})
+	</insert>
+	
+	<select id="countbyseaprintno" resultType="java.lang.Integer">
+		select count(distinct `seaprint`.`id`) 
+		from `seaprint`
+		where `seaprintno`=#{seaprintno} 
+	</select>
+	
+	<select id="countOfSearchKeys" resultType="java.lang.Integer">
+		select count(distinct `seaprint`.id) 
+		from `seaprint`
+		<where>
+			<if test="seaprintno!=null and seaprintno!=''">
+				`seaprint`.seaprintno like #{seaprintno}		
+			</if>
+			<if test="storeId!=null and storeId!=''">
+			and `warehouse_Id`=#{storeId}	
+		</if>	
+		</where>
+	</select>
+	<select id="searchByKeys" resultMap="basic_result_map">
+		select distinct `seaprint`.* 
+		from `seaprint`
+		<where>
+			<if test="seaprintno!=null and seaprintno!=''">
+				`seaprint`.seaprintno like #{seaprintno}		
+			</if>
+			<if test="storeId!=null and storeId!=''">
+			and `warehouse_Id`=#{storeId}	
+		</if>	
+		</where>
+		order by `seaprint`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+	
+	<select id="getbyid" resultMap="basic_result_map">
+		select `seaprint`.* 
+		from `seaprint`
+		where `id`=#{id}
+		<if test="storeId!=null and storeId!=''">
+			and `warehouse_Id`=#{storeId}	
+		</if>	
+	</select>
+	
+	<delete id="deleteseaprint">
+		delete from seaprint
+		where id =#{id}
+	</delete>
+	
+	
+	
+	
+</mapper>

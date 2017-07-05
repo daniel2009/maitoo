@@ -1,0 +1,61 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">微信二维码
+		</p>
+
+		<div class="box_content">
+			<div class="content_title">支付宝付款（<em>人民币</em>）</div>
+			<div id="div">
+				
+			</div>
+		</div>
+	</div>
+
+</body>
+<script>
+	$("main-content").ready(function(){
+		var sessionStorage = window.sessionStorage;
+		var amount = sessionStorage.getItem("amount");
+		sessionStorage.setItem("forwardRechargePage", true);
+		window.location.href="../user/alipay/recharge?amount="+amount;
+	});
+	
+	function checkIfPay(){
+		if($("#isQRCodePageText").val() == "1"){
+			$.ajax({
+				type : "get",
+				url : "../user/weixin/checkIfScanPay",
+				data : {
+					amount : $("#amount").val(),
+				},
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+					} else if(code == "20004"){//session中找不到待充值数据
+						alert("没有待充值数据");
+						nav61Click();
+					} else if(code == "20003"){//未付款
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("提交网上置件信息失败，原因是:" + response.message);
+					}
+					return false;
+				}
+			});
+		}else{
+			clearInterval(qrCodeInterval);
+		}
+	}
+</script>
+</html>

@@ -1,0 +1,778 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <title>后台管理</title>
+  <link rel="icon" href="/images/logo_io.jpg" type="image/x-icon"/>
+    <!-- bootstrap & fontawesome -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css" />
+
+    <!-- page specific plugin styles -->
+    <!-- text fonts -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css" />
+
+    <!-- ace styles -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" />
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" />
+    <![endif]-->
+    <!-- inline styles related to this page -->
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css" type="text/css" />
+    <style type="text/css">
+        .ui-dialog-title {
+            padding: 10px;
+        }
+    </style>
+
+    <!-- ace settings handler -->
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!-- JQuery -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body class="no-skin" style="overflow:hidden">
+
+
+    <div class="wrapper">
+        <!-- #section:basics/navbar.layout -->
+        <div id="navbar" class="navbar navbar-default">
+            <script type="text/javascript">
+                try { ace.settings.check('navbar', 'fixed') } catch (e) { }
+            </script>
+
+            <div class="navbar-container" id="navbar-container">
+                <!-- #section:basics/sidebar.mobile.toggle -->
+                <button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler" data-target="#sidebar">
+                    <span class="sr-only">Toggle sidebar</span>
+
+                    <span class="icon-bar"></span>
+
+                    <span class="icon-bar"></span>
+
+                    <span class="icon-bar"></span>
+                </button>
+
+                <!-- /section:basics/sidebar.mobile.toggle -->
+                <div class="navbar-header pull-left">
+                    <!-- #section:basics/navbar.layout.brand -->
+                    <a href="index.html" class="navbar-brand">
+                        <small>
+                            系统管理平台
+                        </small>
+                    </a>
+                </div>
+
+                <!-- #section:basics/navbar.dropdown -->
+                <div class="navbar-buttons navbar-header pull-right" role="navigation">
+                    <ul class="nav ace-nav">
+
+
+                        <!-- #section:basics/navbar.user_menu -->
+                        <li class="light-blue">
+                            <a data-toggle="dropdown" id="topdropdown" href="../Admin/User/Info/1" target="main">
+
+                                <span class="user-info">
+
+                                    管理员<br /><span id="admin_user_account" style='color:#fff;'></span>
+                                </span>
+
+                                <i class="ace-icon fa fa-caret-down"></i>
+                            </a>
+
+                            <ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                                <li>
+                                    <a href="../../258/frontpage/index.html" target="_blank">
+                                        <i class="ace-icon fa fa-cog"></i>
+                                        网站首页
+                                    </a>
+                                </li>
+
+                               
+
+                                <li>
+                                    <a href="default.html" target="main">
+                                        <i class="ace-icon fa fa-user"></i>
+                                        个人信息
+                                    </a>
+                                </li>
+
+                                <li class="divider"></li>
+
+                                <li>
+                                    <a href="javascript:void(0)" onclick="adminlogout()" >
+                                        <i class="ace-icon fa fa-power-off"></i>
+                                        注销
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- /section:basics/navbar.user_menu -->
+                    </ul>
+                </div>
+
+                <!-- /section:basics/navbar.dropdown -->
+            </div>
+            <!-- /.navbar-container -->
+        </div>
+        <!-- /section:basics/navbar.layout -->
+
+        <div class="main-container" id="main-container">
+            <script type="text/javascript">
+            $(function () {
+                try { ace.settings.check('main-container', 'fixed') } catch (e) { }
+            });
+            </script>
+
+            <!-- #section:basics/sidebar -->
+            <div id="sidebar" class="sidebar responsive">
+                <script type="text/javascript">
+                $(function () {
+                    try { ace.settings.check('sidebar', 'fixed') } catch (e) { }
+                });
+                </script>
+
+                <div class="sidebar-shortcuts" id="sidebar-shortcuts">
+                    <div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
+                        <button class="btn btn-success">
+                            <i class="ace-icon fa fa-signal"></i>
+                        </button>
+
+                        <button class="btn btn-info">
+                            <i class="ace-icon fa fa-pencil"></i>
+                        </button>
+
+                        <!-- #section:basics/sidebar.layout.shortcuts -->
+                        <button class="btn btn-warning">
+                            <i class="ace-icon fa fa-users"></i>
+                        </button>
+
+                        <button class="btn btn-danger">
+                            <i class="ace-icon fa fa-cogs"></i>
+                        </button>
+
+                        <!-- /section:basics/sidebar.layout.shortcuts -->
+                    </div>
+
+                    <div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
+                        <span class="btn btn-success"></span>
+
+                        <span class="btn btn-info"></span>
+
+                        <span class="btn btn-warning"></span>
+
+                        <span class="btn btn-danger"></span>
+                    </div>
+                </div>
+                <!-- /.sidebar-shortcuts -->
+
+                <ul class="nav nav-list">
+                    <li class="">
+                        <a href="#" class="1122" data-toggle="dropdown">
+                            <i class="menu-icon fa fa-home"></i>
+                            <span class="menu-text">后台管理</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="default.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    首页
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                             <li>
+                                <a href="newsguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    新闻管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li> 
+                            <li>
+                                <a href="gonggaoguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    公告管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li> 
+                            <li>
+                                <a href="yanzhengshenfenzheng.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    验证用户身份证
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li> 
+                        </ul>
+                    </li>
+                    <li class="active open">
+                        <a href="#" class="1122" data-toggle="dropdown">
+                            <i class="menu-icon fa fa-fighter-jet"></i>
+                            <span class="menu-text">运单管理</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                          <!--  <li>
+                                <a href="add.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    添加页面模板
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>--> 
+
+                            <li>
+                                <a href="yundanlist.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    运单列表
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+                            <li>
+                                <a href="yundandownload1.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    运单下载
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+                            <li>
+                                <a href="menshidadan.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    门市打单
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <li>
+                                <a href="yundanluyou.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    运单路由管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <li>
+                                <a href="hangbanguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    航班管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                          <li>
+                                <a href="Endicia_manage.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                   Endicia参数管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+                            <li>
+                                <a href="menshidadan_manage.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                   门市控制管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+                            <li>
+                                <a href="shangmenqujianlist.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    上门取件
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            
+                           <li>
+                                <a href="inputstorelist.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                   入库包裹
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+                          <!--   <li>
+                                <a href="pricecalculate.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    价格计算
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>--> 
+                              <li>
+                                <a href="lanshaomslist.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                   发送揽收短信
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            
+                             <li>
+                                <a href="yundanlist_commudity.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                  查看商品
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            
+                            
+                            
+                        </ul>
+                    </li>
+
+                    <li class="">
+                        <a href="#" class="1122" data-toggle="dropdown">
+                            <i class="menu-icon fa fa-users"></i>
+                            <span class="menu-text">会员账户管理</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="huiyuanguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    会员管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <li>
+                                <a href="zhanghuguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    账户管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+                            <li>
+                                <a href="yuchongzhilist.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    交易记录
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                                 <li>
+                                <a href="moneyguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    财务汇总
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <!--  
+                            <li>
+                                <a href="yuangongguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    员工管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <li>
+                                <a href="cangkuguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    仓库门店管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <li>
+                                <a href="huiyuandaochu.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    导出会员
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>-->
+                        </ul>
+                    </li>
+                
+                
+                
+                
+                                   <li class="">
+                        <a href="#" class="1122" data-toggle="dropdown">
+                            <i class="menu-icon fa fa-send"></i>
+                            <span class="menu-text">海关管理</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="haiguandanhao.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                   海关单号管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <li>
+                                <a href="shenfenzhengguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                      身份证管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            
+       						<li>
+                                <a href=" seaNoexport.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                      导出海关单
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                
+                        </ul>
+                    </li>
+                    
+                    
+                    
+                   <li class="">
+                        <a href="#" class="1122" data-toggle="dropdown">
+                            <i class="menu-icon fa fa-life-ring"></i>
+                            <span class="menu-text">门店综合管理</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="cangkuguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    门店配置
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <li>
+                                <a href="yuangongguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                      员工管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <li>
+                                <a href="commuditys_store.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                      商品设置
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+                 
+                        </ul>
+                    </li>
+                    
+                    
+                      <li class="">
+                        <a href="#" class="1122" data-toggle="dropdown">
+                            <i class="menu-icon fa fa-edit"></i>
+                            <span class="menu-text">渠道商品管理</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="channels.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    渠道管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                            <li>
+                                <a href="commudity_admin.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    商品类型管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+               <li>
+                                <a href="commuditys_cost.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    商品成本配置
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+
+                 
+                        </ul>
+                    </li>
+                    
+                    
+                                          <li class="">
+                        <a href="#" class="1122" data-toggle="dropdown">
+                            <i class="menu-icon fa fa-wrench"></i>
+                            <span class="menu-text">系统配置</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="globalargsetting.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    参数配置
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                           
+                 
+                        </ul>
+                    </li>
+                    
+                    
+                   <li class="">
+                        <a href="#" class="1122" data-toggle="dropdown">
+                            <i class="menu-icon fa fa-wrench"></i>
+                            <span class="menu-text">货架管理</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="shelves_list.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                    货架配置
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                           
+                 
+                        </ul>
+                    </li>
+                    
+                        <li class="">
+                        <a href="#" class="1122" data-toggle="dropdown">
+                            <i class="menu-icon fa fa-wrench"></i>
+                            <span class="menu-text">汇通单管理</span>
+
+                            <b class="arrow fa fa-angle-down"></b>
+                        </a>
+                        <b class="arrow"></b>
+                        <ul class="submenu">
+                            <li>
+                                <a href="huitongguanli.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                  汇通单号管理
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                                     <li>
+                                <a href="huitongNoPrint.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                  库存单号打印
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                                    <li>
+                                <a href="huitongNoAPI_Print.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                  API接口打印
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                             <li>
+                                <a href="huitongNoexport.html" target="main">
+                                    <i class="menu-icon fa fa-caret-right"></i>
+                                  汇通运单下载
+                                </a>
+                                <b class="arrow"></b>
+                                <ul class="submenu"></ul>
+                            </li>
+                           
+                 
+                        </ul>
+                    </li>
+                   
+               </ul>
+                <!-- /.nav-list -->
+                <!-- #section:basics/sidebar.layout.minimize -->
+                <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+                    <i class="ace-icon fa fa-angle-double-left" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
+                </div>
+
+                <!-- /section:basics/sidebar.layout.minimize -->
+                <script type="text/javascript">
+                $(function () {
+                    try { ace.settings.check('sidebar', 'collapsed') } catch (e) { }
+                })
+                </script>
+            </div>
+
+            <!-- /section:basics/sidebar -->
+            <div class="main-content">
+                <div class="main-content-inner">
+                    <!-- /section:basics/resources.breadcrumbs -->
+                        <iframe style="width: 100%;height:100%; margin:0; padding: 0; border: 0;" id="main" name="main" src="default.html"></iframe>
+                    </div>
+                    <!-- /.page-content -->
+                </div>
+            </div>
+            <!-- /.main-content -->
+
+          
+            <!--<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+                <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+            </a>-->
+        </div>
+        <!-- /.main-container -->
+
+        <div style="position:fixed; bottom:0px; width:100%; color:#fff; font-size:14px; height:30px; line-height:30px; background-color:#438EB9; text-align:center">
+            Global Postal Service Inc
+        </div>
+
+  
+    <!-- basic scripts -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../resources/js/jquery-ui.custom.min.js"></script>
+    <script src="../resources/js/jquery.ui.touch-punch.min.js"></script>
+
+    <!-- ace scripts -->
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace.min.js"></script>
+
+    <script src="../resources/artDialog/dist/dialog-plus-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <script src="../resources/scripts/common.js"></script>
+    <script type="text/javascript">
+   
+        $(function () {
+       
+        	//获取管理员信息
+        /*	$.ajax({
+        		type : "get",
+        		url : "/admin/emp/get_self",
+        		success : function(response) {
+        			var code = response.code;
+        			if (code == "200") {
+        				//alert("weewew");
+        			} else if ("607" == code) {
+        				alert("您尚未登录或登录已失效！");
+        				adminlogout();
+        			} else {
+        				// 失败
+        				// alert("获取仓库数据失败，原因是:" + response.message);
+        			}
+        		}
+        	});*/
+        	
+        	
+        	
+            var $frmContent = $('#main');
+            function fixFrmContentSize() {
+                var offset = $frmContent.offset();
+                var top = offset.top;
+                var height = document.documentElement.clientHeight;
+                $frmContent.height(height - top);
+            }
+            fixFrmContentSize();
+            $(window).resize(fixFrmContentSize);
+
+            //增加iframe被嵌套的检测
+            if (window != top) {
+                top.location.href = location.href;
+            }
+
+            //菜单active样式
+            $(".nav-list li").click(function () {
+                var $this = $(this);
+                $this.siblings("li").removeClass("active");
+                $this.addClass('active');
+            });
+
+            $(".mainnav li").hover(
+             function () {
+                 jQuery(this).find("a:first").addClass("acur");
+                 jQuery(this).find(".subnav").show();
+             },
+              function () {
+                  jQuery(this).find("a:first").removeClass("acur");
+                  jQuery(this).find(".subnav").hide();
+              });
+        });
+
+        
+        
+        
+        $(document).ready(function(){ 
+            //获取管理员信息
+                	$.ajax({
+                		type : "get",
+                		url : "/admin/emp/get_self",
+                		success : function(response) {
+                			var code = response.code;
+                			if (code == "200") {
+                				
+                				
+                				$("#admin_user_account").html(response.data.account);
+                				
+                				
+                				
+                			} else if ("607" == code) {
+                				alert("您尚未登录或登录已失效！");
+                				adminlogout();
+                			} else {
+                				// 失败
+                				// alert("获取仓库数据失败，原因是:" + response.message);
+                			}
+                		}
+                	});
+        });
+    </script>
+
+   
+</body>
+</html>

@@ -1,0 +1,316 @@
+package com.weiye.test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.ProductUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Cart;
+import com.weiye.model.PageSplit;
+import com.weiye.model.Product;
+import com.weiye.model.ProductRecord;
+import com.weiye.model.ProductType;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.User;
+import com.weiye.service.ProductRecordService;
+import com.weiye.service.ProductService;
+import com.weiye.service.ProductTypeService;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"classpath:/spring-mvc.xml", "classpath:/spring.xml"})
+public class ProductServiceTest {
+	@Resource(name = "productTypeService")
+	private ProductTypeService productTypeService;
+	@Resource(name = "productService")
+	private ProductService productService;
+	@Resource(name = "productRecordService")
+	private ProductRecordService productRecordService;
+	
+	@Test
+	public void testAll(){
+		//测试类型
+		String typeId = this.testAddProductType();
+		ProductType productType = this.testFindByTypeId(typeId);
+		this.testUpdateProductType(productType);
+		this.testFindAllProductType();
+		//测试商品
+		String productId = this.testAddProduct(typeId);
+		Product product = this.testFindById(productId);
+		this.testUpdate(product);
+		this.testFindAll();
+		//测试购买
+		this.testAdd2Cart(productId);
+		this.testFindByUserCart();
+		int rest = this.testPurchaseByUserAllCart(product);//-1
+		this.testPurchaseByCart("1");
+		this.testPurchaseByUser(product, rest);//-1
+		List<ProductRecord> list = this.testFindRecordByProduct(product);
+		this.testRemarkByUser(list.get(list.size()-1));
+		//清理数据
+		this.testFindById(productId);
+		this.testDelete(product);
+		this.testFindByTypeId(typeId);
+		this.testDelete(productType);
+	}
+	private int testPurchaseByCart(String cartId) {
+		Cart cart = new Cart();
+		cart.setId(cartId);
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		ResponseObject<Product> responseProduct = new ResponseObject<Product>();
+		String expectedQuantity = "18";
+		try {
+			ProductRecord productRecord = ProductUtil.transfer(cart);
+			responseObject = productService.purchase(cart, productRecord);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			expectedQuantity = "18";
+		}
+		return Integer.valueOf(expectedQuantity);
+	}
+	private int testPurchaseByUserAllCart(Product product) {
+		ProductRecord productRecord = new ProductRecord();
+		productRecord.setId("1174");
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		ResponseObject<Product> responseProduct = new ResponseObject<Product>();
+		String expectedQuantity = "18";
+		try {
+			responseObject = productService.purchaseByUserAllCart(productRecord);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			expectedQuantity = "20";
+		}
+		try {
+			responseProduct = productService.findById(product);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+		assertEquals(expectedQuantity, responseProduct.getData().getQuantity());
+		return Integer.valueOf(expectedQuantity);
+	}
+
+	private void testFindByUserCart() {
+		int pageIndex = 5;
+		User user = new User();
+		user.setId("1174");
+		ResponseObject<PageSplit<Cart>> responseObject = new ResponseObject<>();
+		try {
+			responseObject = productService.findByCart(user, pageIndex, 10);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+	}
+
+	private void testAdd2Cart(String productId) {
+		Cart cart = new Cart();
+		cart.setUserId("1174");
+		cart.setProductId(productId);
+		cart.setQuantity("2");
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try {
+			responseObject = productService.add2Cart(cart);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+	}
+
+	private void testRemarkByUser(ProductRecord productRecord) {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		productRecord.setComment("商品很好");
+		try {
+			responseObject = productRecordService.updateComment(productRecord);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+	}
+	private List<ProductRecord> testFindRecordByProduct(Product product) {
+		int pageIndex = 3;
+		ResponseObject<PageSplit<ProductRecord>> responseObject = new ResponseObject<>();
+		ProductRecord productRecord = new ProductRecord();
+		productRecord.setProductId(product.getId());
+		try {
+			responseObject = productRecordService.findByKey(productRecord, "", "", pageIndex, 10);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+		return responseObject.getData().getDatas();
+	}
+	private void testDelete(ProductType productType) {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try {
+			responseObject = productTypeService.delete(productType);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+	}
+
+	private void testDelete(Product product) {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try {
+			responseObject = productService.delete(product);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+	}
+
+	private void testPurchaseByUser(Product product, int rest) {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		ResponseObject<Product> responseProduct = new ResponseObject<Product>();
+		int expectedQuantity = rest - 1;
+		ProductRecord productRecord = new ProductRecord();
+		productRecord.setUserId("1174");
+		productRecord.setProductId(product.getId());
+		productRecord.setQuantity("1");
+		try {
+			responseObject = productRecordService.addByUser(productRecord);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			expectedQuantity ++ ;
+		}
+		try {
+			responseProduct = productService.findById(product);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+		assertEquals(String.valueOf(expectedQuantity), responseProduct.getData().getQuantity());
+	}
+
+	private void testFindAll() {
+		int pageIndex = 3;
+		String priceStart = "10";
+		String priceEnd = "";
+		String userId = "";
+		Product product = new Product();
+		ResponseObject<PageSplit<Product>> responseObject = new ResponseObject<PageSplit<Product>>();
+		try {
+			responseObject = productService.findByKey(product, priceStart, priceEnd, userId, pageIndex, 10);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+	}
+
+	private void testUpdate(Product product) {
+		product.setPrice("25");
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try {
+			responseObject = productService.update(product);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+	}
+
+	private Product testFindById(String productId) {
+		Product product = new Product();
+		product.setId(productId);
+		ResponseObject<Product> responseObject = new ResponseObject<Product>();
+		try {
+			responseObject = productService.findById(product);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+		return responseObject.getData();
+	}
+
+	private String testAddProduct(String typeId) {
+		Product product = new Product();
+		product.setEmpId("104");
+		product.setName("衬衣");
+		product.setPrice("30");
+		product.setCurrency("USD");
+		product.setQuantity("20");
+		product.setTypeId(typeId);
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try {
+			responseObject = productService.add(product);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+		return product.getId();
+	}
+
+	private void testFindAllProductType() {
+		int pageIndex = 3;
+		String key = "";
+		ResponseObject<PageSplit<ProductType>> responseObject = new ResponseObject<PageSplit<ProductType>>();
+		try {
+			responseObject = productTypeService.findByKey(key, pageIndex, 10);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+	}
+
+	private void testUpdateProductType(ProductType productType) {
+		productType.setName("衣服");
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try {
+			responseObject = productTypeService.update(productType);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+	}
+
+	private ProductType testFindByTypeId(String typeId) {
+		ProductType productType = new ProductType();
+		productType.setId(typeId);
+		ResponseObject<ProductType> responseObject = new ResponseObject<ProductType>();
+		try {
+			responseObject = productTypeService.findById(productType);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+		return responseObject.getData();
+	}
+
+	private String testAddProductType() {
+		ProductType productType = new ProductType();
+		productType.setName("电器");
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try {
+			responseObject = productTypeService.add(productType);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+			responseObject.setCode(ResponseCode.TEST_EXCEPTION);
+		}
+		assertSame(ResponseCode.SUCCESS_CODE, responseObject.getCode());
+		return productType.getId();
+	}
+}

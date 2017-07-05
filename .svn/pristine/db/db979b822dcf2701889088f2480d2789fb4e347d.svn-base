@@ -1,0 +1,758 @@
+package com.weiye.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import jxl.common.Logger;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.stripe.exception.APIConnectionException;
+import com.stripe.exception.APIException;
+import com.stripe.exception.AuthenticationException;
+import com.stripe.exception.CardException;
+import com.stripe.exception.InvalidRequestException;
+import com.stripe.model.Charge;
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.AccountUtil;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.PropertiesReader;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.alipay.util.AlipayCore;
+import com.weiye.common.util.alipay.util.AlipayNotify;
+import com.weiye.common.util.stripe.StripeUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Account;
+import com.weiye.model.AccountDetail;
+import com.weiye.model.Credit;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.AccountService;
+
+@Controller
+public class AccountController extends BasicController {
+
+	
+	private static final long serialVersionUID = -2836718794551189036L;
+	private static final Logger log = Logger.getLogger(AccountController.class);
+	
+	@Resource(name = "accountService")
+	private AccountService accountService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+
+	@RequestMapping(value = "/credit/all", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<List<Credit>> getAllCredit(HttpServletRequest request) {
+		try {
+			String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+			return this.accountService.getCreditsByUserId(userId);
+		} catch (Exception e) {
+			log.error("获取信用卡信息失败", e);
+		
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取信用卡记录出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/credit/get_one", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<Credit> getOneCredit(HttpServletRequest request, @Param("id") String id) {
+		try {
+			String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+			if (StringUtil.isEmpty(id) || StringUtil.isEmpty(userId)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+			}
+			return this.accountService.getCreditById(id, userId);
+		} catch (Exception e) {
+			log.error("获取信用卡信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取信用卡记录出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/credit/save", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> saveCreditInfo(HttpServletRequest request, Credit credit) {
+		if (credit == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if (!AccountUtil.validateCreditName(credit.getName())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡持卡人姓名输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditZipCode(credit.getZipCode())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "邮编输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditAddress(credit.getAddress1())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "地址1输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditAddress(credit.getAddress2())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "地址2输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditCity(credit.getCity())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "城市输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditProvince(credit.getProvince())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "州信息输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditNo(credit.getCreditNo())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡号码输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditSecurityCode(credit.getCreditSecurityCode())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡安全码输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditExpireYear(credit.getExpireYear())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡到期年信息输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditExpireMonth(credit.getExpireMonth())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡到期月信息输入错误，请重新输入！");
+		}
+
+		if (!AccountUtil.validateCreditType(credit.getType())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡类型输入错误，请重新输入！");
+		}
+
+		try {
+			String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+			credit.setUserId(userId);
+			return this.accountService.addCredit(credit);
+		} catch (Exception e) {
+			log.error("保存信用卡失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "保存信用卡记录出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/credit/recharge", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> rechargeByCredit(HttpServletRequest request,
+	        @RequestParam(value = "creditId") String creditId, @RequestParam(value = "amount") String amount) {
+		if (StringUtil.isEmpty(creditId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "请选择进行充值的信用卡，如果没有请添加！");
+		}
+
+		try {
+			double da = 0;
+			try {
+				da = Double.valueOf(amount != null ? amount.trim() : "");
+			} catch (NumberFormatException e) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "预付款金额必须是数字");
+			}
+
+			if (da > 0) {
+				String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+				AccountDetail detail = new AccountDetail();
+				detail.setAmount(String.valueOf(da));
+				detail.setRealAmount(detail.getRealAmount());
+				detail.setUserId(userId);
+				detail.setCurrency("美元");
+				detail.setName("信用卡充值");
+				detail.setType(Constant.ACCOUNT_DETAIL_TYPE11);
+				detail.setState(Constant.ACCOUNT_DETAIL_STATE1);
+				detail.setCreditId(creditId);
+
+				return this.accountService.addAccountDetail(detail);
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "预付款金额必须大于0");
+			}
+		} catch (Exception e) {
+			log.error("预充值失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "预充值失败");
+		}
+	}
+
+	@RequestMapping(value = "/account/detail/search", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<PageSplit<AccountDetail>> searchUserOfAccountDetail(
+	        HttpServletRequest request,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+			pageIndex = Math.max(pageIndex, 1);
+			return this.accountService.search(userId, null, defaultPageSize, pageIndex, null, null,null);
+		} catch (Exception e) {
+			log.error("获取预充值列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取预充值列表失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/account/get_one", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<Account> getAccountByUserId(@RequestParam(value = "userId") String userId) {
+		if (StringUtil.isEmpty(userId)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			return this.accountService.getAccountByUserId(userId);
+		} catch (Exception e) {
+			log.error("根据用户id获取会员账户失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取会员id获取会员账户失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/account/detail/get_one", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<AccountDetail> getOneAccountDetail(@RequestParam(value = "id") String id) {
+		try {
+			return this.accountService.getAccountDetailById(id);
+		} catch (Exception e) {
+			log.error("根据id获取充值记录失败");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取消费详细记录失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/account/detail/search", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<PageSplit<AccountDetail>> searchNoDealOfCredit(
+			HttpServletRequest request,
+	        @RequestParam(value = "userId", required = false, defaultValue = "") String userId,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false, defaultValue = "") String name,
+	        @RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false, defaultValue = Constant.ACCOUNT_DETAIL_STATE1) String state,
+	        @RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			String groupid = (String)request.getSession().getAttribute(Constant.EMP_GROUPID_SESSION_KEY);
+			if (Constant.ACCOUNT_DETAIL_STATE1.equals(state)) {
+				state = Constant.ACCOUNT_DETAIL_STATE1;
+			} else if (Constant.ACCOUNT_DETAIL_STATE2.equals(state)) {
+				state = Constant.ACCOUNT_DETAIL_STATE2;
+			} else if (Constant.ACCOUNT_DETAIL_STATE3.equals(state)) {
+				state = Constant.ACCOUNT_DETAIL_STATE3;
+			} else {
+				state = "";
+			}
+			userId = StringUtil.isEmpty(userId) ? null : userId;
+			if (userId != null) {
+				state = null;
+				name = null;
+			}
+			pageIndex = Math.max(pageIndex, 1);
+			/*return this.accountService.search(userId, name, defaultPageSize, pageIndex, state,
+			        Constant.ACCOUNT_DETAIL_TYPE11,groupid);*/
+			return this.accountService.search(userId, name, defaultPageSize, pageIndex, state,
+			        null,null);
+			
+		} catch (Exception e) {
+			log.error("获取预充值列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取预充值列表失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/account/detail/modify", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> modifyAccountDetail(AccountDetail detail) {
+		try {
+			AlipayCore.logResult("detail state:"+detail.getState());
+			if (Constant.ACCOUNT_DETAIL_STATE2.equals(detail.getState())) {
+				AlipayCore.logResult("detail type:"+detail.getType());
+				if (Constant.ACCOUNT_DETAIL_TYPE11.equals(detail.getType())) {
+					StringBuffer sb = new StringBuffer();
+					if (!StringUtil.isEmpty(detail.getRemark())) {
+						sb.append(detail.getRemark()).append("\n");
+					}
+					sb.append("预充值金额为：").append(detail.getAmount()).append("，实充金额为：").append(detail.getRealAmount());
+					detail.setRemark(sb.toString());
+				}
+				return this.accountService.modifyAccountDetail(detail);
+			} else if (Constant.ACCOUNT_DETAIL_STATE3.equals(detail.getState())) {
+				return this.accountService.modifyAccountDetail(detail);
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "状态必须设置为充值完成或者是充值失败");
+			}
+		} catch (ServiceException e) {
+			log.error("修改失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/admin/msrecharge", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> rechargeAdminOfMsd(HttpServletRequest request, AccountDetail accountDetail) {
+		
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权此操作!");
+			
+		}
+		if (accountDetail != null
+		        && (Constant.ACCOUNT_DETAIL_TYPE11.equals(accountDetail.getCurrency()) || Constant.ACCOUNT_DETAIL_TYPE12
+		                .equals(accountDetail.getCurrency()))) {
+			// 美元充值 or 人民币充值
+			double amount = 0;
+			try {
+				amount = Double.valueOf(accountDetail.getRealAmount());
+				amount = BigDecimal.valueOf(amount).setScale(2).doubleValue();
+				if (amount == 0.0D) {
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "操作金额不能为零");
+				}
+			} catch (Exception e) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "充值金额必须是数字");
+			}
+
+			try {
+				Account account = this.accountService.getAccountByUserId(accountDetail.getUserId()).getData();
+				if (account == null) {
+					account = new Account();
+					account.setUsd("0");
+					account.setRmb("0");
+					account.setUserId(accountDetail.getUserId());
+				}
+				// 检测账户余额是否足够
+				double usd = Double.valueOf(account.getUsd());
+				double rmb = Double.valueOf(account.getRmb());
+				if (Constant.ACCOUNT_DETAIL_TYPE11.equals(accountDetail.getCurrency())) {
+					// 美元操作
+					usd = usd + amount;
+					if (usd < 0.0D) {
+						// 账户余额不足，请充值
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "账户美元余额不足，请充值或更换货币类型后再操作！");
+					}
+					account.setUsd(String.valueOf(amount));
+					account.setRmb("0");
+				} else {
+					// 人民币操作
+					rmb = rmb + amount;
+					if (rmb < 0.0D) {
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "账户人民币余额不足，请充值或更换货币类型后再操作！");
+					}
+					account.setUsd("0");
+					account.setRmb(String.valueOf(amount));
+				}
+
+				String empId = StringUtil
+				        .obj2String(request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY));
+				accountDetail.setEmpId(empId);
+				accountDetail.setState(Constant.ACCOUNT_DETAIL_STATE2); // 完成
+				accountDetail.setType(Constant.ACCOUNT_DETAIL_TYPE13); // 后台管理员操作
+				if (amount < 0) {
+					accountDetail.setName("后台管理员扣款");
+				} else {
+					accountDetail.setName("后台管理员充值");
+				}
+				accountDetail.setAmount(accountDetail.getRealAmount());
+				try {
+					return this.accountService.modifyAccountOfAdmin(accountDetail, account);
+				} catch (Exception e) {
+					log.error("保存充值信息失败", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "保存充值信息失败");
+				}
+			} catch (Exception e) {
+				log.error("根据id获取账户详细失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据user id获取账户详情失败");
+			}
+		} else {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "必须选择充值的货币类型，美元或者人民币。");
+		}
+	}
+
+	
+	@RequestMapping(value = "/stripe/recharge", method = { RequestMethod.POST, RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Object> rechargeByStripe(
+			HttpServletRequest request, 
+			@RequestParam(value = "name") String name,
+			//@RequestParam(value = "type") String type,
+			@RequestParam(value = "creditNo") String creditNo,
+			@RequestParam(value = "securityCode") String securityCode,
+			@RequestParam(value = "expireYear") String expireYear,
+			@RequestParam(value = "expireMonth") String expireMonth,
+			@RequestParam(value = "currency") String currency,
+			@RequestParam(value = "amount") String amount
+			) {
+		
+			if (!AccountUtil.validateCurrency(currency)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "充值币种不正确，请重新币种！");
+			}
+			if (!AccountUtil.validateCreditName(name)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡持卡人姓名输入错误，请重新输入！");
+			}
+
+
+			if (!AccountUtil.validateCreditNo(creditNo)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡号码输入错误，请重新输入！");
+			}
+
+			if (!AccountUtil.validateCreditSecurityCode(securityCode)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡安全码输入错误，请重新输入！");
+			}
+
+			if (!AccountUtil.validateCreditExpireYear(expireYear)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡到期年信息输入错误，请重新输入！");
+			}
+
+			if (!AccountUtil.validateCreditExpireMonth(expireMonth)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡到期月信息输入错误，请重新输入！");
+			}
+
+		//	if (!AccountUtil.validateCreditType(type)) {
+		//		return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡类型输入错误，请重新输入！");
+		//	}
+			if (!AccountUtil.validateAmount(amount)) {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "充值金额输入错误，请重新输入！");
+			}
+			
+			
+			double da = Double.valueOf(amount != null ? amount.trim() : "");
+			int money = (int) (da*100);
+			if (da > 0) {
+				try {
+					SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");//设置日期格式
+			        String order = df.format(new Date())+String.valueOf((int)(Math.random()*9000+1000));
+			        Charge charge = StripeUtil.createPayMoneyByStrip(name,creditNo,securityCode,expireYear,expireMonth,money,currency,order);
+					System.out.println("charge.getId:"+charge.getId());
+					System.out.println("charge:"+charge);
+				} catch (AuthenticationException e) {
+					log.error("Authentication with Stripe's API failed！");
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "Authentication with Stripe's API failed！");
+				} catch (InvalidRequestException e) {
+					log.error("Invalid parameters were supplied to Stripe's API！");
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "Invalid parameters were supplied to Stripe's API！");
+				} catch (APIConnectionException e) {
+					log.error("Network communication with Stripe failed！");
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "Network communication with Stripe failed！");
+				} catch (CardException e) {
+					String code = e.getCode();
+					if(code.equals("incorrect_number")){
+						log.error("信用卡号码输入错误，请重新输入！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "信用卡号码输入错误，请重新输入！");
+					}else if(e.getCode().equals("invalid_number")){
+						log.error("信用卡号码不是一个有效的卡号，请重新输入！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "信用卡号码不是一个有效的卡号，请重新输入！");
+					}else if(e.getCode().equals("invalid_expiry_month")){
+						log.error("失效月错误，请重新输入！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "失效月错误，请重新输入！");
+					}else if(e.getCode().equals("invalid_expiry_year")){
+						log.error("失效年错误，请重新输入！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "失效年错误，请重新输入！");
+					}else if(e.getCode().equals("invalid_cvc")){
+						log.error("信用卡安全码错误，请重新输入！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "信用卡安全码错误，请重新输入！");
+					}else if(e.getCode().equals("expired_card")){
+						log.error("信用卡就失效卡，请输入有效信用卡！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "信用卡就失效卡，请输入有效信用卡！");
+					}else if(e.getCode().equals("incorrect_cvc")){
+						log.error("信用卡就失效卡，请输入有效信用卡！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "信用卡就失效卡，请输入有效信用卡！");
+					}else if(e.getCode().equals("incorrect_zip")){
+						log.error("信用卡邮编错误，请输入正确邮编！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "信用卡邮编错误，请输入正确邮编！");
+					}else if(e.getCode().equals("card_declined")){
+						log.error("There is no card on a customer that is being charged！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "There is no card on a customer that is being charged！");
+					
+					}else if(e.getCode().equals("missing")){
+						log.error("信用卡不可用！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "信用卡不可用！");
+					}else if(e.getCode().equals("processing_error")){
+						//alert("An error occurred while processing the card.");
+						log.error("信用卡扣款出错，请重试！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "信用卡扣款出错，请重试！");
+					
+					}else if(e.getCode().equals("rate_limit")){
+						//alert("An error occurred due to requests hitting the API too quickly. Please let us know if you're consistently running into this error.");
+						log.error("您输入错误过多，此暂时不可用！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "您输入错误过多，此暂时不可用！");
+					}else{
+						//alert("The card has expired.Unknown reason");
+						log.error("信用卡不可用，原因未知！");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "信用卡不可用，原因未知！");
+					}
+					
+					/*if(e.getCode().equals("incorrect_number")){
+						log.error("信用卡号码输入错误，请重新输入！");
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡号码输入错误，请重新输入！");
+						//alert("The card number is incorrect.");
+					}else if(e.getCode().equals("invalid_number")){
+						//alert("The card number is not a valid credit card number.");
+						log.error("信用卡号码不是一个有效的卡号，请重新输入！");
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡号码不是一个有效的卡号，请重新输入！");
+					}else if(e.getCode().equals("invalid_expiry_month")){
+						//alert("The card's expiration month is invalid.");
+						log.error("失效月错误，请重新输入！");
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "失效月错误，请重新输入！");
+					
+					}else if(e.getCode().equals("invalid_expiry_year")){
+						//alert("The card's expiration year is invalid.");
+						log.error("失效年错误，请重新输入！");
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "失效年错误，请重新输入！");
+					
+					}else if(e.getCode().equals("invalid_cvc")){
+						//alert("The card's security code is invalid.");
+						log.error("信用卡安全码错误，请重新输入！");
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡安全码错误，请重新输入！");
+					
+					}else if(e.getCode().equals("expired_card")){
+						//alert("The card has expired.");
+						log.error("信用卡就失效卡，请输入有效信用卡！");
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡就失效卡，请输入有效信用卡！");
+					
+					}else if(e.getCode().equals("incorrect_cvc")){
+						//alert("The card's security code is incorrect.");
+						log.error("信用卡就失效卡，请输入有效信用卡！");
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR, "信用卡就失效卡，请输入有效信用卡！");
+					
+					}else if(e.getCode().equals("incorrect_zip")){
+						//alert("The card's zip code failed validation.");
+					}else if(e.getCode().equals("card_declined")){
+						//alert("There is no card on a customer that is being charged.");
+					}else if(e.getCode().equals("missing")){
+						//alert("The card was declined.");
+					}else if(e.getCode().equals("processing_error")){
+						//alert("An error occurred while processing the card.");
+					}else if(e.getCode().equals("rate_limit")){
+						//alert("An error occurred due to requests hitting the API too quickly. Please let us know if you're consistently running into this error.");
+					}else{
+						//alert("The card has expired.Unknown reason"); 
+					}*/
+				} catch (APIException e) {
+					log.error("Display a very generic error to the user, and maybe send！");
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "Display a very generic error to the user, and maybe send！");
+				}catch (Exception e) {
+					log.error("支付错误，原因未知！");
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "支付错误，原因未知！");
+				
+				}
+				String procedureRatio ="";
+				String procedureEnable ="1"; 
+				String giveRatio =""; 
+				String giveEnable ="0"; 
+				try {
+					Properties props = PropertiesReader.read(Constant.SYSTEM_PROPERTIES_FILE);
+					procedureRatio = props.getProperty("stripe.recharge.procedure.ratio");
+					procedureEnable = props.getProperty("stripe.recharge.procedure.enable");
+					giveRatio = props.getProperty("stripe.recharge.give.ratio");
+					giveEnable = props.getProperty("stripe.recharge.give.enable");
+				} catch (Exception e) {
+					//Stripe.apiKey = "1a34d5adddbaf841";
+					log.error("读取手续费与赠送费的配置错误!");
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "系统服务忙，请稍后再充值，或者请联系客服!");
+				}
+				String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+				String date = DateUtil.date2String(new Date());
+				AccountDetail giveDetail = new AccountDetail();  //赠送
+				AccountDetail procedureDetail = new AccountDetail(); //手续费
+				double give = da*Double.valueOf(giveRatio);
+				double procedure = da*Double.valueOf(procedureRatio);
+				giveDetail.setAmount(String.valueOf(give));
+				giveDetail.setRealAmount(giveDetail.getAmount());
+				giveDetail.setUserId(userId);
+				giveDetail.setState(Constant.ACCOUNT_DETAIL_STATE2);
+				giveDetail.setName("信用卡充值赠送");
+				giveDetail.setCreditId("-1");
+				giveDetail.setCreateDate(date);
+				procedureDetail.setAmount(String.valueOf(procedure));
+				procedureDetail.setRealAmount(procedureDetail.getAmount());
+				procedureDetail.setUserId(userId);
+				procedureDetail.setState(Constant.ACCOUNT_DETAIL_STATE2);
+				procedureDetail.setName("信用卡充值手续费");
+				procedureDetail.setCreditId("-1");
+				procedureDetail.setCreateDate(date);
+				
+				AccountDetail detail = new AccountDetail();
+				detail.setAmount(String.valueOf(da));
+				detail.setRealAmount(detail.getAmount());
+				detail.setUserId(userId);
+				detail.setCreateDate(date);
+				if(currency.equals("usd")){
+					detail.setCurrency("美元");
+					detail.setType(Constant.ACCOUNT_DETAIL_TYPE11);
+					
+					giveDetail.setCurrency("美元");
+					giveDetail.setType(Constant.ACCOUNT_DETAIL_TYPE11);
+					
+					procedureDetail.setCurrency("美元");
+					procedureDetail.setType(Constant.ACCOUNT_DETAIL_TYPE2);
+				}
+				else if(currency.equals("rmb")){
+					detail.setCurrency("人民币");
+					detail.setType(Constant.ACCOUNT_DETAIL_TYPE12);
+					
+					giveDetail.setCurrency("人民币");
+					giveDetail.setType(Constant.ACCOUNT_DETAIL_TYPE12);
+					
+					procedureDetail.setCurrency("人民币");
+					procedureDetail.setType(Constant.ACCOUNT_DETAIL_TYPE2);
+				}
+				detail.setName("信用卡充值");
+				
+				detail.setState(Constant.ACCOUNT_DETAIL_STATE2);
+				detail.setCreditId("-1");
+				try {
+					ResponseObject<Object> detailobj =  this.accountService.insertAccountDetail(detail);
+					if(detailobj.getCode()!= ResponseCode.SUCCESS_CODE){
+						log.error("已经充值成功，但记录写入数据库失败，请联系客服，修改充值记录!");
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "已经充值成功，但充值加入余额中出现异常，请联系客服，修改充值记录!");
+					}
+					if(procedureEnable.equals("1")){
+						ResponseObject<Object> procedureDetailobj = this.accountService.procedure(procedureDetail);
+						if(procedureDetailobj.getCode()!= ResponseCode.SUCCESS_CODE){
+							log.error("手续费扣取异常!");
+							return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "充值异常，请联系客服!");
+						}
+					}
+					if(giveEnable.equals("1")){
+							return this.accountService.insertAccountDetail(giveDetail);
+					}
+					return generateResponseObject(ResponseCode.SUCCESS_CODE, "已经充值成功!");
+				} catch (ServiceException e) {
+					log.error("已经充值成功，但记录写入数据库失败，请联系客服，修改充值记录!");
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "已经充值成功，但充值加入余额中出现异常，请联系客服，修改充值记录!");
+				}
+				
+			} else {
+				// "充值金额必须大于0";
+				log.error("充值金额必须大于0!");
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "充值金额必须大于0!");
+			}
+			
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/account/alipay_return_url", method = { RequestMethod.GET, RequestMethod.POST })
+	public void alipayReturnUrl(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			AlipayCore.logResult("alipayReturnUrl start");
+			
+			Map<String, String> params = new HashMap<String, String>();
+			Map<String, String> params2 = new HashMap<String, String>();
+			Map requestParams = request.getParameterMap();
+			for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) {
+				String name = (String) iter.next();
+				String[] values = (String[]) requestParams.get(name);
+				String valueStr = "";
+				for (int i = 0; i < values.length; i++) {
+					valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
+				}
+				params2.put(name, valueStr);
+				params.put(name, new String(valueStr.getBytes("ISO-8859-1"), "utf-8"));
+			}
+			String out_trade_no = new String(request.getParameter("out_trade_no").getBytes("ISO-8859-1"), "UTF-8");
+			String trade_status = new String(request.getParameter("trade_status").getBytes("ISO-8859-1"), "UTF-8");
+
+			response.setContentType("text/html;charset=utf-8");
+			AccountDetail detail = this.accountService.getAccountDetailById(
+			        AccountUtil.getAccountDetailIdByAlipayOrderId(out_trade_no)).getData();
+			
+			AlipayCore.logResult("tradeno:"+out_trade_no);
+			AlipayCore.logResult("amount:"+detail.getAmount());
+			
+			detail.setRealAmount(detail.getAmount());
+			boolean verify_result = AlipayNotify.verify(params) || AlipayNotify.verify(params2);
+			if (verify_result) {
+				AlipayCore.logResult("verify result is ok");
+				if (trade_status.equals("TRADE_FINISHED") || trade_status.equals("TRADE_SUCCESS")) {
+					detail.setState(Constant.ACCOUNT_DETAIL_STATE2);
+					detail.setType(Constant.ACCOUNT_DETAIL_TYPE12);
+					this.accountService.modifyAccountDetail(detail);
+					AlipayCore.logResult("Alipay ok");
+					log.info("充值成功" + out_trade_no);
+					// out.println("充值成功<br />");
+				} else {
+					detail.setState(Constant.ACCOUNT_DETAIL_STATE3);
+					this.accountService.modifyAccountDetail(detail);
+					log.info("充值失败" + out_trade_no);
+					AlipayCore.logResult("Alipay fail");
+					// out.println("充值失败，如果您确认你充值成功，请联系客服！");
+				}
+			} else {
+				AlipayCore.logResult("verify_result not sure ,the trade_status="+trade_status);
+				if(!trade_status.equals("WAIT_BUYER_PAY"))//add by DKJ on 20151128
+				{
+					AlipayCore.logResult("verify_result fail");
+					detail.setState(Constant.ACCOUNT_DETAIL_STATE3);
+					this.accountService.modifyAccountDetail(detail);
+					log.info("充值失败" + out_trade_no);
+           		}
+				
+				// out.println("充值失败，如果您确认你充值成功，请联系客服！");
+			}
+			// 跳转到充值详细界面
+			response.sendRedirect(request.getContextPath() + "/user/index.jsp");//caiwujilu.jsp
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (ServiceException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/account/alipay_notify_url", method = { RequestMethod.GET, RequestMethod.POST })
+	public void alipayNoticyUrl(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			AlipayCore.logResult("alipayNoticyUrl start");
+			Map<String, String> params = new HashMap<String, String>();
+			Map<String, String> params2 = new HashMap<String, String>();
+			Map requestParams = request.getParameterMap();
+			for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) {
+				String name = (String) iter.next();
+				String[] values = (String[]) requestParams.get(name);
+				String valueStr = "";
+				for (int i = 0; i < values.length; i++) {
+					valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
+				}
+				params2.put(name, valueStr);
+				params.put(name, new String(valueStr.getBytes("ISO-8859-1"), "utf-8"));
+			}
+			String out_trade_no = new String(request.getParameter("out_trade_no").getBytes("ISO-8859-1"), "UTF-8");
+			String trade_status = new String(request.getParameter("trade_status").getBytes("ISO-8859-1"), "UTF-8");
+
+			// 获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以上仅供参考)//
+			PrintWriter out = response.getWriter();
+			response.setContentType("text/html;charset=utf-8");
+			AccountDetail detail = this.accountService.getAccountDetailById(
+			        AccountUtil.getAccountDetailIdByAlipayOrderId(out_trade_no)).getData();
+			detail.setRealAmount(detail.getAmount());
+			if (AlipayNotify.verify(params) || AlipayNotify.verify(params2)) {// 验证成功
+				if (trade_status.equals("TRADE_FINISHED") || trade_status.equals("TRADE_SUCCESS")) {
+					detail.setState(Constant.ACCOUNT_DETAIL_STATE2);
+					detail.setType(Constant.ACCOUNT_DETAIL_TYPE12);
+					this.accountService.modifyAccountDetail(detail);
+				} else {
+					if(!trade_status.equals("WAIT_BUYER_PAY")) //add by DKJ on 20151128
+					{
+						detail.setState(Constant.ACCOUNT_DETAIL_STATE3);
+						this.accountService.modifyAccountDetail(detail);
+					}
+	
+				}
+				out.println("success"); // 请不要修改或删除
+			} else {// 验证失败
+				detail.setState(Constant.ACCOUNT_DETAIL_STATE3);
+				this.accountService.modifyAccountDetail(detail);
+				out.println("fail");
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+}

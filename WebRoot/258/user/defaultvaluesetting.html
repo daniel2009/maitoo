@@ -1,0 +1,184 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>用户中心</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <link href="css/usercenter.css" rel="stylesheet" />
+    <style type="text/css">
+        .sixword {
+            display: inline-block;
+            width: 6em;
+            text-align: right;
+        }
+
+        .valueblock {
+            padding: 5px 0px;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .floatblock {
+            float: left;
+            padding: 2px 0px;
+        }
+
+        .table-selectheight {
+            height: 28px;
+            padding: 0px;
+            margin: 0;
+        }
+
+        button[type="submit"] {
+            margin-top: 3px;
+        }
+
+        @media screen and (max-width: 768px) {
+            #btnPrintA4, #btnPrintRenMin {
+                display: none;
+            }
+        }
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon blue"></i>
+                    <a href="#">用户中心</a>
+                </li>
+
+                <li>
+                    <a href="#">默认值设置</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content">
+
+            <div class="row">
+                <div style="height:10px;color:#fff">1</div>
+                <div class=" col-xs-12 col-sm-12 col-md-12">
+                    <div class="pull-left alert alert-success no-margin infotitle">
+
+                        <i class="icon-info-sign bigger-120 blue"></i>
+                        默认值设置
+                    </div>
+
+                    <div class="profile-user-info profile-user-info-striped" style="width:100%">
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"> 在线置单： </div>
+                            <div class="profile-info-value" id="zaixiandadanSetting">
+                                <select style="width:200px;margin-top:2px;" name="z_storelists" type="1">
+                                    <option value="-1">选择门店</option>
+                                </select><span style="color:red">*</span>
+                                <select style="width:200px;margin-top:2px;" name="channellist" type="2">
+                                    <option value="-1">选择渠道</option>
+                                </select><span style="color:red">*</span>
+                                <button type="button" class="btn btn-success btn-sm" onclick="updateonlinesetting()"><i class="glyphicon glyphicon-ok"></i><strong>保存</strong></button>
+                            </div>
+                        </div>
+
+                       
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name"> 上门收货： </div>
+                            <div class="profile-info-value" id="shangmenshouhuoSetting">
+                                <select style="width:200px;margin-top:2px;" name="s_storelists" type="3">
+                                    <option value="-1">选择门店</option>
+                                </select><span style="color:red">*</span>
+
+                                <button type="button" class="btn btn-success btn-sm" onclick="updatewanshanghuo()"><i class="glyphicon glyphicon-ok"></i><strong>保存</strong></button>
+                            </div>
+                        </div>
+                        
+                        
+                           <div class="profile-info-row">
+                            <div class="profile-info-name"> 说明： </div>
+                            <div class="profile-info-value" id="settinginfo">
+                                <span style="color:blue;">当使用对应功能时，系统将自动调用此默认值!</span>
+                                  </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <script src="../resources/js/fuelux/fuelux.spinner.min.js"></script>
+    <script src="../resources/scripts/common.js"></script>
+    <script src="scripts/defaultvaluesetting.js"></script>
+</body>
+</html>

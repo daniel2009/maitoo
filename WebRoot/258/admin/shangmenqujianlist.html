@@ -1,0 +1,333 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <style type="text/css">
+        .ui-jqgrid-view > .ui-jqgrid-titlebar {
+            display: block;
+        }
+
+        #divChongzhiRecordGrid .ui-jqgrid tr.ui-row-ltr td,#divChongzhiRecordGrid .ui-jqgrid tr.ui-row-rtl td {
+            border-bottom: 1px solid #E1E1E1;
+            padding: 6px 4px;
+            border-color: #E1E1E1;
+        }
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">运单管理</a>
+                </li>
+
+                <li>
+                    <a href="#">上门取件</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content" id="divGrid">
+          
+
+            <div class="row toolrow" id="divAdvanceSearch" style="border:1px solid #ccc">
+                <div class="col-xs-12" style="padding:3px 5px 0px;">
+                  
+                    <div style="float:right; margin-left:15px;">
+                        创建时间
+                        <input class="text-input Wdate" type="text" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" style="padding:2px 5px;width:110px;"  name="createDateStart">
+                       至
+                        <input class="text-input Wdate" type="text" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" style="padding:2px 5px;width:110px;"  name="createDateEnd">
+                      
+                        <button type="button" class="btn btn-purple btn-sm" id="btnAdvanceSearch">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            搜索
+                        </button>
+                    </div>
+
+                    <div style="float:right; margin-left:15px;">
+                       确认时间
+                        <input class="text-input Wdate" type="text" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" style="padding:2px 5px;width:110px;" name="confirmDateStart">
+                       至
+                        <input class="text-input Wdate" type="text" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" style="padding:2px 5px;width:110px;"  name="confirmDateEnd">
+                      
+                      
+                    </div>
+
+                    <div style="float:right">
+                        门店
+                        <select name="storeId" class="selectStore" style="width:100px;margin-left:5px" onchange="changeWarehouseSelect()">
+                            
+                        </select>
+                        城市
+                        <select name="city" class="selectcity" style="width:100px;margin-left:5px" onchange="changeCitySelect()">
+                            
+                        </select>
+                        <input type="hidden" value="" name="city_text">
+                        <input name="keyword" id="keyword" placeholder="关键字" style="padding:2px;">
+                        <select name="state" class="table-selectheight" style="width:120px;margin-left:5px">
+                            <option value="" selected="selected">请选择状态</option>
+                            <option value="0">没处理</option>
+                            <option value="1">处理中</option>
+                            <option value="2">处理完成</option>
+                            <option value="-10">异常</option>
+                        </select>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div style="clear:both">
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-xs-12">
+
+                    <!-- PAGE CONTENT BEGINS -->
+                    <table id="yundangrid-table"></table>
+                    <div id="yundangrid-pager"></div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+                
+            </div>
+             <div class="clearfix form-buttons">
+                            <label class="control-label col-md-5"></label>
+                            <button type="button" id="btnprintlist" class="btn btn-success btn-sm" onclick="printsmorders()"><i class="glyphicon glyphicon-ok"></i><strong>打印清单</strong></button>
+
+                            
+                </div>
+        </div>
+
+    
+    
+    
+    
+    
+    <div class="page-content" id="divEdit" style="display:none">
+
+            <div class="row">
+                <div style="margin-top: 10px; margin-bottom: 10px;color:blue" class="well well-sm">
+                    <span>修改完整信息</span>
+                </div>
+            </div>
+            <div class="row" style=" margin-bottom:30px;">
+                    <form>
+
+					<input type="hidden" name="id" />
+                        <div class="profile-user-info profile-user-info-striped" style="width:100%">
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">联系人： </div>
+
+                                <div class="profile-info-value">
+                                    <input name="name" type="text" placeholder="必填项" readonly="readonly"/>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">联系人手机： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" size="30" id="sPhone" name="phone" readonly="readonly">
+                                </div>
+                            </div>
+                            
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">预约时间： </div>
+
+                                <div class="profile-info-value">
+                                    <input name="appointmentDate" type="text" placeholder="必填项" readonly="readonly" class="text-input Wdate" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm' })"/>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">上门门店： </div>
+
+                                <div class="profile-info-value">
+                                    <input name="storeName" type="text" placeholder="必填项" readonly="readonly"/>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">州、市： </div>
+
+                                <div class="profile-info-value">
+                                  
+                                    <input type="text" id="warehouseProvince" name="province" readonly="readonly">
+                                    <input type="text" id="city" name="city" readonly="readonly">
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">上门详细地址： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" size="50" id="address" name="address" placeholder="必填项" readonly="readonly">
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">邮编： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" size="30" id="zipCode" name="zipCode" placeholder="必填项" readonly="readonly">
+                                </div>
+                            </div>
+
+                            
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">包裹数量： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" id="quantity" placeholder="必填项" name="quantity" value="1" size="30" style="width:100px;" readonly="readonly">
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name" style="padding:0">预估重量(磅)： </div>
+
+                                <div class="profile-info-value">
+                                    <input type="text" id="weight" placeholder="必填项" name="weight" size="30" style="width:100px;" readonly="readonly">
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name" style="padding:0;color:blue;">确认时间</div>
+
+                                <div class="profile-info-value">
+                                  
+                               <input name="confirmDate" type="text" placeholder="必填项" class="text-input Wdate" onclick="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm' })"/><span>如果没有确认时间，将自动的把用户提交的预约时间作为确认时间!</span>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name" style="padding:0;color:blue;">确认时间</div>
+
+                                <div class="profile-info-value">
+                                  
+                               <select name="state" type="datetime-local" placeholder="必填项" >
+                               <option value="0">未处理</option>
+                               <option value="1">处理中</option>
+                               <option value="2">处理完成</option>
+                               <option value="-10">异常</option>
+                               </select>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name" style="color:blue;">备注： </div>
+
+                                <div class="profile-info-value">
+                                    <textarea rows="2" class="text-input textarea wysiwyg" id="remark" name="remark" style="width:50%;"></textarea>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="clearfix form-buttons">
+                            <label class="control-label col-md-5"></label>
+                            <button type="submit" id="btnSave" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-ok"></i><strong>保存</strong></button>
+
+                            
+                        </div>
+                      
+                    </form>
+                   
+
+                </div>
+            </div>
+        </div>
+    
+    
+    <iframe id="iframePrint" src="" style=" width:0; height:0"></iframe>
+    
+    </div>
+
+
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+
+    <script src="../resources/My97DatePicker/WdatePicker.js"></script>
+
+
+    <!--开关插件-->
+
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <!--表单验证插件-->
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+
+    <script src="../resources/scripts/common.js"></script>
+    <script src="../resources/scripts/shangmenqujianlist.js"></script>
+</body>
+</html>

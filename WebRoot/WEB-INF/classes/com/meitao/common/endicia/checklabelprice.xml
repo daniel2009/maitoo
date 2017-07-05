@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Body>
+		<CalculatePostageRate xmlns="www.envmgr.com/LabelService">
+			<PostageRateRequest>
+				<RequesterID></RequesterID>
+				<CertifiedIntermediary>
+					<AccountID></AccountID>
+					<PassPhrase></PassPhrase>
+				</CertifiedIntermediary>
+				<MailClass></MailClass>
+				<WeightOz></WeightOz>
+				<MailpieceShape>Parcel</MailpieceShape>
+				<Machinable>FALSE</Machinable>
+				<Services DeliveryConfirmation="OFF" SignatureConfirmation="OFF" />
+				<FromPostalCode></FromPostalCode>				
+				<ToCountry></ToCountry>
+				<ToCountryCode></ToCountryCode>
+				<ToPostalCode></ToPostalCode>
+				<ResponseOptions PostagePrice="TRUE" />
+			</PostageRateRequest>
+		</CalculatePostageRate>
+	</soap:Body>
+</soap:Envelope>

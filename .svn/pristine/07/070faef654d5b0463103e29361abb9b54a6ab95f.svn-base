@@ -1,0 +1,16 @@
+package com.weiye.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.model.SpencialChannelName;;
+
+
+public interface SpencialChannelNameDao {
+
+	public List<SpencialChannelName> getallgood() throws Exception;
+
+	public SpencialChannelName getbyid(String id) throws Exception;
+	
+}

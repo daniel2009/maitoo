@@ -1,0 +1,53 @@
+﻿@charset "utf-8";
+/*======== bg ========*/
+/*--- ly_nologin_header ---*/
+.ly_nologin_content .bd {background:none;}
+.ly_nologin_header {height:70px;background-color:#fff;}
+.ly_nologin_header h1 {background:url(../img/bs_sprite.png) no-repeat;float:left;width:225px;height:80px;background-position:0 -97px;}
+.ly_nologin_header h1 a {display:block;height:80px;line-height:200em;overflow:hidden;}
+.ly_nologin_header .ly_in {position:relative;height:80px;}
+.ly_nologin_language {position:absolute;right:0;top:22px;text-align:right;}
+.ly_nologin_language a {display:inline-block;height:20px;padding:0 5px;line-height:20px;color:#999;}
+.ly_nologin_language a.cur {color:#fff;background-color:#aaa;}
+/*--- main ---*/
+.ly_nologin_main {padding-top:34px;}
+.ly_nologin_package_wrap {border:1px solid #ddd;min-height:500px;padding:10px 0;background-color:#fff;_height:500px;}
+/*--- 查询 ---*/
+.ly_nologin_query {position:relative;height:65px;margin-bottom:10px;padding:23px 0 0 0;border:1px solid #ddd;background-color:#fff;}
+.ly_nologin_query_con {width:519px;margin:0 auto;}
+.ly_nologin_query_con input {float:left;width:390px;height:42px;margin-right:5px;padding:0 5px;line-height:42px;color:#bbb;font-size:14px;border:1px solid #dedede;box-shadow:1px 1px 3px rgba(0,0,0,.1) inset;-moz-box-shadow:1px 1px 3px rgba(0,0,0,.1) inset;-webkit-box-shadow:1px 1px 3px rgba(0,0,0,.1) inset;}
+.ly_nologin_query_con input.cur {color:#666;}
+.ly_query_btn {position:relative;float:left;width:110px;height:42px;line-height:42px;color:#c49044;font-size:14px;text-align:center;border:1px solid #d2b284;background:url(../img/line4.png) repeat-x;}
+.ly_query_btn s {position:absolute;bottom:-5px;left:-1px;width:112px;height:4px;background:url(../img/line5.png) repeat-x;}
+/*--- 单号信息 ---*/
+.ly_nologin_package_inf {padding:20px 28px 25px;color:#999;font-size:14px;background-color:#fff;}
+.ly_nologin_package_inf strong {color:#B77719;font-size:28px;font-weight:normal;}
+.ly_nologin_package_inf span {color:#666;font-size:18px;}
+.ly_nologin_package_inf .c_btn_sure {margin-top:10px;}
+/*--- 操作流水 ---*/
+.ly_plane_data {width:100%;margin-top:8px;border:1px solid #eee;}
+.ly_plane_data th {font-weight:normal;border-bottom:1px solid #eee;}
+.ly_plane_data th,.ly_plane_data td{height:36px;padding:0 10px;color:#858585;}
+.ly_plane_data td {border-bottom:1px dotted #eee;}
+.ly_plane_data th.tc,.ly_plane_data td.tc {text-align:center;}
+.ly_operating_water {padding:10px 28px 25px;background-color:#fff;}
+.ly_operating_hd {height:30px;line-height:30px;border-bottom:1px solid #eee;}
+.ly_operating_bd {overflow:hidden;}
+.ly_operating_water h4 {height:36px;margin-top:20px;line-height:36px;color:#bababa;border-bottom:1px solid #eee;}
+.ly_operating_water .ly_plane_data {border:0 none;}
+/*--- 登录 ---*/
+.ly_nologin_content .hd {height:38px;}
+.ly_nologin_content .hd h2 {height:38px;line-height:38px;color:#B77719;}
+.ly_main_content .ly_login_bd {padding-top:2px;}
+.ly_login_wrap {background-color:#fff;}
+.ly_login_box {width:285px;margin:0 auto;padding:30px 0 110px 0;}
+.ly_login_box .c_btn_sure_big {width:70px;margin-right:20px;text-align:center;}
+.ly_login_box .c_btn_sure_big i {background-position:0 -177px;}
+.ly_login_fill_list {padding-bottom:10px;}
+.ly_login_fill_list label {height:32px;line-height:32px;color:#999;font-size:14px;}
+.ly_login_fill_list label.ly_remember_label {font-size:12px;}
+.ly_login_fill_list .c_form_text {width:240px;}
+.ly_login_fill_list .ly_remember_status {margin-right:5px;}
+.ly_forgot_pwd {height:50px;line-height:50px;color:#007fff;}
+/*--- ft ---*/
+.ly_nolgin_ft {padding-top:10px;}

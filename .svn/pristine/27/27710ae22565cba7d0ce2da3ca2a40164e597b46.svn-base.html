@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>美淘快递· 联系我们</title>
+    <meta charset="utf-8" />
+    <!-- Page Loader - Needs to be placed in header for loading at top of all content -->
+    <script type="text/javascript" src="js/pace.min.js"></script>
+    <link href="css/pace-loading-bar.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/animate.shipping.css">
+    <link rel="stylesheet" type="text/css" href="css/ShippingIcon.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" id="main-style" type="text/css" href="css/style.css">
+            <script type="text/javascript">
+   
+
+        function checkCode() {
+            $("#spanError").css("display", "none");
+
+            var code = $("#searchinput").val();
+            if (code == null) {
+                $("#spanError").css("display", "block");
+                alert("面单号不存在");
+            } else {
+               // this.document.location = "newwaybill.jsp?oid=" + escape(code);
+               if((code!="")||(code!="undefined")||(code!=null))
+            	{
+            	   code=code.trim();
+            	}
+               
+               this.document.location = "route-kd100.jsp?oid=" + escape(code);
+            }
+        }
+
+        function BillCodeOnKeyDown(obj, event) {
+            // 输入回车时，焦点转移同一行的重量输入框
+            if (event.keyCode == '13') {
+                event.preventDefault ? event.preventDefault() : event.returnValue = false;
+
+                checkCode();
+            }
+        }
+        function BillCodeOnKeyDown_click() {
+        	checkCode();
+        }
+    </script>
+</head>
+
+<body class="blue page-loading">
+    <!-- Section Start - Header -->
+    <section class='header' id='header'>
+        <!-- Header Top Bar - Start -->
+         <div class="topbar-wrap">
+            <div class="container">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 logo-area">
+                    <div class="logo">
+                        <div>
+                        <a href="index.html">
+                            <img src="img/logo.jpg" alt="Header Image" class="img-responsive"><!--<i class="icon icon-logo white"></i>-->
+                            </a>
+                        </div>
+                        <!--<span class="name">SHIPPING</span>
+                        <span class="small">Logistics & Transport</span>-->
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-9 col-sm-8 col-xs-5 menu-area pull-right">
+                    <!-- Menu Top Bar - Start -->
+                    <div class="topbar">
+                        <div class="menu">
+                            <div class="primary inviewport animated delay2" data-effect="">
+                                <div class='cssmenu'>
+                                    <!-- Menu - Start -->
+                                    <ul class='menu-ul'>
+                                        <li class='has-sub'>
+                                            <a href='index.html'><b>首页</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='price.html'><b>收费标准</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='about-us-2.html'><b>关于我们</b></a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='contact.html'><b>联系我们</b></a>
+                                        </li>
+                                        <!--<li class='has-sub'>
+                                            <a href='location.html'><b>公司地点</b></a>
+                                        </li>-->
+                                         <li class='has-sub'>
+                                            <a href='News.html'><b>新闻公告</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='login.jsp'><b>登陆</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='registe.html'><b>注册</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='upload.html'><b>上传ID</b></a>
+                                        </li>
+                                          
+                                    </ul>
+                                    <!-- Menu - End -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Menu Top Bar - End -->
+                    <!-- Mobile Menu - Start -->
+                    <div class="menu-mobile col-xs-10 pull-right cssmenu">
+                        <i class="icon icon-menu menu-toggle"></i>
+                        <ul class="menu" id='parallax-mobile-menu'>
+                        </ul>
+                    </div>
+                    <!-- Mobile Menu - End -->
+                </div>
+            </div>
+        </div>
+        <!-- Header Top Bar - End -->
+        <div class="header-bg header-small">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 slantbar hidden-xs"></div>
+            <!-- Header Tracking Box - Start -->
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 white-wrap hidden-xs">
+                <div class="white-box">
+                    <div class="track-order">
+                        <div class="track-logo transition col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <i class="icon icon-logo"></i>
+                        </div>
+                        <div class=" col-lg-9 col-md-9 col-sm-9 col-xs-9 track-form-wrap">
+                               <form method='post' action="#" class="track-form">
+                                <input type="text" id="searchinput" placeholder="单号" onkeydown=" BillCodeOnKeyDown(this, event); ">
+                               <!--  <i class="icon icon-magnify" onclick="checkCode();"></i> -->
+                                 <a href="javascript: BillCodeOnKeyDown_click()"><i class="icon icon-magnify" ></i></a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Tracking Box - End -->
+            <!-- Header Content Slide - Start -->
+            <div style="position:relative;display:inline-block;width:100%;height:auto;">
+                <img src="img/banner-2s.jpg" alt="Header Image" class="img-responsive">
+                <div class="bg-overlay"></div>
+                <div class="main-wrap">
+                    <div class="container">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 main-content">
+                            <h1>联系我们</h1>
+                            <div class="headul"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Content Slide - End -->
+        </div>
+    </section>
+    <!-- Section End - Header -->
+    <!-- Section Start - Get In Touch -->
+    <section class='contact' id='contact'>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 ">
+                    <!-- Contact Form - Start -->
+                    <div class='row'>
+                        <form action='send_email.php' method='post'>
+                            <div class='col-xs-12'>
+                                <input type='text' placeholder='姓名' class='transition' id='c_name'>
+                            </div>
+                            <div class='col-xs-12'>
+                                <input type='text' placeholder='邮箱' class='transition' id='c_email'>
+                            </div>
+                            <div class='col-xs-12'>
+                                <textarea class='transition' placeholder='留言' id='c_message'></textarea>
+                            </div>
+                            <div id='response_email' class='col-xs-12'></div>
+                            <div class='col-xs-4'>
+                                <button type='button' class='btn btn-primary disabled transition' id='c_send'>发送信息</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Contact Form - End -->
+                </div>
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-0 contact-full-info">
+                    <h5>洛杉矶办公室</h5>
+                    <p>
+                         2428 W Valley blvd,
+                        <br>Alhambra,
+                        <br> CA 91803
+                        <br> Email: williamliang111@yahoo.com
+                        <br> Phone: (626)620-1616 &nbsp; (626)382-3025 &nbsp;(626)410-8845.
+                    </p>
+                    <br>
+                    <h5>拉斯维加斯办公室</h5>
+                    <p>
+                        3541 S Valley view Blvd,
+                        <br> Las Vegas,
+                        <br> NV 89103
+                        <br> Email: williamliang111@yahoo.com
+                        <br> Phone: (626)898-7996
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Section End - Get In Touch 
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="row">
+            <div id="contact-map" class="gmap"></div>
+        </div>
+    </div>
+    <!-- Section Start - Footer -->
+    <section class='footer bg-black parallax ' id='footer'>
+        <div class="bg-overlay"></div>
+        <div class="container">
+            <div class="row">
+                <!-- Text Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 text-widget inviewport animated delay1" data-effect="fadeInUp">
+                    <div class="logo">
+                        <div>
+                        <a href="index.html">
+                            <img src="img/logo.jpg" alt="Header Image" class="img-responsive" style="width:50%; height:50%;">
+                            </a>
+                        </div>
+                    </div>
+                    <p>公司简介</p>
+                    
+                </div>
+                <!-- Text Widget - End -->
+                <!-- News Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 news-widget inviewport animated delay2" data-effect="fadeInUp">
+                    <h4>微信公众号</h4>
+                    <div class="headul left-align"></div>
+                    <div class="news-wrap row">
+                        <div class="pic col-md-3 col-xs-3 col-sm-3 col-lg-3">
+                            <img alt="news-image" class="img-responsive" src="img/news-1.jpg">
+                        </div>
+                        <div class="info col-md-9 col-xs-9 col-sm-9 col-lg-9">
+                            <h5 class="title"><a href='#'>公众号名称(或微信号)</a></h5>
+                            <div class="date">william18559</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- News Widget - End -->
+                <!-- Contact Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 contact-widget inviewport animated delay3" data-effect="fadeInUp">
+                    <h4>公司地址</h4>
+                    <div class="headul left-align"></div>
+                    <p>地址: 2428 w valley blvd, alhambra  
+                        
+                        <br>CA 91803</p>
+                    <p>电子邮箱: williamliang111@yahoo.com
+                        <br> 联系电话:  (626)620-1616&nbsp;(626)382-3025&nbsp;(626)410-8845</p>
+                </div>
+                <!-- Contact Widget - End -->
+            </div>
+        </div>
+        <!-- Copyright Bar - Start -->
+        <div class="copyright">
+            <div class="col-md-12">
+                <div class="container">
+                    <div class="">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 message inviewport animated delay1" data-effect="fadeInUp">
+                            <span class="">&copy; Copyright WebXury Inc. 2016. ® All Rights Reserved </span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 social">
+                            <a href="#" class="inviewport animated delay1" data-effect="fadeInUp"><i class="icon icon-facebook text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay2" data-effect="fadeInUp"><i class="icon icon-twitter text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay3" data-effect="fadeInUp"><i class="icon icon-dribbble text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay4" data-effect="fadeInUp"><i class="icon icon-google-plus text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay5" data-effect="fadeInUp"><i class="icon icon-youtube-play text-on-primary"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Copyright Bar - End -->
+    </section>
+    <!-- Section End - Footer -->
+    <!-- Javascript & CSS Files moved to bottom of page for faster loading -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/inviewport-1.3.2.js"></script>
+    
+    <!--Fancybox -->
+    <script type="text/javascript" src="js/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" src="js/jquery.fancybox-media.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery.fancybox.css" media="screen" />
+    <!-- Bootstrap Carousel -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Main JS -->
+    <script type="text/javascript" src="js/main.js"></script>
+</body>
+
+</html>

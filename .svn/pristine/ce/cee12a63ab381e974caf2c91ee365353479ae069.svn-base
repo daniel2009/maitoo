@@ -1,0 +1,6 @@
+数据库列新字段：
+transhipment_commodity表：
+ transit_no---varchar--50--存储包裹号
+ 
+ transhipment_bill表：
+ tran_warehouse_id---int--11--存储转运仓库的id号

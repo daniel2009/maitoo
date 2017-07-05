@@ -1,0 +1,173 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>用户中心</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+
+    <link href="css/usercenter.css" rel="stylesheet" />
+
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon blue"></i>
+                    <a href="#">转运中心</a>
+                </li>
+
+                <li>
+                    <a href="#">预报列表</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content" id="divList">
+
+            <div class="row toolrow" id="divaddress" style="border:1px solid #E1E1E1">
+                <div class="col-xs-12">
+                    <div style="float:right; padding-right:5px;">
+                    
+                     <label class="control-label width60px" for="state">
+                           状态:
+                        </label>
+                        <select name="state" >
+                        <option value="-1">请选择</option>
+                        <option value="0">用户预报</option>
+                        <option value="1">录入失败</option>
+                        <option value="2">包裹异常</option>
+                        <option value="3">转运入库</option>
+                        <option value="4">转运出库</option>
+                        <option value="5">已入仓库</option>
+                        <option value="6">已完成</option>
+                        <option value="7">已自提</option>
+                        </select>
+                        
+                    
+                        <label class="control-label width60px" for="keyword">
+                            关键字:
+                        </label>
+                        <input name="keyword" id="keyword" placeholder="运单号">
+                        <button type="button" class="btn btn-purple btn-sm" id="btnSearch">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            搜 索
+                        </button>
+                    </div>
+                    
+                    <div style="float:left; padding-left:4px;padding-top:3px;">
+                        <a href="yundanyubao.html" class="btn btn-primary btn-sm" style="width:90px;" id="btnAdd">
+                            <span class="fa fa-plus-square bigger-110"></span>
+                            添加预报
+                        </a>
+
+                    </div>
+                    <div style="float:left; padding-left:4px;padding-top:3px;">
+                        <a href="zhidan.html" class="btn btn-success btn-sm" style="width:100px;" id="btnAdd">
+                            <span class="glyphicon glyphicon-ok"></span>
+                            提交运单
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="pull-left alert alert-success no-margin infotitle">
+
+                        <i class="icon-list bigger-120 blue"></i>
+                        预报记录
+                    </div>
+                    <!-- PAGE CONTENT BEGINS -->
+                    <table id="addressgrid-table"></table>
+                    <div id="addressgrid-pager"></div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+    <!--开关插件-->
+    <script src="../resources/bootstrap-switch/bootstrap-switch.min.js"></script>
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+    <script src="../resources/js/jquery.bigautocomplete.js"></script>
+    <!--表单验证插件-->
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+
+    <script src="../resources/scripts/common.js"></script>
+    <script src="scripts/yundanyubaolist.js"></script>
+
+
+</body>
+</html>

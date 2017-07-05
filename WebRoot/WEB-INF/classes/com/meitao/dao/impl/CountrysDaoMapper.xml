@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.CountrysDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.Countrys">
+		<id column="id" property="id" javaType="String" />
+		<result column="country" property="country" javaType="String" />
+		<result column="countrycode" property="countrycode" javaType="String"/>
+		<result column="isocode" property="isocode" javaType="String"/>
+		<result column="chinaname" property="chinaname" javaType="String" />
+	</resultMap>
+ 
+	<select id="getCountryById" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from countrys where id=#{id}
+	</select>
+	
+
+
+
+	<insert id="insertCountrys" parameterType="com.meitao.model.Countrys"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into countrys(country,countrycode,isocode,chinaname) values(#{country},#{countrycode},#{isocode},#{chinaname})
+	</insert>
+
+	 <select id="getAllCountrys" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from countrys
+	</select>
+	
+	<select id="selectCountrysbyIds" resultMap="basic_result_map">
+		select * from `countrys`
+		where `countrys`.`id` in
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
+
+
+</mapper>

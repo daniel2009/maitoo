@@ -1,0 +1,248 @@
+﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+<style>
+	.hiddenCheckBox{
+		display: none;
+	}
+	.switcher{
+		display: block;
+		transition: all 0.5s ease-in-out;
+	}
+	.hiddenCheckBox:checked ~ .switcher{
+		margin-top: -50%;
+	}
+	.viewerContainer{
+		display: block;
+		width: 95%;
+		height: 40px;
+		overflow: hidden;
+		text-overflow: clip;
+		-webkit-user-select : none;
+	}
+	.switcherTag1, .switcherTag2{
+		margin: 5px 30%;
+		display: block;
+		color: #aaa;
+	}
+	.switcherTag1:HOVER{
+		border: 2px solid #0d0;
+		box-shadow: 0 0 1px #0d0;
+	}
+	.switcherTag2:HOVER{
+		border: 2px solid #aaa;
+		box-shadow: 0 0 1px #aaa;
+	}
+	.switcherTag2{
+		margin: 25% 30%;
+		color: #0d0;
+	}
+	.acreage90100{
+		width: 90%;
+		height: 100%;
+	}
+	.contentEditer{
+		display: none;
+	}
+	.contentEditer:checked ~ .contentArea{
+		display: inline-block;
+	}
+	.contentEditer:checked ~ .contentAside{
+		display: none;
+	}
+	.contentArea{
+		display: none;
+		width: 90%;
+		height: 50%;
+		border: 0;
+	}
+	.extraContent, .en-extraContent{
+		display: block;
+		white-space: normal;
+		word-break: break-all;
+	}
+	.extraContent:BEFORE {
+		content: "亲爱的用户,";
+	}
+	.extraContent:AFTER {
+		content: "。如非本人操作，请忽略本短信";	
+	}
+	.en-extraContent:BEFORE {
+		content: "Dear Customer,";
+	}
+	.en-extraContent:AFTER {
+		content: ". Please DO NOT reply this message.";
+	}
+}
+</style>
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">自动发送管理</p>
+
+		<div class="box_content">
+			<div class="content_title">自动发送配置</div>
+			<div class="content_text">
+			<div class="tab-content default-tab" id="tab1">
+				<label style="color: #f00; ">如需表明订单号，请用#order#代替。标明订单状态，请用#state#代替，后台可能设置的其他信息（验证码，网址...），请用#code#代替</label>
+				<div style="margin-left: 80%; ">
+					<span>
+						<a href="#" onclick="javascript: addAutoSend();">添加自动发送</a>
+					</span>
+				</div>
+				<div style="clear: both;"></div>
+				<table style="width: 100%" id="table">
+					<thead>
+						<tr>
+							<th>参数名</th>
+							<th>名称</th>
+							<th style="width: 70px;">发送email</th>
+							<th>email内容</th>
+							<th style="width: 70px;">发送短信</th>
+							<th>短信内容</th>
+							<th style="width: 80px;">更新日期</th>
+							<th style="width: 60px;">操作</th>							
+						</tr>
+					</thead>
+					<tbody id="tbody">
+						<tr>
+							<td colspan="8">没有数据</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function(){
+		search();
+	});
+	function search(){
+		$.ajax({
+			type : "get",
+			url : "../admin/autoSend/searchAll",
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					showList(response.data);
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("查询失败，" + response.message);
+				}
+				return false;
+			}
+		});
+	}
+	function showList(list){
+		if(list!=null){
+			var string = "";
+			for(var i=0; i<list.length; i++){
+				string += "<tr id='" + list[i].id + "'>";
+				string += "<td><input type='text' name='name' value='" + list[i].name + "'></td>";
+				string += "<td><input type='text' name='cnName' value='" + list[i].cnName + "'></td>";
+				var autoEmail = list[i].autoEmail==1 ? "checked" : "";
+				if("forget_password"==list[i].name){
+					string += "<td style='padding: 0; vertical-align: middle;'><input type='checkbox' class='hiddenCheckBox' name='autoEmail' value='1' checked><span class='switcherTag2'>启用</span></td>";
+				}else{
+					string += "<td style='padding: 0; vertical-align: middle;'><label class='viewerContainer'><input type='checkbox' class='hiddenCheckBox' name='autoEmail' value='1' " + autoEmail + "><span class='switcher'><span class='switcherTag1'>禁用</span><span class='switcherTag2'>启用</span></span></label></td>";
+				}
+				string += "<td><textarea class='acreage90100' name='emailContent'>" + list[i].emailContent + "</textarea></td>";
+				var autoMessage = list[i].autoMessage==1 ? "checked" : "";
+				var sendRecipient = list[i].send2Recipient==1 ? "checked" : "";
+				var send2Recipient = "<input type='checkbox' name='send2Recipient' value='1' " + sendRecipient + ">给收件人";
+				string += "<td style='padding: 0; vertical-align: middle;'>" + send2Recipient + "<label class='viewerContainer'><input type='checkbox' class='hiddenCheckBox' name='autoMessage' value='1' " + autoMessage + "><span class='switcher'><span class='switcherTag1'>禁用</span><span class='switcherTag2'>启用</span></span></label></td>";
+				string += "<td style='vertical-align: middle; '>"; 
+				string += "<label class='extraContent'><input type='checkbox' class='contentEditer'><textarea class='contentArea' name='messageContent' onkeyup='contentChange(this);'>" + list[i].messageContent + "</textarea><span class='contentAside'>" + list[i].messageContent + "</span><span hidden>" + list[i].messageContent + "</span></label>";
+				string += "<hr style='margin: 0;'/>";
+				string += "<label class='en-extraContent'><input type='checkbox' class='contentEditer'><textarea class='contentArea' name='enMessageContent' onkeyup='contentChange(this);'>" + list[i].enMessageContent + "</textarea><span class='contentAside'>" + list[i].enMessageContent + "</span><span hidden>" + list[i].enMessageContent + "</span></label>";
+				string += "</td>";
+				string += "<td>" + list[i].modifyDate + "</td>";
+				string += "<td><a href='#' onclick='javascript: modifyAutoSend(" + list[i].id + ");'>修改</a>|<a href='#' onclick='javascript: deleteAutoSend(" + list[i].id + ");'>删除</a></td>";
+				string += "</tr>";
+			}
+			$("#tbody").html(string);
+		}
+	}
+	function deleteAutoSend(id){
+		if(confirm("确认删除吗?")){
+			$.ajax({
+				type : "post",
+				url : "../admin/autoSend/delete",
+				data : {id : id},
+				success : function(response) {
+					var code = response.code;
+					if ("200" == code) {
+						alert("删除成功");
+						navAutoSendClick();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("删除失败，" + response.message);
+					}
+					return false;
+				}
+			});
+		}
+	}
+	function modifyAutoSend(id){
+		var name = $("#"+id).find("input[name=name]").val();
+		var cnName = $("#"+id).find("input[name=cnName]").val();
+		var autoEmail = $("#"+id).find("input[name=autoEmail]").attr("checked")=="checked" ? "1" : "";
+		var autoMessage = $("#"+id).find("input[name=autoMessage]").attr("checked")=="checked" ? "1" : "";
+		var emailContent = $("#"+id).find("textarea[name=emailContent]").val();
+		var messageContent = $("#"+id).find("textarea[name=messageContent]").val();
+		var enMessageContent = $("#"+id).find("textarea[name=enMessageContent]").val();
+		var send2Consignor = $("#"+id).find("input[name=send2Consignor]").attr("checked")=="checked" ? "1" : "";
+		var send2Recipient = $("#"+id).find("input[name=send2Recipient]").attr("checked")=="checked" ? "1" : "";
+		$.ajax({
+			type : "post",
+			url : "../admin/autoSend/modify",
+			data : {
+				id : id,
+				name : name,
+				cnName : cnName,
+				autoEmail : autoEmail,
+				autoMessage : autoMessage,
+				emailContent : emailContent,
+				messageContent : messageContent,
+				enMessageContent : enMessageContent,
+				send2Consignor : send2Consignor,
+				send2Recipient : send2Recipient
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					alert("修改成功");
+					navAutoSendClick();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("修改失败，" + response.message);
+				}
+				return false;
+			}
+		});
+	}
+	function addAutoSend(){
+		$("#main-content").load("../admin/autoSendAdd.jsp");
+	}
+	function contentChange(element){
+		$(element).next().html($(element).val());
+		if($(element).next().html()!=$(element).next().next().html()){
+			$(element).next().css("color", "#d00");
+		}else{
+			$(element).next().css("color", "initial");
+		}
+	}
+</script>
+</html>

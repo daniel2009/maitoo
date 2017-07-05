@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0042)http://www.xlobo.com/Public/coreValue.aspx -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/wpa_first_heart_beat.php"></script><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/crmqq.php"></script><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/contains.js"></script><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/localStorage.js"></script><script type="text/javascript" charset="utf-8" async="" src="./pricing_files/Panel.js"></script>
+    
+    <title>阳光国际速递</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+     <link href="./pricing_files/reset.css" rel="stylesheet">
+<link href="./pricing_files/site.css" rel="stylesheet">
+<!-- Favicons
+    ================================================== -->
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="img/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/apple-touch-icon-114x114.png">
+    <!-- Bootstrap 
+    ================================================== -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/jasny-bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="font-awesome-4.2.0/css/font-awesome.css">
+    <!-- Animate 
+    ================================================== -->
+    <link href='css/animate.css' rel='stylesheet' type='text/css'>
+    <!-- Add fancyBox CSS files -->
+    <link rel="stylesheet" type="text/css" href="js/fancybox/jquery.fancybox.css?v=2.1.5" media="screen" />
+    <!-- BxSlider CSS -->
+    <link rel="stylesheet" type="text/css" href="js/bxslider/jquery.bxslider.css?v=2.1.5" media="screen" />
+    <!-- Custom Css 
+    ================================================== -->
+    <link rel="stylesheet" type="text/css" href="css/rs-wp-v1.2.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/responsive.css">
+    <!-- Google Fonts 
+    ================================================== -->
+    <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
+      <link href="./shining_files/reset.css" rel="stylesheet">
+<link href="./shining_files/site.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="./shining_files/bootstrap.css">
+     <script src="./shining_files/Ymt.min.js"></script>
+<script src="./shining_files/jquery-1.5.2.min.js"></script>
+    
+     <script src="./pricing_files/Ymt.min.js"></script>
+<script src="./pricing_files/jquery-1.5.2.min.js"></script>
+
+</head>
+<body>
+<style>
+hr.style-seven {
+    height: 30px;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px 0 0 0;
+    border-radius: 20px;
+}
+hr.style-seven:before { /* Not really supposed to work, but does */
+    display: block;
+    content: "";
+    height: 30px;
+    margin-top: -31px;
+    border-style: solid;
+    border-color: black;
+    border-width: 0 0 1px 0;
+    border-radius: 20px;
+}
+</style>
+      <!-- header S -->
+   <div class="xlobo_hd">
+        <div class="ly_in">
+           <h1> <img src="./shining_files/shining_logo_.png"></h1>
+           
+            <div class="main_nav">
+                <ul class="main_nav_list">
+                    <li class="cur"><a href="./index.html">首页</a></li>
+                    <li><a href="./pricing.html">收费标准</a></li>
+                    <li><a href="./about_us.html">关于我们</a></li>
+                    <li><a href="./location.html">地点</a></li>
+		    <li><a href="./../newsandgonggao.jsp"  target="_blank">公告</a>/ <a href="./xieyi_mt.html" target="_blank">协议</a> </li>
+                    <li><a href="./../login.jsp">注册</a> &nbsp;/&nbsp; <a href="./../login.jsp">登陆</a> </li>
+                    <li><a href="./../shangchuan.jsp" target="_blank">上传身份证</a></li> 
+
+            	    <li> <a class="qqOn" target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=76085666&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:2278808484:41 &r=0.8940031429092906" alt="美国洛杉矶" title="美国洛杉矶"></a> </li>
+
+                </ul>
+            </div>
+            
+
+
+            </div>
+
+
+<script>
+    function gocn(url) {
+        
+    $.ajax({
+        url: "/api/changelanguageapi/ChangeLanguageToCn",
+        type: 'post',
+
+        contentType: 'application/json',
+        success: function (result) {
+            location.href = url;
+        }
+    });
+    }
+</script>
+        </div>
+    </div>
+    <!-- header E -->
+    <!-- main S -->
+    <div class="main">
+        <!-- banner S -->
+        <div class="worth_banner">
+            <div class="ly_in">
+                <h2>理赔说明</h2>
+                <!--<p>跨境电子商务国际物流解决方案专家</p>-->
+            </div>
+        </div>
+        <!-- banner E -->
+        <!-- banner E -->
+        <div class="ly_in core_values">
+            <div class="rst_title">
+                <h1> </h1> <h2>（一）免责条款</h2>
+            </div>
+            <div class="row rst_shortcode_table">
+                
+                <div class="col-xs-12 col-md-12">
+                  <p style="font-size:18px;">  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;阳光国际快递（以下简称本公司）不承担任何间接、附带、特殊或衍生的损失所产生的赔偿责任。本公司不受理任何除了发货人之外的任何第三方的理赔要求；本公 司不会就任何下列原因所引起或造成的遗失、损毁、延迟送达、误送、未送达、提供错误资料或未能提供资料负任何责任，亦不采取任何运费调整、退款或任何补偿 行为： </p>
+
+ <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1、 因发货人不履行责任或疏忽而导致货物发生损毁；</p>
+
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2、货物本身具有瑕疵及缺陷，如有明显破损等；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3、 因您违反本公司及海关相关规定和条款，诸如：申报不实、转运严禁入境之商品、物品数量超过海关规定数量，所导致的货物遗失、清关延误、罚款、罚没及退运等；同时本公司有权追究由此造成的公司损失及其他同批货物的连带损失（如有）。
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4、客 户需在生成运单时，确认所申报的商品名称及数量，与包裹内商品内容完全一致，不得有伪报、少报、多报、瞒报、 漏报等。否则产生海关罚款、退运等后果一律自负；如包裹中含有申报明细中未列明之物品，这些物品一旦发生丢失、损坏，后果一律自负。同时本公司有权追究由 此造成的本公司的损失及其他同批货物的连带损失（如有）。
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5、发生空难事故、公敌入侵、 政府当 局、法律权限、海关或检疫所官员的行为或疏忽、暴动、罢工或 其它地区性争执、民众骚乱、战争或天气所带来的危险、或由非本公司所能控制事项所致的全国性或区域性空中或地面交通系统中断或通讯系统干扰或故障，而导致 的货物毁坏及延误。在此情况下，本公司仍会尽合理的努力，尽快运送至目的地并完成送件。但我们没有义务在出现此类情况时向您发出及时通知；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6、本公司因遵循您或其他寄件人的口头或书面送件指示行为而导致的不良后果；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7、本公司不能保证发件人或者购物网站提供的产品包装质量和商品本身质量，如因发件人或者购物网站、加盟门店、代购商家自行打包，且未能提供能够支持多次转运需要的包装而造成的毁损，本公司不承担任何责任；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8、因清关手续或海关政策临时变动所致的延误及异常情况；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;9、因您没有及时确认关税及税金支付所致的延误；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;10、磁带、文件或其它存储媒体中数据的消除、或曝光底片中照相影像或音带的消除；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;11、 因提供错误、不完整的收件信息，造成重复配送所产生的费用及延误等不良后果；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;12、 因航班延误、取消或停飞造成的运输延误；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;13、  因天气原因造成货物融化、冻结等后果；产品保质期不够长造成的货到过期，收货人不再需要所承运的货物等理由。
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;14、对入库超过45天未申请发货的货物，一旦发生丢失及坏损等不良后果。
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15、  对 于网站、发货方少发、错发以及寄件人未提供正确的收件标识，代码造成 的货物遗失，损毁；由于收件人写法与实际账户信息不符导致包裹入错库或错发；由于写错仓库收货地址导致包裹未能送达仓库；对于快递显示送达但公司没收到包 裹，需要提供快递签收凭证以证公司签收了此包裹，否则公司不承担赔偿责任。
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;16、 所有理赔仅限于阳光国际快递签收入库的包裹，对于阳光国际快递没有签收记录的货品理赔不予受理；
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;17、.本公司不受理任何形式下的“内件短少”或外包装完好下的内件破损的理赔申请，且除非在收货时在签收记录上注明有破损，否则将认为托运货物在派送时是完好无缺的。签收时出现以疑似破损的情况，务必在派送人员共同在场时查验清楚，并在运单上备注，对外包装和内件拍照取证.
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;18、 签收包裹时，无论是家人、门卫、同事、亲友等代收将一律视为本人签收。本公司对于正常签收的包裹，将不接受任何坏损及少件等理赔申请。
+</p>
+                </div>
+            </div>
+            <div class="rst_title">
+                <h1> </h1> <h2>（二）赔偿标准</h2>
+            </div>
+            <div class="row rst_shortcode_table">
+                
+                <div class="col-xs-12 col-md-12">
+                  <p style="font-size:18px;"><b>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1、包裹丢失 </b></p>
+
+ <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1）购买保价的包裹发生丢失（不包括短少），根据保价金额，所举证的采购清单，商业发票，按实际价值赔付，但最高赔偿额不得超过保价；</p>
+
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2）未保价包裹发生丢失（不包括短少），按国际快件惯例根据承运人责任和实际损失，每个包裹（以运单为单位）赔付总额按照实际货值赔偿。但单个包裹的最高赔付额不得超过100美金。
+</p>
+<p style="font-size:18px;"> <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2、 包裹损坏
+</b></p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1） 全损：如申请过本公司特殊加固服务，同时可以提供快递公司出具的损坏证明，或者拒收包裹由本公司核定并属实后，按照包裹丢失标准赔付。
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2） 部分损坏：如申请过本公司特殊加固服务，本公司将针对损坏货物的实际情况对其进行赔偿，但最高不超过2倍运费。请注意：奶粉、米粉、粉饼，玻璃制品，陶瓷 制品等商品在运输过程中颠簸震动极易发生损坏，此类商品即使申请过加固服务，一旦损货（泄漏、爆罐、碎裂）也不在本公司赔付范围内。
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3） 对于易碎物品建议客户购买加固服务，对于未购买加固服务的包裹一旦包裹内物品损坏公司一律不给予赔偿。
+</p>
+<p style="font-size:18px;"><b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3、其他
+</b></p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1）由于公司收货是批量签收，对于本公司签收但没有入库记录的包裹公司暂不进行理赔，但公司承诺尽量帮忙查询包裹下落。
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2）免税州转运到加州仓库途中发生丢失（即免税州有签收记录，加州仓库没有入库记录）的包裹，在一个月内公司追踪无果的情况下，按照商品购买发票的实际金额赔付，每单最高赔偿额不得超过100美金。
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3）免费或收费仓储期间，包裹在仓库发生丢失，按照商品购买发票的实际金额赔付，每单最高赔偿额不得超过100美金。
+</p>
+
+                </div>
+            </div>
+               <div class="rst_title">
+                <h1> </h1> <h2>（三）理赔流程</h2>
+            </div>
+            <div class="row rst_shortcode_table">
+                
+                <div class="col-xs-12 col-md-12">
+                  <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1、客户必须在包裹签收后3个工作日内提出理赔申请，逾期不予受理。</p>
+
+ <p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2、公司调查核实，是否属于公司理赔范围。</p>
+
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3、如果确认在公司理赔范围内：
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1）请顾客填写《阳光国际快递公司转运包裹丢失理赔申请表》
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2） 提供包裹内商品的采购商业发票照片
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3）  若是破损包裹请提供实际商品破损图片及当地快递出具的破损证明
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4） 将上述资料图片或文档统一发送到info@shiningexoress.com邮箱。发送标题注明：会员登录名＋转运包裹丢失理赔申请
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5）受理理赔之日起10个工作日内，完成对理赔请求的调查及赔付
+</p>
+<p style="font-size:18px;"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6）赔偿金额以运费充值形式返还给客人，同时可以免费提现一次。
+</p>
+
+
+                </div>
+            </div>
+            <hr class="style-seven">
+           <div class="row rst_shortcode_table">
+                
+                <div class="col-xs-12 col-md-12">
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- main E -->
+   
+    <!-- footer S -->
+
+    
+
+<div class="xlobo_ft">
+    <div class="ly_in">
+       
+        
+         <div class="global_site"> <span>联系我们：</span>
+            <ul class="global_site_list">
+                <li class="st1"><i></i><a href="./location.html">地址：18513 Gale Ave. City of Industry CA 91748</a></li>
+                <li class="st2"><i></i><a href="#" target="_blank">联系电话：(310)997-0057</a></li>
+                <li class="st3"><i></i><a href="#" target="_blank">Email(电子邮箱)：info@shiningexpress.com</a></li>
+                <li class="st4"><i></i><a href="#" target="_blank"></a></li>
+            </ul>
+        </div>
+
+       
+       
+        <div class="copy_right">
+            <p>
+            
+                <a href="#" target="_blank">帮助及问答</a>
+                <a href="#" target="_blank">资源下载</a>
+                <a href="#" target="_blank">加盟合作</a>
+                <a href="#" target="_blank">服务协议</a>
+
+                
+            </p>
+            <p>Copyright © 2015 Shining Express. All Rights Reserved.</p>
+        </div>
+    </div>
+</div>
+    
+    <!-- footer E -->
+    
+  <script src="./pricing_files/main.js"></script>
+<script src="./pricing_files/changeLang.js"></script>
+
+
+
+</body></html>

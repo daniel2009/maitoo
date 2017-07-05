@@ -1,0 +1,669 @@
+<!doctype html>
+<html>
+<!-- InstanceBegin template="/Templates/Template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta charset="utf-8">
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>91闪淘</title>
+<!-- InstanceEndEditable -->
+<link rel="stylesheet" type="text/css" href="css/libs/CSSRESET.css">
+<link rel="stylesheet" type="text/css" href="css/common.css">
+<script src="js/libs/jquery-1.11.1.min.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<link rel="stylesheet" type="text/css" href="css/product_detail.css">
+<script src="js/product_detail.js"></script>
+<!-- InstanceEndEditable -->
+</head>
+<body>
+	<input type="hidden" id="productId">
+	<input type="hidden" id="typeId">
+	<input type="hidden" id="expireDate">
+	<section class="menu">
+		<div class="_container">
+			<p>91闪淘为您服务</p>
+			<p>
+				<a href="../r/login.jsp">登陆</a><a href="../r/register.html">注册</a>
+			</p>
+		</div>
+	</section>
+
+	<header class="header">
+		<div class="_container">
+			<h1>
+				<a href="javascript:;">91闪购</a>
+			</h1>
+
+			<div class="search">
+				<input type="text" id="spiderOrderUrl" name="url" placeholder=""><input
+					type="submit" value="搜索" onclick="searchSpiderOrder();" />
+			</div>
+		</div>
+	</header>
+	<!-- header End -->
+
+	<nav class="nav">
+		<div class="_container">
+			<ul class="ul_nav">
+				<li><a href="../91gou/index.html">首页</a></li>
+				<li><a href="../91gou/discount.html">优惠</a></li>
+				<li><a href="javascript:;">晒单</a></li>
+				<li><a href="../91gou/gou.html">一键购</a></li>
+				<li><a href="javascript:;">联系我们</a></li>
+			</ul>
+			<div class="cart">
+				<a href="../91gou/cart.html"><span></span>购物车中<em id="cartCount">0</em>件</a>
+			</div>
+		</div>
+	</nav>
+	<!-- nav -->
+
+	<!-- InstanceBeginEditable name="EditRegion1" -->
+	<section class="main" style="display:none;" id="product_detail">
+		<div class="_container">
+			<div class="intro clear">
+				<div class="intro_left">
+					<div class="show">
+						<img src="img/pd_show_img_1.png" alt="" id="landingImage" />
+					</div>
+
+					<ul class="ul_show">
+						<li><img src="img/pd_show_img_1.png" alt="" id="pic1" /></li>
+						<li><img src="img/pd_show_s_2.png" alt="" id="pic2" /></li>
+						<li><img src="img/pd_show_s_2.png" alt="" id="pic3" /></li>
+						<li id="li_border"></li>
+					</ul>
+				</div>
+
+				<div class="intro_right">
+					<h4 id="name">【保税仓发货】德国爱他美Aptamil婴幼儿奶粉 1段 800g 2罐装</h4>
+					<p id="description">德国爱他美Aptami婴幼儿配方奶粉一段，适用于0-6个月婴儿。新生宝宝最好的食物当然是母乳，当母乳不足是，适当的添加配方奶，一段段爱他美奶粉最接近母乳，为出生宝宝准备，不含淀粉，全乳糖配方，有效减轻新生宝宝的肠胃负担，适合宝宝消化吸收，为新生宝宝提供母乳般的营养支持。</p>
+					<div class="div_sec">
+						<strong>闪购秒杀</strong> <span>距结束：<i id="restHour">13</i>时<i
+							id="restMinute">20</i>分<i id="restSecond">20</i>秒
+						</span>
+					</div>
+					<div class="div_mxj">
+						秒杀价：<strong id="price">￥298</strong>
+					</div>
+					<div class="div_ckj">
+						参考价：<i>￥699</i> 节省：￥401
+					</div>
+					<div class="div_sj">商家：</div>
+					<div class="div_count" id="purchaseCount">3576人已经购买</div>
+					<div class="div_num clear">
+						<span>数量：</span>
+						<div>
+							<input type="text" id="quantity" value="1" class="txt_num"
+								readonly /> <i class="i_add"></i> <i class="i_min"></i>
+						</div>
+						<span>剩余<em id="rest">51</em>件
+						</span>
+					</div>
+					<div class="div_shop">
+						<a target="_blank" id="url">购物直达</a> <a
+							href="javascript: add2Cart();">一键购</a>
+					</div>
+				</div>
+				<!-- intro_right -->
+
+			</div>
+			<!-- intro End -->
+
+			<h3>同类精品 >></h3>
+			<div class="goods clear">
+				<ul class="ul_goods" id="sameTypeProductUl">
+					<li><img src="img/pd_img_1.png" alt="" />
+						<div>
+							<h5>KAO花王 F系列超薄多量夜用带护翼30cm 10片*4包组</h5>
+							<p>
+								￥190 <s>￥210</s>
+							</p>
+						</div></li>
+
+					<li><img src="img/pd_img_1.png" alt="" />
+						<div>
+							<h5>KAO花王 F系列超薄多量夜用带护翼30cm 10片*4包组</h5>
+							<p>
+								￥190 <s>￥210</s>
+							</p>
+						</div></li>
+
+					<li><img src="img/pd_img_1.png" alt="" />
+						<div>
+							<h5>KAO花王 F系列超薄多量夜用带护翼30cm 10片*4包组</h5>
+							<p>
+								￥190 <s>￥210</s>
+							</p>
+						</div></li>
+
+					<li><img src="img/pd_img_1.png" alt="" />
+						<div>
+							<h5>KAO花王 F系列超薄多量夜用带护翼30cm 10片*4包组</h5>
+							<p>
+								￥190 <s>￥210</s>
+							</p>
+						</div></li>
+
+					<li><img src="img/pd_img_1.png" alt="" />
+						<div>
+							<h5>KAO花王 F系列超薄多量夜用带护翼30cm 10片*4包组</h5>
+							<p>
+								￥190 <s>￥210</s>
+							</p>
+						</div></li>
+				</ul>
+			</div>
+			<!-- goods -->
+
+			<div class="others clear">
+				<div class="others_left">
+					<ul class="ul_tabs">
+						<li class="active"><a href="javascript:;" data-target="_tab1">商品参数</a></li>
+						<li><a href="javascript:;" data-target="_tab2">商品详情</a></li>
+						<li><a href="javascript:;" data-target="_tab3">闪淘口碑</a></li>
+						<li id="li_tabs"></li>
+					</ul>
+
+					<div class="tab_pane" id="_tab1" style="font-size: 20px;">
+						商品参数</div>
+
+					<div class="tab_pane" id="_tab2" style="font-size: 20px;">
+						商品详情</div>
+
+					<div class="tab_pane" id="_tab3">
+						<ul class="ul_comment clear" id="commentUl">
+							<li><img src="img/icon_user.png" alt="" />
+								<div class="div_cc">
+									<div class="div_star">
+										<span></span><span></span><span></span><span></span><span></span>
+									</div>
+									<p></p>
+								</div></li>
+
+							<li><img src="img/icon_user.png" alt="" />
+								<div class="div_cc">
+									<div class="div_star">
+										<span></span><span></span><span></span><span></span>
+									</div>
+									asdfsadfsdfd
+								</div></li>
+
+							<li><img src="img/icon_user.png" alt="" />
+								<div class="div_cc">
+									<div class="div_star">
+										<span></span><span></span><span></span><span></span>
+									</div>
+								</div></li>
+
+						</ul>
+
+						<div class="paging" id="commentPagination">
+							<a class="active">1</a><a>2</a><a>3</a><a>...</a><a>下一页</a>
+						</div>
+					</div>
+
+				</div>
+				<!-- other_left End -->
+
+				<div class="others_right">
+					<h4>闪淘足迹</h4>
+					<ul class="ul_track" id="recentProductUl">
+						<li><a href="javascript:;"> <img src="img/pd_img_1.png"
+								alt="" />
+								<div>
+									<h5>KAO花王 F系列超薄多量夜用带护翼30cm 10片*4包组</h5>
+									<p>
+										￥190 <s>￥210</s>
+									</p>
+								</div>
+						</a></li>
+
+						<li><a href="javascript:;"> <img src="img/pd_img_1.png"
+								alt="" />
+								<div>
+									<h5>KAO花王 F系列超薄多量夜用带护翼30cm 10片*4包组</h5>
+									<p>
+										￥190 <s>￥210</s>
+									</p>
+								</div>
+						</a></li>
+
+						<li><a href="javascript:;"> <img src="img/pd_img_1.png"
+								alt="" />
+								<div>
+									<h5>KAO花王 F系列超薄多量夜用带护翼30cm 10片*4包组</h5>
+									<p>
+										￥190 <s>￥210</s>
+									</p>
+								</div>
+						</a></li>
+					</ul>
+				</div>
+				<!-- others_right End -->
+
+			</div>
+			<!-- others End -->
+
+
+		</div>
+	</section>
+
+
+
+	<!-- InstanceBeginEditable name="EditRegion1" -->
+	<section class="main" style="display:none" id="product_detail_fail">
+		<div class="_container">
+			<div class="center_panel clearfix pt30 pb50"
+				style="border: 1px solid #eeeeee;text-align:center;margin-top: 80px;">
+				<div class="fail-inner" >
+					<img src="img/ico-search-fail_show.png">
+					<h1 style="margin-top: 20px;font-size:30px">很遗憾，没有找到您要海淘的宝贝</h1>
+					<p class="t_color_3 mb20" style="font-size:20px">
+						您刚才输入/粘贴的URL是&nbsp;&nbsp;<a
+							href=""
+							target="_blank" id="fail_url"></a>
+					</p>
+					<p class="t_color_2 mb30" style="font-size:20px">请检查一下URL，看看有没有遗漏的部分。</p>
+
+					<div class="line"></div>
+					
+					
+
+				</div>
+			</div>
+
+
+		</div>
+	</section>
+
+
+	<!-- InstanceEndEditable -->
+
+	<footer class="footer">
+		<div class="_container">
+			<div class="link">
+				<p>
+					<a href="javascript:;">首页</a>&nbsp;|&nbsp; <a href="javascript:;">最新优惠</a>&nbsp;|&nbsp;
+					<a href="javascript:;">闪淘晒单</a>&nbsp;|&nbsp; <a href="javascript:;">海淘经验</a>
+				</p>
+
+				<p>
+					<a href="javascript:;">关于我们</a>&nbsp;|&nbsp; <a href="javascript:;">联系我们</a>&nbsp;|&nbsp;
+					<a href="javascript:;">加入我们</a>&nbsp;|&nbsp; <a href="javascript:;">建议反馈</a>
+				</p>
+			</div>
+
+			<div class="flink">
+				<a href="javascript:;">360导航</a>&nbsp;|&nbsp; <a href="javascript:;">中环转运</a>&nbsp;|&nbsp;
+				<a href="javascript:;">乐一番</a>&nbsp;|&nbsp; <a href="javascript:;">飞碟快递</a>&nbsp;|&nbsp;
+				<a href="javascript:;">易海淘</a>&nbsp;|&nbsp; <a href="javascript:;">转运中国</a>&nbsp;|&nbsp;
+				<a href="javascript:;">先锋快递</a>&nbsp;|&nbsp; <a href="javascript:;">瓦拉淘</a>&nbsp;|&nbsp;
+				<a href="javascript:;">海带宝</a>&nbsp;|&nbsp; <a href="javascript:;">八达网</a>&nbsp;|&nbsp;
+				<a href="javascript:;">今日头条</a><br /> <a href="javascript:;">网易新闻</a>&nbsp;|&nbsp;
+				<a href="javascript:;">搜狐新闻</a>&nbsp;|&nbsp; <a href="javascript:;">转运四方</a>
+			</div>
+
+			<p class="copyright">© copyright 2012-2014 极客海淘. All rights
+				reserved. 京ICP备14036389号-1 京公网安备11010602100083</p>
+		</div>
+	</footer>
+	<script src="../resources/scripts/htmlTagUtil.js"></script>
+	<script src="../resources/scripts/imgUtil.js"></script>
+	<script>
+		setFooter(".footer");
+		var spiderOrderUrl = window.sessionStorage
+				.getItem("spiderOrderUrlKeep");
+		var productId = window.sessionStorage.getItem("productIdKeep");
+		$("#spiderOrderUrl").val(spiderOrderUrl);
+		$("#productId").val(productId);
+		if (productId != null) {
+			getProduct();
+			getComment();
+			getPurchaseCount();
+		} else if (spiderOrderUrl != null) {
+			searchSpiderOrder();
+		}
+		getRecentProduct();
+		getCartCount();
+
+		function getProduct() {
+			$.ajax({
+				type : "post",
+				url : "../product/findById",
+				data : {
+					id : $("#productId").val()
+				},
+				success : function(response) {
+					if (200 == response.code) {
+						var product = response.data;
+						$("#name").html(product.name);
+						$("#typeId").val(product.typeId);
+						var price = product.price;
+						if (price == "" || price == -999999) {
+							price = "<span style='color: #f00;'>待定</span>";
+						}
+						$("#price").html(product.currency + price);
+						$("#rest").html(product.quantity);
+						$("#url").prop("href", product.url);
+						$("#description").html(product.description);
+						$("#_tab1").html(product.description);
+						$("#_tab2").html(product.description);
+						$("#landingImage").prop("src", "../" + product.pic1);
+						$("#pic1").prop("src", "../" + product.pic1);
+						$("#pic2").prop("src", "../" + product.pic2);
+						$("#pic3").prop("src", "../" + product.pic3);
+						$("#expireDate").val(product.expireDate);
+						countRestTime();
+						getSameTypeProduct();
+						clearWrongImgNoBaseUrl();
+					} else if (36008 == response.code) {
+						alert("找不到商品");
+						location.href = "../91gou/discount.html";
+					}
+				}
+			});
+		}
+		function getPurchaseCount() {
+			$.ajax({
+				type : "get",
+				url : "../productRecord/getPurchaseCountByProduct",
+				data : {
+					id : $("#productId").val()
+				},
+				success : function(response) {
+					if (200 == response.code) {
+						$("#purchaseCount").html(response.data + "人已购买");
+					}
+				}
+			});
+		}
+		function getSameTypeProduct() {
+			$
+					.ajax({
+						type : "post",
+						url : "../product/findAllByUser",
+						data : {
+							typeId : $("#typeId").val()
+						},
+						success : function(response) {
+							if (200 == response.code) {
+								$("#sameTypeProductUl").html("");
+								var string = "";
+								for (var i = 0; i < 5
+										&& i < response.data.datas.length; i++) {
+									var product = response.data.datas[i];
+									string += "<li onclick='javascript: productInfo("
+											+ product.id + ")'>";
+									string += "<img src='../" + product.pic1 + "' alt=''>";
+									string += "<div>";
+									string += "<h5>" + product.name + "</h5>";
+									var price = product.price;
+									if (price == "" || price == -999999) {
+										price = "<span style='color: #f00;'>待定</span>";
+									}
+									string += "<p>" + product.currency + price
+											+ "<s>￥210</s></p>";
+									string += "</div>";
+									string += "</li>";
+								}
+								$("#sameTypeProductUl").html(string);
+								clearWrongImgNoBaseUrl();
+							} else if (36011 == response.code) {
+								$("#sameTypeProductUl").html("");
+							}
+						}
+					});
+		}
+		function getComment() {
+			$.ajax({
+				type : "post",
+				url : "../productRecord/findByProductIdAndWithComment",
+				data : {
+					productId : $("#productId").val()
+				},
+				success : function(response) {
+					if (200 == response.code) {
+						showCommentList(response.data.datas);
+						showCommentPage(response.data);
+					} else if (36015 == response.code) {
+						showCommentList(0);
+						$("#commentPagination").html("");
+					}
+				}
+			});
+		}
+		function showCommentList(list) {
+			$("#commentUl").html("");
+			var string = "";
+			for (var i = 0; i < list.length; i++) {
+				var productRecord = list[i];
+				string += "<li>";
+				string += "<img src='img/icon_user.png' alt=''/>";
+				string += "<div class='div_cc'>";
+				string += "<div class='div_star'>";
+				for (var j = 0; j < productRecord.rate; j++) {
+					string += "<span></span>";
+				}
+				string += "<p>" + productRecord.comment + "</p>";
+				string += "</div>";
+				string += "</div>";
+				string += "</li>";
+			}
+			$("#commentUl").html(string);
+		}
+		function showCommentPage(pageSplit) {
+			$("#commentPagination").html("");
+			var string = "";
+			if (pageSplit.pageNow - 1 > 0) {
+				var pageNow = pageSplit.pageNow - 1;
+				string += "<a onclick='javascript: changePage(" + pageNow
+						+ ");'>上一页</a>";
+			}
+			var active = " class='active' ";
+			for (var i = -2; i < 3; i++) {
+				var pageNow = pageSplit.pageNow + i;
+				if (pageNow > 0
+						&& (pageNow < pageSplit.pageCount || pageNow == pageSplit.pageCount)) {
+					string += "<a "
+							+ (i == 0 ? active : "")
+							+ (i == 0 ? ""
+									: " onclick='javascript: changePage("
+											+ pageNow + ");' ") + ">" + pageNow
+							+ "</a>";
+				}
+			}
+			if (pageSplit.pageNow + 1 == pageSplit.pageCount
+					|| pageSplit.pageNow + 1 < pageSplit.pageCount) {
+				var pageNow = pageSplit.pageNow + 1;
+				string += "<a onclick='javascript: changePage(" + pageNow
+						+ ");'>下一页</a>";
+			}
+			$("#commentPagination").html(string);
+		}
+		function getRecentProduct() {
+			var localStorage = window.localStorage;
+			var recentProduct3 = localStorage.getItem("recentProduct3");
+			var recentProduct2 = localStorage.getItem("recentProduct2");
+			var recentProduct1 = localStorage.getItem("recentProduct1");
+			var recentProduct0 = localStorage.getItem("recentProduct0");
+
+			var recentArray = new Array();
+			recentArray[0] = recentProduct0;
+			recentArray[1] = recentProduct1;
+			recentArray[2] = recentProduct2;
+			recentArray[3] = recentProduct3;
+			for (var i = 0; i < 5; i++) {
+				if (recentArray[i] == "") {
+					recentArray.splice(i, 1);
+				}
+			}
+			var formData = new FormData();
+			formData.append("ids", recentArray);
+			$
+					.ajax({
+						type : "post",
+						url : "../product/findByIds",
+						data : formData,
+						processData : false,
+						contentType : false,
+						success : function(response) {
+							if (200 == response.code) {
+								$("#recentProductUl").html("");
+								var string = "";
+								for (var i = 0; i < 3
+										&& i < response.data.datas.length; i++) {
+									var product = response.data.datas[i];
+									string += "<li onclick='javascript: productInfo("
+											+ product.id + ")'>";
+									string += "<img src='../" + product.pic1 + "' alt=''>";
+									string += "<div>";
+									string += "<h5>" + product.name + "</h5>";
+									var price = product.price;
+									if (price == "" || price == -999999) {
+										price = "<span style='color: #f00;'>待定</span>";
+									}
+									string += "<p>" + product.currency + price
+											+ "<s>￥210</s></p>";
+									string += "</div>";
+									string += "</li>";
+								}
+								$("#recentProductUl").html(string);
+								clearWrongImgNoBaseUrl();
+							} else if (36011 == response.code) {
+								$("#recentProductUl").html("");
+							}
+						}
+					});
+			recentArray.splice(0, 0, $("#productId").val());
+			for (var i = 0; i < recentArray.length; i++) {
+				localStorage.setItem("recentProduct" + i, recentArray[i]);
+			}
+		}
+		function searchSpiderOrder() {
+			sessionStorage.removeItem("productIdKeep");
+			$.ajax({
+				type : "post",
+				url : "../spiderOrder/search",
+				data : {
+					url : $("#spiderOrderUrl").val()
+				},
+				success : function(response) {
+					///alert(response.code);
+					if (200 == response.code) {
+						
+						$("#product_detail").show();
+						$("#product_detail_fail").hide();
+						
+						var spiderOrder = response.data;
+						$("#name").html(spiderOrder.name);
+						var price = spiderOrder.price;
+
+						if (price == "" || price == -999999) {
+							price = "<span style='color: #f00;'>待定</span>";
+						}
+						$("#price").html(spiderOrder.currency + price);
+						$("#quantity").html(spiderOrder.quantity);
+						$("#url").prop("href", spiderOrder.url);
+						$("#description").html(spiderOrder.featureHtml);
+						$("#_tab1").html(spiderOrder.featureHtml);
+						$("#_tab2").html(spiderOrder.detailHtml);
+						$("#landingImage").prop("src", spiderOrder.pics[0]);
+						$("#pic1").prop("src", spiderOrder.pics[0]);
+						$("#pic2").prop("src", spiderOrder.pics[1]);
+						$("#pic3").prop("src", spiderOrder.pics[2]);
+						getSameTypeProduct();
+						clearWrongImgNoBaseUrl();
+					}/* else if (36008 == response.code) {
+						alert("找不到商品");
+					} */else {
+						alert("搜索失败！");
+						$("#product_detail").hide();
+						$("#product_detail_fail").show();
+						$("#fail_url").attr("href",$("#spiderOrderUrl").val());
+						$("#fail_url").html($("#spiderOrderUrl").val());
+					}
+				}
+			});
+		}
+		function getCartCount() {
+			$.ajax({
+				type : "get",
+				url : "../cart/countCart",
+				success : function(response) {
+					if (200 == response.code || 36019 == response.code) {
+						$("#cartCount").html(response.data);
+					} else if (607 == response.code) {
+						var cartArray = localStorage.getItem("cartArray");
+						if (cartArray != null) {
+							cartArray = JSON.parse(cartArray);
+							$("#cartCount").html(cartArray.length);
+						}
+					}
+				}
+			});
+		}
+		function add2Cart() {
+			var quantity = $("#quantity").val();
+			var productId = $("#productId").val();
+			if (productId == "") {
+				sessionStorage.setItem("forwardProductSearchPage", true);
+				location = "../r/login.jsp";
+			} else {
+				$.ajax({
+					type : "post",
+					url : "../cart/add2Cart",
+					data : {
+						productId : productId,
+						quantity : quantity
+					},
+					success : function(response) {
+						if (200 == response.code) {
+							alert("加入完成");
+						} else if (607 == response.code) {
+							var cartArray = localStorage.getItem("cartArray");
+							if (cartArray == null) {
+								cartArray = [];
+							} else {
+								cartArray = JSON.parse(cartArray);
+							}
+							if (productId != "" && quantity > 0) {
+								var cart = {
+									productId : productId,
+									quantity : quantity
+								};
+								cartArray.push(cart);
+								localStorage.setItem("cartArray", JSON
+										.stringify(cartArray));
+							}
+						}
+						getCartCount();
+
+					}
+				});
+			}
+		}
+		function productInfo(id) {
+			sessionStorage.setItem("productIdKeep", id);
+			window.location = window.location;
+		}
+		var restTimer;
+		function countRestTime() {
+			var expireDateHidden = $("#expireDate").val();
+			if (expireDateHidden != "") {
+				var restTime = new Date(expireDateHidden) - new Date();
+				var restDay = parseInt(restTime / 1000 / 60 / 60 / 24, 10);
+				$("#restHour").html(
+						parseInt(restTime / 1000 / 60 / 60 % 24 + restDay * 24,
+								10));
+				$("#restMinute").html(parseInt(restTime / 1000 / 60 % 60, 10));
+				$("#restSecond").html(parseInt(restTime / 1000 % 60, 10));
+				restTimer = setTimeout("countRestTime()", 1000);
+				if (restTime <= 0) {
+					clearTimeout(restTimer);
+				}
+			}
+		}
+	</script>
+</body>
+<!-- InstanceEnd -->
+</html>

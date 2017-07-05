@@ -1,0 +1,197 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">商品详情
+			<a  href="#" onclick="javascript: navProductClick();">返回列表</a>
+		</p>
+		<div class="box_content">
+			<div class="content_title">商品详情</div>
+			<div class="content_text">
+				<div class="tab-content" id="tab2">
+					<input type="hidden" id="idHidden">
+					<hr/>
+					<article style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+						<label class="center">商品信息：</label>
+						<div style="flex-basis: 100%;">
+							<label style="display: inline;">名称：</label>
+							<label id="productName"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">类型：</label>
+							<label id="productTypeName"></label>
+						</div>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">价格：</label>
+							<label id="productPrice"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">剩余：</label>
+							<label id="productQuantity"></label>
+						</div>
+						<div style="flex-basis: 100%;">
+							<label style="display: inline;">剩余时间：</label>
+							<label id="restTime"></label><input type="hidden" id="expireDate">
+						</div>
+						<div style="flex-basis: 100%;">
+							<label style="display: inline;">详情：</label>
+							<label id="productDescription"></label>
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">图片：</label>
+							<img id="productPic1">
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">图片：</label>
+							<img id="productPic2">
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">图片：</label>
+							<img id="productPic3">
+						</div>
+					</article>
+					<section>
+						<table id="datatable" class="table">
+							<thead>
+								<tr>
+									<th scope="col">用户名</th>
+									<th scope="col" style="width: 100px;">评价</th>
+									<th scope="col" >评论</th>
+									<th scope="col" style="width: 100px;">下单日期</th>
+								</tr>
+							</thead>
+							<tbody id="tbody">
+								<tr><td colspan="4">没有数据</td></tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td id="pagination" colspan="4" style="text-align: right;">共<span id="trsize">0</span>条
+										<a id="first_page" href="1" name="to_page">首页</a> |
+										<a id="pre_page" name="to_page">上一页</a> |
+										<input type="number" class="bor" style="width: 50px;" min="0" step="1" /> / <span id="tpsize">0</span>|
+										<a id="next_page" name="to_page">下一页</a> |
+										<a id="last_page" name="to_page">未页</a>&nbsp;&nbsp;
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</section>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		            <section>
+		            	购买数量<input type="number" id="quantity" value="1" step="1" min="1">
+		            	<input class="button" type="button" value="提交" onclick="javascript: add2Cart();" />
+		            </section>
+		        </div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+$("#main-content").ready(function(){
+	$("#idHidden").val(window.sessionStorage.getItem("productId"));
+	window.sessionStorage.clear();
+	loadProduct();
+	loadProductRecord();
+});
+function loadProductRecord(){
+	$.ajax({
+		type : "post",
+		url : "../user/productRecord/findByProductIdAndWithComment",
+		data : {productId : $("#idHidden").val()},
+		success : function(response){
+			if("200" == response.code){
+				var list = response.data.datas;
+				$("#datatable").html("");
+				var string = "";
+				for(var i=0; i<list.length; i++){
+					var productRecord = list[i];
+					string += "<tr>";
+					string += "<td>" + productRecord.userId + "</td>";
+					string += "<td>" + productRecord.rate + "</td>";
+					string += "<td>" + productRecord.comment + "</td>";
+					string += "<td>" + productRecord.date + "</td>";
+					string += "</tr>";
+				}
+				$("#datatable").html(string);
+			}else{
+			}
+		}
+	});
+}
+function loadProduct(){
+	$.ajax({
+		type : "post",
+		url : "../user/product/findById",
+		data : {id : $("#idHidden").val()},
+		success : function(response){
+			if("200" == response.code){
+				var product = response.data;
+				$("#productName").html(product.name);
+				$("#productTypeName").html(product.typeName);
+				var price = product.price;
+				if(price == "" || price == -999999){
+					price = "<span style='color: #f00;'>待定</span>";
+				}
+	            price = product.currency + price;
+				$("#productPrice").html(price);
+				$("#productQuantity").html(product.quantity);
+				$("#productDescription").html(product.description);
+				$("#productPic1").attr("src", "../"+product.pic1);
+				$("#productPic2").attr("src", "../"+product.pic2);
+				$("#productPic3").attr("src", "../"+product.pic3);
+				$("#quantity").attr("max", product.quantity);
+				$("#expireDate").val(product.expireDate);
+				countRestTime();
+				clearWrongImg();
+			}else{
+				alert("获取商品失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+function add2Cart(id){
+	$.ajax({
+		type: "post",
+		url: "../user/cart/add2Cart",
+		data : {
+			productId : $("#idHidden").val(),
+			quantity : $("#quantity").val(),
+			},
+		success: function(response){
+			var code = response.code;
+			if("200" == code){
+				alert("加入成功");
+				navProductClick(); 
+			}else if(607 == code){
+				alert("请登录");
+				logout();
+			}else{
+				alert("加入失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+var restTimer;
+function countRestTime(){
+	var expireDateHidden = $("#expireDate").val();
+	if(expireDateHidden != ""){
+		var restTime = new Date(expireDateHidden) - new Date();
+		var restDay = parseInt(restTime/1000/60/60/24, 10);
+		var restHour = parseInt(restTime/1000/60/60%24 + restDay*24, 10);
+		var restMinute = parseInt(restTime/1000/60%60, 10);
+		var restSecond = parseInt(restTime/1000%60, 10);
+		$("#restTime").html(restHour + "小时" + restMinute + "分" + restSecond + "喵");
+		restTimer = setTimeout("countRestTime()", 1000);
+		if(restTime<=0){
+			clearTimeout(restTimer);
+		}
+	}
+}
+</script>
+</html>

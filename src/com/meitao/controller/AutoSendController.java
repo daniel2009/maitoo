@@ -1,0 +1,90 @@
+package com.meitao.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.meitao.service.AutoSendService;
+
+import com.meitao.common.constants.ResponseCode;
+import com.meitao.model.AutoSend;
+
+import com.meitao.model.ResponseObject;
+
+@Controller
+public class AutoSendController extends BasicController{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4082140452026930414L;
+	private static final Logger log = Logger.getLogger(AutoSendController.class);
+	@Resource(name = "autoSendService")
+	private AutoSendService autoSendService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+	
+	@RequestMapping(value = "/admin/autoSend/searchAll", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<List<AutoSend>> findAll(HttpServletRequest request){
+		try{
+			return autoSendService.findAll();
+		}catch(Exception e){
+			log.error("查询自动发送设置列表发生异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查询自动发送设置列表发生异常");
+		}
+	}
+	@RequestMapping(value = "/admin/autoSend/add", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> add(HttpServletRequest request, AutoSend autoSend){
+		try{
+			return autoSendService.add(autoSend);
+		}catch(Exception e){
+			log.error("添加自动发送信息异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加自动发送信息异常");
+		}
+		
+	}
+	
+	@RequestMapping(value = "/admin/autoSend/modify", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> modify(HttpServletRequest request, AutoSend autoSend){
+		try{
+			return autoSendService.modify(autoSend);
+		}catch(Exception e){
+			log.error("修改自动发送信息异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改自动发送信息异常");
+		}
+	}
+	
+	@RequestMapping(value = "/admin/autoSend/delete", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> delete(HttpServletRequest request, AutoSend autoSend){
+		try{
+			return autoSendService.delete(autoSend);
+		}catch(Exception e){
+			log.error("删除自动发送信息异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除自动发送信息异常");
+		}
+	}
+	
+	@RequestMapping(value = "/getNeedResiterCode", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<Object> getNeedResiterCode(HttpServletRequest request){
+		try{
+			return autoSendService.getNeedResiterCode();
+		}catch(Exception e){
+			log.error("查找注册码要求信息异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "查找注册码要求信息异常");
+		}
+	}
+}

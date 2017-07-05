@@ -1,0 +1,480 @@
+﻿
+// kai 20150911-1 modify
+// js获取项目根路径，如： http://localhost:8083/uimcardprj
+base_url_set_has_sub = true;
+function getRootPath() {
+	// 获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+	var curWwwPath = window.document.location.href;
+	// 获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+	var pathName = window.document.location.pathname;
+	var pos = curWwwPath.indexOf(pathName);
+	// 获取主机地址，如： http://localhost:8083
+	var localhostPaht = curWwwPath.substring(0, pos);
+	// 获取带"/"的项目名，如：/uimcardprj
+	var projectName = pathName
+			.substring(0, pathName.substr(1).indexOf('/') + 1);
+	
+	if(base_url_set_has_sub==true)
+	{
+		return (localhostPaht + projectName);
+	}
+	else
+	{
+		return localhostPaht;
+	}
+}
+
+
+function Endicia_label_page_init_admin()
+{
+	
+	$("#bt_add_ediciallabel").click(function() {
+		
+		Endicia_label_submit_admin();
+		return false;
+	});
+	
+	$("#a_back_endiciallabel_list_link").click(function() {
+	
+		nav_endicialabel_list_Click();
+		return false;
+	});
+	//searchLabelList(1);
+	$("select[name='tocountry']")
+	.change(
+			function() {
+				
+				
+				var usoption='<option value="StandardPost">标准邮件</option>';
+				usoption+='<option value="PriorityExpress">特快专递</option>';
+				usoption+='<option value="First">第一类邮件包裹</option>';
+				usoption+='<option value="LibraryMail">图书馆邮件</option>';
+				usoption+='<option value="MediaMail">媒体邮件</option>';
+				usoption+='<option value="ParcelSelect">轻型包裹</option>';
+				usoption+='<option value="Priority">优先邮件</option>';
+				usoption+='<option value="CriticalMail">重要邮件</option>';
+				
+				var International='<option value="PriorityMailExpressInternational">国际3-5天件</option>';
+				International+='<option value="FirstClassMailInternational">一级国际邮件</option>';
+				International+='<option value="FirstClassPackageInternationalService">一级国际包裹邮件服务</option>';
+				International+='<option value="PriorityMailInternational">国际6-10天件</option>';
+				var country=$("select[name='tocountry']").val();
+				$(":text[name='r_zipcode']").val("");
+				if(country=="US")
+				{
+					$("select[name='MailClass']").html(usoption);
+					$(":text[name='r_zipcode']").attr("maxlength","5");
+					
+				}
+				else
+				{
+					$("select[name='MailClass']").html(International);
+					$(":text[name='r_zipcode']").attr("maxlength","6");
+				}
+			});
+	
+	
+	
+
+}
+
+
+//提交label数据入口
+function Endicia_label_submit_admin()
+{
+	var s_name=$(":text[name='s_name']").val();
+	var s_phone=$(":text[name='s_phone']").val();
+	var s_addr=$(":text[name='s_addr']").val();
+	var s_city=$(":text[name='s_city']").val();
+	var s_state=$(":text[name='s_state']").val();
+	var s_zipcode=$(":text[name='s_zipcode']").val();
+	var s_zip4=$(":text[name='s_zip4']").val();
+	var r_name=$(":text[name='r_name']").val();
+	var r_phone=$(":text[name='r_phone']").val();
+	var tocountry=$("select[name='tocountry']").find("option:selected").attr("name");
+	var toCountryCode=$("select[name='tocountry']").val();
+	
+	var labelType="Default";
+	if(toCountryCode!="US")
+	{
+		labelType="International";
+	}
+	
+	
+	var r_name=$(":text[name='r_name']").val();
+	var r_phone=$(":text[name='r_phone']").val();
+	var r_toCompany=$(":text[name='r_toCompany']").val();
+	
+	var r_addr=$(":text[name='r_addr']").val();
+	var r_city=$(":text[name='r_city']").val();
+	var r_state=$(":text[name='r_state']").val();
+	var r_zipcode=$(":text[name='r_zipcode']").val();
+	var r_zip4=$(":text[name='r_zip4']").val();
+	
+	
+	var description=$("textarea[name='description']").val();
+	var weight=$(":text[name='weight']").val();
+	
+	//var weightoz=$(":text[name='weightoz']").val();
+	var weightoz=parseFloat(weight)*16;
+	if(weightoz=="NaN")
+	{
+		alert("重量填写错误!");
+		return false;
+	}
+	var quantity=$(":text[name='quantity']").val();
+	var value=$(":text[name='value']").val();
+	
+	var MailClass=$("select[name='MailClass']").val();
+	
+	
+
+	
+	
+	$.ajax({
+		post : "post",
+		url : "../admin/endicial/label_arg_url",
+		data : {
+		"labelType" : labelType,
+		"dateAdvance" : "0",
+		"weightOz" : weightoz,
+		"mailpieceShape" : "Parcel",
+		"description" : description,
+		"quantity" : quantity,
+		"weight" : weight,
+		"toName" : r_name,
+		"toCompany" : r_toCompany,
+		"toAddress1" : r_addr,
+		"toCity" : r_city,
+		"toState" : r_state,
+		"toCountry" : tocountry,
+		"toCountryCode" : toCountryCode,
+		"toPostalCode" : r_zipcode,
+		"toZIP4" : r_zip4,
+		"toPhone" : r_phone,
+		"value" : value,
+		
+		"fromName" : s_name,
+		"returnAddress1" : s_addr,
+		"fromCity" : s_city,
+		"fromState" : s_state,
+		"fromPostalCode" : s_zipcode,
+		"fromZIP4" : s_zip4,
+		"fromPhone" : s_phone,
+		"mailClass" : MailClass
+	},success : function(response) {
+		var code = response.code;
+		if ("200" == code) {
+			
+			if (confirm("你打印的label价格为："+response.data+" 是否确定打印？")) {
+				$.ajax({
+					post : "post",
+					url : "../admin/endicial/label_print_url",
+					data : {
+					"labelType" : labelType,
+					"dateAdvance" : "0",
+					"weightOz" : weightoz,
+					"mailpieceShape" : "Parcel",
+					"description" : description,
+					"quantity" : quantity,
+					"weight" : weight,
+					"toName" : r_name,
+					"toCompany" : r_toCompany,
+					"toAddress1" : r_addr,
+					"toCity" : r_city,
+					"toState" : r_state,
+					"toCountry" : tocountry,
+					"toCountryCode" : toCountryCode,
+					"ToPostalCode" : r_zipcode,
+					"toZIP4" : r_zip4,
+					"toPhone" : r_phone,
+					"value" : value,
+					
+					"fromName" : s_name,
+					"returnAddress1" : s_addr,
+					"fromCity" : s_city,
+					"fromState" : s_state,
+					"fromPostalCode" : s_zipcode,
+					"fromZIP4" : s_zip4,
+					"fromPhone" : s_phone,
+					"mailClass" : MailClass
+				},success : function(response) {
+					var code = response.code;
+					//alert(response);
+					//alert(response.data);
+					if ("200" == code) {
+						
+						alert("操作成功，请查看打开的文档或查看历史记录!");
+						if((response.data!="")&&(response.data!="null")&&(response.data!="undefined")&&(response.data!=null))
+						{
+							var urlaa=response.data.split(";");
+							for(var i=0;i<urlaa.length;i++)
+							{
+								//alert(urlaa[i]);
+								if(urlaa[i]!="")
+								{
+									var url=getRootPath()+"/"+urlaa[i];
+									
+									window.open(url, "_blank");
+								}
+							}
+						}
+						//searchLabelList(1);
+						//alert(url);
+						//window.localtion=url;
+						//alert("操作成功，请查看下载的文档或查看历史记录!");
+						
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					}
+					else {
+						alert("提交出错，原因是:"
+								+ response.message);
+						
+					}
+				}
+				});
+			}
+			
+		} else if ("607" == code) {
+			alert("您尚未登录或登录已失效！");
+			logout();
+		}
+		else {
+			alert("提交出错，原因是:"
+					+ response.message);
+		}
+	}
+	});
+	
+}
+function printpic(id){ 
+	//var newstr = document.all.item(id).innerHTML;
+	var dom = document.getElementById(id);
+	//alert(newstr);
+	var win=window.open();
+	win.document.write(dom.outerHTML);
+	win.print();
+	win.close();
+   // printWindow = window.open();
+    //printWindow.write(newstr);
+   // printWindow.document.write(newstr);
+   // printWindow.print();
+    
+    
+    return false;
+} 
+
+
+
+function showuserlabellist_admin(list)
+{
+	var str = "";
+
+	if (list != null) {
+		$
+				.each(
+						list,
+						function() {
+							//alert(this.id);
+							str += "<tr>";
+							
+							str += '<td name="e_id">' + this.id + '</td>';
+							
+							
+							str += '<td name="e_createdate">' + this.createDate
+							str += '<td name="e_fromName">' + this.fromName
+									+ '</td>';
+							str += '<td name="e_fromPhone">' + this.fromPhone
+							+ '</td>';
+
+							str += '<td>' + this.returnAddress1
+									+ '&nbsp;' + this.fromCity + '&nbsp;'
+									+ this.fromState + '&nbsp;'
+									+ this.fromPostalCode + '</td>';
+							
+							str += '<td name="e_toname">' + this.toName
+									+ '</td>';
+							str += '<td name="e_tophone">' + this.toPhone
+									+ '</td>';
+
+							str += '<td>' + this.toAddress1
+									+ '&nbsp;' + this.toCity + '&nbsp;'
+									+ this.toState + '&nbsp;'
+									+ this.toCountry + '&nbsp;'
+									+ this.toPostalCode + '</td>';
+							str += '<td name="e_amount">' + this.amount
+							+ '</td>';
+							
+							str += '<td >' + this.adminid
+							+ '</td>';
+							if((this.labelUrl!="")&&(this.labelUrl!=null)&&(this.labelUrl!="undefined")&&(this.labelUrl!="null"))
+							{
+								var urlaa1=this.labelUrl.split(";");
+								var str00="";
+								
+								for(var i=0;i<urlaa1.length;i++)
+								{
+									var j=i+1;
+									str00+='<a href="'+getRootPath()+"/"+urlaa1[i]+'">'+"图"+j+"</a>";
+									str00+="&nbsp;";
+								}
+								str += '<td>' + str00+"</a>"+ '</td>';
+							}
+							else
+							{
+								
+								var str00="";
+								
+								
+								str += '<td>' + str00+"</a>"+ '</td>';
+							}
+							
+							
+							str += '</tr>';
+							
+						});
+	} else {
+		//alert("5555");
+	}
+	
+	$("#tab1 table tbody").html(str);
+}
+
+function showpagesplit_endicialabel(pageSplit) {
+	var rowCount = 0;
+	var pageSize = 0;
+	var pageNow = 0;
+	var pageCount = 0;
+	if (pageSplit != null) {
+		rowCount = pageSplit.rowCount;
+		pageSize = pageSplit.pageSize;
+		pageNow = pageSplit.pageNow;
+		pageCount = pageSplit.pageCount;
+	}
+	$("#trsize1").html(rowCount);
+	$("#tpsize1").html(pageCount);
+	$("#first_page1").attr("href", "1");
+	$("#pre_page1").attr("href", pageNow - 1);
+	$("#next_page1").attr("href", pageNow + 1);
+	$("#last_page1").attr("href", pageCount);
+}
+
+
+function endicialabellistData()
+{
+	searchLabelList_admin("", "", "", "", 1) ;
+	//loadFirstRenlingList();
+
+	$(":submit[name='searchSub']").click(
+			function() {
+		
+			
+				var userInfo = $(":text[name='userInfo']").val();
+				var labelInfo = $(":text[name='labelInfo']").val();
+				var sdate = $(":text[name='sdate']").val();
+				var edate = $(":text[name='edate']").val();
+
+				
+				
+				searchLabelList_admin(userInfo, labelInfo, sdate, edate, 1);
+				
+				
+				return false;
+			});
+
+	
+
+	
+}
+
+
+function searchLabelList_admin(userInfo, labelInfo, sdate, edate, pn) {
+	$(":hidden[name='userInfo']").val(userInfo);
+	$(":hidden[name='labelInfo']").val(labelInfo);
+	$(":hidden[name='sdate']").val(sdate);
+	$(":hidden[name='edate']").val(edate);
+	$(":hidden[name='pn']").val(pn);
+	$.ajax({
+		type : "get",
+		url : "../admin/endicial/searchbykey",
+		data : {
+			userInfo : userInfo,
+			labelInfo : labelInfo,
+			sd : sdate,
+			ed : edate,
+			pageIndex : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			//alert(code);
+			if ("200" == code) {
+				if (response.data == null) {
+					showuserlabellist_admin(null);
+					showsearchLabelListLink(null);
+				} else {
+					showuserlabellist_admin(response.data.datas);
+					showsearchLabelListLink(response.data);
+					//showRenlingshipLink(response.data);
+				}
+				afterRenlingList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='10'>"
+						+ "<span>&nbsp;&nbsp;获取label列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+	});
+}
+
+function showsearchLabelListLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .bulk-actions").show();
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var userInfo = $(":hidden[name='userInfo']").val();
+			var labelInfo = $(":hidden[name='labelInfo']").val();
+			var sdate = $(":hidden[name='sdate']").val();
+			var edate = $(":hidden[name='edate']").val();
+
+			
+			
+			searchLabelList_admin(userInfo, labelInfo, sdate, edate, pn);
+			
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var userInfo = $(":hidden[name='userInfo']").val();
+					var labelInfo = $(":hidden[name='labelInfo']").val();
+					var sdate = $(":hidden[name='sdate']").val();
+					var edate = $(":hidden[name='edate']").val();
+					searchLabelList_admin(userInfo, labelInfo, sdate, edate, pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .bulk-actions").hide();
+		$("tfoot .pagination").html("");
+	}
+}

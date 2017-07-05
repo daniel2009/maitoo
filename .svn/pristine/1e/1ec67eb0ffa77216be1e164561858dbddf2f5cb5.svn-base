@@ -1,0 +1,195 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+	<input type="hidden" name="key" value="" />
+	<input type="hidden" name="type" value="" />
+	<input type="hidden" name="state" value="" />
+	<input type="hidden" name="sdate" value="" />
+	<input type="hidden" name="edate" value="" />
+	<input type="hidden" name="pn" value="1" />
+	<input type="hidden" name="wid" value="" />
+	<input type="hidden" name="cid" value="" />
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">价格计算</p>
+
+		<div class="box_content">
+			<div class="content_title">订单列表</div>
+			<div class="content_text">
+
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u52" style="padding-top: 5px;">
+						<div id="u520">
+							<!--  <form action="">
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;运单号：<input type="text"
+									name="search_order_no" class="text-input" size="20"
+									style="width:100px;" /> <input class="button" type="submit"
+									value="搜索" name="searchSub" style="height:20px" />
+									
+									
+									
+									
+									
+							</form>
+							
+							
+							
+							<br />
+									-->					
+							<form action="">
+								<!--运单号：<input type="text" name="search_order_no" class="text-input" size="10"/>-->
+								&nbsp; &nbsp;
+								创建日期：
+								<input type="text" class="text-input Wdate" size="15" name="sdate" id="sd" onClick="WdatePicker()" style="width:100px;"/>
+								~
+								<input type="text" class="text-input Wdate" size="15" name="edate" id="ed" onClick="WdatePicker()" style="width:100px;"/>
+								&nbsp;
+								所属用户：
+								<input class="text-input" size="10" type="text" name="key" style="width:100px;" />
+								<select class="text-input" name="type" style="width:100px;display:none;">
+									
+									<option value="2">
+										所属用户
+									</option>
+								
+								</select>
+								<select class="text-input" name="state" style="width:100px;">
+									<option value="-1">
+										请选择状态
+									</option>
+									<!-- kai 20150911-1 -->
+									<!--<option value="-10">网上置单</option>-->
+									<option value="0">等待审核</option>
+									<option value="1">未付款</option>
+									<!--<option value="2">等待入库</option>
+									<option value="3">打包待发</option>
+									<option value="4">入库打件</option>
+									<option value="5">送往机场</option>
+									<option value="6">空运中</option>
+									<option value="7">海关清关</option>
+									<option value="8">目的地第三方快递</option>
+									<option value="9">收件人已接收</option>-->
+								</select>
+								
+								
+			            	 <span id="span_wid" style="display:none;">&nbsp;&nbsp;&nbsp;选择门店：</span> <select
+										class="text-input" name="wid_download" style="display:none;">
+										<option value="-1">
+										请选择门店
+									</option>
+									</select><span style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;选择渠道：</span>  <select class="text-input"
+										name="cid_downloadload" style="display:none;">
+										<option value="-1">
+										请选择渠道
+									</option>
+									</select>
+			            
+				            
+				             
+				           
+								
+								
+								
+								<input class="button" type="submit" value="高级搜索" name="searchSub" />
+							</form>
+
+						</div>
+						
+
+						<div style="clear: both;"></div>
+					</div>
+
+				
+									
+							
+									
+			<form  name="submitdownn" id="submitdownn" method="post">
+					
+					
+										<p >
+										<input type="checkbox" name="o_order_checked_all"
+												id="o_order_checked_all" />
+											<strong>全选</strong>
+											
+											<span id="orders_no">
+										</span>
+										<span id="orderschecked_no">
+										</span>
+										
+									
+										
+										</p>
+										
+					
+					<div id="u5402" style="height:500px;max-height:800px">
+					
+						<table id="user_info_table">
+							<colgroup>
+								<col width="4%">
+								<col width="5%">
+								<col width="10%">
+								<col width="15%">
+								<col width="11%">
+								<col width="10%">
+								<col width="10%">
+								<col width="10%">
+								<col width="8%">
+								<col width="8%">
+								<col width="9%">
+							</colgroup>
+							<thead>
+								<tr>
+									<th>序号</th>
+									<th>操作</th>
+									<th>运单号</th>
+									<th>货物品名</th>
+									<th>所属用户</th>
+									<th>收件人姓名</th>
+									<th>状态</th>
+									<th>创建时间</th>
+									<th>重量（lb）</th>
+									<th>重量（kg）</th>
+									<th>价格</th>
+								</tr>
+							</thead>
+	
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+					<p>
+					&nbsp; &nbsp;
+								总重量(lb)：
+								<input type="text" class="text-input" size="15" name="totalweightlb" id="totalweightlb"  readonly = "readonly" style="width:100px;"/>
+								
+					&nbsp; &nbsp;
+								总重量(kg)：
+								<input type="text" class="text-input" size="15" name="totalweightkg" id="totalweightkg"  readonly = "readonly" style="width:100px;"/>
+								
+					&nbsp; &nbsp;
+								总价格($)：
+								<input type="text" class="text-input" size="15" name="totalMoneys" id="totalMoneys"  readonly = "readonly" style="width:100px;"/>
+								&nbsp; &nbsp;
+								<input id="bt_orders_money" class="button" type="button" value="提交">
+								</p>
+</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		//loadNav521Data();
+		loadNavCountOrdersMoney();
+	});
+</script>
+</html>

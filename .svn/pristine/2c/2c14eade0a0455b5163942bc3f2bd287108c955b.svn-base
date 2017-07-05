@@ -1,0 +1,185 @@
+﻿<%@ page language="java"  import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+
+	<body>
+	
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">上门取件列表</p>
+
+		<div class="box_content">
+			<div class="content_title">上门取件列表</div>
+			<div class="content_text">
+	
+				<div class="tab-content default-tab" id="tab1">
+					<section>
+						<form id="searchForm" action=""  style="margin-top: 10px;">
+							&nbsp;&nbsp;
+							关键字：
+							<input class="text-input" size="20" type="text" name="key" />
+							&nbsp;&nbsp;搜索内容：
+							<select class="text-input" name="type">
+								<option value="0">全部</option>
+								<option value="1">用户id</option>
+								<option value="2">姓名</option>
+								<option value="3">手机</option>
+							</select>
+							<select name="state" class="text-input">
+								<option value="" selected="selected">请选择状态</option>
+								<option value="0">还没处理</option>
+				              	<option value="1">处理中</option>
+				              	<option value="2">处理完成</option>
+				            </select>
+							&nbsp;&nbsp;
+							创建时间：
+							<input type="text" class="text-input Wdate" size="10" name="createDateStart" onClick="WdatePicker()"/>
+							~
+							<input type="text" class="text-input Wdate" size="10" name="createDateEnd" onClick="WdatePicker()"/>
+							<input class="button" type="button" value="高级搜索" onclick="search();"/>
+						</form>
+					</section>
+					<table style="width: 100%">
+						<thead>
+							<tr>
+								<th>编号</th>
+								<th>用户</th>
+								<th>姓名</th>
+								<th>所属州</th>
+								<th>门店</th>
+								<th>预约时间</th>
+								<th>手机</th>
+								<th>确认时间</th>
+								<th>操作状态</th>
+							</tr>
+						</thead>
+						<tfoot>
+						<tr>
+							<td id="pagination" colspan="7" style="text-align: right;">共<label id="trsize">0</label>条
+								<a id="first_page" href="1" name="to_page">首页</a> |
+								<a id="pre_page" name="to_page">上一页</a> |
+								<input type="number" class="bor" style="width: 50px;" min="0" step="1" /> / <label id="tpsize">0</label>|
+								<a id="next_page" name="to_page">下一页</a> |
+								<a id="last_page" name="to_page">未页</a>&nbsp;&nbsp;
+							</td>
+						</tr>
+						</tfoot>
+						<tbody id = "tbody">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadList();
+		$("#pagination a[name='to_page']").click(function() {
+			// 跳页
+			var pn = $(this).attr("href");
+			var formData = new FormData(document.getElementById("searchForm"));
+			formData.append("pageIndex", pn);
+			loadList(formData);
+			return false;
+		});
+
+		$("#pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var formData = new FormData(document.getElementById("searchForm"));
+					formData.append("pageIndex", pn);
+					loadList(formData);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	});
+	function loadList(formData){
+		var httpRequest = new XMLHttpRequest();
+		var url = "../admin/callOrder/searchByKey";
+		httpRequest.onreadystatechange = function(){
+			if(4 == httpRequest.readyState){
+				if(200 == httpRequest.status){
+					var response = eval("(" + httpRequest.responseText + ")");
+					var code = response.code;
+					if("200" == code){
+						if(response.data != null){
+							var list = response.data.datas;
+							var length = list.length;
+							var tbody = document.getElementById("tbody");
+							tbody.innerHTML = "";
+							var string = "";
+							if(list == null || length <= 0){
+								string += "<tr><td cols='10'>没有数据</td></tr>";
+							}else{
+								for(var i = 0; i< length; i++){
+									string += "<tr>";
+									string += "<td >" + list[i].id + "</td>";
+									string += "<td >" + list[i].userId + "</td>";
+									string += "<td >" + list[i].sName + "</td>";
+									string += "<td >" + list[i].sProvince + "</td>";
+									string += "<td >" + list[i].warehouseName + "</td>";
+									string += "<td >" + transformInputDatetimeLocal(list[i].appointmentDate) + "</td>";
+									string += "<td >" + list[i].sPhone + "</td>";
+									string += "<td >" + transformInputDatetimeLocal(list[i].confirmDate) + "</td>";
+									var operation = "处理";
+									if(list[i].state=="1"){
+										operation = "查看";
+									}
+									string += "<td><a href='#' onclick='javascript: callOrderInfo("+list[i].id+");'>"+operation+"</a>";
+									string += "</tr>";
+								}
+								
+							}
+							tbody.innerHTML += string;
+							showPage(response.data);
+						}
+					}else if("607" == code){
+						alert("您尚未登录或登录已失效！");
+						logout();
+					}else{
+						alert("获取上门取件列表数据失败，原因是:" + response.message);
+					}
+					return false;
+				}
+			}
+		};
+		httpRequest.open("post", url, true);
+		httpRequest.send(formData);
+		return false;
+	}
+	function showPage(pageSplit) {
+		var rowCount = 0;
+		var pageNow = 0;
+		var pageCount = 0;
+		if (pageSplit != null) {
+			rowCount = pageSplit.rowCount;
+			pageNow = pageSplit.pageNow;
+			pageCount = pageSplit.pageCount;
+		}
+		$("#trsize").html(rowCount);
+		$("#tpsize").html(pageCount);
+		$("#first_page").attr("href","1");
+		$("#pre_page").attr("href", pageNow - 1);
+		$("#next_page").attr("href",pageNow + 1);
+		$("#last_page").attr("href", pageCount);
+	}
+	function search(){
+		var formData = new FormData(document.getElementById("searchForm"));
+		loadList(formData);
+	}
+	function callOrderInfo(id){
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("callOrderId", id);
+		$("#main-content").load("../admin/callOrderInfo.jsp");
+	}
+</script>
+</html>

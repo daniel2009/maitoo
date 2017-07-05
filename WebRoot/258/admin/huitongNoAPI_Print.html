@@ -1,0 +1,153 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+    
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    
+    <script src="../resources/scripts/LodopFuncs.js"></script>
+    
+    
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden;">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">汇通单管理</a>
+                </li>
+
+                <li>
+                    <a href="menshidadan.html">单号打印</a>
+                </li>
+                
+
+            </ul>
+        </div>
+
+        <div class="page-content">
+
+           
+
+               
+             
+             
+           <table class="table table-bordered  table-striped table-condensed ">
+                    <thead>
+                        <tr>
+                            <th colspan="4">
+                                对接汇通打印单号（通过汇通API获取单号打印）
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      
+
+                        <tr>
+                            <td class="name" style="text-align:right;">
+                               打印单号：
+                            </td>
+                            <td>
+
+                             <input name="orderId"/><button id="btprintorder" style='width:70px;margin-left:5px;margin-top:1px;' class='btn btn-purple btn-sm'  onclick="PrintHuitongAPI()">打印</button>
+                             <span id="print_result" style="color:blue;"></span>
+                                </td>
+                                
+                         
+                           
+                        </tr>
+                 
+                      
+                    </tbody>
+                </table>
+             
+
+
+
+
+
+        </div>
+        <iframe id="iframePrint_huitong" src="" style=" width:0; height:0; display:none;"></iframe>
+        <!-- 最早引入基本脚本 -->
+        <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+        <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+        <!-- ace 设置 -->
+        <script src="../resources/ace/js/ace.min.js"></script>
+        <script src="../resources/ace/js/ace-elements.min.js"></script>
+        <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+        <!--grid 控件-->
+        <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+        <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+        <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+        <!--[if lte IE 8]>
+        <script src="../resources/js/html5shiv.min.js"></script>
+        <script src="../resources/js/respond.min.js"></script>
+        <![endif]-->
+        <!--日历控件支持-->
+
+        <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+        <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+        <!--表单验证插件-->
+        <script src="../resources/js/jquery.validate.min.js"></script>
+        <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+        <!--开关插件-->
+        <script src="../resources/bootstrap-switch/bootstrap-switch.min.js"></script>
+        <!--弹出框插件-->
+        <script src="../resources/artDialog/dist/dialog-min.js"></script>
+        <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <script src="../resources/js/jquery.form.js"></script>
+        <script src="../resources/js/jquery.bigautocomplete.js"></script>
+        <script src="../resources/scripts/area.js"></script>
+        <script src="../resources/js/fuelux/fuelux.spinner.min.js"></script>
+        <script src="../resources/scripts/huitongNoAPI_Print.js"></script>
+        <script src="../resources/scripts/common.js"></script>
+
+</body>
+</html>

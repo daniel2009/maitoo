@@ -1,0 +1,64 @@
+package com.meitao.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.meitao.model.Storage;
+import com.meitao.model.StoragePosition;
+import com.meitao.model.StoragePositionRecord;
+import com.meitao.model.User;
+
+public interface StoragePositionDao {
+
+	int updateUseStoragePosition(StoragePosition storagePosition) throws Exception;
+
+	StoragePosition findById(@Param("id")String id) throws Exception;
+	
+	StoragePosition findByIdRelateId(@Param("id")String id, @Param("relateId")String relateId) throws Exception;
+
+	StoragePosition findNextEmptyStoragePositionByStorage(Storage storage) throws Exception;
+	
+	List<StoragePosition> findNextEmptyStoragePositionByStorageList(Storage storage) throws Exception;
+
+	StoragePosition findByStorageIdAndUserId(@Param("storageId")String storageId, @Param("userId")String userId) throws Exception;
+
+	StoragePosition findByNameAndPosition(StoragePosition storagePosition) throws Exception;
+
+	int insert(StoragePosition storagePosition) throws Exception;
+
+	int deleteByStorageId(@Param("storageId")String storageId) throws Exception;
+
+	List<StoragePosition> findNoPositionUserByStorage(@Param("storage")Storage storage, @Param("array")String[] stateArray) throws Exception;
+	StoragePosition findNoPositionRecordByStorageAndUser(@Param("storage")Storage storage, @Param("user")User user, @Param("array")String[] stateArray) throws Exception;
+
+	StoragePosition findStoragePositionByStorageAndRecord(@Param("storage")Storage storage, @Param("storagePositionRecord")StoragePositionRecord storagePositionRecord) throws Exception;
+
+	int countStoragePositionByUser(@Param("storagePosition")StoragePosition storagePosition, @Param("storage")Storage storage) throws Exception;
+	List<StoragePosition> findStoragePositionByUser(@Param("storagePosition")StoragePosition storagePosition, @Param("storage")Storage storage, @Param("firstResult")int firstResult, @Param("pageSize")int pageSize) throws Exception;
+
+	List<StoragePosition> findSamePackage(@Param("storage")Storage storage, @Param("relateId")String relateId) throws Exception;
+	
+	StoragePosition findStoragePositionByWarehouseIdAndTypeAndRelateIdRowCol(
+			@Param("warehouseId")String warehouseId,
+			@Param("type")String type,
+			@Param("typeRelateId")String typeRelateId,
+			@Param("storageId")String storageId,
+			@Param("colNumber")String colNumber,
+			@Param("rowNumber")String rowNumber) throws Exception;
+	StoragePosition findNextEmptyStoragePositionByWarehoseIdTypeRelate(
+			@Param("warehouseId")String warehouseId,
+			@Param("type")String type,
+			@Param("typeRelateId")String typeRelateId) throws Exception;
+	
+	
+	StoragePosition findStoragePositionByWarehoseIdTypeRelateUser(
+			@Param("warehouseId")String warehouseId,
+			@Param("type")String type,
+			@Param("typeRelateId")String typeRelateId,
+			@Param("userId")String userId
+			) throws Exception;
+
+
+
+}

@@ -1,0 +1,48 @@
+/* CSS Document */
+.list ._container{  width:1300px; position:relative; }
+.list h3{ height:60px; line-height:60px; font-size:42px; font-weight:normal; color:#f80a00; text-align:center; padding-bottom:34px; margin:10px 0; background:url(../img/icon_h3_bg.png) no-repeat center bottom;}
+.div_list{ width:1118px; height:340px; background:#FAF9F6; padding:15px 0; border:1px solid #ddd; margin:0 auto; overflow:hidden; position:relative;}
+.ul_list{ position:absolute; left:0;}
+.ul_list li{ width:260px; height:310px; border:1px solid #ddd; float:left; margin-left:14px; overflow:hidden; -webkit-transition:box-shadow 0.3s; -moz-transition:box-shadow 0.3s; transition:box-shadow 0.3s;}
+.ul_list li:hover{ box-shadow:0 0 3px #aaa,0 0 5px #aaa;}
+.ul_list img{ width:260px; height:260px;}
+.ul_list p{ font-size:16px; color:#000; padding:4px 8px 0;}
+.list .a_prev{ width:47px; height:80px; display:block; padding:3px; background: url(../img/icon_prev.png) no-repeat center center; position:absolute; left:0; top:50%;  z-index:100;}
+.list .a_prev:hover{  background:rgba(0,0,0,0.05) url(../img/icon_prev.png) no-repeat center center;  }
+.list .a_next{ width:47px; height:80px; display:block; padding:3px; background:url(../img/icon_next.png) no-repeat center center; position:absolute; right:0; top:50%;  z-index:100;}
+.list .a_next:hover{  background:rgba(0,0,0,0.05) url(../img/icon_next.png) no-repeat center center;  }
+.div_list .p_more{ width:100%; height:30px; line-height:30px; position:absolute; bottom:0; text-align:right;}
+.div_list .p_more a{ font-size:14px; color:#222; margin-right:20px;}
+
+.strategy h3{ height:60px; line-height:60px; font-size:42px; font-weight:normal; color:#f80a00; text-align:center; padding-bottom:34px; margin:10px 0; background:url(../img/icon_h3_bg.png) no-repeat center bottom;}
+.strategy_detail{ padding:10px 20px; border:1px solid #DEDEDE; background:#FAF9F6;}
+.strategy_detail p{ font-size:20px; line-height:34px; color:#000;}
+.strategy_detail p:last-of-type a{ float:right; color:#222;}
+.strategy_detail p:last-of-type a:hover{ color:#f80a00; text-decoration:underline;}
+
+.info{ margin-top:10px;}
+.info h3{ height:60px; line-height:60px; font-size:42px; font-weight:normal; color:#f80a00; text-align:center; padding-bottom:34px; margin-bottom:10px; background:url(../img/icon_h3_bg.png) no-repeat center bottom;}
+.ul_tabs{ width:100%;  background:#535353; height:50px; overflow:hidden;}
+.ul_tabs li{ height:50px; float:left;}
+.ul_tabs li:last-of-type{ width:143px; margin-right:0;}
+.ul_tabs li.active{ background:#f80a00;}
+.ul_tabs a{ padding:0 23px; line-height:50px; text-align:center; display:block;  color:#fff; font-size:21px; -webkit-transition:color 0.3s; -moz-transition:color 0.3s; transition:color 0.3s;}
+.ul_tabs a:hover{ color:#f80a00;}
+.ul_tabs li.active a:hover{ color:#fff;}
+
+.ul_info{ margin-top:21px;}
+.ul_info li{ width:250px; padding:6px 6px 15px; border:1px solid #ccc; box-shadow:0 0 3px #999; float:left; margin:0 21px 21px 0; }
+.ul_info li:nth-of-type(4n){margin-right:0;}
+.ul_info img{ width:100%;}
+.ul_info h5{ color:#222; font-size:20px; line-height:32px; font-weight:normal;}
+.ul_info p{ color:#f60b01; font-size:20px; line-height:32px;}
+.info_func p{ float:left;}
+.info_func p a{ width:20px; height:30px; padding-left:26px; display:inline-block; color:#000; margin-right:4px; font-size:16px;}
+.info_func p a:nth-of-type(1){ background:url(../img/icon_shared.png) no-repeat left center/22px 18px;}
+.info_func p a:nth-of-type(1):hover{ -webkit-animation:scale 1s 1; -moz-animation:scale 1s 1; animation:scale 1s 1;}
+.info_func p a:nth-of-type(2){ background:url(../img/icon_store.png) no-repeat left center/24px 24px;}
+.info_func p a:nth-of-type(2):hover{ -webkit-animation:scale 1s 1; -moz-animation:scale 1s 1; animation:scale 1s 1;}
+.info_func p a:nth-of-type(3){ background:url(../img/icon_msg.png) no-repeat left center/20px 20px;}
+.info_func p a:nth-of-type(3):hover{ -webkit-animation:scale 1s 1; -moz-animation:scale 1s 1; animation:scale 1s 1;}
+.info_func>a:nth-of-type(1){ height:26px; line-height:26px; padding:0 10px; margin-top:4px; border-radius:4px; display:inline-block; background:#f80a00; color:#fff; font-size:16px; float:right;}
+.info_func>a:nth-of-type(1):hover{ -webkit-animation:scale 1s 1; -moz-animation:scale 1s 1; animation:scale 1s 1; }

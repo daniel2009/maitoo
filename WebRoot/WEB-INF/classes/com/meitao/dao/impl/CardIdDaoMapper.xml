@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.CardIdDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.CardId">
+		<id column="id" property="id" javaType="String" />
+		<result column="cname" property="cname" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="province" property="province" javaType="String" />
+		<result column="city" property="city" javaType="String" />
+		<result column="dist" property="dist" javaType="String" />
+		<result column="address" property="address" javaType="String" />
+		<result column="card_id" property="cardid" javaType="String" />
+		
+	</resultMap>
+
+
+
+
+	<insert id="insertcaridinfo" parameterType="com.meitao.model.CardId"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		cardid(cname,create_date,modify_date,province,city,dist,address,card_id)
+		values(#{cname},#{createDate},#{modifyDate},#{province},#{city},#{dist},#{address},#{cardid})
+	</insert>
+	<select id="countbycardid" resultType="java.lang.Integer">
+		select count(distinct `cardid`.`id`) 
+		from `cardid`
+		where `card_id`=#{cardid} 
+	</select>
+	
+	
+	<select id="getcardidbyname" resultMap="basic_result_map">
+		select `cardid`.* 
+		from `cardid`
+		where `cname`=#{cname}
+	</select>
+	
+</mapper>

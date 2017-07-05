@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.Morder_TorderDao">
+	<resultMap id="basic_result_map" type="com.meitao.model.Morder_Torder">
+		<id column="id" property="id" javaType="String" />
+		<result column="order_id" property="orderId" javaType="String" />
+		<result column="t_orderId" property="torderId" javaType="String" />
+		<result column="date" property="date" javaType="String" />
+		
+		
+		
+	</resultMap>
+
+	<insert id="insert" parameterType="com.meitao.model.Morder_Torder" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		morder_torder(order_id,t_orderId,date)
+		values(#{orderId},#{torderId},#{date})
+	</insert>
+
+	
+	<select id="getById" resultMap="basic_result_map">
+		select morder_torder.* from morder_torder 
+		where id=#{id}
+	</select>
+	
+	<select id="getorderIds" resultType="java.lang.String">
+		select morder_torder.order_id from morder_torder 
+		where t_orderId=#{torderId}
+	</select>
+		
+	<select id="gettorderIds" resultType="java.lang.String">
+		select morder_torder.t_orderId from morder_torder 
+		where order_id=#{orderId}
+	</select>
+	
+	<delete id="deletebyorderId">
+		delete from morder_torder where order_id=#{orderId}
+	</delete>
+	
+	<delete id="deletebytorderId">
+		delete from morder_torder where t_orderId=#{torderId}
+	</delete>
+			
+</mapper>

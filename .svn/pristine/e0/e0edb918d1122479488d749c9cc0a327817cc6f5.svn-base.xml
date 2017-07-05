@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.ProductRecordDao">
+	<resultMap id="basic_result_map" type="com.weiye.model.ProductRecord">
+		<id column="id" property="id" javaType="String" />
+		<result column="product_id" property="productId" javaType="String"/>
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="quantity" property="quantity" javaType="String" />
+		<result column="date" property="date" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="emp_remark" property="empRemark" javaType="String" />
+		<result column="rate" property="rate" javaType="String" />
+		<result column="comment" property="comment" javaType="String" />
+		<result column="comment_date" property="commentDate" javaType="String" />
+		<result column="user_name" property="userName" javaType="String"/>
+		<result column="user_phone" property="userPhone" javaType="String"/>
+		<result column="c_name" property="cName" javaType="String"/>
+		<result column="c_phone" property="cPhone" javaType="String"/>
+		<result column="c_address" property="cAddress" javaType="String"/>
+		<result column="c_zip_code" property="cZipCode" javaType="String"/>
+		<result column="c_card_id" property="cCardId" javaType="String"/>
+		<result column="c_id_card_pic" property="cIdCardPic" javaType="String"/>
+		<result column="c_id_card_other_pic" property="cIdCardOtherPic" javaType="String"/>
+		<result column="c_id_card_together_pic" property="cIdCardTogetherPic" javaType="String"/>
+		<association property="product" javaType="com.weiye.model.Product">
+			<result property="name" column="product_name" javaType="String"/>
+			<result property="currency" column="product_currency" javaType="String"/>
+			<result property="price" column="product_price" javaType="String"/>
+		</association>
+	</resultMap>
+	<resultMap id="full_info_result_map" type="com.weiye.model.ProductRecord">
+		<id column="id" property="id" javaType="String" />
+		<result column="product_id" property="productId" javaType="String"/>
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="quantity" property="quantity" javaType="String" />
+		<result column="date" property="date" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="emp_remark" property="empRemark" javaType="String" />
+		<result column="rate" property="rate" javaType="String" />
+		<result column="comment" property="comment" javaType="String" />
+		<result column="comment_date" property="commentDate" javaType="String" />
+		<result column="user_name" property="userName" javaType="String"/>
+		<result column="user_phone" property="userPhone" javaType="String"/>
+		<result column="c_name" property="cName" javaType="String"/>
+		<result column="c_phone" property="cPhone" javaType="String"/>
+		<result column="c_address" property="cAddress" javaType="String"/>
+		<result column="c_zip_code" property="cZipCode" javaType="String"/>
+		<result column="c_card_id" property="cCardId" javaType="String"/>
+		<result column="c_id_card_pic" property="cIdCardPic" javaType="String"/>
+		<result column="c_id_card_other_pic" property="cIdCardOtherPic" javaType="String"/>
+		<result column="c_id_card_together_pic" property="cIdCardTogetherPic" javaType="String"/>
+		<association property="product" column="product_id" select="com.weiye.dao.ProductDao.findById"></association>
+	</resultMap>
+	<insert id="insert">
+		INSERT INTO product_record(product_id, user_id, quantity, date, state, remark, 
+			c_name, c_phone, c_address, c_zip_code, c_card_id, c_id_card_pic, c_id_card_other_pic, c_id_card_together_pic) 
+		VALUES(#{productId}, #{userId}, #{quantity}, #{date}, #{state}, #{remark},
+			#{cName}, #{cPhone}, #{cAddress}, #{cZipCode}, #{cCardId}, #{cIdCardPic}, #{cIdCardOtherPic}, #{cIdCardTogetherPic})
+	</insert>
+	<delete id="delete">
+		DELETE FROM product_record WHERE id=#{id}
+	</delete>
+	<update id="updateComment">
+		UPDATE product_record SET rate=#{rate}, comment=#{comment}, comment_date=#{commentDate} WHERE id=#{id}
+	</update>
+	<update id="updateByUser">
+		UPDATE product_record SET state=#{state}, quantity=#{quantity}, remark=#{remark}, date=#{date},
+			c_name=#{cName}, c_phone=#{cPhone}, c_address=#{cAddress}, c_zip_code=#{cZipCode}, c_card_id=#{cCardId}, c_id_card_pic=#{cIdCardPic}, c_id_card_other_pic=#{cIdCardOtherPic}, c_id_card_together_pic=#{cIdCardTogetherPic}
+		WHERE id=#{id}
+	</update>
+	<update id="updateStateByAdmin">
+		UPDATE product_record SET state=#{state}, emp_remark=#{empRemark} WHERE id=#{id}
+	</update>
+	<update id="updateState">
+		UPDATE product_record SET state=#{state} WHERE id=#{id}
+	</update>
+	<select id="countByKey" resultType="java.lang.Integer">
+		SELECT COUNT(r.id) FROM product_record r
+			LEFT JOIN product p ON p.id=r.product_id
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="productRecord.productId!=null and productRecord.productId!=''"> 
+				AND r.product_id=#{productRecord.productId}
+			</if>
+			<if test="productRecord.state!=null and productRecord.state!=''"> 
+				AND r.state=#{productRecord.state}
+			</if>
+			<if test="dateStart!=null and dateStart!=''">
+				AND r.date <![CDATA[>=]]> #{dateStart}
+			</if>
+			<if test="dateEnd!=null and dateEnd!=''">
+				AND r.date <![CDATA[<=]]> #{dateEnd}
+			</if>
+			<if test="productRecord.userId!=null and productRecord.userId!=''"> 
+				AND r.user_id=#{productRecord.userId}
+			</if>
+			<if test="productRecord.remark!=null and productRecord.remark!=''"> 
+				AND (r.remark LIKE #{productRecord.remark} OR p.name LIKE #{productRecord.remark})
+			</if>
+		</trim>
+	</select>
+	<select id="findByKey" resultMap="basic_result_map">
+		SELECT r.*, p.name AS product_name, p.currency AS product_currency, p.price AS product_price, u.real_name AS user_name FROM product_record r
+			LEFT JOIN product p ON p.id=r.product_id
+			LEFT JOIN users u ON u.id=r.user_id
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="productRecord.productId!=null and productRecord.productId!=''"> 
+				AND r.product_id=#{productRecord.productId}
+			</if>
+			<if test="productRecord.state!=null and productRecord.state!=''"> 
+				AND r.state=#{productRecord.state}
+			</if>
+			<if test="dateStart!=null and dateStart!=''">
+				AND r.date <![CDATA[>=]]> #{dateStart}
+			</if>
+			<if test="dateEnd!=null and dateEnd!=''">
+				AND r.date <![CDATA[<=]]> #{dateEnd}
+			</if>
+			<if test="productRecord.userId!=null and productRecord.userId!=''"> 
+				AND r.user_id=#{productRecord.userId}
+			</if>
+			<if test="productRecord.remark!=null and productRecord.remark!=''"> 
+				AND (r.remark LIKE #{productRecord.remark} OR p.name LIKE #{productRecord.remark})
+			</if>
+		</trim>
+		ORDER BY r.date DESC
+		LIMIT #{firstResult}, #{pageSize}
+	</select>
+	<select id="countByKeyAndWithComment" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM product_record r
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="productRecord.productId!=null and productRecord.productId!=''"> 
+				AND r.product_id=#{productRecord.productId}
+			</if>
+			<if test="productRecord.state!=null and productRecord.state!=''"> 
+				AND r.state=#{productRecord.state}
+			</if>
+			<if test="dateStart!=null and dateStart!=''">
+				AND r.date <![CDATA[>=]]> #{dateStart}
+			</if>
+			<if test="dateEnd!=null and dateEnd!=''">
+				AND r.date <![CDATA[<=]]> #{dateEnd}
+			</if>
+			<if test="productRecord.userId!=null and productRecord.userId!=''"> 
+				AND r.user_id=#{productRecord.userId}
+			</if>
+			AND r.comment IS NOT NULL 
+		</trim>
+	</select>
+	<select id="findByKeyAndWithComment" resultMap="basic_result_map">
+		SELECT r.*, p.name AS product_name, p.currency AS product_currency, p.price AS product_price, u.real_name AS user_name FROM product_record r
+			LEFT JOIN product p ON p.id=r.product_id
+			LEFT JOIN users u ON u.id=r.user_id
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="productRecord.productId!=null and productRecord.productId!=''"> 
+				AND r.product_id=#{productRecord.productId}
+			</if>
+			<if test="productRecord.state!=null and productRecord.state!=''"> 
+				AND r.state=#{productRecord.state}
+			</if>
+			<if test="dateStart!=null and dateStart!=''">
+				AND r.date <![CDATA[>=]]> #{dateStart}
+			</if>
+			<if test="dateEnd!=null and dateEnd!=''">
+				AND r.date <![CDATA[<=]]> #{dateEnd}
+			</if>
+			<if test="productRecord.userId!=null and productRecord.userId!=''"> 
+				AND r.user_id=#{productRecord.userId}
+			</if>
+			AND r.comment IS NOT NULL
+		</trim> 
+		ORDER BY r.date DESC
+		LIMIT #{firstResult}, #{pageSize}
+	</select>
+	<select id="findById" resultMap="full_info_result_map">
+		SELECT r.*, u.real_name AS user_name FROM product_record r 
+			LEFT JOIN product p ON p.id=r.product_id
+			LEFT JOIN users u ON u.id=r.user_id
+		WHERE r.id=#{id}
+	</select>
+	<select id="countPurchase" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM product_record WHERE product_id=#{id} AND state=2 
+	</select>
+</mapper>

@@ -1,0 +1,241 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">商品记录信息
+			<a  href="#" onclick="javascript: navProductRecordClick();">返回列表</a>
+		</p>
+		<div class="box_content">
+			<div class="content_title">商品记录信息</div>
+			<div class="content_text">
+				<div class="tab-content">
+					<input type="hidden" id="globalUsd2Rmb">
+			            <fieldset>
+							<input type="hidden" id="productRecordId" name="productRecordId">
+							<input type="hidden" id="productIdHidden" name="productId">
+							<input type="hidden" id="currencyHidden" name="currency" value="USD">
+			            	<input type="hidden" id="priceHidden" name="price" value="-999999">
+							<hr/>
+							<article style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+								<label class="center">商品信息：</label>
+								<div style="flex-basis: 100%;">
+									<label style="display: inline;">名称：</label>
+									<label id="productName"></label>
+								</div>
+								<div style="flex-basis: 300px;">
+									<label style="display: inline;">类型：</label>
+									<label id="productTypeName"></label>
+								</div>
+								<div style="flex-basis: 100%;"></div>
+								<div style="flex-basis: 100%;">
+									<label style="display: inline;">价格查看：</label>
+					            		<select style="display: inline;" id="currencySelect" onchange="javascript: changeCurrency(this.value);">
+					            			<option value="RMB">RMB</option>
+					            			<option value="USD">USD</option>
+					            		</select>
+					            	<label style="display: inline;" id="productPrice"></label>(价格会因运费等原因有所变动)
+								</div>
+								<div style="flex-basis: 300px;">
+									<label style="display: inline;">剩余：</label>
+									<label id="productQuantity"></label>
+								</div>
+								<div style="flex-basis: 100%;">
+									<label style="display: inline;">详情：</label>
+									<label id="productDescription"></label>
+								</div>
+								<div style="flex-basis: 500px;">
+									<label style="display: inline;">图片：</label>
+									<img id="productPic1">
+								</div>
+								<div style="flex-basis: 500px;">
+									<label style="display: inline;">图片：</label>
+									<img id="productPic2">
+								</div>
+								<div style="flex-basis: 500px;">
+									<label style="display: inline;">图片：</label>
+									<img id="productPic3">
+								</div>
+							</article>
+							<hr/>
+			            	<article style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+								<label class="center">购买信息</label>
+								<div style="flex-basis: 100%;"></div>
+								<div style="flex-basis: 300px;">
+									<label style="display: inline;">购买状态：</label>
+									<label id="state"></label>
+								</div>
+								<div style="flex-basis: 300px;">
+									<label style="display: inline;">购买日期：</label>
+									<label id="date"></label>
+								</div>
+								<div style="flex-basis: 100%;">
+									<label style="display: inline;">反馈信息：</label>
+					            	<label style="display: inline;" id="empRemark"></label>
+								</div>
+								<form id="form" style="flex-basis: 100%; display: flex; flex-wrap: wrap;">
+								<div style="flex-basis: 300px;">
+									<label style="display: inline;">评价：</label>
+									<label id="rate" style="display: inline;"></label>
+									<select id="rateSelect" name="rate"><option value="1">*</option><option value="2">**</option><option value="3">***</option><option value="4">****</option><option value="5">*****</option></select>
+								</div>
+								<div style="flex-basis: 300px;">
+									<label style="display: inline;">评论日期：</label>
+									<label id="commentDate" style="display: inline;"></label>
+								</div>
+								<div style="flex-basis: 100%;">
+									<label style="display: inline;">评论：</label>
+									<label id="comment" style="display: inline;"></label>
+									<textarea id="commentTextarea" name="comment" style="width: 95%;"></textarea>
+								</div>
+								</form>
+							</article>
+				            <div style="margin-left: 50px;">
+				              <input class="button" type="button" id="button" value="提交" onclick="javascript: updateComment();" />
+				              <!-- <input id="bt_add_news_reset" class="button" type="reset" value="重置"/> -->
+				            </div>
+			            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		        </div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function(){
+		$("#productRecordId").val(window.sessionStorage.getItem("productRecordId"));
+		window.sessionStorage.clear();
+		loadProduct();
+		
+		$.ajax({
+			type : "get",
+			url : "../user/get_self",
+			success : function(response){
+				if("200" == response.code){
+					$("#userIdHidden").val(response.data.id);
+					$("#fromUserPhone").html(response.data.phone);
+					$("#fromUserRealName").html(response.data.real_name);
+				}else{
+					alert("获取商品失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function loadProduct(){
+		$.ajax({
+			type : "post",
+			url : "../user/productRecord/findById",
+			data : {id : $("#productRecordId").val()},
+			success : function(response){
+				if("200" == response.code){
+					var product = response.data.product;
+					$("#productName").html(product.name);
+					$("#productTypeName").html(product.typeName);
+					var price = product.price;
+					if(price == "" || price == -999999){
+						price = "<span style='color: #f00;'>待定</span>";
+					}
+					$("#productPrice").html(price);
+					$("#productIdHidden").val(response.data.productId);
+					$("#priceHidden").val(product.price);
+					$("#currencyHidden").val(product.currency);
+					$("#productQuantity").html(product.quantity);
+					$("#productDescription").html(product.description);
+					$("#productPic1").attr("src", "../"+product.pic1);
+					$("#productPic2").attr("src", "../"+product.pic2);
+					$("#productPic3").attr("src", "../"+product.pic3);
+					$("#quantity").attr("max", product.quantity);
+					$("#quantity").val(response.data.quantity);
+					loadGlobalArgs();
+					clearWrongImg();
+					var state = "用户下单";
+		            if(response.data.state == "1"){
+		            	state = "有问题";
+		            }else if(response.data.state == "2"){
+		            	state = "完成";
+		            }
+					$("#state").html(state);
+					$("#date").html(response.data.date);
+					$("#empRemark").html(response.data.empRemark);
+					if(response.data.commentDate == null || response.data.commentDate == ""){
+						
+					}else{
+						$("#rate").html(response.data.rate);
+						$("#comment").html(response.data.comment);
+						$("#commentDate").html(response.data.commentDate);
+						$("#rateSelect").css("display", "none");
+						$("#commentTextarea").css("display", "none");
+						$("#button").css("display", "none");
+					}
+				}else{
+					alert("获取商品记录失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function updateComment(){
+		var formData = new FormData(document.getElementById("form"));
+		formData.append("id", $("#productRecordId").val());
+		$.ajax({
+			type: "post",
+			url: "../user/productRecord/updateComment",
+			data : formData,
+			processData : false,
+			contentType : false,
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var remark = "";
+					if($("input[name=price]").val()=="-999999"){
+						remark = ",未检测到合适价格，该商品将由管理员重新设置价格";
+					}
+					alert("更新成功" + remark);
+					navProductRecordClick();
+				}else{
+					alert("添加失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function loadGlobalArgs(){
+		$.ajax({
+   			type: "get",
+   			url: "../globalargs/getcontents",
+   			data : {"flags" : "cur_usa_cn"},
+   			success: function(response){
+   				if("200" == response.code){
+   					$("#globalUsd2Rmb").val(response.data);
+   					$("#currencySelect").val("RMB");
+					changeCurrency("RMB");
+   				}
+   			}
+		});
+    }
+	function changeCurrency(currency){
+		var priceOriginal = $("#priceHidden").val();
+		var currencyOriginal = $("#currencyHidden").val();
+		var rate = 1;
+		if(currency!=currencyOriginal){
+			if("RMB" == currency){
+				if("USD"==currencyOriginal){
+					rate = $("#globalUsd2Rmb").val();
+				}
+			}
+			if("USD" == currency){
+				if("RMB"==currencyOriginal){
+					rate = 1/($("#globalUsd2Rmb").val());
+				}
+			}
+		}
+		if(priceOriginal == -999999){
+			$("#productPrice").html("未检测到价格");
+		}else{
+			$("#productPrice").html((priceOriginal * rate).toFixed(2));
+		}
+	}
+</script>
+</html>

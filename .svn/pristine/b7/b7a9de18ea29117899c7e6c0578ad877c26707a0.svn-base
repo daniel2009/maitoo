@@ -1,0 +1,266 @@
+﻿
+
+
+//kai 20150911-1 modify
+//js获取项目根路径，如： http://localhost:8083/uimcardprj
+base_url_set_has_sub = false;
+function getRootPath() {
+	// 获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+	var curWwwPath = window.document.location.href;
+	// 获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+	var pathName = window.document.location.pathname;
+	var pos = curWwwPath.indexOf(pathName);
+	// 获取主机地址，如： http://localhost:8083
+	var localhostPaht = curWwwPath.substring(0, pos);
+	// 获取带"/"的项目名，如：/uimcardprj
+	var projectName = pathName
+			.substring(0, pathName.substr(1).indexOf('/') + 1);
+	
+	if(base_url_set_has_sub==true)
+	{
+		return (localhostPaht + projectName);
+	}
+	else
+	{
+		return localhostPaht;
+	}
+}
+/*
+ * 初始化航班信息入口
+ * */
+function init_printsea()
+{
+	loadFirstSeaprintList();
+	
+
+	//点击创建批次
+	$("#createprintseano").click(function() {
+		
+		if($("#createprintseano").attr("state")=="close")
+		{
+			$("#createprintseano").attr("state","open");
+			$("#createprintseano").attr("style","width: 230px;height: 30px;font-size: 18px;background-color:green;");
+			$("#showcreatefly").attr("style","");
+		}
+		else
+		{
+			/*$("#createflyid").attr("state","close");
+			$("#createflyid").attr("style","width: 230px;height: 30px;font-size: 18px;background-color:pink;");
+			$("#showcreatefly").attr("style","display:none;");*/
+			
+			var create_fly_no = $(":text[name='create_fly_no']").val();
+			//var fly_state = $("select[name='fly_state']").val();
+			var fly_remark = $("textarea[name='fly_remark']").val();
+			if(create_fly_no=="")
+			{
+				alert("批次号不能为空!");
+				return;
+			}
+			//alert(create_fly_no);
+			$.ajax({
+				type : "post",
+				url : admin_seaprintcreate_add_url,
+				data : {
+					seaprintno : create_fly_no,
+					remark : fly_remark
+				},
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("添加成功");
+						$("#main-content").load(admin_sea_create_page_url);
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("添加失败，失败原因是:" + response.message);
+					}
+				}
+			});
+			
+		}
+		return false;
+	});
+	$(":submit[name='searchSub']").click(function() {
+		//alert("22222");
+				var oid = $(":text[name='search_flyinfo_no']").val();
+								
+				$(":hidden[name='seaprintno']").val(oid);
+				loadSeaprintlist(oid,"1");
+				
+				return false;
+			});
+}
+function loadFirstSeaprintList() {
+	loadSeaprintlist("","1");
+}
+function loadSeaprintlist(seaprintno,pn) {
+
+	$(":hidden[name='pn']").val(pn);
+	$(":hidden[name='seaprintno']").val(seaprintno);
+
+	$.ajax({
+		type : "post",
+		url : admin_seaprint_list_url,
+		data : {
+			seaprintno:seaprintno,
+			pageIndex : pn
+		},
+		success : function(response) {
+			var code = response.code;
+
+			if ("200" == code) {
+				if (response.data == null) {
+					showSeaprintList(null);
+					showSeaprintLink(null);
+				} else {
+
+					showSeaprintList(response.data.datas);
+					showSeaprintLink(response.data);
+				}
+				//afterLoadOrderList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='8'>"
+						+ "<span>&nbsp;&nbsp;获取批次列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+
+	});
+}
+
+function showSeaprintList(list) {
+
+	var str = "";
+
+	if (list != null) {
+
+		$.each(list, function() {
+			
+			str += "<tr id='" + this.id + "'>";
+			
+			str +='<td id="seaprint_id">'+this.id + '</td>';
+			str +='<td id="seaprintno">'+this.seaprintno+'</td>';
+			str +='<td id="remark">'+this.remark+'</td>';
+			
+			str +='<td>'+this.warehouseName + '</td>';
+			str +='<td>'+this.pordersno + '</td>';
+			
+			str +='<td>'+this.createDate + '</td>';
+			str +='<td>'+this.modifyDate + '</td>';
+			
+			str += "<td id='" + this.id + "'><a href='" + this.id
+			+ "' name='a_seaprint_modify_link'>修改</a> | <a href='" + this.id
+		+ "' name='a_seaprint_del_link'>删除</a></td>";
+
+			str += "</tr>";
+		});
+
+	} else {
+		if (str == null || str == '') {
+			str = "<td style='text-align: left;' colspan='8'>"
+					+ "<span>&nbsp;&nbsp;没有符合您查找要求的批次信息!</span></td>";
+		}
+	}
+
+	$("#u520 table tbody").html(str);
+	
+	$("a[name='a_seaprint_modify_link']").click(function() {
+		var oid = $(this).attr("href");	
+		
+		$.ajax({
+			type : "post",
+			url : admin_seaprint_get_one_url,
+			data : {
+				id : oid
+			},
+			success : function(response) {
+				var code = response.code;
+				//alert(code);
+				if (code == "200") {
+					//alert("修改成功");
+					$("#main-content").load(admin_seaprint_one_page_url+"?id="+oid);
+				} else if (code == "607") {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("修改失败，失败原因是:" + response.message);
+				}
+			}
+		});
+
+		return false;
+	});
+	$("a[name='a_seaprint_del_link']").click(function() {
+		var id = $(this).attr("href");	
+		if (confirm("你是否确定删除此批次信息？ 如果删除，相关联的运单也会被删除。"))
+		{
+			$.ajax({
+				type : "post",
+				url : admin_seaprint_del_url,
+				data : {
+					id : id
+				},
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("删除成功");
+						$("#main-content").load(admin_sea_create_page_url);
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("删除失败，失败原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	});
+	
+}
+
+function showSeaprintLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .bulk-actions").show();
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			
+			
+			var seaprintno=$(":hidden[name='seaprintno']").val();
+			loadSeaprintlist(seaprintno,pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var seaprintno=$(":hidden[name='seaprintno']").val();
+					loadSeaprintlist(seaprintno,pn);
+					
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .bulk-actions").hide();
+		$("tfoot .pagination").html("");
+	}
+}
+

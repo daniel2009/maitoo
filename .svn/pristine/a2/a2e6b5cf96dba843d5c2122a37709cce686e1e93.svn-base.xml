@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<Mapper namespace="com.weiye.dao.NewsDao">
+	<resultMap id="basic_result_map"  type="com.weiye.mode.News">
+		<id column="id" property="id" javaType="String" />
+		<result column="title" property="title" javaType="String" />
+		<result column="content" property="content" javaType="String" />
+		<result column="releaseTime" property="releaseTime" javaType="Date"/>
+		<result column="viewCount" property="viewCount" javaType="Date"/>
+		<result column="author" property="author" javaType="String"/>
+		<result column="tag" property="tag" javaType="String"/>
+		<result column="img" property="img" javaType="String"/>
+	</resultMap>
+	<select id="searchNewsByKey" resultMap="basic_result_map">
+		select news.*
+		from news 
+	</select>
+	<select id="retrieveNewsById" resultMap="basic_result_map">
+		select news.*
+		from news where news.id=#{id}
+	</select>
+	<insert id="insertNews" parameterType="com.weiye.model.News">
+		insert into
+		news(title,content,author,releasetime,viewcount,tag,img)
+		values(#{title},#{content},#{author},#{releasetime},#{viewcount},#{tag},#{img}})
+	</insert>
+	<update id="updateNews" parameterType="com.weiye.model.News">
+		update news
+		set
+		title=#{title,jdbcType=VARCHAR} ,
+		content=#{content,jdbcType=VARCHAR},
+		releasetime=#{releasetime,jdbcType=DATETIME},
+		author=#{author,jdbcType=VARCHAR},
+		viewcount=#{viewcount,jdbcType=VARCHAR},
+		author=#{author,jdbcType=VARCHAR},
+		tag=#{tag,jdbcType=VARCHAR},
+		img=#{img,jdbcType=VARCHAR}
+		where id=#{id}
+	</update>
+</Mapper>

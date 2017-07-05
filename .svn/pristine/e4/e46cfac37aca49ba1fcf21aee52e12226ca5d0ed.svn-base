@@ -1,0 +1,44 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+    pageEncoding="utf-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/md5.js"></script>
+<title>快递访问电商</title>
+</head>
+<body>
+<!-- 这里的userName和email是session中保存的key constatnt这个类中  -->
+<input type="hidden" id="s_username" value="${user_email_session_key }"/>
+<input type="hidden" id="s_email" value="${user_email_session_key }"> 
+<a href="#" onclick="rds(this);"target="_blank">电商网站</a>
+</body>
+<script type="text/javascript">
+	function rds(a) {
+		// 注意，由于密码是加密的，就是传递过去也没有办法解密的。
+		// 从session中获取要传递的会员信息，好像可以获取到用户名，邮箱，密码和会员类型。这些信息可以直接先保存在页面中
+		// 如果还要获取更多的会员信息，那么就不直接在这里调用一个后台的获取会员信息的接口，这个接口一起就有，你可以查一下，在前台的那个用户信息那个页面中有调用。
+		// 1、获取username
+		var name = $("#s_username").val();
+		// 2、获取email
+		var email =$("#s_email").val();
+		// 3、获取时间戳
+		var time = new Date().getTime();
+		// 4、产生一个key，如果不是动态的就自己写js的方法实现。
+		var akey = 'yuejiaPsF1257';
+		//$SinKey=md5('username=name&stime=time&key=akey');
+		//var url = $(a).attr("href");
+		var str= "username="+name+"&stime="+time+"&key="+akey;
+		var sinKey=hex_md5(str);
+		//alert(time);
+		var url = $(a).attr("href");
+		 //var params = "?username=" + escape(username) + "&time=" + escape(stime) + "&sinKey=" + escape(sinKey);
+		var params = "?username=" + name + "&stime=" + time + "&sinkey=" + sinKey;
+		alert(params);
+		url = url + params;
+		$(a).attr("href",url);
+	}
+	
+</script>
+</html>

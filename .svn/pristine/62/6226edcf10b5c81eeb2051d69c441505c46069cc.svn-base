@@ -1,0 +1,161 @@
+﻿<%@ page language="java"  import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+
+	<body>
+	
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">上门取件详情</p>
+
+		<div class="box_content">
+			<div class="content_title">上门取件详情</div>
+			<div class="content_text">
+	
+				<div class="tab-content default-tab" id="tab1">
+					<table>
+						<tr>
+							<th>寄件人：</th>
+							<td><label id="sNameInfo"></label></td>
+						</tr>
+						<tr>
+							<th>预约时间：</th>
+							<td><label id="appointmentDateInfo"></label></td>
+						</tr>
+						<tr>
+							<th>上门门店：</th>
+							<td><label id="warehouseNameInfo"></label></td>
+						</tr>
+						<tr>
+							<th>寄件人国家、州：</th>
+							<td><label id="sProviceInfo"></label></td>
+						</tr>
+						<tr>
+							<th>寄件详细地址：</th>
+							<td><label id="sStreetAddressInfo" ></label></td>
+						</tr>
+						<tr>
+							<th>寄件人邮编：</th>
+							<td><label id="sZipCodeInfo"></label></td>
+						</tr>
+						<tr>
+							<th>寄件人手机：</th>
+							<td><label id="sPhoneInfo"></label></td>
+						</tr>
+						<tr>
+							<th>包裹个数：</th>
+							<td><label id="quantityInfo"></label></td>
+						</tr>
+						<tr>
+							<th>货物大概重量(磅)：</th>
+							<td><label id="weightInfo"></label></td>
+						</tr>
+						<tr>
+							<th>备注：</th>
+							<td><label id="remarkInfo"></label></td>
+						</tr>
+						<tr>
+							<th>创建日期：</th>
+							<td><label id="createDateInfo"></label></td>
+						</tr>
+						<tr>
+							<th>更新日期：</th>
+							<td><label id="modifyDateInfo"></label></td>
+						</tr>
+						<tr>
+							<th>确认日期：</th>
+							<td><input type="datetime-local" style="width: 200px;" id="confirmDate" name="confirmDate" form="form"></td>
+						</tr>
+						<tr>
+							<th>审核结果：</th>
+							<td><select id="state" name="state" form="form"><option value="0">未处理</option><option value="1">已处理</option><option value="2">有问题</option></select></td>
+						</tr>
+						<tr>
+							<th></th>
+							<td><input type="button" id="submitButton" value="提交" onclick="auditCallOrder();"></td>
+						</tr>
+					</table>
+					<form id="form"><input type="hidden" id="id" name="id" ></form>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		var sessionStorage = window.sessionStorage;
+		var id = sessionStorage.getItem("callOrderId");
+		document.getElementById("id").value = id;
+		sessionStorage.removeItem("callOrderId");
+		$.ajax({
+			type: "get",
+			url: "../admin/callOrder/findById",
+			data: {
+				id:id
+			},
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var data = response.data;
+					if(data != null){
+						$("#sNameInfo").html(data.sName);
+						$("#appointmentDateInfo").html(transformInputDatetimeLocal(data.appointmentDate));
+						$("#warehouseNameInfo").html(data.warehouseName);
+						$("#sProviceInfo").html(data.sProvince + data.sCity);
+						$("#sStreetAddressInfo").html(data.sStreetAddress);
+						$("#sZipCodeInfo").html(data.sZipCode);
+						$("#sPhoneInfo").html(data.sPhone);
+						$("#quantityInfo").html(data.quantity);
+						$("#weightInfo").html(data.weight);
+						$("#remarkInfo").html(data.remark);
+						$("#createDateInfo").html(data.createDate);
+						$("#modifyDateInfo").html(data.modifyDate);
+						if(data.state=="1"){
+							$("#confirmDate").val(data.confirmDate);
+							document.getElementById("confirmDate").readOnly = true;
+							document.getElementById("state").disabled = true;
+							$("#state").val(data.state);
+							document.getElementById("submitButton").disabled = true;
+							document.getElementById("submitButton").hidden = true;
+						}
+					}
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("获取信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function auditCallOrder(){
+		var httpRequest = new XMLHttpRequest();
+		var url = "../admin/callOrder/audit";
+		httpRequest.onreadystatechange = function(){
+			if(4 == httpRequest.readyState){
+				if(200 == httpRequest.status){
+					var response = eval("(" + httpRequest.responseText + ")");
+					var code = response.code;
+					if("200" == code){
+						alert("审核成功");
+						nav58Click();
+					}else if("607" == code){
+						alert("您尚未登录或登录已失效！");
+						logout();
+					}else{
+						alert("审核上门取件列表数据失败，原因是:" + response.message);
+					}
+					return false;
+				}
+			}
+		};
+		httpRequest.open("post", url, true);
+		httpRequest.send(new FormData(document.getElementById("form")));
+		return false;
+	}
+</script>
+</html>

@@ -1,0 +1,284 @@
+﻿<%@ page language="java" contentType="text/html; charset=utf-8"
+    pageEncoding="utf-8"%>
+  		<!--==============================header=================================-->
+ 		<div class="header-block clearfix">
+	<!-- open close panel -->
+	<!-- 
+	<div id="toppanel">
+		<div id="panel" style="overflow: hidden; height: 230px;">
+			<div class="container">
+
+				<div class="row">
+					<div class="span12">
+						<ul class="thumbnails thumbnails_2">
+							<li class="span4">
+								<div class="thumbnail_2">
+									<div>
+										<h2>中国俄勒冈免税州仓库地址变更通知</h2>
+										<p class="p0">美淘转运中国俄勒冈免税州仓库地址即日起变更为
+											410 Beavercreek Rd Ste 512,Oregon City, OR97045
+											请各位会员下单地址变更为新地址，原地址过度到这个月底，谢谢配合。
+										</p>
+									</div>
+								</div>
+							</li>
+							<li class="span4">
+								<div class="thumbnail_2">
+									<div>
+										<h2>上传身份证</h2>
+										<p class="">亲，近期海关严查，为了确保您的包裹在7-10个工作日到手，请您配合我们及时上传收件人身份证号或者身份证正、反面，请在身份证写上海关清关专用。可以在会员收件人处上传身份证或者发邮件至;usitao001@gmail.com,感谢您的配合.</p>
+									</div>
+								</div>
+							</li>  
+							<li class="span4">
+								<div class="thumbnail_2">
+									<div>
+										<h2>美国邮政小包直邮即将开通</h2>
+										<p class="">美淘快递即日起开通美国到世界218个国家和地区的包裹、信函直邮服务，发中国首磅10刀，续磅5刀，可以俄勒冈直发，包裹不限重，可以混装，时效6-10天，由美国邮政时效保证.同时开通UPS美国全境境内业务，价格为UPS的6折。</p>
+									</div>
+								</div>
+							</li>
+							
+						</ul>
+					</div>
+					<div class="span12 center" >
+              			<a href="#" class="btn btn-warning" data-type="submit">More</a>
+          			</div>
+				</div>	
+			</div>
+		</div>
+		<div class="toggle-button" id="hide_button" style="display: none;">
+			<a href="#" ><i class="icon-chevron-up icon-white"></i>
+			</a>
+		</div>
+	</div>
+	<div class="toggle-button" style="display: visible;">
+		<a href="#"><i class="icon-chevron-down icon-white"></i>
+		</a>
+	</div>  -->
+	
+	<!-- topbar -->
+	<div id="topbar">
+				<div class="container clearfix">
+					<div class="row ">
+						<div class="span12">
+
+							 <div class="span6">
+							<address class="vcard">
+								<i class="icon-money"></i>当前汇率:<span style="color:red;" id="cur_usa_cn"></span> &nbsp;&nbsp;&nbsp; <i
+									class="icon-time"></i><span id="ddate"></span>
+									
+							</address>
+							</div>  
+	<!--  	<div id="time"></div>
+		
+<div id="ddate2"></div>-->
+							<div class="span6 right">
+							<ul class="header-social-icon">
+								<li><a href="shangmenqujian.jsp"><span>上门取件丨</span>
+								</a>
+								</li>	
+								<li><a href="#"><span>物流公告丨</span>
+								</a>
+								</li> 					
+								<li><a target="_blank" href="shangchuan.jsp"><span>身份证上传丨</span>
+								</a>
+								</li>
+								<li><a target="_blank" href="login.jsp"><span>登陆丨</span>
+								</a>
+								</li>
+								<li><a target="_blank" href="register.html"><span>注册丨</span>
+								</a>
+								</li>									
+								<li><a target="_blank" href="login.jsp"><span>会员中心丨</span>
+								</a>
+								</li>															
+							</ul>									
+							</div>
+							
+							<div class="index_r fl">
+								<br>
+								<form action="/php/query_status.php" method="get" target="_blank">
+									<input name="action" type="hidden" value="5">
+									<div class="tracking">
+										<div class="tracking_c">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<textarea name="orderId" style="width: 143px; height: 28px;"
+												onFocus="this.value='';">如：WY1001;WY1002</textarea>
+											<a href="javascript:searchRoute()" class="btn btn-info" data-type="submit">单号查询</a>
+										</div>
+									</div>
+								</form>
+							</div>
+													
+																			
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+			<!-- Logo & Navigation -->
+			<header>
+				<div class="container clearfix">
+					<div class="row ">
+						<div class="span12">
+							<!-- Logo -->
+							<h1 class="brand brand_">
+								<a href="index.jsp"><img src='' id="log_big" alt="" style="width:248px;height:80px;">
+								</a>
+							</h1>
+							<!-- Navigation -->
+							<div class="navbar navbar_">
+								<div class="container">
+									<!--=========== menu ===============-->
+									<div class="nav-collapse nav-collapse_ collapse">
+										<ul class="nav sf-menu">
+											<li class="active sub-menu"><a href="index.jsp">首页</a></li>
+											<li class="sub-menu"><a href="newsandgonggao.jsp">新闻与公告</a></li>
+											<li class="sub-menu"><a href="fuwujiage.jsp">服务与价格</a></li>
+											<li class="sub-menu"><a href='haitaotuijian.jsp'>海淘推荐</a>
+											<li class="sub-menu"><a href='weiyegonglue.jsp'>飞力攻略</a></li>
+											<li><a href='jinyunwupin.jsp'>禁运物品</a></li>
+											<li><a href='caozuoliucheng.jsp'>操作流程</a></li>
+											<li><a href="contact.jsp">关于我们</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="clear"></div>
+						</div>
+					</div>
+				</div>
+			</header>
+		</div>
+	<script src="lib/jquery-1.8.1.min.js" type="text/javascript"></script>	
+  <script type="text/javascript">
+  base_url_set_has_sub = false;
+  function getRootPath() {
+		// 获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+		var curWwwPath = window.document.location.href;
+		// 获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+		var pathName = window.document.location.pathname;
+		var pos = curWwwPath.indexOf(pathName);
+		// 获取主机地址，如： http://localhost:8083
+		var localhostPaht = curWwwPath.substring(0, pos);
+		// 获取带"/"的项目名，如：/uimcardprj
+		var projectName = pathName
+				.substring(0, pathName.substr(1).indexOf('/') + 1);
+		//return (localhostPaht + projectName);
+		if(base_url_set_has_sub==true)
+	{
+		return (localhostPaht + projectName);
+	}
+	else
+	{
+		return localhostPaht;
+	}
+		
+	}
+  
+  
+  $.ajax({
+		type : "get",
+		url : "globalargs/getcontent",
+		data : {
+			"flag" : "logo_big"
+		},
+		success : function(response) {
+			var code = response.code;
+
+			if ("200" == code) {
+
+				if (response.data != null) {
+					$("#log_big").attr("src",getRootPath()+response.data);
+					
+				} else {
+					
+				}
+			}  else {
+			
+			}
+		}
+	});
+
+  $.ajax({
+		type : "get",
+		url : "globalargs/getcontent",
+		data : {
+			"flag" : "cur_usa_cn"
+		},
+		success : function(response) {
+			var code = response.code;
+
+
+			if ("200" == code) {
+
+				if (response.data != null) {
+					$("#cur_usa_cn").html(response.data);
+
+				} else {
+
+				}
+			}  else {
+
+			}
+		}
+	});
+  
+  
+  
+  
+  </script>
+  
+  <script type="text/javascript">
+  
+  
+  var getMonthWeek = function (a, b, c) { 
+	  /* 
+	  a = d = 当前日期 
+	  b = 6 - w = 当前周的还有几天过完（不算今天） 
+	  a + b 的和在除以7 就是当天是当前月份的第几周 
+	  */ 
+	  var date = new Date(a, parseInt(b) - 1, c), w = date.getDay(), d = date.getDate(); 
+	  return Math.ceil( 
+	  (d + 6 - w) / 7 
+	  ); 
+	  }; 
+  
+  
+//var ddate=document.getElementByIdx_x_x("ddate");
+//var ddate2=document.getElementByIdx_x_x("ddate2");
+//网上给出的是上面的代码，怎么会多出个x_x_x呢，下面才是正确的
+var ddate=document.getElementById("ddate");
+var ddate2=document.getElementById("ddate2");
+function updatedate(){
+var dd1=new Date(); 
+dd1.setMinutes(dd1.getMinutes()+dd1.getTimezoneOffset()-420); //取当地时间加上和格林威治的时差减要求地区和格林的时差分钟，这里是-300，代表美国东部纽约和格林的时差
+//先设置setMinutes再取getHours才有效
+var tmin=dd1.getHours();
+if(tmin>=0 && tmin<6){
+   tmin='凌晨'+tmin;
+}
+if(tmin>=6 && tmin<=12){
+   tmin='早上'+tmin;
+}
+if(tmin>12 && tmin<=18){
+   tmin='下午'+tmin;
+}
+if(tmin>18 && tmin<=24){
+   tmin='晚上'+tmin;
+}
+//alert(getMonthWeek(dd1.getFullYear(), (dd1.getMonth()+1), dd1.getDate()));
+ddate.innerHTML='美国洛杉矶时间:<span style="color:red;">'+dd1.getFullYear()+"年"+(dd1.getMonth()+1)+"月"+dd1.getDate()+"日"+tmin+"点"+dd1.getMinutes()+"分"+dd1.getSeconds()+"秒</span>";
+/*var dd2=new Date();
+
+    dd2.setMinutes(dd2.getMinutes()+dd2.getTimezoneOffset()+15*60-420);//纽约和中国相差13个小时，夏天是12个小时所以这里加上13*60 夏天改为12*60 
+ddate2.innerHTML='北京时间'+ dd2.getFullYear()+"年"+(dd2.getMonth()+1)+"月"+dd2.getDate()+"日"+dd2.getHours()+"点"+dd2.getMinutes()+"分"+dd2.getSeconds()+"秒";
+*/
+    var t=setTimeout("updatedate()",1000);
+}
+updatedate();
+</script>
+  
+  

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.WarehouseDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.Warehouse">
+		<id column="id" property="id" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="company" property="company" javaType="String" />
+		<result column="country" property="country" javaType="String" />
+		<result column="province" property="province" javaType="String" />
+		<result column="city" property="city" javaType="String" />
+		<result column="address" property="address" javaType="String" />
+		<result column="zip_code" property="zipCode" javaType="String" />
+		<result column="telephone" property="telephone" javaType="String" />
+		<result column="contact_name" property="contactName" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="groupid" property="groupId" javaType="String"/>
+		<result column="print_p_cn" property="printP_CN" javaType="String"/>
+		<result column="print_p_usa" property="printP_USA" javaType="String"/>
+		
+		<result column="type" property="type" javaType="String"/>
+		<result column="call_order_available" property="callOrderAvailable" javaType="String"/>
+		<result column="call_order_city" property="callOrderCity" javaType="String"/>
+
+		<result column="printWidCode" property="printWidCode" javaType="String"/>
+		
+		<result column="sendmessage" property="sendmessage" javaType="String"/>
+		<result column="showstore" property="showstore" javaType="String"/>
+	</resultMap>
+
+	<insert id="insertWarehouse" parameterType="com.meitao.model.Warehouse"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		warehouse(name,company,country,address,city,province,zip_code,telephone,contact_name,remark,create_date,modify_date,groupid,print_p_cn,print_p_usa,type, call_order_available, call_order_city,printWidCode,sendmessage,showstore)
+		values(#{name},#{company},#{country},#{address},#{city},#{province},#{zipCode},#{telephone},#{contactName},#{remark},#{createDate},#{modifyDate},#{groupId},#{printP_CN},#{printP_USA},#{type}, #{callOrderAvailable}, #{callOrderCity}, #{printWidCode}, #{sendmessage}, #{showstore})
+	</insert>
+
+	<update id="updateWarehouse" parameterType="com.meitao.model.Warehouse">
+		update warehouse
+		set
+		name=#{name},company=#{company}, country=#{country}, address=#{address},
+		city=#{city},province=#{province},zip_code=#{zipCode},
+		telephone=#{telephone}, contact_name=#{contactName},printWidCode=#{printWidCode},
+		remark=#{remark}, print_p_cn=#{printP_CN}, print_p_usa=#{printP_USA}, type=#{type},
+		call_order_available=#{callOrderAvailable}, call_order_city=#{callOrderCity}, modify_date=#{modifyDate},
+		sendmessage=#{sendmessage},showstore=#{showstore}
+		where id=#{id}
+	</update>
+
+	<delete id="deleteWarehouseByIds">
+		delete from warehouse
+		where id in
+		<trim prefix="(" suffix=")">
+			<foreach collection="list" item="id" separator=",">
+				#{id}
+			</foreach>
+		</trim>
+	</delete>
+
+	<select id="getAll" resultMap="basic_result_map">
+		select * from warehouse
+	</select>
+
+	<select id="getById" parameterType="java.lang.String" resultMap="basic_result_map">
+		select * from warehouse where id=#{id}
+	</select>
+
+	<select id="count" resultType="java.lang.Integer">
+		select count(*) from warehouse
+	</select>
+
+	<select id="searchWarehouse" resultMap="basic_result_map">
+		select * from warehouse
+		where groupid=#{groupid}
+		order by warehouse.serial_no asc,warehouse.id
+		limit
+		#{index},#{size}
+	</select>
+	
+	
+	<select id="getwarehousebyadmin" resultMap="basic_result_map">
+		select * from warehouse
+		<if test="storeids != null and storeids != ''">
+			where id=#{storeids}
+		</if>
+	</select>
+	<select id="getNamebyId" parameterType="java.lang.String" resultType="java.lang.String">
+		select name from warehouse where id=#{id} limit 1
+	</select>
+	
+	
+	
+	<select id="countbyadmin" resultType="java.lang.Integer">
+		select count(*) from warehouse
+		<where>
+			<if test="keyword !=null and keyword!=''">
+				name like #{keyword} or company like #{keyword} or country like #{keyword} or address like #{keyword} or city like #{keyword} or province like #{keyword}
+				or zip_code like #{keyword} or telephone like #{keyword} or contact_name like #{keyword} or remark like #{keyword} or print_p_cn like #{keyword}
+				or print_p_usa like #{keyword}
+				or call_order_city like #{keyword}
+				or printWidCode like #{keyword}
+			</if>
+			<if test="storeId !=null and storeId!=''">
+				and id=#{storeId}
+			</if>
+		</where>
+	</select>
+
+	<select id="searchWarehousebyadmin" resultMap="basic_result_map">
+		select * from warehouse
+		<where>
+			<if test="keyword !=null and keyword!=''">
+				name like #{keyword} or company like #{keyword} or country like #{keyword} or address like #{keyword} or city like #{keyword} or province like #{keyword}
+				or zip_code like #{keyword} or telephone like #{keyword} or contact_name like #{keyword} or remark like #{keyword} or print_p_cn like #{keyword}
+				or print_p_usa like #{keyword}
+				or call_order_city like #{keyword}
+				or printWidCode like #{keyword}
+			</if>
+			<if test="storeId !=null and storeId!=''">
+				and id=#{storeId}
+			</if>
+		</where>
+		order by warehouse.create_date desc
+		limit
+		#{index},#{size}
+	</select>
+</mapper>

@@ -1,0 +1,16 @@
+.admin-menu-hidden{
+display:none;
+}
+.admin-menu-show{
+display:block;
+}
+
+
+
+input,select,textarea,button{
+    font-size:1em;
+    -webkit-box-sizing:content-box;
+    -moz-box-sizing:content-box;
+    box-sizing:content-box;
+    width: 106px;
+}

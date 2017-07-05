@@ -1,0 +1,1090 @@
+//////////////loadNav71Data Start   ////////////////////////////
+function loadNav71Data(){
+	
+	// 获取用户数据
+	$.ajax({
+		type:"get",
+		url:user_get_self_url,
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				var data = response.data;
+				
+				$("#yonghuming").html(data.nickName);
+				$("#realName").html(data.realName);
+				$("#phone").html(data.phone);
+				$("#email").html(data.email);
+				$("#qq").html(data.qq);
+				$("#address").html(data.address);
+				$("#country").html(data.country);
+				
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}	
+
+//////////////loadNav71Data End   ////////////////////////////
+
+//////////////loadNav73Data Start   ////////////////////////////
+function loadNav73Data(){
+	
+	// 获取用户数据
+	$.ajax({
+		type:"get",
+		url:user_get_self_url,
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				var data = response.data;
+				
+				//$("#yonghuming").html(data.phone);data.nickName
+				$(":text[name='nick_yonghuming']").val(data.nickName);
+				$(":text[name='realName']").val(data.realName);
+				$(":text[name='phone']").val(data.phone);
+				$(":text[name='email']").val(data.email);
+				$(":text[name='qq']").val(data.qq);
+				$(":text[name='address']").val(data.address);
+				$(":text[name='country']").val(data.country);
+				
+				if(data.phoneState==1)//电话状态已经验证
+				{
+					
+					 $(":text[name='phone']").attr("readonly","true");
+					 $("#phoneverify").attr("style","display:none;");
+					 $("#phoneflag").attr("style","color:green;");
+				}
+				else
+				{
+					if(data.regType==0)//注册类型为手机
+					{
+						$(":text[name='phone']").attr("readonly","true");
+					}
+				}
+				if(data.emailState==1)//邮箱状态已经验证
+				{
+					
+					 $(":text[name='email']").attr("readonly","true");
+					 $("#emailverify").attr("style","display:none;");
+					 $("#emailflag").attr("style","color:green;");
+					 
+				}
+				else
+				{
+					if(data.regType==1)//注册类型为邮箱
+					{
+						$(":text[name='email']").attr("readonly","true");
+					}
+				}
+				
+				
+				$("#phoneverifycode").attr("style","display:none;");
+				$(":text[name='phonecode']").attr("style","display:none;");
+				$("#remarkcodephone").attr("style","display:none;");
+				
+				$("#emailverifycode").attr("style","display:none;");
+				$(":text[name='emailcode']").attr("style","display:none;");
+				$("#remarkcodeemail").attr("style","display:none;");
+				
+				
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}	
+	
+/*
+ * kai 20151101
+ * 验证按钮
+ * 
+ * */
+function verifyflag(type)
+{
+	var value="";
+	if(type==0)//电话
+	{
+		value=$(":text[name='phone']").val();
+		if(!checkUserPhone(value)){
+			alert("请输入正确手机号！");
+			return false;
+		}
+		$.ajax({
+			type:"post",
+			url:"../code/phone_reg",
+			data:{
+			"phone":value
+			},
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					$("#remarkcodephone").attr("style","");
+					 $("#phoneverify").attr("style","display:none;");
+					$("#phoneverifycode").attr("style","");
+					$(":text[name='phonecode']").attr("style","background-color:rgba(98, 206, 17, 0.24);width:50px;");
+					$(":text[name='phone']").attr("readonly","readonly");
+					
+					
+					alert("发送成功，请查看手机收到的验证码,并填入验证！");
+					
+				} 
+				else
+				{
+					alert("发送失败！"+response.message);
+				}
+			}
+		});
+		
+		
+	}
+	else if(type==1)//邮箱
+	{
+		value=$(":text[name='email']").val();
+		if(! checkUserEmailRegex(value))
+		{
+			alert("请输入正确邮箱号！");
+			return false;
+		}
+		
+		
+		$.ajax({
+			type:"post",
+			url:"../code/sendemail_verify_code",
+			data:{
+			"email":value
+			},
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					$("#remarkcodeemail").attr("style","");
+					 $("#emailverify").attr("style","display:none;");
+					$("#emailverifycode").attr("style","");
+					$(":text[name='emailcode']").attr("style","background-color:rgba(98, 206, 17, 0.24);width:50px;");
+					$(":text[name='email']").attr("readonly","readonly");
+					
+					
+					alert("发送成功，请查看邮箱获取验证码,并填入验证！");
+					
+				} 
+				else
+				{
+					alert("发送失败！"+response.message);
+				}
+			}
+		});
+		
+	}
+	else
+	{
+		return false;
+	}
+	
+}
+
+/*
+ * 20151102 kai
+ * 验证用户提交的验证码
+ * */
+function verifycodeflag(type)
+{
+	if(type==0)//电话验证
+	{
+		var value=$(":text[name='phonecode']").val();
+		var phone=$(":text[name='phone']").val();
+		$.ajax({
+			type:"post",
+			url:user_verify_info_url,
+			data:{
+				"vcode":value,
+				"phone":phone
+			},
+			success:function(response){
+				var code = response.code;
+				if (code == "200") {
+					alert("认证成功");
+					nav73Click();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("认证信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	else if(type==1)//邮箱验证
+	{
+		var value=$(":text[name='emailcode']").val();
+		var email=$(":text[name='email']").val();
+		$.ajax({
+			type:"post",
+			url:user_verify_info_email_url,
+			data:{
+				"vcode":value,
+				"email":email
+			},
+			success:function(response){
+				var code = response.code;
+				if (code == "200") {
+					alert("认证成功");
+					nav73Click();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("认证信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+}
+
+
+function saveInfo() {
+	var nickName =  $(":text[name='nick_yonghuming']").val();
+	var realName =  $(":text[name='realName']").val();
+	var phone=$(":text[name='phone']").val();
+	var email = $(":text[name='email']").val();
+	var qq = $(":text[name='qq']").val();
+	var address = $(":text[name='address']").val();
+	var country = $(":text[name='country']").val();
+	if(realName=="")
+	{
+		alert("必须填写\"姓名\"！");
+		return false;
+	}
+	
+	$.ajax({
+		type:"post",
+		url:user_save_info_url,
+		data:{
+			"name":nickName,
+			"realName":realName,
+			"phone":phone,
+			"email":email,
+			"qq":qq,
+			"address":address,
+			"country":country
+		},
+		success:function(response){
+			var code = response.code;
+			if (code == "200") {
+				alert("修改成功");
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("修改会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+//////////////loadNav73Data End   ////////////////////////////
+
+//////////////    loadNav74Data Start   //////////////////////
+function loadNav74Data() {
+	// 获取收货地址信息
+	loadshouhuodizhiinfo("1");
+	// 设置点击跳转的事件
+	$("#sjdztable tfoot a").click(function() {
+		// 跳页
+		var pn = $(this).attr("href");
+		loadshouhuodizhiinfo(pn);
+		return false;
+	});
+
+	$("#sjdztable tfoot input").keydown(function(event) {
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				loadshouhuodizhiinfo(pn);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});
+	
+	showLocation();
+	showusaLocation();
+	/*
+	 * kai 20151029
+	 * 添加禁用省请市区事件
+	 * */
+	$("#use_pct").click(function() {
+		
+		if($("#use_pct").is(':checked')==true)
+		{
+			$("#loc_province").attr("disabled","disabled");
+			$("#loc_city").attr("disabled","disabled");
+			$("#loc_town").attr("disabled","disabled");
+			
+		}
+		else
+		{
+			$("#loc_province").removeAttr("disabled");
+			$("#loc_city").removeAttr("disabled");
+			$("#loc_town").removeAttr("disabled");
+		}
+	});
+
+}
+
+function loadshouhuodizhiinfo(pn) {
+	$.ajax({
+		type : "get",
+		url : consignee_search_url,
+		data : {
+			"pageIndex" : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+				if (response.data != null) {
+					showsjrdzlist(response.data.datas);
+					showpagesplit(response.data);
+				} else {
+					showsjrdzlist(null);
+					showpagesplit(null);
+				}
+				aftershow();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+/*
+function showsjrdzlist(list) {
+	$("#sjdztable tbody").html("");
+	if (list != null && list.length > 0) {
+		$.each(list,function() {
+			var str = "<tr>";
+			str += "<td>" + this.id + "</td>";
+			str += "<td><a href='" + this.id + "' name='a_detail_link'>"+ this.name + "</a></td>";
+			str += "<td>" + this.phone + "</td>";
+			str += "<td>" + this.province + "/" + this.city+ "/" + this.district + "</td>";
+			str += "<td>" + this.streetAddress + "</td>";
+			str += "<td>" + this.cardId + "</td>";
+			if (this.cardUrl == null || this.cardUrl == '') {
+					str += "<td>无</td>";
+			} else {
+				var url = this.cardUrl;
+				url = baseUrl+url;
+				str += "<td><a href='" + url + "'  target='_blank'><img width='30px' height='30px' src='" + url + "'/></a></td>";
+			}
+			str += "<td><a href='" + this.id + "' name='a_modify_sjdz_link'>修改</a>|<a href='" + this.id + "' name='a_del_sjdz_link'>删除</a></td></tr>";
+			$("#sjdztable tbody").append(str);
+		});
+	}
+} */
+
+function showsjrdzlist(list) {
+	$("#sjdztable tbody").html("");
+	if (list != null && list.length > 0) {
+		$
+				.each(
+						list,
+						function() {
+							var str = "<tr>";
+							str += "<td>" + this.id + "</td>";
+							str += "<td><a href='" + this.id
+									+ "' name='a_detail_link'>" + this.name
+									+ "</a></td>";
+							str += "<td>" + this.phone + "</td>";
+							str += "<td>" + this.province + "/" + this.city
+									+ "/" + this.district + "</td>";
+							str += "<td>" + this.streetAddress + "</td>";
+							str += "<td>" + this.cardId + "</td>";
+							if (this.cardUrl == null || this.cardUrl == '') {
+								str += "<td>无</td>";
+							} else {
+								var url = this.cardUrl;
+								url = baseUrl + url;
+								str += "<td><a href='"
+										+ url
+										+ "'  target='_blank'><img width='30px' height='30px' src='"
+										+ url + "'/></a></td>";
+							}
+							//kai 20150921 身份证反面图片
+							//alert(this.cardurlother);
+							if (this.cardurlother == null || this.cardurlother == '') {
+								str += "<td>无</td>";
+							} else {
+								var url = this.cardurlother;
+								url = baseUrl + url;
+								str += "<td><a href='"
+										+ url
+										+ "'  target='_blank'><img width='30px' height='30px' src='"
+										+ url + "'/></a></td>";
+							}
+							//kai 20150921 身份证合成图片
+							if (this.cardurltogether == null || this.cardurltogether == '') {
+								str += "<td>无</td>";
+							} else {
+								var url = this.cardurltogether;
+								url = baseUrl + url;
+								str += "<td><a href='"
+										+ url
+										+ "'  target='_blank'><img width='30px' height='30px' src='"
+										+ url + "'/></a></td>";
+							}
+
+							str += "<td><a href='"
+									+ this.id
+									+ "' name='a_modify_sjdz_link'>修改</a>|<a href='"
+									+ this.id
+									+ "' name='a_del_sjdz_link'>删除</a></td></tr>";
+							$("#sjdztable tbody").append(str);
+						});
+	}
+}
+
+function showpagesplit(pageSplit) {
+	var rowCount = 0;
+	var pageSize = 0;
+	var pageNow = 0;
+	var pageCount = 0;
+	if (pageSplit != null) {
+		rowCount = pageSplit.rowCount;
+		pageSize = pageSplit.pageSize;
+		pageNow = pageSplit.pageNow;
+		pageCount = pageSplit.pageCount;
+	}
+	$("#trsize").html(rowCount);
+	$("#tpsize").html(pageCount);
+	$("#first_page").attr("href", "1");
+	$("#pre_page").attr("href", pageNow - 1);
+	$("#next_page").attr("href", pageNow + 1);
+	$("#last_page").attr("href", pageCount);
+}
+
+function aftershow() {
+	
+	$("a[name='a_modify_sjdz_link']").click(function() {
+		
+		var id = $(this).attr("href");
+		nav742Click(id);
+		return false;
+	});
+
+	$("a[name='a_del_sjdz_link']").click(function() {
+		var id = $(this).attr("href");
+		if (confirm("您确认要删除收货地址信息？")) {
+			$.ajax({
+				type : "post",
+				url : consignee_del_url,
+				data : {
+					"id" : id
+				},
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("删除成功");
+						nav74Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						// 失败
+						alert("删除信息失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	});
+}
+
+
+function zengjiadizi() {
+	var picValue = $(":file[name='file']").val();
+	var picValueother = $(":file[name='fileother']").val();
+	var country = $("input:radio[name='country']:checked").val();
+	if (country == "undefind") {
+		alert("请选择国家");
+	} else if (country == 1) {
+		
+		if($("#use_pct").is(':checked')==true)//禁止使用
+		{
+			
+			$(":hidden[name='province']").val("");
+			$(":hidden[name='city']").val("");
+			$(":hidden[name='dist']").val("");
+		}
+		else
+		{
+			$(":hidden[name='province']").val(
+					$("#loc_province option:checked").text());
+			$(":hidden[name='city']").val($("#loc_city option:checked").text());
+			$(":hidden[name='dist']").val($("#loc_town option:checked").text());
+		}
+		
+		
+	} else if (country == 2) {
+		$(":hidden[name='province']").val(
+				$("#usa_province option:checked").text());
+		$(":hidden[name='city']").val($("#usa_city option:checked").text());
+		$(":hidden[name='dist']").val("------");
+	}
+	if ((picValue == null || "" == picValue)&&(picValueother == null || "" == picValueother)) {
+		//alert("save no pic");
+		savenopic();
+	} else {
+		//alert("save have pic");
+		savehavepic();
+	}
+	return false;
+}
+
+function savenopic() {
+	var name = $(":text[name='name']").val();
+	var province = $(":hidden[name='province']").val(); // 省份
+	var city = $(":hidden[name='city']").val(); // 城市
+	var dist = $(":hidden[name='dist']").val(); // 区
+	var sadd = $(":text[name='sadd']").val();
+	var phone = $(":text[name='phone']").val();
+	var zipCode = $(":text[name='zcode']").val();
+	var cardId = $(":text[name='cid']").val();
+
+	var validate = true;
+	if (name == null || name == "") {
+		$(":text[name='name']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='name']").change(function() {
+			if ($(":text[name='name']").val() != null)
+				$(":text[name='name']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if($("#use_pct").is(':checked')==true)//禁止使用
+	{}
+	else
+	{
+		if (province == "省份" && $("input:radio[name='country']:checked").val() == 1) {
+			alert("请选择收货省份");
+			validate = false;
+			return;
+		} else if ($("input:radio[name='country']:checked").val() == 2
+				&& province == "countries") {
+			alert("请选择收货countries");
+			return;
+		}
+		if (city == "地级市" && $("input:radio[name='country']:checked").val() == 1) {
+			alert("请选择收货城市");
+			validate = false;
+			return;
+		} else if ($("input:radio[name='country']:checked").val() == 2
+				&& city == "state") {
+			alert("请选择收货state");
+			return;
+		}
+		if (dist == "市、县、区" && $("input:radio[name='country']:checked").val() == 1) {
+			alert("请选择收货市、县、区");
+			validate = false;
+			return;
+		}
+	}
+
+	if (sadd == null || sadd == "") {
+		$(":text[name='sadd']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='sadd']").change(function() {
+			if ($(":text[name='sadd']").val() != null)
+				$(":text[name='sadd']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (phone == null || phone == "") {
+		$(":text[name='phone']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='phone']").change(function() {
+			if ($(":text[name='phone']").val() != null)
+				$(":text[name='phone']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	/*if (zipCode == null || zipCode == "") {
+		$(":text[name='zcode']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='zcode']").change(function() {
+			if ($(":text[name='zcode']").val() != null)
+				$(":text[name='zcode']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}*/
+
+	if (!validate) {
+		alert("红色框中的信息必须正确填写，才可以提交！");
+		return;
+	}
+	if (dist == null || dist == "")
+		dist = "      ";
+	$.ajax({
+		type : "post",
+		url : consignee_add_no_pic_url,
+		data : {
+			"name" : name,
+			"province" : province,
+			"city" : city,
+			"dist" : dist,
+			"sadd" : sadd,
+			"phone" : phone,
+			"zcode" : zipCode,
+			"cid" : cardId
+		},
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+				alert("添加成功");
+				nav74Click();
+				// window.location.href = "zhengjiadizi.jsp";
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("添加失败，原因是:" + response.message);
+			}
+		}
+	});
+	return false;
+}
+
+function savehavepic() {
+	var name = $(":text[name='name']").val();
+	var province = $(":hidden[name='province']").val(); // 省份
+	var city = $(":hidden[name='city']").val(); // 城市
+	var dist = $(":hidden[name='dist']").val(); // 区
+	var sadd = $(":text[name='sadd']").val();
+	var phone = $(":text[name='phone']").val();
+	var zipCode = $(":text[name='zcode']").val();
+	var cardId = $(":text[name='cid']").val();
+
+	var validate = true;
+	if (name == null || name == "") {
+		$(":text[name='name']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='name']").change(function() {
+			if ($(":text[name='name']").val() != null)
+				$(":text[name='name']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if($("#use_pct").is(':checked')==true)//禁止使用
+	{}
+	else
+	{
+		if (province == "省份" && $("input:radio[name='country']:checked").val() == 1) {
+			alert("请选择收货省份");
+			validate = false;
+			return;
+		} else if ($("input:radio[name='country']:checked").val() == 2
+				&& province == "countries") {
+			alert("请选择收货countries");
+			return;
+		}
+		if (city == "地级市" && $("input:radio[name='country']:checked").val() == 1) {
+			alert("请选择收货城市");
+			validate = false;
+			return;
+		} else if ($("input:radio[name='country']:checked").val() == 2
+				&& city == "state") {
+			alert("请选择收货state");
+			return;
+		}
+		if (dist == "市、县、区" && $("input:radio[name='country']:checked").val() == 1) {
+			alert("请选择收货市、县、区");
+			validate = false;
+			return;
+		}
+	}
+	if (sadd == null || sadd == "") {
+		$(":text[name='sadd']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='sadd']").change(function() {
+			if ($(":text[name='sadd']").val() != null)
+				$(":text[name='sadd']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (phone == null || phone == "") {
+		$(":text[name='phone']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='phone']").change(function() {
+			if ($(":text[name='phone']").val() != null)
+				$(":text[name='phone']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	/*if (zipCode == null || zipCode == "") {
+		$(":text[name='zcode']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='zcode']").change(function() {
+			if ($(":text[name='zcode']").val() != null)
+				$(":text[name='zcode']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}*/
+
+	if (!validate) {
+		alert("红色框中的信息必须正确填写，才可以提交！");
+		return;
+	}
+	if (dist == null || dist == "")
+		$(":hidden[name='dist']").val("      ");
+
+	$("#add_form").ajaxSubmit({
+		type : "post",
+		url : consignee_add_url,
+		success : function(response) {
+			//alert(response);  
+			$("#tmpmsgdiv").html(response);
+			var str = $("#tmpmsgdiv pre").html();
+			var obj = $.parseJSON(str);
+			var code = obj.code;
+			if (code == "200") {
+				alert("添加成功");
+				nav74Click();
+				// window.location.href = "zhengjiadizi.jsp";
+			} else if (code == "607") {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("添加收件人失败，原因是:" + obj.message);
+			}
+			//alert("return true");
+			return false;
+		},
+		error : function(XmlHttpRequest, textStatus, errorThrown) {
+			alert("操作失败");
+			return false;
+		}
+	});
+}
+
+//////////////loadNav74Data End   //////////////////////
+
+////////////////////////////////////////////////////////
+function loadNav742Data(){
+	showLocation();
+	showusaLocation();
+	// 加载被修改的收件人信息
+	$.ajax({
+		type:"get",
+		url:consignee_get_one_url,
+		data:{
+			"id":$(":hidden[name='id']").val()
+		},
+		success:function(response){
+			var code = response.code;
+			if (code == "200") {
+				// show
+				$(":text[name='name']").val(response.data.name);
+				$(":hidden[name='province']").val(response.data.province); // 省份
+				$(":hidden[name='city']").val(response.data.city); // 城市
+				$(":hidden[name='dist']").val(response.data.district); // 区
+				$(":text[name='sadd']").val(response.data.streetAddress);
+				$(":text[name='phone']").val(response.data.phone);
+				$(":text[name='zcode']").val(response.data.zipCode);
+				$(":text[name='cid']").val(response.data.cardId);
+
+				$("#loc_province option[name='" + response.data.province + "']").attr("selected", true);
+				$("#loc_province").change();
+				$("#loc_city option[name='" + response.data.city + "']").attr("selected", true);
+				$("#loc_city").change();
+				$("#loc_town option[name='" + response.data.district + "']").attr("selected", true);
+				var str = '';
+				if (response.data.cardUrl==null || response.data.cardUrl==''|| response.data.cardUrl=='null') {
+					// no pic, ignore
+				} else {
+					var url = response.data.cardUrl;
+					$(":hidden[name='old_file']").val(url);
+					url = baseUrl+url;
+					str += "<br/><a href='" + url + "' target='_blank'><img width='30px' height='30px' src='" + url + "'/></a>";
+				}
+				$("#card_file").html(str);
+				//反面照片处理
+				str = '';
+				if (response.data.cardurlother==null || response.data.cardurlother==''|| response.data.cardurlother=='null') {
+					// no pic, ignore
+				} else {
+					var url = response.data.cardurlother;
+					$(":hidden[name='old_fileother']").val(url);
+					url = baseUrl+url;
+					str += "<br/><a href='" + url + "' target='_blank'><img width='30px' height='30px' src='" + url + "'/></a>";
+				}
+				$("#card_fileother").html(str);
+				
+			} else if (code == "607") {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取收件人详情失败，失败原因是:" + response.message);
+			}
+		}
+	});
+	
+	/*
+	 * kai 20151029
+	 * 添加禁用省请市区事件
+	 * */
+	$("#use_pct").click(function() {
+		
+		if($("#use_pct").is(':checked')==true)
+		{
+			$("#loc_province").attr("disabled","disabled");
+			$("#loc_city").attr("disabled","disabled");
+			$("#loc_town").attr("disabled","disabled");
+			
+		}
+		else
+		{
+			$("#loc_province").removeAttr("disabled");
+			$("#loc_city").removeAttr("disabled");
+			$("#loc_town").removeAttr("disabled");
+		}
+	});
+}
+
+
+function xiugaidizi() {
+	var picValue = $(":file[name='file']").val();
+	var picValueother = $(":file[name='fileother']").val();
+	if($("#use_pct").is(':checked')==true)//禁止使用
+	{
+		$(":hidden[name='province']").val("");
+		$(":hidden[name='city']").val("");
+		$(":hidden[name='dist']").val("");
+	}
+	else
+	{
+		var provice=$("#loc_province option:checked").text();
+		var city=$("#loc_city option:checked").text();
+		var town=$("#loc_town option:checked").text();
+		if(provice=="省份")
+		{
+			alert("必须选择省份或禁用！");
+			return false;
+		}
+		if(city=="地级市")
+		{
+			alert("必须选择市或禁用！");
+			return false;
+		}
+		if(town=="市、县、区")
+		{
+			alert("必须选择市、县、区或禁用！");
+			return false;
+		}
+		$(":hidden[name='province']").val($("#loc_province option:checked").text());
+		$(":hidden[name='city']").val($("#loc_city option:checked").text());
+		$(":hidden[name='dist']").val($("#loc_town option:checked").text());
+		
+	}
+	
+	if ((picValue == null || "" == picValue)&&(picValueother == null || "" == picValueother)) {
+		updatenopic();
+	} else {
+		updatehavepic();
+	}
+	return false;
+}
+
+function updatenopic() {
+	var name = $(":text[name='name']").val();
+	var province = $(":hidden[name='province']").val(); // 省份
+	var city = $(":hidden[name='city']").val(); // 城市
+	var dist = $(":hidden[name='dist']").val(); // 区
+	var sadd = $(":text[name='sadd']").val();
+	var phone = $(":text[name='phone']").val();
+	var zipCode = $(":text[name='zcode']").val();
+	var cardId = $(":text[name='cid']").val();
+
+	$.ajax({
+		type : "post",
+		url : consignee_modify_no_pic_url,
+		data : {
+			"id" : $(":hidden[name='id']").val(),
+			"name" : name,
+			"province" : province,
+			"city" : city,
+			"dist" : dist,
+			"sadd" : sadd,
+			"phone" : phone,
+			"zcode" : zipCode,
+			"cid" : cardId
+		},
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+				alert("修改成功");
+				nav74Click();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("修改失败，原因是:" + response.message);
+			}
+		}
+	});
+	return false;
+}
+
+function updatehavepic() {
+	$("#update_form").ajaxSubmit({
+		type : "post",
+		url : consignee_modify_url,
+		success : function(data) {
+			$("#tmpmsgdiv").html(data);
+			var str = $("#tmpmsgdiv pre").html();
+			var obj = $.parseJSON(str);
+			var code = obj.code;
+			if (code == "200") {
+				alert("修改成功");
+				//window.location.href = "shouhuodizi.jsp";
+				nav74Click();
+			} else if (code == "607") {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("修改收件人失败，原因是:" + obj.message);
+			}
+			return false;
+		},
+		error : function(XmlHttpRequest, textStatus, errorThrown) {
+			alert("操作失败");
+			return false;
+		}
+	});
+}
+
+/*
+function updatehavepic() {
+	$("#update_form").ajaxSubmit( {
+		type : "post",
+		url : consignee_modify_url,
+		success : function(data) {
+			$("#tmpmsgdiv").html(data);
+			var str = $("#tmpmsgdiv pre").html();
+			var obj = $.parseJSON(str);
+			var code = obj.code;
+			if (code == "200") {
+				alert("修改成功");
+				window.location.href = "shouhuodizi.jsp";
+			} else if (code == "607") {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("修改收件人失败，原因是:" + obj.message);
+			}
+			return false;
+		},
+		error : function(XmlHttpRequest, textStatus, errorThrown) {
+			alert("操作失败");
+			return false;
+		}
+	});
+} */
+
+
+/////////////////////////////////////
+//kai 20151029 用户修改密码
+function loadNav75Data()
+{
+	
+	
+}
+
+function resetpwdbyuser() {
+	var old_code = $(":password[name='old_code']").val();
+	var new_code_1 = $(":password[name='new_code_1']").val();
+	var new_code_2 = $(":password[name='new_code_2']").val();
+	if(old_code=="")
+	{
+		alert("必须输入旧密码！");
+		return false;
+	}
+	if(new_code_1=="")
+	{
+		alert("必须输入新密码！");
+		return false;
+	}
+	
+	if(new_code_1!=new_code_2)
+	{
+		alert("新密码输入不一致，请重新输入!");
+		$(":password[name='new_code_1']").val("");
+		$(":password[name='new_code_1']").val("");
+		return false;
+	}
+	
+	
+
+		$.ajax({
+			type:"get",
+			url:user_modify_code_url,
+			data:{
+				"oldcode":old_code,
+				"newcode1":new_code_1,
+				"newcode2":new_code_2
+			},
+			success:function(response) {
+				var code = response.code;
+				
+				if (code == "200") {
+					alert("重设密码成功！你可以使用新密码登录");
+					logout();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("找回密码失败，失败原因是" + response.message);
+				}
+				
+				
+			}
+		});
+}

@@ -1,0 +1,608 @@
+function loadNav31Data() {
+	loadUserListFirst();
+
+	$("#a_add_user_link").click(function() {
+	
+		$("#main-content").load(admin_add_user_page_url);
+		return false;
+	});
+
+	$("#a_delete_user_link").click(function() {
+		var chk_value = [];
+		$('input[name="del_id"]:checked').each(function() {
+			chk_value.push($(this).val()); // 这里就是拼数组了，也就是后台的list集合
+		});
+		if (chk_value.length == 0) {
+			alert("您还没有选择要删除的会员！");
+		} else {
+			if (confirm("您是否确认要删除会员信息?")) {
+				$.ajax( {
+					type : "post",
+					url : admin_delete_user_url,
+					data : $.param({
+						"id" : chk_value,
+					}, true),
+					success : function(response) {
+						var code = response.code;
+						if ("200" == code) {
+							alert("删除成功");
+							//$("#nav31").click();
+							nav31Click();
+						} else if ("607" == code) {
+							alert("您尚未登录或登录已失效！");
+							logout();
+						} else {
+							alert("删除会员失败，原因是:" + response.message);
+						}
+						return false;
+					}
+				});
+			}
+		}
+		return false;
+	});
+
+	$("#u_del_check_all").click(function() {
+		
+		if ($(this).is(':checked')) {
+			$('input[name="del_id"]').attr("checked", 'true');
+		} else {
+			$('input[name="del_id"]').removeAttr("checked");
+		}
+	});
+
+	$(":submit[name='searchSub']").click(function() {
+		var userId = $(":text[name='userId']").val();
+		var key = $(":text[name='key']").val();
+		var type = $("select[name='type']").val();
+		var pn = "1";
+		if (userId != null && userId != '') {
+			$(":text[name='key']").val('');
+			$("select[name='type']").val('');
+			key = '';
+			type = '';
+		}
+		loadUserList(userId, key, type, pn);
+
+		return false;
+	});
+}
+
+function loadUserListFirst() {
+	loadUserList("", "", "all", 1);
+}
+
+function loadUserList(userId,key, type, pn) {
+	$(":hidden[name='userId']").val(userId);
+	$(":hidden[name='key']").val(key);
+	$(":hidden[name='type']").val(type);
+	$(":hidden[name='pn']").val(pn);
+	$.ajax( {
+		type : "get",
+		url : admin_user_list_url,
+		data : {
+			"userId":userId,
+			"key" : key,
+			"type" : type,
+			"pageIndex" : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data == null) {
+					showUserList(null);
+					showUserLink(null);
+				} else {
+					showUserList(response.data.datas);
+					showUserLink(response.data);
+				}
+				afterLoadUserList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='10'>"
+						+ "<span>&nbsp;&nbsp;获取会员列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+		}
+	});
+}
+
+function removenull(str)
+{
+    if((str=="")||(str=="null")||(str==null)||(str=="undefined"))	
+    {
+    	return "";
+    }
+    else
+    {
+    	return str;
+    }
+}
+function showUserList(list) {
+	var str = "";
+	if (list != null) {
+		$.each(list, function() {
+			str += "<tr id='" + this.id + "'>";
+			str += "<td><input type='checkbox' name='del_id' value='" + this.id
+					+ "'/></td>";
+			str += "<td><a href='#' name='a_user_detail_link'>" + this.id
+					+ "</a></td>";
+			str += "<td>" + this.nickName + "</td>";
+			str += "<td>" + this.realName + "</td>";
+			str += "<td>" + this.phone + "</td>";
+			str += "<td>" + this.email + "</td>";
+			str += "<td>" + this.qq + "</td>";
+			str += "<td>" + this.signDate + "</td>";
+			str += "<td>" + this.rmbBalance + "/" + this.usdBalance + "</td>";
+			if(removenull(this.type)!="")
+			{
+				var str1="";
+				if(this.type=="0")
+				{
+					str1="普通会员";
+				}
+				else if(this.type=="1")
+				{
+					str1="门市会员";
+				}
+				else if(this.type=="2")
+				{
+					str1="VIP会员";
+				}
+				else if(this.type=="3")
+				{
+					str1="VIP2会员";
+				}
+				else if(this.type=="4")
+				{
+					str1="VIP3会员";
+				}
+				else if(this.type=="5")
+				{
+					str1="代理会员";
+				}
+				else
+				{
+					str1=this.type;
+				}
+			str += "<td>" + str1 + "</td>";
+			}
+			else
+			{
+				str += "<td></td>";
+			}
+			str += "<td><a href='#' name='a_user_modify_link'>修改</a>|<a href='#' name='a_login_as_user_link'>登陆</a></td>";
+			str += "</tr>";
+		});
+		
+	} else {
+		if (str == null || str == '') {
+			str = "<td style='text-align: left;' colspan='10'>"
+					+ "<span>&nbsp;&nbsp;没有符合您查找要求的会员!</span></td>";
+		}
+	}
+	$("#tab1 table tbody").html(str);
+}
+
+function showUserLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .bulk-actions").show();
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var userId = $(":hidden[name='userId']").val();
+			var key = $(":hidden[name='key']").val();
+			var type = $(":hidden[name='type']").val();
+			if (userId != null && userId != '') {
+				key = "";
+				type = "";
+			}
+			loadUserList(userId, key, type, pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var userId = $(":hidden[name='userId']").val();
+					var key = $(":hidden[name='key']").val();
+					var type = $(":hidden[name='type']").val();
+					if (userId != null && userId != '') {
+						key = "";
+						type = "";
+					}
+					loadUserList(userId, key, type, pn);
+					alert(pn);
+					alert(type);
+					alert(key);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .bulk-actions").hide();
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterLoadUserList() {
+	$("a[name='a_user_modify_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = admin_modify_user_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+	$("a[name='a_login_as_user_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = "../admin/user/loginAsUser";
+		$.ajax({
+			type : "post",
+			url : url,
+			data : {
+				id : id
+			},
+			success : function(response){
+				var code = response.code;
+				if ("200" == code) {
+					alert("登陆成功");
+					location.href = "../user/index.jsp";
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("以会员方式登陆失败，失败原因:" + response.message);
+				}
+				return false;
+			}
+		});
+		$("#main-content").load(url);
+		return false;
+	});
+	$("a[name='a_user_detail_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = admin_detail_user_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+}
+
+function loadNav32Data() {
+	setBackUserLinkFunction();
+
+	$(".close").click(function() {
+		$(this).parent().fadeTo(400, 0, function() {
+			$(this).slideUp(400);
+		});
+		return false;
+	});
+
+	$("#bt_add_user").click(function() {
+		var name = $(":text[name='phone']").val();
+		var password = $(":password[name='password']").val();
+		var email = $(":text[name='email']").val();
+		var realName = $(":text[name='realName']").val();
+		var phone = $(":text[name='phone']").val();
+		var qq = $(":text[name='qq']").val();
+		var country = $(":text[name='country']").val();
+		var address = $(":text[name='address']").val();
+		var type = $("select[name='type']").val();
+		submitAddUser(name, password, email, realName, phone, qq, country,address, type);
+	});
+}
+
+function submitAddUser(name, password, email, realName, phone, qq, country,address, type) {
+	if (!checkUserPassword(password)) {
+		alert("密码格式不正确，密码必须由6到20个可见字符组成，请重新输入！");
+	} else if (!checkUserRealName(realName)) {
+		alert("真实姓名格式不正确，最长长度为20个字符，请重新输入！");
+	} else if (!checkUserPhone(phone)) {
+		alert("手机号码格式不正确，最长长度为20个字符，请重新输入！");
+	} else if (!checkUserQQ(qq)) {
+		alert("qq号码格式不正确，qq号码必须由数字组成，最长长度为20，请重新输入！");
+	} else if (!checkUserCountry(country)) {
+		alert("国家信息格式不正确，国家信息最长为20个字符，请重新输入！");
+	} else if (!checkUserAddress(address)) {
+		alert("地址信息格式不正确，地址信息最长为150个字符，请重新输入！");
+	} else {
+		$("#bt_add_user").attr("disabled", true);
+		$.ajax( {
+			type : "post",
+			url : admin_add_user_url,
+			data : {
+				"name" : name,
+				"email" : email,
+				"password" : password,
+				"realName" : realName,
+				"phone" : phone,
+				"qq" : qq,
+				"country" : country,
+				"address":address,
+				"type" : type
+			},
+			success : function(response) {
+				$("#bt_add_user").attr("disabled", false);
+				var code = response.code;
+				if ("200" == code) {
+					alert("添加成功");
+					$("#main-content").load(admin_add_user_page_url);
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("添加会员失败，失败原因:" + response.message);
+				}
+				return false;
+			}
+		});
+	}
+	return false;
+}
+
+function loadNav33Data() {
+	$.ajax({
+		type:"get",
+		url:admin_show_one_user_url,
+		data:{
+			id:$(":hidden[name='id']").val()
+		},
+		success: function(response) {
+			var code = response.code;
+			if (code == "200") {
+				$("#u_create_time").html(response.data.createDate);
+				$("#u_modify_time").html(response.data.modifyDate);
+				
+				
+				if(response.data.regType==0)
+				{
+					$("#u_reg_type").html("电话");
+				}
+				else if(response.data.regType==1)
+				{
+					$("#u_reg_type").html("邮箱");
+				}
+				else
+				{
+					$("#u_reg_type").html("未知");
+				}
+				
+				if(response.data.phoneState==0)
+				{
+					$("#u_phone_state").html("未验证");
+				}
+				else if(response.data.phoneState==1)
+				{
+					$("#u_phone_state").html("已验证");
+				}
+				else
+				{
+					$("#u_phone_state").html("未知");
+				}
+				
+				if(response.data.emailState==0)
+				{
+					$("#u_email_state").html("未验证");
+				}
+				else if(response.data.phoneState==1)
+				{
+					$("#u_email_state").html("已验证");
+				}
+				else
+				{
+					$("#u_email_state").html("未知");
+				}
+				
+				$(":text[name='nickName']").val(response.data.nickName);
+				$(":text[name='phone']").val(response.data.phone);
+				$(":text[name='realName']").val(response.data.realName);
+				$(":text[name='email']").val(response.data.email);
+				$(":text[name='qq']").val(response.data.qq);
+				$(":text[name='country']").val(response.data.country);
+				$(":text[name='address']").val(response.data.address);
+				$("select[name='type'] option[value='" + response.data.type + "']").attr("selected",true);
+			} else if (code == "607") {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取会员信息失败");
+				//$("#nav31").click();
+				nav31Click();
+			}
+			return false;
+		}
+	});
+
+	setBackUserLinkFunction();
+	$("#a_update_user_pwd_link").click(function() {
+		var id = $(":hidden[name='id']").val();
+		var url = admin_modify_user_pwd_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+
+	$("#bt_modify_user").click(function() {
+		var realName = $(":text[name='realName']").val();
+		var email =  $(":text[name='email']").val();
+		var qq = $(":text[name='qq']").val();
+		var country = $(":text[name='country']").val();
+		var address = $(":text[name='address']").val();
+		var nickName= $(":text[name='nickName']").val();
+		var phone= $(":text[name='phone']").val();
+		//alert(email);
+		if (!checkUserRealName(realName)) {
+			alert("真实姓名格式不正确，最长长度为20个字符，请重新输入！");
+		} else if ((email!="")&&(!checkUserEmailRegex(email))) {
+			
+			alert("Email格式不正确，请重新输入！");
+		} else if (!checkUserQQ(qq)) {
+			alert("qq号码格式不正确，qq号码必须由数字组成，最长长度为20，请重新输入！");
+		} else if (!checkUserCountry(country)) {
+			alert("国家信息格式不正确，国家信息最长为20个字符，请重新输入！");
+		} else if (!checkUserAddress(address)) {
+			alert("地址信息格式不正确，地址信息最长为150个字符，请重新输入！");
+		} else {
+			
+			
+			$("#bt_modify_user").attr("disabled", true);
+			$.ajax( {
+				type : "post",
+				url : admin_modify_user_url,
+				data : {
+					"id" : $(":hidden[name='id']").val(),
+					"realName" : $(":text[name='realName']").val(),
+					"email" : $(":text[name='email']").val(),
+					"qq" : $(":text[name='qq']").val(),
+					"country" : $(":text[name='country']").val(),
+					"address" : $(":text[name='address']").val(),
+					"type" : $("select[name='type']").val(),
+					"name" : nickName,
+					"phone" : phone
+				},
+				success : function(response) {
+					$("#bt_modify_user").attr("disabled", false);
+					var code = response.code;
+					if ("200" == code) {
+						alert("修改成功");
+						//$("#nav31").click();
+						nav31Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("修改会员失败，失败原因:" + response.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+}
+function loadNav34Data() {
+	setBackUserLinkFunction();
+	$("#bt_modify_pwd_user").click(function(){
+		var npwd = $(":password[name='password']").val();
+		var confirmPwd = $(":password[name='confirm_pwd']").val();
+		var empPwd = $(":password[name='empPwd']").val();
+		if (!checkUserPassword(npwd)) {
+			alert("新密码格式不正确，密码必须由6到20个可见字符组成，请重新输入！");
+		} else if (!checkUserPassword(confirmPwd)) {
+			alert("确认密码格式不正确，密码必须由6到20个可见字符组成，请重新输入！");
+		} else if (!checkEmpPassword(empPwd)) {
+			alert("员工密码格式不正确，密码必须由6到20个可见字符组成，请重新输入！");
+		} else if (npwd!=confirmPwd) {
+			alert("新密码和确认密码必须一致，请重新输入！");
+		} else {
+			$("#bt_modify_pwd_user").attr("disabled", true);
+			$.ajax({
+				type:"post",
+				url:admin_modify_user_pwd_url,
+				data:{
+					id:$(":hidden[name='id']").val(),
+					emppwd:empPwd,
+					password:npwd
+				},
+				success:function(response){
+					$("#bt_modify_pwd_user").attr("disabled", false);
+					var code = response.code;
+					if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						if (code == "200") {
+							alert("修改密码成功");
+							//$("#nav31").click();
+							nav31Click();
+						} else {
+							alert("修改密码失败，原因是:" + response.message);
+							$(":reset").click();
+						}
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+}
+function loadNav35Data() {
+	setBackUserLinkFunction();
+	$.ajax({
+		type:"get",
+		url:admin_show_one_user_url,
+		data:{
+			id:$(":hidden[name='id']").val()
+		},
+		success:function(response){
+			var code = response.code;
+			if (code == "200") {
+				$("#u_d_nick_name").html(response.data.nickName);
+				$("#u_d_email").html(response.data.email);
+				$("#u_d_real_name").html(response.data.realName);
+				$("#u_d_phone").html(response.data.phone);
+				$("#u_d_qq").html(response.data.qq);
+				$("#u_d_country").html(response.data.country);
+				$("#u_d_address").html(response.data.address);
+				$("#u_d_type").html(response.data.type);
+				$("#u_d_sign_date").html(response.data.signDate);
+				$("#u_d_banlcen").html(response.data.rmbBalance + "&nbsp;&nbsp;/&nbsp;&nbsp;" + response.data.usdBalance);
+				if (response.data.empaccount == null || response.data.empaccount == '') {
+					$("#u_d_emp_add").html("否");
+				} else {
+					$("#u_d_emp_add").html("是");
+				}
+			} else if (code == "607") {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取会员信息失败");
+				//$("#nav31").click();
+				nav31Click();
+			}
+			return false;
+		}
+	});
+	
+	$.ajax({
+		type:"get",
+		url:admin_login_info_user_url,
+		data :{
+			id:$(":hidden[name='id']").val()
+		},
+		success: function(response){
+			var code = response.code;
+			if(code == '200') {
+				var lastDate = "";
+				var times = "0";
+				if (response.data != null) {
+					lastDate = response.data.lastDate;
+					times = response.data.times;
+				}
+				$("#u_d_last_date").html(lastDate);
+				$("#u_d_times").html(times);
+			}
+		}
+	});
+}
+
+function setBackUserLinkFunction() {
+	$("#a_back_user_list_link").click(function() {
+		nav31Click();
+		return false;
+	});
+}
+
+function loadNav36Data() {
+}

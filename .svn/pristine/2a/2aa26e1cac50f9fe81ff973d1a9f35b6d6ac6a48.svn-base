@@ -1,0 +1,243 @@
+package com.weiye.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import jxl.common.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.CommodityUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.ChannelDao;
+import com.weiye.dao.CommodityDao;
+import com.weiye.dao.WarehouseDao;
+import com.weiye.model.Channel;
+import com.weiye.model.Commodity;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.Warehouse;
+
+@Controller
+public class ChannelController extends BasicController {
+	private static final long serialVersionUID = 5270532661049625109L;
+	private static final Logger log = Logger.getLogger(ChannelController.class);
+	@Autowired
+	private ChannelDao channelDao;
+	
+	@Autowired
+	private WarehouseDao warehouseDao;
+
+	@RequestMapping(value = "/channel/allgoodorstodp", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<Channel>> getAllChannel(HttpServletRequest request,
+			@RequestParam(value = "wid", required = false) String wid ) {
+		try {
+			List<Channel> list = new ArrayList<Channel>();
+			
+			if(wid==null||wid==""){
+				String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+				list = this.channelDao.getByWarhouseId(storeId, null);
+			}else{
+				list = this.channelDao.getByWarhouseId(wid, null);
+			}
+			
+			ResponseObject<List<Channel>> responseObj = new ResponseObject<List<Channel>>(ResponseCode.SUCCESS_CODE);
+			if (list != null && !list.isEmpty()) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setMessage("没有渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道列表失败");
+		}
+	}
+	
+	@RequestMapping(value = "/channel/all", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<Channel>> getAllgoodChannel(HttpServletRequest request,
+			@RequestParam(value = "wid", required = false) String wid ) {
+		try {
+			List<Channel> list = new ArrayList<Channel>();
+			
+			if(wid==null||wid==""){
+				String storeId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+				list = this.channelDao.getByWarhouseId(storeId, "1");
+			}else{
+				list = this.channelDao.getByWarhouseId(wid, "1");
+			}
+			
+			ResponseObject<List<Channel>> responseObj = new ResponseObject<List<Channel>>(ResponseCode.SUCCESS_CODE);
+			if (list != null && !list.isEmpty()) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setMessage("没有渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道列表失败");
+		}
+	}
+	
+	@RequestMapping(value = "/admin/channel/modify", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyChannelOfAdmin(HttpServletRequest request, Channel channel) {
+		
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权修改渠道!");
+			
+		}
+		
+		if (channel == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		
+		if (StringUtil.isEmpty(channel.getId())||StringUtil.isEmpty(channel.getWarehouseId())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效,无法通过参数验证");
+		}
+		if (!channel.getState().equals("1")&&!channel.getState().equals("2")) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道状态错误");
+		}
+		if (StringUtil.isEmpty(channel.getName())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道名不能为空");
+		}
+		if (StringUtil.isEmpty(channel.getAlias())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道别名不能为空");
+		}
+		if (StringUtil.isEmpty(channel.getAdditivePrice())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "附加费不能为空");
+		}
+		try {
+			int nRet = this.channelDao.modifyChannel(channel);
+			if(nRet>0){
+				return generateResponseObject(ResponseCode.SUCCESS_CODE, "");
+			}else{
+				return generateResponseObject(ResponseCode.CHANNEL_UPDATE_FAILURE, "修改渠道信息失败");
+			}
+		} catch (Exception e) {
+			log.error("修改渠道信息失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改渠道信息失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/admin/channel/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addChannel(
+			HttpServletRequest request, Channel channel) {
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权添加渠道!");
+			
+		}
+		
+		if (channel == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		
+		if (StringUtil.isEmpty(channel.getWarehouseId())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效,无法通过参数验证");
+		}
+		if (!channel.getState().equals("1")&&!channel.getState().equals("2")) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道状态错误");
+		}
+		if (StringUtil.isEmpty(channel.getName())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道名不能为空");
+		}
+		if (StringUtil.isEmpty(channel.getAlias())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "渠道别名不能为空");
+		}
+		if (StringUtil.isEmpty(channel.getAdditivePrice())) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "附加费不能为空");
+		}
+		if(channel.getWarehouseId().equals("-1")){
+			try {
+				List<Warehouse> warehouses = this.warehouseDao.getAll();
+				if (warehouses != null && !warehouses.isEmpty()) {
+					List<Channel> channels = new ArrayList<Channel>();
+					int count = 0;
+					for (Warehouse w : warehouses) {
+						Channel tmpChannel = new Channel();
+						tmpChannel.setName(channel.getName());
+						tmpChannel.setAlias(channel.getAlias());
+						tmpChannel.setState(channel.getState());
+						tmpChannel.setWarehouseId(w.getId());
+						
+						channels.add(tmpChannel);
+						count++;
+					}
+					
+					int nRet = channelDao.insertChannelByList(channels);
+					if (count == 0 || nRet != count) {
+						return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加渠道失败");
+					}else{
+						return generateResponseObject(ResponseCode.SUCCESS_CODE, "");
+					}
+					
+				} else{
+					return generateResponseObject(ResponseCode.CHANNEL_INSTER_FAILURE, "没有仓库信息，增加失败");
+				}
+			} catch (Exception e) {
+				log.error("获取仓库列表失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取仓库列表失败");
+			}
+		}
+		
+	
+		try {
+			int nRet =channelDao.insertChannel(channel);
+			if(nRet>0){
+				return generateResponseObject(ResponseCode.SUCCESS_CODE, "");
+			}else{
+				return generateResponseObject(ResponseCode.CHANNEL_INSTER_FAILURE, "添加渠道失败");
+			}
+		} catch (Exception e) {
+			log.error("添加渠道失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加渠道失败");
+		}
+		
+		
+	}
+	
+	@RequestMapping(value = "/channel/getcannelbyid", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<Channel> getChannelbyid(HttpServletRequest request,
+			@RequestParam(value = "cid", required = false) String cid ) {
+		try {
+			
+			if(StringUtil.isEmpty(cid))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "获取渠道信息失败，参数出错!");
+			}
+			Channel list = this.channelDao.getChannelById(cid);
+			
+	
+			ResponseObject<Channel> responseObj = new ResponseObject<Channel>(ResponseCode.SUCCESS_CODE);
+			if (list != null) {
+				responseObj.setData(list);
+			} else {
+				responseObj.setCode(ResponseCode.SHOW_EXCEPTION);
+				responseObj.setMessage("没有渠道数据");
+			}
+			return responseObj;
+		} catch (Exception e) {
+			log.error("获取渠道列表失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "获取渠道列表失败");
+		}
+	}
+}

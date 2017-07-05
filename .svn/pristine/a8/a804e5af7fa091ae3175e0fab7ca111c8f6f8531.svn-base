@@ -1,0 +1,2040 @@
+package com.weiye.service.impl;
+
+import java.io.File;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
+import jxl.format.Colour;
+import jxl.write.Label;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
+import jxl.write.WritableSheet;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.OrderUtil;
+import com.weiye.common.util.PageSplitUtil;
+import com.weiye.common.util.PaymentUtil;
+import com.weiye.common.util.ProductUtil;
+import com.weiye.common.util.StoragePositionUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.TranshipmentUtil;
+import com.weiye.common.util.excel.ExcelUtil;
+import com.weiye.common.util.excel.ExcelWrite;
+import com.weiye.common.util.sms.SmsSendUtil;
+import com.weiye.dao.AccountDao;
+import com.weiye.dao.AccountDetailDao;
+import com.weiye.dao.ErrorTranshipmentBillDao;
+import com.weiye.dao.OrderDao;
+import com.weiye.dao.ProductDao;
+import com.weiye.dao.ProductRecordDao;
+import com.weiye.dao.RenlingDao;
+import com.weiye.dao.StoragePositionRecordDao;
+import com.weiye.dao.TranshipmentBillDao;
+import com.weiye.dao.TranshipmentCommodityDao;
+import com.weiye.dao.TranshipmentRouteDao;
+import com.weiye.dao.UserDao;
+import com.weiye.dao.WarehouseDao;
+import com.weiye.dao.globalargsDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Account;
+import com.weiye.model.AccountDetail;
+import com.weiye.model.Commodity;
+import com.weiye.model.ErrorTranshipmentBillInfo;
+import com.weiye.model.Order;
+import com.weiye.model.OrderDetail;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ProductRecord;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.Route;
+import com.weiye.model.StoragePosition;
+import com.weiye.model.StoragePositionRecord;
+import com.weiye.model.TranshipmentBill;
+import com.weiye.model.TranshipmentCommodity;
+import com.weiye.model.TranshipmentRoute;
+import com.weiye.model.User;
+import com.weiye.model.Warehouse;
+import com.weiye.model.WayBill;
+import com.weiye.model.temp.ExportTranshipmentBill;
+import com.weiye.model.temp.ImportOrder;
+import com.weiye.model.temp.ImportthirdOrder;
+import com.weiye.service.OrderService;
+import com.weiye.service.ProductRecordService;
+import com.weiye.service.StoragePositionService;
+import com.weiye.service.TranshipmentBillService;
+import com.weiye.service.TranshipmentRouteService;
+
+@Service("transhipmentBillService")
+public class TranshipmentBillServiceImpl extends BasicService implements TranshipmentBillService {
+	@Autowired
+	private globalargsDao globalargsDao;
+	// 运单操作dao对象
+	@Autowired
+	private TranshipmentBillDao transhipmentBillDao;
+	//与储藏间关联dao对象
+	@Autowired
+	private StoragePositionRecordDao storagePositionRecordDao;
+	// 运单商品链接操作dao对象
+	@Autowired
+	private TranshipmentCommodityDao transhipmentCommodityDao;
+	@Autowired
+	private WarehouseDao warehouseDao;
+	@Autowired
+	private ErrorTranshipmentBillDao errorTranshipmentBillDao;
+	@Autowired
+	private UserDao userDao;
+	@Autowired
+	private AccountDao accountDao;
+	@Autowired
+	private AccountDetailDao accountDetailDao;
+	@Autowired
+	private RenlingDao renlingDao;
+	@Autowired
+	private TranshipmentRouteDao transhipmentRouteDao;
+	
+	@Autowired
+	private OrderDao orderDao;
+	
+	@Resource(name = "orderService")
+	private OrderService orderService;
+	@Resource(name = "transhipmentRouteService")
+	private TranshipmentRouteService transhipmentRouteService;
+	@Resource(name = "storagePositionService")
+	private StoragePositionService storagePositionService;
+	@Resource(name="productRecordService")
+	private ProductRecordService productRecordService;
+	@Resource(name="transhipmentBillService")
+	private TranshipmentBillService transhipmentBillService;
+	
+
+	public ResponseObject<Object> addTranshipment(TranshipmentBill bill, List<TranshipmentCommodity> lists)
+	        throws ServiceException {
+		ResponseObject<Object> responseObj = new ResponseObject<Object>();
+		if (bill == null /*|| lists== null*/) {
+			responseObj.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObj.setMessage("参数无效");
+		} else {
+			try {
+				bill.setCreateDate(DateUtil.date2String(new Date()));
+				bill.setModifyDate(DateUtil.date2String(new Date()));
+				
+				int irbill = this.transhipmentBillDao.insertTranshipmentBill(bill);
+				if (irbill > 0) {
+					int id=this.transhipmentBillDao.getlastidbyuser(bill.getUserId());
+					/*for (TranshipmentCommodity tc : lists) {
+						tc.setTranshipmentId(bill.getId());
+					}
+					int ircomm = this.transhipmentCommodityDao.insertTranshipmentCommodity(lists);
+					if (ircomm == lists.size()) {
+						responseObj.setCode(ResponseCode.SUCCESS_CODE);
+					} else {
+						// 操作失败，抛出异常，提醒spring框架进行事务回滚
+						throw new Exception();
+					}*/
+					
+					//插入转运路由
+					TranshipmentRoute route = new TranshipmentRoute();
+					
+					route.setDate(DateUtil.date2String(new Date()));
+					route.setRemark("用户添加包裹预报");
+					route.setTranshipmentId(String.valueOf(id));
+					route.setState(TranshipmentUtil.transformerState(0, Constant.TRANSHIPMENT_STATE_ROUTE0));
+					
+					this.transhipmentRouteDao.insert(route);
+					
+					responseObj.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObj.setCode(ResponseCode.TRANSHIPMENT_INSERT_ERROR);
+					responseObj.setMessage("操作失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObj;
+	}
+
+	public ResponseObject<Object> deleteTranshipment(List<String> ids, String state) throws ServiceException {
+		ResponseObject<Object> responseObj = new ResponseObject<Object>();
+		if (ids == null || ids.isEmpty()) {
+			responseObj.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObj.setMessage("参数无效");
+		} else {
+			int count = ids.size();
+			try {
+				int irt = this.transhipmentBillDao.deleteMultiTranshipmentBill(state, ids);
+				if (irt == count) {
+					this.transhipmentCommodityDao.deleteMultiTranshipmentCommodity(ids);
+					responseObj.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					// 进行事务回滚
+					int	irt1 = this.transhipmentBillDao.deleteMultiTranshipmentBill(Constant.TRANSHIPMENT_STATE_8, ids);//已退货的可以删除
+					if((irt1+irt)== count)
+					{
+						this.transhipmentCommodityDao.deleteMultiTranshipmentCommodity(ids);
+						responseObj.setCode(ResponseCode.SUCCESS_CODE);
+					}
+					else
+					{
+						throw new Exception();
+					}
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObj;
+	}
+
+	public ResponseObject<Object> deleteTranshipmentByUserId(List<String> ids, String userId) throws ServiceException {
+		ResponseObject<Object> responseObj = new ResponseObject<Object>();
+		if (ids == null || ids.isEmpty() || StringUtil.isEmpty(userId)) {
+			responseObj.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObj.setMessage("参数无效");
+		} else {
+			int count = ids.size();
+			try {
+				int irt = this.transhipmentBillDao.deleteTranshipmentBill(userId, ids);
+				if (irt == count) {
+					this.transhipmentCommodityDao.deleteMultiTranshipmentCommodity(ids);
+					responseObj.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					// 进行事务回滚
+					throw new Exception();
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObj;
+	}
+
+	
+	//kai 20150929 modify 修改添加用户余额
+	public ResponseObject<TranshipmentBill> getById(String id) throws ServiceException {
+		ResponseObject<TranshipmentBill> responseObj = new ResponseObject<TranshipmentBill>();
+		if (StringUtil.isEmpty(id)) {
+			responseObj.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObj.setMessage("参数无效");
+		} else {
+			try {
+				TranshipmentBill bill = this.transhipmentBillDao.getById(id);
+				User user=new User();
+				user=this.userDao.getUserById(bill.getUserId());
+				bill.setRmbBalance(user.getRmbBalance());
+				bill.setUsdBalance(user.getUsdBalance());
+				if(!StringUtil.isEmpty(bill.getTranWarehouseId()))
+				{
+					Warehouse house=this.warehouseDao.getById(bill.getTranWarehouseId());
+					if(house!=null)
+					{
+						bill.setTranWarehouseName(house.getName());//设置转运州名称
+					}
+				}
+				
+				if (bill != null) {
+					responseObj.setCode(ResponseCode.SUCCESS_CODE);
+					responseObj.setData(bill);
+				} else {
+					responseObj.setCode(ResponseCode.TRANSHIPMENT_ID_NOT_EXISTS);
+					responseObj.setMessage("运单不存在");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObj;
+	}
+
+	public ResponseObject<Object> modifyTranshipment(TranshipmentBill bill, List<TranshipmentCommodity> lists,
+	        String empName) throws ServiceException {
+		ResponseObject<Object> responseObj = new ResponseObject<Object>();
+		if (bill == null) {
+			responseObj.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObj.setMessage("参数无效");
+		} else {
+			try {
+				// 修改最后操作时间
+				String date = DateUtil.date2String(new Date());
+				bill.setModifyDate(date);
+				int irt;
+				if(StringUtil.isEmpty(bill.getTranWarehouseId()))
+				{
+					bill.setTranWarehouseId("-1");
+				}
+				//状态大于已入库的都必须填写地址
+				if(((bill.getTransitType()!=null)&&bill.getTransitType().equalsIgnoreCase("1"))||((!StringUtil.isEmpty(bill.getState())&&(Double.parseDouble(bill.getState())>Double.parseDouble(Constant.TRANSHIPMENT_STATE1)))))//添加快速类型的更新
+				{
+					irt = this.transhipmentBillDao.updateTranshipmentBillquicktype(bill);
+				}
+				else
+				{
+					irt = this.transhipmentBillDao.updateTranshipmentBill(bill);
+				}
+				if (irt > 0) {
+					if (lists != null && !lists.isEmpty()) {
+						// 修改运单商品列表信息
+						String transhipmentId = bill.getId();
+						this.transhipmentCommodityDao.deleteMultiTranshipmentCommodity(Arrays
+						        .asList(new String[] { transhipmentId }));
+						for (TranshipmentCommodity tc : lists) {
+							tc.setTranshipmentId(transhipmentId);
+						}
+						if (this.transhipmentCommodityDao.insertTranshipmentCommodity(lists) != lists.size()) {
+							// 事务回滚过
+							throw new Exception();
+						}
+					}
+					else//交上来的是空的，清空原有商品
+					{
+						String transhipmentId = bill.getId();
+						this.transhipmentCommodityDao.deleteMultiTranshipmentCommodity(Arrays
+						        .asList(new String[] { transhipmentId }));
+					}
+					
+					
+					//操作成功，插入仓位
+					boolean a=this.useStoragePosition(bill);//修改转运单操作
+					if(!a)//插入失败，重新查找原来是否存在，如果不存在，将分配一个新的。感觉分配新的不太好，还不如alert给用户，让他自己去储藏间操作
+					{
+						ResponseObject<StoragePosition> responsePosition = this.storagePositionService.findShouldIn(bill);
+						if(ResponseCode.SUCCESS_CODE.equals(responsePosition.getCode())){
+							a = this.useStoragePosition(bill);
+						}else{//返回告诉用户，已经没有仓位，或者还是失败，让他自己去储藏间管理操作
+							
+						}
+					}
+					if(a){//transhipmentBill操作成功 后，考虑order问题
+						if(!this.transferStoragePosition(bill)){//利用该transhipmentbill来添加order进仓位失败
+							
+						}
+					}
+					
+					// 根据状态值修改其他信息
+					if (Constant.TRANSHIPMENT_STATE_10.equals(bill.getState())) {
+						ErrorTranshipmentBillInfo info = new ErrorTranshipmentBillInfo();
+						info.setTranshId(bill.getId());
+						info.setCreateDate(date);
+						info.setModifyDate(date);
+						if (StringUtil.isEmpty(bill.getRemark())) {
+							info.setContent(empName + "修改预订单为包裹异常状态");
+						} else {
+							info.setContent(bill.getRemark());
+						}
+						info.setEmpName(empName);
+						info.setParentId("-1");
+						this.errorTranshipmentBillDao.insertErrorTranshInfo(info);
+					} else  {
+						// 修改异常运单状态为结束
+						ErrorTranshipmentBillInfo info = new ErrorTranshipmentBillInfo();
+						info.setTranshId(bill.getId());
+						info.setModifyDate(date);
+						info.setState(Constant.ERROR_TRANSH_STATE2);
+						this.errorTranshipmentBillDao.updateState(info);
+					}
+					
+					//插入路由
+					
+					//插入转运路由
+					TranshipmentRoute route = new TranshipmentRoute();
+					
+					route.setDate(DateUtil.date2String(new Date()));
+					route.setRemark("路由状态变动");
+					route.setTranshipmentId(String.valueOf(bill.getId()));
+					route.setState(TranshipmentUtil.transformerState(0, bill.getState()));
+					
+					this.transhipmentRouteDao.insert(route);
+					
+					responseObj.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObj.setCode(ResponseCode.TRANSHIPMENT_MODIFY_ERROR);
+					responseObj.setMessage("修改失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObj;
+	}
+	
+	
+	
+	//kai 20150930 修改运单并有可能要生成新运单并交费
+	public ResponseObject<Object> modifyTranshipmentandquick(TranshipmentBill bill, List<TranshipmentCommodity> lists,
+	        String empName) throws ServiceException {
+		ResponseObject<Object> responseObj = new ResponseObject<Object>();
+		if (bill == null) {
+			responseObj.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObj.setMessage("参数无效");
+		} else {
+			try {
+				// 修改最后操作时间
+				String date = DateUtil.date2String(new Date());
+				bill.setModifyDate(date);
+				int irt;
+				if((bill.getTransitType()!=null)&&bill.getTransitType().equalsIgnoreCase("1"))//添加快速类型的更新
+				{
+					irt = this.transhipmentBillDao.updateTranshipmentBillquicktype(bill);
+				}
+				else
+				{
+					irt = this.transhipmentBillDao.updateTranshipmentBill(bill);
+				}
+				if (irt > 0) {
+					if (lists != null && !lists.isEmpty()) {
+						// 修改运单商品列表信息
+						String transhipmentId = bill.getId();
+						this.transhipmentCommodityDao.deleteMultiTranshipmentCommodity(Arrays
+						        .asList(new String[] { transhipmentId }));
+						for (TranshipmentCommodity tc : lists) {
+							tc.setTranshipmentId(transhipmentId);
+						}
+						if (this.transhipmentCommodityDao.insertTranshipmentCommodity(lists) != lists.size()) {
+							// 事务回滚过
+							throw new Exception();
+						}
+					}
+					// 根据状态值修改其他信息
+					if (Constant.TRANSHIPMENT_STATE3.equals(bill.getState())) {
+						ErrorTranshipmentBillInfo info = new ErrorTranshipmentBillInfo();
+						info.setTranshId(bill.getId());
+						info.setCreateDate(date);
+						info.setModifyDate(date);
+						if (StringUtil.isEmpty(bill.getRemark())) {
+							info.setContent(empName + "修改预订单为包裹异常状态");
+						} else {
+							info.setContent(bill.getRemark());
+						}
+						info.setEmpName(empName);
+						info.setParentId("-1");
+						this.errorTranshipmentBillDao.insertErrorTranshInfo(info);
+					} else if (Constant.TRANSHIPMENT_STATE2.equals(bill.getState())
+					        || Constant.TRANSHIPMENT_STATE4.equals(bill.getState())) {
+						// 修改异常运单状态为结束
+						ErrorTranshipmentBillInfo info = new ErrorTranshipmentBillInfo();
+						info.setTranshId(bill.getId());
+						info.setModifyDate(date);
+						info.setState(Constant.ERROR_TRANSH_STATE2);
+						this.errorTranshipmentBillDao.updateState(info);
+					}
+					responseObj.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObj.setCode(ResponseCode.TRANSHIPMENT_MODIFY_ERROR);
+					responseObj.setMessage("修改失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObj;
+	}
+	
+
+	public ResponseObject<PageSplit<TranshipmentBill>> searchByKey(String tid, String key, String column, String sdate,
+	        String edate, String storeid,int pageSize, int pageNow) throws ServiceException {
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			int rowCount = 0;
+			try {
+				rowCount = this.transhipmentBillDao.countByKey(tid, key, column, sdate, edate, null, null,storeid);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单数量失败", e);
+			}
+
+			ResponseObject<PageSplit<TranshipmentBill>> responseObj = new ResponseObject<PageSplit<TranshipmentBill>>(
+			        ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<TranshipmentBill> pageSplit = new PageSplit<TranshipmentBill>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<TranshipmentBill> bills = this.transhipmentBillDao.searchByKey(tid, key, column, sdate, edate,
+					        null, startIndex, pageSize, null,storeid);
+					if (bills != null && !bills.isEmpty()) {
+						for (TranshipmentBill tb : bills) {
+							if(tb!=null)
+							{
+								Warehouse house=null;
+								if(!StringUtil.isEmpty(tb.getWarehouseId()))
+								{
+									house=this.warehouseDao.getById(tb.getWarehouseId());
+									if(house!=null)
+									{
+										tb.setWarehouseName(house.getName());
+									}
+									else
+									{
+										tb.setWarehouseName("");
+									}
+								}
+								if(!StringUtil.isEmpty(tb.getTranWarehouseId()))
+								{
+									house=this.warehouseDao.getById(tb.getTranWarehouseId());
+									if(house!=null)
+									{
+										tb.setTranWarehouseName(house.getName());
+									}
+									else
+									{
+										tb.setTranWarehouseName("");
+									}
+								}
+							}
+							pageSplit.addData(tb);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取预运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有预运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	
+	public ResponseObject<PageSplit<TranshipmentBill>> searchByKeynew(String tid, String key, String column, String sdate,
+	        String edate, int pageSize, int pageNow,String state,String trantype,String storeid,String tranwid,String towid) throws ServiceException {
+		String usercode=null;
+		try {
+			
+			
+			
+			key = StringUtil.escapeStringOfSearchKey(key);
+			if((state==null)||state.equalsIgnoreCase(""))
+			{
+				state=null;
+			}
+			if((trantype==null)||trantype.equalsIgnoreCase(""))
+			{
+				trantype=null;
+			}
+			
+			if(tid!=null)
+			{
+				tid="%"+tid+"%";
+			}
+			if((column!=null)&&(column.equalsIgnoreCase("6")))//添加用户唯一标识标志
+			{
+				if(key!=null)//查找值不为空
+				{
+					//key=key.toUpperCase();
+					usercode="6";//不为空将搜索唯一标识
+				}
+				column=null;
+			}
+			
+			int rowCount = 0;
+			try {
+				rowCount = this.transhipmentBillDao.countByKeynew(tid, key, column, sdate, edate, null, state,trantype,usercode,storeid,tranwid,towid);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单数量失败", e);
+			}
+
+			ResponseObject<PageSplit<TranshipmentBill>> responseObj = new ResponseObject<PageSplit<TranshipmentBill>>(
+			        ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				
+				
+				
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<TranshipmentBill> pageSplit = new PageSplit<TranshipmentBill>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<TranshipmentBill> bills = this.transhipmentBillDao.searchByKeynew(tid, key, column, sdate, edate,
+					        null, startIndex, pageSize, state,trantype,usercode,storeid,tranwid,towid);
+					if (bills != null && !bills.isEmpty()) {
+						for (TranshipmentBill tb : bills) {
+							if(tb!=null)
+							{
+								if(!StringUtil.isEmpty(tb.getUserId()))
+								{
+									User user=this.userDao.getUserById(tb.getUserId());
+									
+									if(user!=null)
+									{
+										tb.setUser(user);
+										if(StringUtil.isEmpty(tb.getUsdBalance()))
+										{
+											tb.setUsdBalance(user.getUsdBalance());
+										}
+										if(StringUtil.isEmpty(tb.getUseralias()))
+										{
+											tb.setUseralias(user.getUseralias());
+										}
+										if(StringUtil.isEmpty(tb.getUsercode()))
+										{
+											tb.setUsercode(user.getUsercode());
+										}
+										if(StringUtil.isEmpty(tb.getUserName()))
+										{
+											if(!StringUtil.isEmpty(user.getPhone()))
+											{
+												tb.setUserName(user.getPhone());
+											}
+											else
+											{
+												tb.setUserName(user.getEmail());
+											}
+											
+										}
+										
+										if(StringUtil.isEmpty(tb.getUserRealName()))
+										{
+											tb.setUserRealName(user.getRealName());
+										}
+									}
+								}
+								
+								
+								
+								Warehouse house=null;
+								if(!StringUtil.isEmpty(tb.getWarehouseId()))
+								{
+									house=this.warehouseDao.getById(tb.getWarehouseId());
+									if(house!=null)
+									{
+										tb.setWarehouseName(house.getName());
+									}
+									else
+									{
+										tb.setWarehouseName("");
+									}
+								}
+								if(!StringUtil.isEmpty(tb.getTranWarehouseId()))
+								{
+									house=this.warehouseDao.getById(tb.getTranWarehouseId());
+									if(house!=null)
+									{
+										tb.setTranWarehouseName(house.getName());
+									}
+									else
+									{
+										tb.setTranWarehouseName("");
+									}
+								}
+							}
+							pageSplit.addData(tb);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取预运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有预运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<PageSplit<TranshipmentBill>> searchByUserId(String tid, String userId, String state, String storeid,int pageSize,
+	        int pageNow) throws ServiceException {
+		try {
+			tid = StringUtil.escapeStringOfSearchKey(tid);
+			String column = "`transhipment_bill`.`id`";
+			int rowCount = 0;
+			try {
+				rowCount = this.transhipmentBillDao.countByKey(null, tid, column, null, null, userId, state, storeid);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单数量失败", e);
+			}
+
+			ResponseObject<PageSplit<TranshipmentBill>> responseObj = new ResponseObject<PageSplit<TranshipmentBill>>(
+			        ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<TranshipmentBill> pageSplit = new PageSplit<TranshipmentBill>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<TranshipmentBill> bills = this.transhipmentBillDao.searchByKey(null, tid, column, null, null,
+					        userId,startIndex, pageSize, state, storeid);
+					if (bills != null && !bills.isEmpty()) {
+						for (TranshipmentBill tb : bills) {
+							pageSplit.addData(tb);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取预运单列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有预运单");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<List<TranshipmentBill>> getTranshipmentByOrderId(String orderId) throws ServiceException {
+		try {
+			List<TranshipmentBill> bills = this.transhipmentBillDao.getByOrderId(orderId);
+			if (bills != null && bills.size() > 0) {
+				ResponseObject<List<TranshipmentBill>> result = new ResponseObject<List<TranshipmentBill>>(
+				        ResponseCode.SUCCESS_CODE);
+				result.setData(bills);
+				return result;
+			} else {
+				return new ResponseObject<List<TranshipmentBill>>(ResponseCode.PARAMETER_ERROR, "数据库中没有对应该运单号的转运单信息");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<List<TranshipmentBill>> getByIds(String userId, List<String> ids) throws ServiceException {
+		try {
+			ResponseObject<List<TranshipmentBill>> result = new ResponseObject<List<TranshipmentBill>>();
+			List<TranshipmentBill> list = this.transhipmentBillDao.getByIds(userId, ids);
+			result.setData(list);
+			return result;
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+
+	@Override
+	public ResponseObject<Object> createPreOrder(String id, WayBill wayBill) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try{
+			responseObject = orderService.check_mux_Submit(wayBill);
+			if(responseObject.getCode().equals(ResponseCode.SUCCESS_CODE)){
+				TranshipmentBill transhipmentBill = transhipmentBillDao.getById(id);
+				if(null == transhipmentBill){
+					responseObject.setCode(ResponseCode.TRANSHIPMENT_ID_NOT_EXISTS);
+					responseObject.setMessage("运单不存在");
+				}else{
+					transhipmentBill.setState(Constant.TRANSHIPMENT_STATE_PRE_ORDER);
+					transhipmentBill.setModifyDate(DateUtil.date2String(new Date()));
+					TranshipmentUtil.setTranshipConsignee(transhipmentBill, wayBill.getConsigneeInfo());
+					int result = transhipmentBillDao.updateToPreOrder(transhipmentBill);
+					if(result > 0){
+//						result = transhipmentCommodityDao.updatePreOrderByIds(id, wayBill.getCommodityIdList());
+						if(result > 0){
+							responseObject.setCode(ResponseCode.SUCCESS_CODE);
+						}else{
+							responseObject.setCode(ResponseCode.TRANSHIPMENT_CREATE_PREORDER_ERROR);
+							responseObject.setMessage("更新transhipment关联商品异常");
+						}
+					}else{
+						responseObject.setCode(ResponseCode.TRANSHIPMENT_CREATE_PREORDER_ERROR);
+						responseObject.setMessage("更新transhipment数据异常");
+					}
+				}
+			}
+		}catch (Exception e){
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> auditPreOrder(TranshipmentBill transhipmentBill) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(transhipmentBill == null){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数错误");
+		}else{
+			try{
+				TranshipmentBill transhipmentBillOriginal = this.transhipmentBillDao.getById(transhipmentBill.getId());
+				//no need to update
+				transhipmentBill.setcName(null);
+				transhipmentBill.setcProvince(null);
+				transhipmentBill.setcCity(null);
+				transhipmentBill.setcDistrict(null);
+				transhipmentBill.setcStreetAddress(null);
+				transhipmentBill.setcZipCode(null);
+				transhipmentBill.setcPhone(null);
+				TranshipmentUtil.setUpUpdateInfo(transhipmentBillOriginal, transhipmentBill);
+				this.modifyTranshipment(transhipmentBillOriginal, transhipmentBill.getCommoditys(), transhipmentBill.getEmpId());
+				//end of original use
+				transhipmentBill = this.transhipmentBillDao.getById(transhipmentBill.getId());
+				if(Constant.TRANSHIPMENT_STATE4.equals(transhipmentBill.getState())){//become a order
+					User user = userDao.getUserById(transhipmentBill.getUserId());
+					WayBill wayBill = TranshipmentUtil.transformTranshipment2WayBill(transhipmentBill, user, Constant.ORDER_TYPE_WEB, Constant.ORDER_SUBMIT_TYPE_MUBOX);
+					ResponseObject<List<String>> responseString = orderService.addOrdersOfWayBillbyusermux(wayBill);
+					if(responseString.getData() != null && !StringUtil.isEmpty(responseString.getData().get(0))){
+						StringBuffer stringBuffer = new StringBuffer("订单号为：");//这东西貌似不能存在remark这里，如果把更新放到这下面会更新失败
+						for(String orderId : responseString.getData()){
+							stringBuffer.append(orderId).append(";");
+						}
+						String remark = stringBuffer.toString();
+						this.transhipmentBillDao.updateStateAndRemark(transhipmentBill.getId(), Constant.TRANSHIPMENT_STATE4, remark, DateUtil.date2String(new Date()));
+						responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					}else{
+						responseObject.setCode(responseString.getCode());
+						responseObject.setMessage(responseString.getMessage());
+						return responseObject;
+					}
+				}
+			}catch(Exception e){
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> addByAdmin(TranshipmentBill transhipmentBill)
+			throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if (transhipmentBill == null || StringUtil.isEmpty(transhipmentBill.getUserId())) {
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		} else {
+			try {
+				transhipmentBill.setCreateDate(DateUtil.date2String(new Date()));
+				transhipmentBill.setModifyDate(DateUtil.date2String(new Date()));
+				transhipmentBill.setState(Constant.TRANSHIPMENT_STATE1);
+				int result = this.transhipmentBillDao.insertTranshipmentBill(transhipmentBill);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.TRANSHIPMENT_INSERT_ERROR);
+					responseObject.setMessage("数据库管理员添加数据失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> addByProductRecord(TranshipmentBill transhipmentBill, ProductRecord productRecord) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if (transhipmentBill == null || StringUtil.isEmpty(transhipmentBill.getUserId()) || productRecord == null || StringUtil.isEmpty(productRecord.getId())) {
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		} else {
+			try {
+				int transhipmentResult = -1;
+				if(Constant.PRODUCT_RECORD_STATE_FINISHED.equals(productRecord.getState())){
+					ProductUtil.transfer2TranshipmentBill(productRecord, transhipmentBill);
+					transhipmentBill.setCreateDate(DateUtil.date2String(new Date()));
+					transhipmentBill.setModifyDate(DateUtil.date2String(new Date()));
+					transhipmentBill.setState(Constant.TRANSHIPMENT_STATE0);
+					transhipmentResult = this.transhipmentBillDao.insertTranshipmentBill(transhipmentBill);
+					if(transhipmentResult > 0){
+						productRecord.setEmpRemark("运单号:" + transhipmentBill.getTransitNo());
+					}else{
+						responseObject.setCode(ResponseCode.TRANSHIPMENT_INSERT_ERROR);
+						responseObject.setMessage("转换转运单失败");
+					}
+					
+				}
+				if(transhipmentResult != 0){
+					ResponseObject<Object> recordResponseObject = productRecordService.audit(productRecord);
+					if(ResponseCode.SUCCESS_CODE.equals(recordResponseObject.getCode())){
+						responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					} else {
+						responseObject.setCode(ResponseCode.PRODUCT_REMARK_UPDATE_FAIL);
+						responseObject.setMessage("审核商品下单失败");
+					}
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<PageSplit<TranshipmentBill>> searchWithRouteByKey(String id, String key, String type, String state, String warehouseId, String createDateStart, String createDateEnd, int pageSize, int pageIndex)
+			throws ServiceException {
+		ResponseObject<PageSplit<TranshipmentBill>> responseObject = new ResponseObject<PageSplit<TranshipmentBill>>();
+		if(!StringUtil.isEmpty(type)){
+			if(type.equals("0")){
+				type = "transit_no";
+			}else if(type.equals("1")){
+				type = "user_id";
+			}
+		}
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			int rowCount = this.transhipmentBillDao.countWithRouteByKey(id, key, type, createDateStart, createDateEnd, state, warehouseId);
+			if (rowCount > 0) {
+				PageSplit<TranshipmentBill> pageSplit = new PageSplit<TranshipmentBill>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, rowCount);
+				List<TranshipmentBill> list = this.transhipmentBillDao.searchWithRouteByKey(id, key, type, createDateStart, createDateEnd, state, warehouseId, firstResult, pageSize);
+				if (list != null && !list.isEmpty()) {
+					pageSplit.setDatas(list);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(pageSplit);
+				}else{
+					responseObject.setCode(ResponseCode.TRANSHIPMENT_EMPTY_LIST);
+					responseObject.setMessage("获取转运单列表失败");
+				}
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> takeBySelf(String id, String warehouseId) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if (StringUtil.isEmpty(id)) {
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		} else {
+			try {
+				TranshipmentBill transhipmentBill = this.getById(id).getData();
+				double payment = this.calcTranshipmentBillPayment(transhipmentBill);
+				double[] balance = PaymentUtil.calculatePayment(transhipmentBill.getUsdBalance(), transhipmentBill.getRmbBalance(), String.valueOf(payment), this.getCurUsaToCn());
+				if(balance == null){
+					responseObject.setCode(ResponseCode.USER_BALANCE_NOT_ENOUGH);
+					responseObject.setMessage("数据库管理员添加数据失败");
+				}else{
+					User user = this.userDao.getUserById(transhipmentBill.getUserId());
+					pay(user, String.valueOf(payment), id, transhipmentBill.getWarehouseId(), Constant.TRANSHIPMENT_STATE4);
+					
+					transhipmentRouteService.add(id, Constant.TRANSHIPMENT_ROUTE_STATE_TOKEN_BY_SELF, warehouseId);
+					int result = this.transhipmentBillDao.updateStateAndRemark(id, Constant.TRANSHIPMENT_STATE4, "已自提", DateUtil.date2String(new Date()));
+					if (result > 0) {
+						responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					} else {
+						responseObject.setCode(ResponseCode.TRANSHIPMENT_INSERT_ERROR);
+						responseObject.setMessage("数据库管理员添加数据失败");
+					}
+				}
+				
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	public String getCurUsaToCn() throws ServiceException {
+		try {
+			return this.globalargsDao.getcontentbyflag("cur_usa_cn");
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+	public double calcTranshipmentBillPayment(TranshipmentBill transhipmentBill) throws Exception{
+		try{
+			String userType = this.userDao.getUserById(transhipmentBill.getUserId()).getType();
+			BigDecimal price = new BigDecimal(0);
+			for(int i = 0; i<transhipmentBill.getCommoditys().size(); i++){
+				TranshipmentCommodity transhipmentCommodity = transhipmentBill.getCommoditys().get(i);
+				Commodity commodity = transhipmentCommodity.getCommodity();
+				String firstFee = commodity.getFirstFee();
+				String correspondingPrice = "0";
+				switch(userType){
+					case Constant.USER_TYPE_STORE:
+						correspondingPrice = commodity.getMsPrice();
+						break;
+					case Constant.USER_TYPE_VIP:
+						correspondingPrice = commodity.getVipOnePrice();
+						break;
+					case Constant.USER_TYPE_VIP2:
+						correspondingPrice = commodity.getVipTwoPrice();
+						break;
+					case Constant.USER_TYPE_VIP3:
+						correspondingPrice = commodity.getVipThreePrice();
+						break;
+					default:
+						correspondingPrice = commodity.getPrice();
+						break;
+				}
+				String sjWeight = PaymentUtil.calcWeightRound(transhipmentCommodity.getSjweight(), this.globalargsDao.getcontentbyflag(Constant.GLOBALARGS_FLAG_WEIGHT_ROUND_UP));//妈的，什么是射精重量？
+				price = StringUtil.string2BigDecimal(correspondingPrice).multiply(StringUtil.string2BigDecimal(sjWeight)).add(StringUtil.string2BigDecimal(firstFee));
+			}
+			BigDecimal tariff = StringUtil.string2BigDecimal(transhipmentBill.getTariff());
+			BigDecimal other = StringUtil.string2BigDecimal(transhipmentBill.getOther()); 
+			BigDecimal or = StringUtil.string2BigDecimal(transhipmentBill.getOr());
+			BigDecimal premium = StringUtil.string2BigDecimal(transhipmentBill.getPremium());
+			BigDecimal length = StringUtil.string2BigDecimal(transhipmentBill.getLength());
+			BigDecimal width = StringUtil.string2BigDecimal(transhipmentBill.getWidth());
+			BigDecimal height = StringUtil.string2BigDecimal(transhipmentBill.getHeight());
+			BigDecimal fromWarehousePrice = StringUtil.string2BigDecimal(transhipmentBill.getFromWarehousePrice());
+			
+			price = price.add(tariff).add(other).add(or).add(premium).add(length.multiply(width).multiply(height).divide(new BigDecimal(166), 3, BigDecimal.ROUND_HALF_UP).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+			double result = price.add(fromWarehousePrice).doubleValue();//提取加上转运州费用不加回国费用
+			return result;
+		}catch(Exception e){
+			e.printStackTrace();
+			throw new Exception("计算transhipment的总价出现异常");
+		}
+	}
+	private boolean pay(User user, String payment, String transhipmentId, String warehouseId, String routeState) throws ServiceException {
+		double[] balance = PaymentUtil.calculatePayment(user.getUsdBalance(),user.getRmbBalance(), payment, this.getCurUsaToCn());
+		String date = DateUtil.date2String(new Date());
+		AccountDetail detail = new AccountDetail();
+		detail.setAmount(payment);
+		detail.setCreateDate(date);
+		detail.setModifyDate(date);
+		detail.setState(Constant.ACCOUNT_DETAIL_STATE2);
+		detail.setCurrency("美元");
+		detail.setName("支付运费");
+		detail.setType(Constant.ACCOUNT_DETAIL_TYPE2);
+		detail.setUserId(user.getId());
+		String prefix = "现金支付";
+		Account account = new Account();
+		account.setUsd(String.valueOf(balance[0]));
+		account.setRmb(String.valueOf(balance[1]));
+		account.setUserId(user.getId());
+		account.setModifyDate(date);
+		try {
+			if (this.accountDao.modifyAccount(account) <= 0) {
+				ExceptionUtil.handle2ServiceException("账户更新越失败");
+			}
+			prefix = "帐户余额支付";
+			detail.setRemark(prefix + "转运单id：" + transhipmentId);
+			this.accountDetailDao.insertAccountDetail(detail);
+			TranshipmentRoute route = new TranshipmentRoute();
+			route.setDate(date);
+			route.setTranshipmentId(transhipmentId);
+			route.setWarehouseId(warehouseId);
+			route.setRemark(prefix);
+			route.setState(routeState);
+			this.transhipmentRouteService.add(route);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw ExceptionUtil.handle2ServiceException("进行账户支付出现异常", e);
+		}
+		return true;
+	}
+	
+	public ResponseObject<TranshipmentBill> getByIdAndUser(String id, String userId) throws ServiceException {
+		ResponseObject<TranshipmentBill> responseObject = new ResponseObject<TranshipmentBill>();
+		if (StringUtil.isEmpty(id) || StringUtil.isEmpty(userId)) {
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		} else {
+			try {
+				TranshipmentBill bill = this.transhipmentBillDao.getByIdAndUserId(id, userId);
+				
+				
+				if (bill != null) {
+					
+					Account account=this.accountDao.getAccountByUserId(userId);
+					bill.setRmbBalance(account.getRmb());
+					bill.setUsdBalance(account.getUsd());
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(bill);
+				} else {
+					responseObject.setCode(ResponseCode.TRANSHIPMENT_ID_NOT_EXISTS);
+					responseObject.setMessage("你无此运单");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	
+	// kai 20151230 组合运单提交时,检查合法性
+	public ResponseObject<Object> check_mux_Submit(TranshipmentBill bill,String[] commoditylist)
+			throws ServiceException {
+		if ((bill == null)|| (commoditylist.length == 0)) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+		try {
+
+			Set<String> trancommids = new HashSet<String>();
+
+			//List<Order> orders = wayBill.getOrders();
+			//String[] commoditylist;
+			//commoditylist = wayBill.getCommodityIdList();
+
+			// 先去掉重复的值
+			for (int i = 0; i < commoditylist.length; i++) {
+				trancommids.add(commoditylist[i]);
+			}
+
+			for (String ids : trancommids) {
+				int com_no = 0;// 计算同一行中取多少个商品
+				for (int i = 0; i < commoditylist.length; i++) {
+					if (commoditylist[i].equalsIgnoreCase(ids))//
+					{
+						com_no = com_no + 1;
+					}
+
+				}
+				if (com_no > 0) {
+					TranshipmentCommodity comlist = this.transhipmentCommodityDao.getByIdsn(ids);
+					if (comlist == null) {
+						return new ResponseObject<Object>(
+								ResponseCode.ORDER_IS_SUBMITED,
+								"商品列表已经被更改,请联系客服!");
+					} else {
+
+						if (Integer.parseInt(comlist.getQuantity()) < com_no) {
+							return new ResponseObject<Object>(
+									ResponseCode.ORDER_IS_SUBMITED,
+									"商品列表已经被更改,请联系客服!");
+						} else {
+							TranshipmentBill bill_no = this.transhipmentBillDao
+									.getById(comlist.getTranshipmentId());
+							if (bill_no == null) {
+								return new ResponseObject<Object>(
+										ResponseCode.ORDER_IS_SUBMITED,
+										"转运订单异常，请联系客服!");
+							} else {
+								
+									if ((!bill.getWarehouseId()
+											.equalsIgnoreCase(
+													bill_no.getWarehouseId()))
+											|| (!bill
+													.getChannelId()
+													.equalsIgnoreCase(
+															bill_no.getChannelId()))) {
+										return new ResponseObject<Object>(
+												ResponseCode.ORDER_IS_SUBMITED,
+												"组合包裹必须是同一仓库和同一渠道,请联系客服!");
+									}
+								
+
+							}
+
+						}
+
+					}
+				}
+			}
+
+			return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+	
+	
+	// kai 20151230 用户提交转运组合商品时的处理接口
+
+	public ResponseObject<Object> muxboxSubmit(TranshipmentBill bill,String[] commoditylist)
+				throws ServiceException {
+			try {
+				String userId = bill.getUserId();
+
+				
+				bill.setUserId(userId);
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 设置日期格式
+
+				bill.setCreateDate(df.format(new Date()));
+				bill.setModifyDate(df.format(new Date()));
+				bill.setState(Constant.TRANSHIPMENT_STATE2);
+				bill.setAwt(df.format(new Date()));
+				bill.setTransitNo("composed");//包裹号
+				bill.setTariff("0");
+				//bill.setOr("0");
+				bill.setOther("0");
+				bill.setLength("0");
+				bill.setWidth("0");
+				bill.setHeight("0");
+				bill.setTransitType("0");
+
+				
+
+				int k = this.transhipmentBillDao.insertTranshipmentBill(bill);
+				int tranid = this.transhipmentBillDao.getidByOrderId(userId);
+
+				
+
+				Set<String> trancommids = new HashSet<String>();
+				Set<String> transitnolists = new HashSet<String>();
+				Set<String> tranwidnolists = new HashSet<String>();
+				Set<String> trancids = new HashSet<String>();// 保存包含运单的id
+
+				
+
+				for (int i = 0; i < commoditylist.length; i++) {
+					trancommids.add(commoditylist[i]);
+				}
+
+				// 开始取值
+				for (String ids : trancommids) {
+					int com_no = 0;// 计算同一行中取多少个商品
+					for (int i = 0; i < commoditylist.length; i++) {
+						if (commoditylist[i].equalsIgnoreCase(ids))//
+						{
+							com_no = com_no + 1;
+						}
+
+					}
+
+					if (com_no > 0) {
+						// OrderDetail od = new OrderDetail();
+						TranshipmentCommodity tranc = new TranshipmentCommodity();
+						tranc.setTranshipmentId(String.valueOf(tranid));
+
+						TranshipmentCommodity comlist = this.transhipmentCommodityDao
+								.getByIdsn(ids);
+
+						if (comlist != null) {
+
+							if (Integer.parseInt(comlist.getQuantity()) >= com_no)// 更新运单商品订单
+							{
+
+								transitnolists.add(comlist.getTransitNo());//保存所有商品的包裹号
+								tranwidnolists.add(comlist.getTranWarehouseId());//记录转运的仓库号
+								trancids.add(String.valueOf(comlist
+										.getTranshipmentId()));// 保存商品对应的转运id
+								// 复制公共信息
+								tranc.setCommodityId(comlist.getCommodityId());
+								tranc.setXiangqing(comlist.getXiangqing());
+								tranc.setCommoditySku(comlist.getCommoditySku());
+								tranc.setEachjfweight(comlist.getEachjfweight());
+								tranc.setTransitNo(comlist.getTransitNo());
+								tranc.setQuantity(String.valueOf(com_no));
+								tranc.setTranWarehouseId(comlist.getTranWarehouseId());
+								// 计算新重量
+								double eachweight1 = 0;// 商品单件重量
+								double newweight = 0;
+								eachweight1 = StringUtil.string2Double(comlist
+										.getEachjfweight());
+								newweight = eachweight1 * com_no;// 计算商品重量
+								tranc.setSjweight(String.valueOf(newweight));
+
+								List<TranshipmentCommodity> tran_temp = new ArrayList<TranshipmentCommodity>();
+								tran_temp.add(tranc);
+								this.transhipmentCommodityDao
+										.insertTranshipmentCommodity(tran_temp);// 插入新行
+
+								if (Integer.parseInt(comlist.getQuantity()) != com_no)// 更新原表
+								{
+									double newquntity = Integer.parseInt(comlist
+											.getQuantity()) - com_no;// 产品新数量
+									// 更新原来数据
+									newweight = newquntity * eachweight1;// 计算商品重的新重量
+									comlist.setQuantity(String.valueOf(newquntity));
+									comlist.setSjweight(String.valueOf(newweight));
+									this.transhipmentCommodityDao
+											.modifyTranshipmentnyIdsn(comlist);
+								} else// 原有商品已经被清空，删除此商品
+								{
+									this.transhipmentCommodityDao
+											.deletesimpleTranshipmentCommodity(comlist
+													.getId());
+								}
+
+							}
+
+						}
+
+					}
+				}
+
+				String TransitNo = "";// 记录合成后的转运包裹号
+				String  tranwidno="0";// 记录合成后的转运仓库号
+				int tempno=0;
+				for (String ids : transitnolists) {
+					if(tempno==0)
+					{
+						if(!StringUtil.isEmpty(ids))
+						{
+							TransitNo=TransitNo+ids;
+							tempno++;
+						}
+					}
+					else
+					{
+						if(!StringUtil.isEmpty(ids))
+						{
+							TransitNo=TransitNo+" | "+ids;
+							tempno++;
+						}
+					}
+				}
+				tempno=0;
+				for (String ids : tranwidnolists) {
+					if(tempno==0)
+					{
+						if(!StringUtil.isEmpty(ids))
+						{
+							tranwidno=ids;
+							tempno++;
+						}
+					}
+					else
+					{
+						if(!StringUtil.isEmpty(ids))
+						{
+							tranwidno=tranwidno+"|"+ids;
+							tempno++;
+						}
+					}
+				}
+				
+				
+				
+				int sizetranid = trancids.size();
+				for (String tid : trancids)// 开始检查调整后，原来的订单是否还有商品
+				{
+
+					// 记录原有的包裹号
+					TranshipmentBill billtemp = this.transhipmentBillDao
+							.getById(tid);
+					int tempii = 0;
+					/*if ((billtemp.getTransitNo() != null)
+							&& (!billtemp.getTransitNo().equalsIgnoreCase(""))) {
+						tempii++;
+						if (tempii != sizetranid)// 不是最后一个
+						{
+							if (!TransitNo.equalsIgnoreCase(""))// 不为空
+							{
+								TransitNo = TransitNo + " | "
+										+ billtemp.getTransitNo();
+							} else {
+								TransitNo = billtemp.getTransitNo();
+							}
+
+						}
+					}*/
+
+					int i = this.transhipmentCommodityDao
+							.countTranshipmentCommodity(tid);// 查找此运单的商品是否继续存在
+					if (i > 0) {
+						List<TranshipmentCommodity> trancommlist = this.transhipmentCommodityDao
+								.getById(tid);
+
+						double weight = 0;
+						double weightkg = 0;
+						for (TranshipmentCommodity list : trancommlist) {
+							weight = StringUtil.string2Double(list.getSjweight())
+									+ weight;
+
+						}
+
+						weightkg = 0.4535924 * weight;
+						this.transhipmentBillDao
+								.updateTranshipmentBillremovecommditysnew(
+										df.format(new Date()),
+										String.valueOf(weight),
+										String.valueOf(weightkg), tid);
+					} else {
+						StoragePositionRecord storagePositionRecord = new StoragePositionRecord(); 
+						storagePositionRecord.setRelateId(tid);
+						if(null != billtemp.getStoragePosition()){
+							storagePositionRecord.setStoragePositionId(billtemp.getStoragePosition().getId());
+							this.storagePositionRecordDao.deleteByRelate(storagePositionRecord);
+						}
+						
+						this.transhipmentBillDao.deleteTranshipmentBillbyid(tid);// 已经没有它的商品，删除此运单
+					}
+				}
+
+				// 计算新运单的商品重量
+				List<TranshipmentCommodity> trancommlist = this.transhipmentCommodityDao
+						.getById(String.valueOf(tranid));
+				Set<String> trancno_bg = new HashSet<String>();// 保存包含运单转包裹号，用于插入新生成的运单的转运id
+				double weight = 0;
+				for (TranshipmentCommodity list : trancommlist) {
+					weight = StringUtil.string2Double(list.getSjweight()) + weight;
+				}
+				bill.setWeight(String.valueOf(weight));
+				bill.setId(String.valueOf(tranid));
+				bill.setWeightKg(String.valueOf(0.4535924 * weight));
+				bill.setTransitNo(TransitNo);
+				bill.setTranWarehouseId(tranwidno);
+				// this.transhipmentBillDao.updateTranshipmentBill(bill);
+				this.transhipmentBillDao.updateTranshipmentBillcomposed(bill);
+
+				// }
+
+				//ResponseObject<List<String>> responseObj = quickboxSubmit_process(
+				//		wayBill, String.valueOf(tranid));
+				
+				ResponseObject<Object> responseObj = new
+				 ResponseObject<Object>(
+				 ResponseCode.SUCCESS_CODE);
+				 responseObj.setData(tranid);
+
+				return responseObj;
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+
+	public ResponseObject<Object> trantToOrder(String id) throws ServiceException
+	{
+		if(StringUtil.isEmpty(id))
+		{
+			return new ResponseObject<Object>(ResponseCode.TRANSHIPMENT_ID_ERROR,
+					"参数无效");
+		}
+		try
+		{
+			//先判断钱是否足够
+			double rate=Double.parseDouble(this.globalargsDao.getcontentbyflag("cur_usa_cn"));
+			TranshipmentBill bill=this.transhipmentBillDao.getById(id);
+			double totalmoney=Double.parseDouble(bill.getTotalMoney());
+			if(totalmoney<=0)
+			{
+				return new ResponseObject<Object>(ResponseCode.TRANSHIPMENT_ID_ERROR,
+						"转运订单信息出错!");
+			}
+			Account account=this.accountDao.getAccountByUserId(bill.getUserId());
+			double rmb=Double.parseDouble(account.getRmb());
+			double usa=Double.parseDouble(account.getUsd());
+			if(totalmoney>usa)
+			{
+				if((totalmoney-usa)*rate>rmb)
+				{
+					return new ResponseObject<Object>(ResponseCode.ORDER_PAY_ACCOUNT_NOT_MONEY,
+							"余额不足!");
+				}
+			}
+			Order order=tran_to_order(bill);
+			if(StringUtil.isEmpty(bill.getCommodityCost()))
+			{
+				order.setCommodityCost(String.valueOf(this.orderService.calculationOrderCostFreight(order)));
+			}
+			else
+			{
+				order.setCommodityCost(String.valueOf(this.orderService.calculationOrderCostFreight(order)+Double.parseDouble(bill.getCommodityCost())));
+			}
+			order.setType(Constant.ORDER_TYPE_WEB);
+			order.setUserId(bill.getUserId());
+			//order.setState(Constant.ORDER_STATE3);
+			order.setOrderIdPrefix(Constant.ORDER_ID_PREFIX_WEB);
+			User user = this.userDao.getUserById(bill.getUserId());
+			String type =user.getType();
+			ResponseObject<Map<String, String>> obj=this.orderService.addOrderbytranship(order, type);
+			if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))
+			{
+				//插入完成
+				List<String> array = new ArrayList<String>();
+				array.add(obj.getData().get("id").toString());
+				
+				account=this.accountDao.getAccountByUserId(bill.getUserId());
+				rmb=Double.parseDouble(account.getRmb());
+				usa=Double.parseDouble(account.getUsd());
+					double newusd = usa - totalmoney;
+					double newrmb = rmb; // 先用美元支付
+					if (newusd >= 0) {
+						// ignore
+					} else {
+						newusd = 0.0D; // 人民币余额全部支付，开始扣美元的钱
+						newrmb = new BigDecimal((rmb - (totalmoney - usa)*rate)).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+						if(newrmb<0)
+						{
+							throw new Exception("余额不足!");
+						}
+					}
+					ResponseObject<Object> responseObj1= this.orderService.pay(array, Arrays.asList(obj.getData().get("orderId").toString()),
+							bill.getUserId(), String.valueOf(totalmoney), newrmb, newusd,
+							true);
+					
+					if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(responseObj1.getCode()))
+					{
+						int k=this.transhipmentBillDao.updateState(bill.getId(), Constant.TRANSHIPMENT_STATE4);
+						if(k<1)
+						{
+							throw new Exception("修改转运单状态失败!");
+						}
+						else
+						{
+							k=this.transhipmentBillDao.updateorderidbyid(bill.getId(), obj.getData().get("orderId").toString());
+							if(k<1)
+							{
+								throw new Exception("修改转运单信息失败!");
+							}
+						}
+						
+						
+						TranshipmentRoute route = new TranshipmentRoute();
+						
+						route.setDate(DateUtil.date2String(new Date()));
+						route.setRemark("用户支付，帐户扣除："+bill.getTotalMoney()+"美元!");
+						
+						 
+						route.setWarehouseId(bill.getWarehouseId());
+						 
+						route.setTranshipmentId(String.valueOf(bill.getId()));
+						route.setState(TranshipmentUtil.transformerState(0, Constant.TRANSHIPMENT_STATE4));
+						
+						this.transhipmentRouteDao.insert(route);
+						
+						responseObj1.setCode(ResponseCode.SUCCESS_CODE);
+						responseObj1.setData(obj.getData().get("orderId").toString());
+						return responseObj1;
+					}
+					else
+					{
+						throw new Exception("生成运单出现异常!");
+					}
+				
+			}
+			else
+			{
+				return new ResponseObject<Object>(ResponseCode.TRANSHIPMENT_ROUTE_INSERT_ERROR,
+						"生成运单失败!");
+			}
+			
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		
+	}
+	//构造转运单到order的数据交换
+	/*
+	 * bill表示转的转运单,返回交换后的order类
+	 * */
+	public Order tran_to_order(TranshipmentBill bill)
+	{
+		if(bill==null)
+		{
+			return null;
+		}
+		
+		Order order=new Order();
+		order.setCardid(bill.getCardid());
+		order.setCardurl(bill.getCardurl());
+		order.setCardurlother(bill.getCardurlother());
+		order.setCardurltogether(bill.getCardurltogether());
+		order.setcCity(bill.getcCity());
+		order.setcDistrict(bill.getcDistrict());
+
+		order.setcName(bill.getcName());
+		order.setcPhone(bill.getcPhone());
+		order.setcProvince(bill.getcProvince());
+		order.setCreateDate( DateUtil.date2String(new Date()));
+		order.setcStreetAddress(bill.getcStreetAddress());
+		order.setcZipCode(bill.getcZipCode());
+		List<String> transhipmentIds=new ArrayList<String>();
+		transhipmentIds.add(bill.getId());
+		order.setTranshipmentIds(transhipmentIds);
+		try{
+			List<OrderDetail> list = new ArrayList<OrderDetail>();
+			//List<String> commodityId = new ArrayList<String>();
+			int number=0;
+			if ((bill.getCommoditys() != null) && (bill.getCommoditys().size() > 0) ) {
+				for(TranshipmentCommodity comm :bill.getCommoditys())
+				{
+			        OrderDetail detail = new OrderDetail();
+			        detail.setCommodityId(comm.getCommodityId());
+			        detail.setQuantity(comm.getQuantity());
+			        detail.setXiangqing(comm.getXiangqing());
+			        detail.setSjweight(comm.getSjweight());
+			       // detail.setBrands(bill.getCommoditys().get(number).get);
+			        detail.setJwweight(comm.getSjweight());
+			        //detail.setJfweight(commodifys[4][0]);
+			        detail.setTranshipmentId(bill.getId());
+			        list.add(detail);
+				}
+		        //commodityId.add(commodifys[0][0]);
+		        order.setDetails(list.toArray(new OrderDetail[0]));
+				
+		    }
+			else
+			{
+				throw new Exception("商品不能为空!");
+			}
+		}
+		 catch (Exception e) {
+				
+			}
+		
+		
+		
+		
+		
+		order.setEmpId("-1");
+		order.setWeight(bill.getWeight());
+		order.setWeightKg(bill.getWeightKg());
+		order.setLength(bill.getLength());
+		order.setWidth(bill.getWidth());
+		order.setHeight(bill.getHeight());
+		order.setOther(bill.getOther());
+		order.setPremium(bill.getPremium());
+		order.setTariff(bill.getTariff());
+		order.setParceValue(bill.getParcelValue());
+		order.setOr(bill.getOr());
+		order.setTotalMoney(bill.getTotalMoney());
+		order.setWarehouseId(bill.getWarehouseId());
+		order.setChannelId(bill.getChannelId());
+		order.setStoreId(bill.getWarehouseId());
+		if(StringUtil.isEmpty(bill.getRemark()))
+		{
+			order.setRemark("转运包裹");
+		}
+		else
+		{
+			order.setRemark(bill.getRemark());
+		}
+	
+		return order;
+	}
+	
+	/**
+	 * 使用仓位，如果使用失败，可以提示管理员在仓位页面手动使用
+	 * @param transhipmentBill 自己要有id, 如果有页面指定的仓位，吧id放到属性的storagePosition.id中，否则将使用空的，或user使用中的(如果有)
+	 * @return 试用成功与否
+	 * @throws ServiceException
+	 */
+	public boolean useStoragePosition(TranshipmentBill transhipmentBill) throws ServiceException{
+		boolean result = false;
+		try{
+			StoragePosition storagePosition = null;
+			if(null != transhipmentBill.getStoragePosition() && !StringUtil.isEmpty(transhipmentBill.getStoragePosition().getId())){
+				//findById获取到多个storage_position_record结果
+				//li zhang 02292016
+//				storagePosition = this.storagePositionService.findById(transhipmentBill.getStoragePosition().getId()).getData();
+				storagePosition = this.storagePositionService.findByIdRelateId(transhipmentBill.getStoragePosition().getId(), transhipmentBill.getId()).getData();
+				if(null == storagePosition) //为null说明是初次分配需要用id查找
+					storagePosition = this.storagePositionService.findById(transhipmentBill.getStoragePosition().getId()).getData();
+			}
+			String transhipmentBillId = transhipmentBill.getId();
+			if(!StringUtil.isEmpty(transhipmentBill.getId())){
+				transhipmentBill = this.transhipmentBillDao.getById(transhipmentBill.getId());
+			}else{
+				return false;
+			}
+			int operation = StoragePositionUtil.getOperation(transhipmentBill);
+			if(transhipmentBill == null || StringUtil.isEmpty(transhipmentBill.getId())){
+				transhipmentBill = new TranshipmentBill();
+				transhipmentBill.setId(transhipmentBillId);
+				String code = this.storagePositionService.useStorage(storagePosition, transhipmentBill, operation).getCode();
+				result = ResponseCode.SUCCESS_CODE.equals(code);
+			}
+			if(-1 != operation){
+				if(null == storagePosition){
+					ResponseObject<StoragePosition> responseObject = this.storagePositionService.findShouldIn(transhipmentBill);
+					if(ResponseCode.SUCCESS_CODE.equals(responseObject.getCode())){
+						storagePosition = responseObject.getData();
+					}
+				}
+				String code = this.storagePositionService.useStorage(storagePosition, transhipmentBill, operation).getCode();
+				result = ResponseCode.SUCCESS_CODE.equals(code);
+			}else if(transhipmentBill == null || StringUtil.isEmpty(transhipmentBill.getId())){
+				transhipmentBill = new TranshipmentBill();
+				transhipmentBill.setId(transhipmentBillId);
+				String code = this.storagePositionService.useStorage(storagePosition, transhipmentBill, operation).getCode();
+				result = ResponseCode.SUCCESS_CODE.equals(code);
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return result;
+	}
+	private boolean transferStoragePosition(TranshipmentBill transhipmentBill) throws ServiceException{
+		boolean result = false;
+		try{
+			if(Constant.TRANSHIPMENT_STATE5.equals(transhipmentBill.getState())){
+				Order order = this.orderDao.getByOrderId(transhipmentBill.getOrderId());
+				if(order != null){
+					ResponseObject<StoragePosition> positionReponseObject = this.storagePositionService.findShouldIn(order);
+					if(ResponseCode.SUCCESS_CODE.equals(positionReponseObject.getCode())){
+						 order.setStoragePosition(positionReponseObject.getData());
+						 this.orderService.useStoragePosition(order);
+						 result = true;
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return result;
+	}
+	
+	
+	//转运单批量列新状态
+	public ResponseObject<Object> importExcelOfOrderState(
+			List<ExportTranshipmentBill> importOrders, String empName,String storeId)
+			throws ServiceException {
+		try {
+			String[] result= new String[importOrders.size()];
+			String date = DateUtil.date2String(new Date());
+			//List<TranshipmentBill> orders = new ArrayList<TranshipmentBill>();
+
+		
+			
+			int aa=0;
+			for (ExportTranshipmentBill io : importOrders) {
+				
+			
+					TranshipmentBill bill=null;
+					if(!StringUtil.isEmpty(io.getId()))
+					{
+						bill = this.transhipmentBillDao.getById(io.getId());
+					}
+					if(bill==null)
+					{
+						List<TranshipmentBill> bills=null;
+						if(!StringUtil.isEmpty(io.getTransitNo()))
+						{
+							bills = this.transhipmentBillDao.getByTransitNo(io.getTransitNo(),storeId);
+						}
+						if((bills!=null)&&(bills.size()>1))
+						{
+							int aaa=bills.size();
+							String tt=aaa+"";
+							io.setState_result("失败：转运包裹单号超过1个,数量为"+tt+"个");
+						}
+						else if((bills==null)||(bills.size()<1))
+						{
+							io.setState_result("失败：更新数据失败,请检查单号是否属于本仓库或字符格式!");
+							
+						}
+						else
+						{
+						    bill=bills.get(0);
+						    int k=0;
+							//未入库的处理方式
+							 if((StringUtil.isEmpty(bill.getState()))||(bill.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE0)))//没入库的，直接修改状态
+							 {
+								 //bill.setState(io.getState());
+								// bill.setWarehouseId(io.getWarehouseId());
+								 
+								 //bill.setTranWarehouseId(io.getTranWarehouseId());
+								// bill.setPretranwarehouseId(io.getPretranwarehouseId());
+								 k=this.transhipmentBillDao.updateTranshipmentBilltranStatebytransit_no(io.getState(), io.getWarehouseId(), io.getTranWarehouseId(), io.getPretranwarehouseId(), null,io.getTransitNo());
+							 }
+							 //已经入库的，更新状态还在转运中的
+							 else if((io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_7))||(io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6)))
+							 {
+								 //bill.setState(io.getState());
+								 //bill.setWarehouseId(io.getWarehouseId());
+								 
+								// bill.setTranWarehouseId(io.getTranWarehouseId());
+								// bill.setPretranwarehouseId(io.getPretranwarehouseId());
+								 if(io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_7))
+								 {
+									 k=this.transhipmentBillDao.updateTranshipmentBilltranStatebytransit_no(io.getState(), io.getWarehouseId(), null, io.getPretranwarehouseId(), storeId,io.getTransitNo());
+								 }
+								 else
+								 {
+									 k=this.transhipmentBillDao.updateTranshipmentBilltranStatebytransit_no(io.getState(), io.getWarehouseId(), io.getTranWarehouseId(), io.getPretranwarehouseId(), storeId,io.getTransitNo());
+								 }
+							 }
+							 else
+							 {
+								// bill.setState(io.getState());
+								 k=this.transhipmentBillDao.updateTranshipmentBilltranStatebytransit_no2(io.getState(),io.getWarehouseId(),storeId,io.getTransitNo());
+							 }
+							 
+							 if(k<1)
+							 {
+								// result[aa]="失败：更新数据失败!";
+								 io.setState_result("失败：更新数据失败,请检查单号是否属于本仓库或字符格式!");
+							 }
+							 else
+							 {
+								 
+								/*
+									//操作成功，插入仓位
+									boolean a=this.useStoragePosition(bill);
+									
+									if(a==false)//插入失败，重新查找原来是否存在，如果不存在，将分配一个新的
+									{
+										
+									}
+								if(Constant.TRANSHIPMENT_STATE5.equalsIgnoreCase(bill.getState()))//此状态要给运单分配仓位
+								{
+									 if(StringUtil.isEmpty(bill.getOrderId()))//这样分配全仓位?
+									 {
+										// Order order=this.orderService.getOrderByOrderId(bill.getOrderId());
+										 Order order = this.orderDao.getByOrderId(bill.getOrderId());//这里会不会包含仓库信息？
+										 if(order!=null)
+										 {
+											 this.orderService.useStoragePosition(order);
+										 }
+									 }
+								}
+								 */
+								 
+								 //li zhang 03012016 还是先获取storagePosition的好，useStoragePosition()处理的比较麻烦不小心就掉进坑了。
+								 StoragePosition storagePosition = this.storagePositionService.findStoragePositionByWarehoseIdTypeRelateUserOrNoUser(
+										 io.getWarehouseId(), StoragePositionUtil.getType(io), io.getPretranwarehouseId(), bill.getUserId(), bill.getId()).getData();
+								 bill.setStoragePosition(storagePosition);
+								 boolean a=this.useStoragePosition(bill);
+								 if(Constant.TRANSHIPMENT_STATE5.equalsIgnoreCase(bill.getState()) || Constant.TRANSHIPMENT_STATE_6.equalsIgnoreCase(bill.getState()))//此状态要给运单分配仓位
+									{
+										if(StringUtil.isEmpty(bill.getOrderId()))//这样分配全仓位?
+										 {
+											// Order order=this.orderService.getOrderByOrderId(bill.getOrderId());
+											 Order order = this.orderDao.getByOrderId(bill.getOrderId());//这里会不会包含仓库信息？
+											 if(order!=null)
+											 {
+												 storagePosition = new StoragePosition();
+												 storagePosition = this.storagePositionService.findStoragePositionByWarehoseIdTypeRelateUserOrNoUser(
+														 io.getWarehouseId(), StoragePositionUtil.getType(io), io.getPretranwarehouseId(), order.getUserId(), order.getId()).getData();
+												 order.setStoragePosition(storagePosition);
+												 this.orderService.useStoragePosition(order);
+											 }
+										 }
+									}
+								 if(a && null != storagePosition){
+									 io.setState_result("成功!仓位更新成功!");
+								 }else{
+									 io.setState_result("成功!");
+								 }
+								 
+								 
+								 
+//								 io.setState_result("成功!");
+								 if(io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6))//转运出库要保存转运仓库号
+								 {
+									 this.transhipmentCommodityDao.updatetranidandpackageidbyid(io.getTranWarehouseId(), io.getTransitNo(), bill.getId());
+								 }
+								
+								
+								TranshipmentRoute route = new TranshipmentRoute();
+								
+								route.setDate(DateUtil.date2String(new Date()));
+								route.setRemark("路由状态变动");
+								 if(io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6))//转运出库要保存转运仓库号
+								 {
+									 route.setWarehouseId(io.getTranWarehouseId());
+								 }
+								 else
+								 {
+									 route.setWarehouseId(io.getWarehouseId());
+								 }
+								route.setTranshipmentId(String.valueOf(bill.getId()));
+								route.setState(TranshipmentUtil.transformerState(0, io.getState()));
+								
+								this.transhipmentRouteDao.insert(route);
+										
+										
+								
+								 
+							 }
+						}
+							
+					}
+					else
+					{
+						int k=0;
+						//未入库的处理方式
+						 if((StringUtil.isEmpty(bill.getState()))||(bill.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE0)))//没入库的，直接修改状态
+						 {
+							// bill.setState(io.getState());
+							// bill.setWarehouseId(io.getWarehouseId());
+							// 
+							// bill.setTranWarehouseId(io.getTranWarehouseId());
+							// bill.setPretranwarehouseId(io.getPretranwarehouseId());
+							 k=this.transhipmentBillDao.updateTranshipmentBilltranStatebyid(io.getState(), io.getWarehouseId(), io.getTranWarehouseId(), io.getPretranwarehouseId(), null,io.getId());
+							
+						 }
+						 //已经入库的，更新状态还在转运中的
+						 else if((io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_7))||(io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6)))
+						 {
+							// bill.setState(io.getState());
+							// bill.setWarehouseId(io.getWarehouseId());
+							 
+							 //bill.setTranWarehouseId(io.getTranWarehouseId());
+							// bill.setPretranwarehouseId(io.getPretranwarehouseId());
+							 if(io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_7))
+							 {
+								 k=this.transhipmentBillDao.updateTranshipmentBilltranStatebyid(io.getState(), io.getWarehouseId(), null, io.getPretranwarehouseId(), storeId,io.getId());								
+							 }
+							 else
+							 {
+								 k=this.transhipmentBillDao.updateTranshipmentBilltranStatebyid(io.getState(), io.getWarehouseId(), io.getTranWarehouseId(), io.getPretranwarehouseId(), storeId,io.getId());
+							 }	 
+						 }
+						 else
+						 {
+							// bill.setState(io.getState());
+							 k=this.transhipmentBillDao.updateTranshipmentBilltranStatebyid2(io.getState(),io.getWarehouseId(),storeId,io.getId());
+						 }
+						 
+						 if(k<1)
+						 {
+							
+							 io.setState_result("失败：更新数据失败,请检查单号是否属于本仓库或字符格式!");
+						 }
+						 else
+						 {
+							 /*
+							//操作成功，插入仓位
+								boolean a=this.useStoragePosition(bill);
+								
+								if(a==false)//插入失败，重新查找原来是否存在，如果不存在，将分配一个新的
+								{
+									
+								}
+								if(Constant.TRANSHIPMENT_STATE5.equalsIgnoreCase(bill.getState()))//此状态要给运单分配仓位
+								{
+									if(StringUtil.isEmpty(bill.getOrderId()))//这样分配全仓位?
+									 {
+										// Order order=this.orderService.getOrderByOrderId(bill.getOrderId());
+										 Order order = this.orderDao.getByOrderId(bill.getOrderId());//这里会不会包含仓库信息？
+										 if(order!=null)
+										 {
+											 this.orderService.useStoragePosition(order);
+										 }
+									 }
+								}
+								*/
+							//li zhang 03012016 还是先获取storagePosition的好，useStoragePosition()处理的比较麻烦不小心就掉进坑了。
+							 StoragePosition storagePosition = this.storagePositionService.findStoragePositionByWarehoseIdTypeRelateUserOrNoUser(
+									 io.getWarehouseId(), StoragePositionUtil.getType(io), io.getPretranwarehouseId(), bill.getUserId(), bill.getId()).getData();
+							 bill.setStoragePosition(storagePosition);
+							 boolean a=this.useStoragePosition(bill);
+							 if(Constant.TRANSHIPMENT_STATE5.equalsIgnoreCase(bill.getState()) || Constant.TRANSHIPMENT_STATE_6.equalsIgnoreCase(bill.getState()))//此状态要给运单分配仓位
+								{
+									if(StringUtil.isEmpty(bill.getOrderId()))//这样分配全仓位?
+									 {
+										// Order order=this.orderService.getOrderByOrderId(bill.getOrderId());
+										 Order order = this.orderDao.getByOrderId(bill.getOrderId());//这里会不会包含仓库信息？
+										 if(order!=null)
+										 {
+											 storagePosition = new StoragePosition();
+											 storagePosition = this.storagePositionService.findStoragePositionByWarehoseIdTypeRelateUserOrNoUser(
+													 io.getWarehouseId(), StoragePositionUtil.getType(io), io.getPretranwarehouseId(), order.getUserId(), order.getId()).getData();
+											 order.setStoragePosition(storagePosition);
+											 this.orderService.useStoragePosition(order);
+										 }
+									 }
+								}
+							 if(a && null != storagePosition){
+								 io.setState_result("成功!仓位更新成功!");
+							 }else{
+								 io.setState_result("成功!");
+							 }
+								
+//							 io.setState_result("成功!");
+							 if(io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6))//转运出库要保存转运仓库号
+							 {
+								 this.transhipmentCommodityDao.updatetranidandpackageidbyid(io.getTranWarehouseId(), io.getTransitNo(), bill.getId());
+							 }
+							
+							
+							TranshipmentRoute route = new TranshipmentRoute();
+							
+							route.setDate(DateUtil.date2String(new Date()));
+							route.setRemark("路由状态变动");
+							 if(io.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6))//转运出库要保存转运仓库号
+							 {
+								 route.setWarehouseId(io.getTranWarehouseId());
+							 }
+							 else
+							 {
+								 route.setWarehouseId(io.getWarehouseId());
+							 }
+							route.setTranshipmentId(String.valueOf(bill.getId()));
+							route.setState(TranshipmentUtil.transformerState(0, io.getState()));
+							
+							this.transhipmentRouteDao.insert(route);
+						 }
+						
+						
+						 
+						
+					}
+					
+					
+					
+					
+					
+					aa++;
+				
+			}
+			ResponseObject<Object> obj = new ResponseObject<Object>(
+					ResponseCode.SUCCESS_CODE);
+			obj.setData(importOrders);
+				return obj;
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		//return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+	}
+	
+	//保存异常备注信息
+	public ResponseObject<Object> savewrongmessage(String id,String message,String storeId) throws ServiceException
+	{
+		if(StringUtil.isEmpty(id))
+		{
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+		try{
+		int k=this.transhipmentBillDao.updateTranshipmentBillWrongState(id, Constant.TRANSHIPMENT_STATE_10, message, storeId);
+		if(k>0)
+		{
+			TranshipmentRoute route = new TranshipmentRoute();
+			
+			route.setDate(DateUtil.date2String(new Date()));
+			route.setRemark("状态变动");
+			
+			route.setTranshipmentId(id);
+			route.setState(TranshipmentUtil.transformerState(0,  Constant.TRANSHIPMENT_STATE_10));
+			
+			this.transhipmentRouteDao.insert(route);
+		ResponseObject<Object> obj = new ResponseObject<Object>(
+				ResponseCode.SUCCESS_CODE);
+		return obj;
+		}
+		else
+		{
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"修改失败!");
+		}
+	} catch (Exception e) {
+		throw ExceptionUtil.handle2ServiceException(e);
+	}
+	}
+
+	@Override
+	public ResponseObject<String[]> getAllStateCount(String warehouseId) throws ServiceException {
+		ResponseObject<String[]> responseObject = new ResponseObject<String[]>();
+		try {
+			String[] array = new String[24];
+			String[] labelArray = {"0", "N7", "N6", "N5", "1", "2", "3", "4", "5", "N9", "N8", "N10"};//12
+			String[] valueArray = {"0", "-7", "-6", "-5", "1", "2", "3", "4", "5", "-9", "-8", "-10"};//12
+			for(int i = 0; i<labelArray.length; i++){
+				array[i*2] = "countTranshipmentBillState" + labelArray[i];
+				array[i*2+1] = String.valueOf(this.transhipmentBillDao.countByKeynew(null, null, null, null, null, null, valueArray[i], null, null, warehouseId, null, null));
+			}
+			responseObject.setCode(ResponseCode.SUCCESS_CODE);
+			responseObject.setData(array);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+}

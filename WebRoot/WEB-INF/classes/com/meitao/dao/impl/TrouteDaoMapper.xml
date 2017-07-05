@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.TrouteDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.T_route">
+		<id column="id" property="id" javaType="String" />
+		<result column="date" property="date" javaType="String" />
+		<result column="t_id" property="t_id" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="t_orderId" property="t_orderId" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="employeeName" property="employeeName" javaType="String" />
+	</resultMap>
+
+	<insert id="insertTroute" parameterType="com.meitao.model.T_route">
+		insert into `t_route`(`date`,`t_id`,`state`,`t_orderId`,`remark`,`employeeName`)
+		values(#{date},#{t_id},#{state},#{t_orderId},#{remark},#{employeeName})
+	</insert>
+	
+	<select id="getRouteByTid" parameterType="java.lang.String" resultMap="basic_result_map">
+		select * from `t_route` where t_id=#{t_id} order by date asc
+	</select>
+	
+	<delete id="deleteRouteByTids">
+		delete from `t_route`
+		where t_id in
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

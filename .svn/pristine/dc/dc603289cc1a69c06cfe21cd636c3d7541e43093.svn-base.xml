@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.UserCodeDao">
+	<resultMap id="basic_result_map" type="com.weiye.model.UserCode">
+		<id column="id" property="id" javaType="String" />
+		<result column="usercode" property="usercode" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+	</resultMap>
+	<insert id="inserUserCode" parameterType="com.weiye.model.UserCode"
+		useGeneratedKeys="true" keyProperty="id">
+	intsert into
+	usercode(usercode,state)
+	value(#{usercode},#{state})
+	</insert>
+	<select id="findUserCodeById" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select usercode.*
+		from
+		usercode
+		where usercode.id=#{id}
+	</select>
+	
+	<select id="findUserCodeByState" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select usercode.*
+		from
+		usercode
+		where usercode.state=#{state} order by rand() limit 1
+	</select>
+	<update id="updateUserCode" parameterType="com.weiye.model.UserCode">
+		update usercode
+		set
+		state=#{state,jdbcType=VARCHAR}
+		where usercode=#{usercode}
+	</update>
+</mapper>

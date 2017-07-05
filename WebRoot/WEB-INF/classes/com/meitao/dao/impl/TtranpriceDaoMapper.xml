@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.TtranpriceDao">
+	<resultMap id="basic_result_map" type="com.meitao.model.T_tran_price">
+		<id column="id" property="id" javaType="String" />
+		<result column="storeId" property="storeId" javaType="String" />
+		<result column="cost" property="cost" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="price" property="price" javaType="String" />
+		<result column="self_price" property="self_price" javaType="String" />
+	
+		
+		
+
+		
+	</resultMap>
+
+	<insert id="insert" parameterType="com.meitao.model.T_tran_price" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		t_tran_price(storeId,cost,create_date,modify_date,price,self_price)
+		values(#{storeId},#{cost},#{createDate},#{modifyDate},#{price},#{self_price})
+	</insert>
+
+	
+	<select id="getBystoreId" resultMap="basic_result_map">
+		select t_tran_price.* from t_tran_price 
+		where storeId=#{storeId}
+
+	</select>
+	<update id="modify">
+		update `t_tran_price`
+		set `cost`=#{cost},
+		`modify_date`=#{modifyDate},
+		`price`=#{price},
+		`self_price`=#{self_price}
+		where id=#{id}
+	</update>
+	
+	<select id="getoneBystoreId" resultMap="basic_result_map">
+		select t_tran_price.* from t_tran_price 
+		where storeId=#{storeId}
+		limit 1
+	</select>
+</mapper>

@@ -1,0 +1,701 @@
+function loadNav71Data() {
+	loadFirstMsgList();
+
+	$(":submit[name='searchSub']").click(function() {
+		var userId = $(":text[name='userId']").val();
+		var state = $("select[name='state']").val();
+		var pn = "1";
+		loadMsgList(userId, state, pn);
+		return false;
+	});
+}
+
+function loadFirstMsgList() {
+	loadMsgList("", "", 1);
+}
+
+function loadMsgList(id, state, pn) {
+	$(":hidden[name='userId']").val(id);
+	$(":hidden[name='state']").val(state);
+	$(":hidden[name='pn']").val(pn);
+	$.ajax( {
+		type : "get",
+		url : admin_message_list_url,
+		data : {
+			user_id : id,
+			state : state,
+			pageIndex : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data == null) {
+					showMsg(null);
+					showMsgLink(null);
+				} else {
+					showMsg(response.data.datas);
+					showMsgLink(response.data);
+				}
+				afterLoadMsg();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='6'>"
+						+ "<span>&nbsp;&nbsp;获取留言列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+	});
+}
+
+function showChildMsg(list,id, replyable) {
+	var str = "<div name='child_msg' id='" + id + "'><hr/>";
+	if (list != null) {
+		$.each(list, function(){
+			var strc = "<strong>" + this.userName + "</strong>：" + this.content + "<hr/>";
+			str += "<div style='margin:5px;'>" + strc + "</div>";
+		});
+	}
+	if(replyable){
+		str += "回复：<textarea name='add_msg' cols='50' rows='3' class='text-input'></textarea>" +
+		"<input name='bt_add_msg' class='button' value='提交' type='submit'/>" +
+		"<input name='bt_cancel' type='button' value='取消' class='button'/>";
+	}
+	str += "</div>";
+	return str;
+}
+
+function showMsg(list) {
+	var str = "";
+	if (list != null) {
+		$.each(list, function() {
+			var count = 0;
+			if(this.replyMessages.length == 0){
+				count = 1;
+			}
+			for(var i = 0; i < this.replyMessages.length; i++){
+				if(this.replyMessages[i].userName == this.userName){
+					count ++;
+					continue;
+				}else{
+					break;
+				}
+			}
+			var countView = "";
+			if(count != 0){
+				countView = "<span style='margin: 0 3px; color: #f00;'>(" + count + ")</span>";
+			}
+			str += "<tr>";
+			str += "<td><a href='#' name='a_back_msg_url'>回复</a>" + countView + "</td>";
+			str += "<td>" + this.id + "</td>";
+			var strc = "<strong>" + this.userName + "</strong>：" + this.content;
+			var replyable = this.userId==-1 ? false : true; 
+			str += "<td title='" + strc + "'>" + strc + showChildMsg(this.replyMessages, this.id, replyable) + "</td>";
+			if (this.state == '1') {
+				str += "<td>已读</td>";
+			} else {
+				str += "<td>未读</td>";
+			}
+			str += "<td>" + this.createDate + "</td>";
+			str += "<td>" + this.modifyDate + "</td>";
+
+		});
+	} else {
+		if (str == null || str == '') {
+			str = "<td style='text-align: left;' colspan='6'>"
+					+ "<span>&nbsp;&nbsp;对不起，现在还没有留言或者是没有符合您查找要求的留言!</span></td>";
+		}
+	}
+	$("#tab1 table tbody").html(str);
+}
+
+function showMsgLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var userId = $(":hidden[name='userId']").val();
+			var state = $(":hidden[name='state']").val();
+			loadMsgList(userId, state, pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var userId = $(":hidden[name='userId']").val();
+					var state = $(":hidden[name='state']").val();
+					loadMsgList(userId, state, pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterLoadMsg() {
+	var divshow = true;
+	$("div[name='child_msg']").hide();
+	$("a[name='a_back_msg_url']").click(function(){
+		var el = $(this).parent().parent().find("div[name='child_msg']");
+		if (divshow) {
+			el.show();
+			divshow = false;
+		} else {
+			el.hide();
+			divshow = true;
+		}
+		return false;
+	});
+	$(":input[name='bt_cancel']").click(function(){
+		$(this).parent().parent().find("div[name='child_msg']").hide();
+		return false;
+	});
+	$(":input[name='bt_add_msg']").click(function(){
+		var id = $(this).parent().attr("id");
+		var msg = $(this).parent().find("textarea").val();
+		if (!checkMessageContent(msg)) {
+			alert("留言内容不能为空，且最长长度为200个字符！");
+		} else {
+			$(this).attr("disabled", true);
+			$.ajax({
+				type:"post",
+				url:admin_message_add_url,
+				data:{
+					pid:id,
+					content:msg
+				},
+				success:function(response) {
+					$(this).attr("disabled", false);
+					var code = response.code;
+					if ("200" == code) {
+						alert("回复成功");
+						
+						var userId = $(":hidden[name='userId']").val();
+						var state = $(":hidden[name='state']").val();
+						var pn = $(":hidden[name='pn']").val();
+						loadMsgList(userId, state, pn);
+						//$("#nav71").click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("回复失败，原因是:" + responsn.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+}
+
+function loadNav72Data() {
+	//$("#a_add_error_order_info_link").facebox();
+	loadFirstErrorOrderList();
+
+	$(":submit[name='searchSub']").click(function() {
+		var oid = $(":text[name='oid']").val();
+		var pn = "1";
+		loadErrorOrderList(oid, pn);
+		return false;
+	});
+}
+
+function loadFirstErrorOrderList() {
+	loadErrorOrderList("", "1");
+}
+
+function loadErrorOrderList(oid, pn) {
+	$(":hidden[name='oid']").val(oid);
+	$(":hidden[name='pn']").val(pn);
+	$.ajax( {
+		type : "get",
+		url : admin_error_order_list_url,
+		data : {
+			oid : oid,
+			pageIndex : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data == null) {
+					showErrorOrderList(null);
+					showErrorOrderLink(null);
+				} else {
+					showErrorOrderList(response.data.datas);
+					showErrorOrderLink(response.data);
+				}
+				afterLoadErrorOrder();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='5'>"
+						+ "<span>&nbsp;&nbsp;获取异常件信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+	});
+}
+
+function showChildEOI(list,id) {
+	var detailinfo = "<div name='detail_eoi'><hr/>";
+	var str = "<div name='child_eoi' id='" + id + "'><hr/>";
+	var info = '';
+	if (list != null) {
+		$.each(list, function(){
+			var strc = "<strong>" + this.empName + "(" + this.createDate + ")" + "</strong>：" + this.content  + "<hr/>";
+			info += "<div style='margin:5px;'>" + strc + "</div>";
+		});
+	}
+	str += info;
+	detailinfo = detailinfo + info + "</div>";
+	str += "记录：<textarea name='add_eoi' cols='50' rows='3' class='text-input'></textarea>" +
+			"<input name='bt_add_eoi' class='button' value='提交' type='submit'/>" +
+			"<input name='bt_cancel' type='button' value='取消' class='button'/>"
+	str += "</div>";
+	str += detailinfo;
+	return str;
+}
+
+function showErrorOrderList(list) {
+	var str = "";
+	if (list != null) {
+		$.each(list, function() {
+			str += "<tr>";
+			//str += "<td><a href='#' name='a_back_eoi_url'>回复</a></td>";
+			str += "<td>" + this.orderId + "</td>";
+			var strc = "<strong>" + this.empName + "</strong>：" + this.content;
+			str += "<td title='" + strc + "'>" + strc + showChildEOI(this.replyInfos, this.id) + "</td>";
+			str += "<td>" + this.createDate + "</td>";
+			//str += "<td>" + this.modifyDate + "</td>";
+			if (this.state == '0') {
+				str += "<td name='" + this.id + "'>" + "<input name='btn_ok' type='button' value='处理完成请确认' class='button'/>"+ "</td>";
+				str += "<td><a href='#' name='a_back_eoi_url'>记录</a>/<a href='" + this.id + "' name='a_del_eoi_link'>删除</a></td>";
+			} else {
+				str += "<td>处理完成</td>";
+				str += "<td><a href='#' name='a_detail_eoi_url'>查看详情</a>/<a href='" + this.id + "' name='a_del_eoi_link'>删除</a></td>";
+			}
+			str += "</tr>";
+		});
+	} else {
+		if (str == null || str == '') {
+			str = "<tr><td style='text-align: left;' colspan='5'>"
+					+ "<span>&nbsp;&nbsp;对不起，现在还没有异常件或者是没有符合您查找要求的异常件!</span></td></tr>";
+		}
+	}
+	$("#tab1 table tbody").html(str);
+}
+
+function showErrorOrderLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var oid = $(":hidden[name='oid']").val();
+			loadErrorOrderList(oid, pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var oid = $(":hidden[name='oid']").val();
+					loadErrorOrderList(oid, pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterLoadErrorOrder() {
+	var divshow = true;
+	$("div[name='child_eoi']").hide();
+	$("div[name='detail_eoi']").hide();
+	
+	$(":button[name='btn_ok']").click(function(){
+		var id = $(this).parent().attr("name");
+		var state = "1"; // 表示处理完成
+		$.ajax({
+			type:"post",
+			url:admin_error_order_modify_state_url,
+			data:{
+				"id":id,
+				"state":state
+			},
+			success:function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					alert("修改成功");
+					//$("#nav72").click();
+					nav72Click();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("修改异常件状态失败，失败原因:" + response.message);
+				}
+				return false;
+			}
+		});
+		return false;
+	});
+
+	$("a[name='a_back_eoi_url']").click(function(){
+		var el =  $(this).parent().parent().find("div[name='child_eoi']");
+		if (divshow) {
+			el.show();
+			divshow = false;
+		} else {
+			el.hide();
+			divshow = true;
+		}
+		return false;
+	});
+	$("a[name='a_detail_eoi_url']").click(function(){
+		var el =  $(this).parent().parent().find("div[name='detail_eoi']");
+		if (divshow) {
+			el.show();
+			divshow = false;
+		} else {
+			el.hide();
+			divshow = true;
+		}
+		return false;
+	});
+	$(":input[name='bt_cancel']").click(function(){
+		$(this).parent().parent().find("div[name='child_eoi']").hide();
+		return false;
+	});
+	$(":input[name='bt_add_eoi']").click(function(){
+		var id = $(this).parent().attr("id");
+		var msg = $(this).parent().find("textarea").val();
+		if (!checkErrorOrderInfoContent(msg)) {
+			alert("异常件内容不能为空，且最长长度为200个字符！");
+		} else {
+			$(this).attr("disabled", true);
+			$.ajax({
+				type:"post",
+				url:admin_error_order_add_url,
+				data:{
+					"parentId":id,
+					"content":msg
+				},
+				success:function(response) {
+					$(":input[name='bt_add_eoi']").attr("disabled", false);
+					var code = response.code;
+					if ("200" == code) {
+						alert("操作成功");
+						//$("#nav72").click();
+						nav72Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("操作失败，原因是:" + response.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+	
+	$("a[name='a_del_eoi_link']").click(function(){
+		if (confirm("您确定要删除此条异常记录吗？")) {
+			var id = $(this).attr("href");
+			var chk_value = [];
+			chk_value.push(id);
+			$.ajax({
+				type:"post",
+				url:admin_error_order_del_url,
+				data:$.param({
+					"eid" : chk_value,
+				}, true),
+				success:function(response) {
+					var code = response.code;
+					if ("200" == code) {
+						alert("删除成功");
+						//$("#nav72").click();
+						nav72Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("删除失败，原因是:" + responsn.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+}
+function loadNav73Data() {
+	$("#a_add_error_torder_info_link").facebox();
+	loadFirstErrorTranshList();
+	$(":submit[name='searchSub73']").click(function() {
+		var toid = $(":text[name='toid']").val();
+		loadErrorTranshList(toid, "1");
+		return false;
+	});
+}
+function loadFirstErrorTranshList() {
+	loadErrorTranshList("", "1");
+}
+
+function loadErrorTranshList(toid, pn) {
+	$(":hidden[name='toid']").val(toid);
+	$(":hidden[name='pn']").val(pn);
+	$.ajax( {
+		type : "get",
+		url : admin_error_torder_list_url,
+		data : {
+			"tid" : toid,
+			"pageIndex" : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data == null) {
+					showErrorTranshList(null);
+					showErrorTranshLink(null);
+				} else {
+					showErrorTranshList(response.data.datas);
+					showErrorTranshLink(response.data);
+				}
+				afterLoadErrorTransh();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='5'>"
+						+ "<span>&nbsp;&nbsp;获取异常件信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+	});
+}
+
+function showChildETI(list,id) {
+	var detailinfo = "<div name='detail_eti'><hr/>";
+	var str = "<div name='child_eti' id='" + id + "'><hr/>";
+	var info = '';
+	if (list != null) {
+		$.each(list, function(){
+			var strc = "<strong>" + this.empName + "(" + this.createDate + ")" + "</strong>：" + this.content  + "<hr/>";
+			info += "<div style='margin:5px;'>" + strc + "</div>";
+		});
+	}
+	str += info;
+	detailinfo = detailinfo + info + "</div>";
+	str += "记录：<textarea name='add_eti' cols='40' rows='3' class='text-input'></textarea>" +
+			"<input name='bt_add_eti' class='button' value='提交' type='submit'/>" +
+			"<input name='bt_cancel' type='button' value='取消' class='button'/>"
+	str += "</div>";
+	str += detailinfo;
+	return str;
+}
+
+function showErrorTranshList(list) {
+	var str = "";
+	if (list != null) {
+		$.each(list, function() {
+			str += "<tr>";
+			//str += "<td><a href='#' name='a_back_eoi_url'>回复</a></td>";
+			str += "<td>" + this.transhId + "</td>";
+			var strc = "<strong>" + this.empName + "</strong>：" + this.content;
+			str += "<td title='" + strc + "'>" + strc + showChildETI(this.replyInfos, this.id) + "</td>";
+			str += "<td>" + this.createDate + "</td>";
+			//str += "<td>" + this.modifyDate + "</td>";
+			if (this.state == '0') {
+				str += "<td name='" + this.transhId + "'>" + "<input name='btn_ok_eti' type='button' value='处理完成请确认' class='button'/>"+ "</td>";
+				str += "<td><a href='#' name='a_back_eti_url'>记录</a>/<a href='" + this.id + "' name='a_del_eti_link'>删除</a></td>";
+			} else {
+				str += "<td>处理完成</td>";
+				str += "<td><a href='#' name='a_detail_eti_url'>查看详情</a>/<a href='" + this.id + "' name='a_del_eti_link'>删除</a></td>";
+			}
+			str += "</tr>";
+		});
+	} else {
+		if (str == null || str == '') {
+			str = "<tr><td style='text-align: left;' colspan='5'>"
+					+ "<span>&nbsp;&nbsp;对不起，现在还没有异常件或者是没有符合您查找要求的异常件!</span></td></tr>";
+		}
+	}
+	$("#tab1 table tbody").html(str);
+}
+
+function showErrorTranshLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var toid = $(":hidden[name='toid']").val();
+			loadErrorTranshList(toid, pn);
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var toid = $(":hidden[name='toid']").val();
+					loadErrorTranshList(toid, pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterLoadErrorTransh() {
+	var divshow = true;
+	$("div[name='child_eti']").hide();
+	$("div[name='detail_eti']").hide();
+	
+	$(":button[name='btn_ok_eti']").click(function(){
+		var id = $(this).parent().attr("name");
+		// step1：修改左侧的显示
+		//$("#nav5").click();
+		//$("#nav51").addClass("current");
+		var url = admin_modify_tranship_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+
+	$("a[name='a_back_eti_url']").click(function(){
+		var el =  $(this).parent().parent().find("div[name='child_eti']");
+		if (divshow) {
+			el.show();
+			divshow = false;
+		} else {
+			el.hide();
+			divshow = true;
+		}
+		return false;
+	});
+	$("a[name='a_detail_eti_url']").click(function(){
+		var el =  $(this).parent().parent().find("div[name='detail_eti']");
+		if (divshow) {
+			el.show();
+			divshow = false;
+		} else {
+			el.hide();
+			divshow = true;
+		}
+		return false;
+	});
+	$(":input[name='bt_cancel']").click(function(){
+		$(this).parent().parent().find("div[name='child_eti']").hide();
+		return false;
+	});
+	$(":input[name='bt_add_eti']").click(function(){
+		var id = $(this).parent().attr("id");
+		var msg = $(this).parent().find("textarea").val();
+		if (!checkErrorTOrderInfoContent(msg)) {
+			alert("异常件内容不能为空，且最长长度为200个字符！");
+		} else {
+			$(this).attr("disabled", true);
+			$.ajax({
+				type:"post",
+				url:admin_error_torder_add_url,
+				data:{
+					"parentId":id,
+					"content":msg
+				},
+				success:function(response) {
+					$(":input[name='bt_add_eti']").attr("disabled", false);
+					var code = response.code;
+					if ("200" == code) {
+						alert("操作成功");
+						//$("#nav73").click();
+						nav73Click();
+					} else if ("607" == code) {
+						alert("您没有权限进行此操作，请登录！");
+						logout();
+					} else {
+						alert("操作失败，原因是:" + response.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+	
+	$("a[name='a_del_eti_link']").click(function(){
+		if (confirm("您确定要删除此条异常记录吗？")) {
+			var id = $(this).attr("href");
+			var chk_value = [];
+			chk_value.push(id);
+			$.ajax({
+				type:"post",
+				url:admin_error_torder_del_url,
+				data:$.param({
+					"eid" : chk_value,
+				}, true),
+				success:function(response) {
+					var code = response.code;
+					if ("200" == code) {
+						alert("删除成功");
+						//$("#nav73").click();
+						nav73Click();
+					} else if ("607" == code) {
+						alert("您没有权限进行此操作，请登录！");
+						logout();
+					} else {
+						alert("删除失败，原因是:" + responsn.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	});
+}
+

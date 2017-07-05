@@ -1,0 +1,649 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>用户中心</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <link href="css/usercenter.css" rel="stylesheet" />
+    <style type="text/css">
+        .sixword {
+            display: inline-block;
+            width: 6em;
+            text-align: right;
+        }
+
+        .valueblock {
+            padding: 5px 0px;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .floatblock {
+            float: left;
+            padding: 1px 0px;
+        }
+
+        .table-selectheight {
+            height: 28px;
+            padding: 0px;
+            margin: 0;
+        }
+
+       .ui-dialog-body{padding:0px;}
+        .sn {
+            font-size: 18px;
+            color: red;
+        }
+        .inputError {
+            border:1px solid red;
+        }
+
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon blue"></i>
+                    <a href="#">转运中心</a>
+                </li>
+
+                <li>
+                    <a href="#">提交运单</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content">
+        <p><span  style="display:inline-block;margin-left:20px;color:blue">账号余额：<span style="color:red;background-color:#fff;display:inline-block;width:300px;text-align:center;" id="usermoney">$0,￥0</span></span></p>
+            <div class=" col-xs-12 col-sm-12 col-md-12">
+                <div style="height:10px;color:#fff">1</div>
+
+                <div class="pull-left alert alert-success no-margin infotitle">
+                    <i class="icon-info-sign bigger-120 blue"></i>
+                    到库转运列表<span class="phoneHide" style="display:inline-block;margin-left:20px;color:blue">入库转运单数：<span style="color:red;background-color:#fff;display:inline-block;width:20px;text-align:center;" id="zhuanyundancount">0</span></span>
+                    <span class="phoneHide" style="display:inline-block;margin-left:20px;color:blue">将打包数量：<span style="color:red;background-color:#fff;display:inline-block;width:20px;text-align:center;" id="packagecount">1</span></span>
+                
+                    
+         
+                
+                
+                </div>
+                <div style="clear:both;"></div>
+                <div style="border:1px solid #E1E1E1">
+                    <div class="row" id="divAdvanceSearch" style="padding:5px 0px;">
+                        <div class="col-xs-12">
+
+
+                            <div style="">
+                                <label class="control-label width60px">
+                                    入库门店：
+                                </label>
+                                <select name="storeId" class="table-selectheight" style="width:160px;margin-left:5px"></select>
+                                <label class="control-label width60px" for="keyword">
+                                    关键字：
+                                </label>
+                                <input name="keyword" id="keyword" placeholder="请输入关键字">
+
+                                <button type="button" class="btn btn-purple btn-sm" id="btnSearch">
+                                    <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                                    搜 索
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                    <table id="packagegrid-table"></table>
+                </div>
+            </div>
+            
+            <div class="boxTemplate" style="display:none;">
+                <div class="boxitem">
+                    <div style="clear:both; height:10px;color:#fff">1</div>
+                    <div class="pull-left alert alert-success no-margin infotitle">
+                        <i class="icon-info-sign bigger-120 blue"></i>
+                        装箱&nbsp;<span class="sn">1</span>
+                        <span style="display:inline-block;float:right;">
+                            <a href="javascript:void(0)" class="btn btn-primary btn-sm" onclick="addBox()">
+                                <span class="fa fa-plus-square bigger-110"></span>
+                                添加分箱
+                            </a>
+                            <button style="margin-left:10px;" class="btn btn-danger btn-sm" type="button" onclick="removeBox(this)"><span class="fa fa-times"></span>移除分箱</button>
+                        </span>
+                    </div>
+
+                    <div class="boxInfo">
+                        <div class=" col-xs-12 col-sm-12 col-md-12">
+
+                            <div class="infotitle" style="background:#EDF3F4">
+                                收货人地址
+                            </div>
+
+                            <div class="profile-user-info profile-user-info-striped" style="width:100%">
+                                <div class="profile-info-row" name="receiverInfo">
+
+                                    <div class="profile-info-value">
+                                        <div class="valueblock">
+                                            <a href="javascript:void(0)" class="btn btn-yellow btn-sm" name="selectReceiver" onclick="showReceiverSelect(this)">
+                                                <span class="fa fa-check-square-o"></span>
+                                                从地址簿选择取
+                                            </a>
+                                            <button onclick="addReceiverAddress()" class="btn btn-primary btn-sm" >
+                                                <span class="fa fa-plus-square bigger-110"></span>
+                                                添加收件人地址
+                                            </button>
+                                        </div>
+                                        <div class="valueblock">
+                                            <span style="color:red">*</span><span class="sixword">收件人信息：</span><span name="receiver"></span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class=" col-xs-12 col-sm-12 col-md-12">
+                            <div class="infotitle" style="background:#EDF3F4">
+                                快递物品
+                            </div>
+
+                            <div class="profile-user-info profile-user-info-striped" style="width:100%">
+
+                                <div class="profile-info-row">
+                                    <div class="profile-info-value" body="goodsItemBody">
+                                        <div class="valueblock">
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:5em;text-align:right">商品类型：</label>      <select class="table-selectheight" name="commodityName" onchange="changecommudity(this)" style="width:120px;"></select><span style="color:red">*</span>
+                                            </div>
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:5em;text-align:right">中文品名：</label>    <input style="width:120px" value="" name="cproductname" /><span style="color:red">*</span>
+                                            </div>
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:5em;text-align:right">英文品牌：</label>    <input style="width:120px" value="" name="cbrandname" /><span style="color:red">*</span>
+                                            </div>
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:5em;text-align:right">数量：</label>    <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="cquantity" /><span style="color:red">*</span>
+
+                                            </div>
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:5em;text-align:right">价值($)：</label>   <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="cvalue" /><span style="color:red">*</span>
+
+                                            </div>
+
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:5em;text-align:right">备注：</label>    <input type="text" style="width:120px;padding:2px 2px 3px 2px" name="cremark" />
+
+                                                <button type="button" onclick="addGoodsItem(this)" class="btn btn-success btn-sm table-button"><i class="glyphicon glyphicon-plus"></i><strong>添加</strong></button>
+                                            </div>
+
+                                            <div style="clear:both"></div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" col-xs-12 col-sm-12 col-md-12">
+
+                            <div class="infotitle" style="background:#EDF3F4">
+                                汇总及保险信息
+                            </div>
+                            <div class=" col-xs-12 col-sm-6 col-md-6">
+                                <div class="profile-user-info profile-user-info-striped" style="width:100%">
+
+                                    <div class="profile-info-row">
+                                        <div class="profile-info-name"> 商品汇总： </div>
+
+                                        <div class="profile-info-value">
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:7em;text-align:right">总数量($)：</label>         <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="allquantity" />
+                                            </div>
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:7em;text-align:right">总商品价值($)</label>
+                                                <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="allcvalue" />
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+
+                                    <div class="profile-info-row">
+                                        <div class="profile-info-name"> 保险： </div>
+
+                                        <div class="profile-info-value">
+                                            <div class="valueblock" style="border:0">
+
+                                                <div class="floatblock">
+                                                    <label style="display:inline-block;width:7em;text-align:right"> 保险($)：</label>
+                                                    <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="insurance" value="0" />
+                                                </div>
+                                                <div class="floatblock">
+                                                    <label style="display:inline-block;width:7em;text-align:right"> 保险额度($)：</label>
+                                                    <input style="width:60px;padding:2px 2px 3px 2px" type="number" readonly="readonly" name="maxinsurance" />
+                                                </div>
+
+                                                <div style="clear:both"></div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class=" col-xs-12 col-sm-6 col-md-6">
+                                <div class="profile-user-info profile-user-info-striped" style="width:100%">
+                                    <div class="profile-info-row">
+                                        <div class="profile-info-name"> 备注： </div>
+                                        <div class="profile-info-value">
+                                            <textarea style="width:270px; height:80px;overflow:hidden;" name="totalremark"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+
+            <div class="boxitem">
+                <div style="clear:both; height:10px;color:#fff">1</div>
+                <div class="pull-left alert alert-success no-margin infotitle">
+                    <i class="icon-info-sign bigger-120 blue"></i>
+                    装箱&nbsp;<span class="sn">1</span>
+                    <span style="display:inline-block;float:right;">
+                        <a href="javascript:void(0)" class="btn btn-primary btn-sm" onclick="addBox()">
+                            <span class="fa fa-plus-square bigger-110"></span>
+                            添加分箱
+                        </a>
+                    </span>
+                </div>
+
+                <div class="boxInfo">
+                    <div class=" col-xs-12 col-sm-12 col-md-12">
+
+                        <div class="infotitle" style="background:#EDF3F4">
+                            收货人地址
+                        </div>
+
+                        <div class="profile-user-info profile-user-info-striped"  style="width:100%">
+                            <div class="profile-info-row" name="receiverInfo">
+
+                                <div class="profile-info-value">
+                                    <div class="valueblock">
+                                        <a href="javascript:void(0)" class="btn btn-yellow btn-sm" name="selectReceiver" onclick="showReceiverSelect(this)">
+                                            <span class="fa fa-check-square-o"></span>
+                                            从地址簿选择取
+                                        </a>
+                                        <button onclick="addReceiverAddress()" class="btn btn-primary btn-sm" >
+                                            <span class="fa fa-plus-square bigger-110"></span>
+                                            添加收件人地址
+                                        </button>
+                                    </div>
+                                    <div class="valueblock">
+                                        <span style="color:red">*</span><span class="sixword">收件人信息：</span><span name="receiver"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" col-xs-12 col-sm-12 col-md-12">
+                        <div class="infotitle" style="background:#EDF3F4">
+                            快递物品【请先选择商品类型后再添加商品条目】
+                        </div>
+
+                        <div class="profile-user-info profile-user-info-striped" style="width:100%">
+
+                            <div class="profile-info-row">
+
+                                <div class="profile-info-value" body="goodsItemBody">
+                                    <div class="valueblock">
+                                        <div class="floatblock">
+                                            <label style="display:inline-block;width:5em;text-align:right">商品类型：</label>      <select class="table-selectheight" name="commodityName" onchange="changecommudity(this)" style="width:120px;"></select><span style="color:red">*</span>
+                                        </div>
+                                        <div class="floatblock">
+                                            <label style="display:inline-block;width:5em;text-align:right">中文品名：</label>    <input style="width:120px" value="" name="cproductname" /><span style="color:red">*</span>
+                                        </div>
+                                        <div class="floatblock">
+                                            <label style="display:inline-block;width:5em;text-align:right">英文品牌：</label>    <input style="width:120px" value="" name="cbrandname" /><span style="color:red">*</span>
+                                        </div>
+                                        <div class="floatblock">
+                                            <label style="display:inline-block;width:5em;text-align:right">数量：</label>    <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="cquantity" /><span style="color:red">*</span>
+
+                                        </div>
+                                        <div class="floatblock">
+                                            <label style="display:inline-block;width:5em;text-align:right">价值($)：</label>   <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="cvalue" /><span style="color:red">*</span>
+
+                                        </div>
+
+                                        <div class="floatblock">
+                                            <label style="display:inline-block;width:5em;text-align:right">备注：</label>    <input type="text" style="width:120px;padding:2px 2px 3px 2px" name="cremark" />
+
+                                            <button type="button" onclick="addGoodsItem(this)" class="btn btn-success btn-sm table-button"><i class="glyphicon glyphicon-plus"></i><strong>添加</strong></button>
+                                        </div>
+
+                                        <div style="clear:both"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" col-xs-12 col-sm-12 col-md-12">
+
+                        <div class="infotitle" style="background:#EDF3F4">
+                            汇总及保险信息
+                        </div>
+                        <div class=" col-xs-12 col-sm-6 col-md-6">
+                            <div class="profile-user-info profile-user-info-striped" style="width:100%">
+
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 商品汇总： </div>
+
+                                    <div class="profile-info-value">
+                                        <div class="floatblock">
+                                            <label style="display:inline-block;width:7em;text-align:right">总数量($)：</label>         <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="allquantity" />
+                                        </div>
+                                        <div class="floatblock">
+                                            <label style="display:inline-block;width:7em;text-align:right">总商品价值($)</label>
+                                            <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="allcvalue" />
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 保险： </div>
+
+                                    <div class="profile-info-value">
+                                        <div class="valueblock" style="border:0">
+
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:7em;text-align:right"> 保险($)：</label>
+                                                <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="insurance" value="0" />
+                                            </div>
+                                            <div class="floatblock">
+                                                <label style="display:inline-block;width:7em;text-align:right"> 保险额度($)：</label>
+                                                <input style="width:60px;padding:2px 2px 3px 2px" type="number" readonly="readonly" name="maxinsurance" />
+                                            </div>
+
+                                            <div style="clear:both"></div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class=" col-xs-12 col-sm-6 col-md-6">
+                            <div class="profile-user-info profile-user-info-striped" style="width:100%">
+                                <div class="profile-info-row">
+                                    <div class="profile-info-name"> 备注： </div>
+                                    <div class="profile-info-value">
+                                        <textarea style="width:270px; height:80px;overflow:hidden;" name="totalremark"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+        </div>
+      
+        <div class="clearfix form-buttons">
+
+            <label class="control-label col-md-5"></label>
+            <button type="button" class="btn btn-success btn-sm" onclick="submitOnlineOrder()"><i class="glyphicon glyphicon-ok"></i><strong>提交运单</strong></button>
+            <a href="yundanyubaolist.html" style="display:inline-block;" class="btn btn-sub btn-sm btn-warning"><i class="fa fa-mail-reply"></i><strong>返回预报列表</strong></a>
+            &nbsp;&nbsp;<input type="checkbox" name="checkbox_agree" /><a target="_blank" href="../frontpage/disclaimer.html">同意本站协议</a>
+<p style="color:red;">注意：请如实填写申报信息，根据海关公布要求，个人申报商品价值一次不能超过2000元人民币、收件人年度累计不能超过两万元人民币,超过部分必须按国家规定缴纳税款！</p>
+        </div>
+    </div>
+
+   
+
+
+    <div id="divKehu" style="display:none; position:absolute; border:1px solid #aaa; padding-top:5px; background:#fff">
+        <div>
+            <label for="receiverphone" class="control-label width60px">姓名或手机号：</label>
+            <input name="keyword" id="receiverinfo" placeholder="">
+
+            <button type="button" class="btn btn-purple btn-sm" id="btnSearchReceiver">
+                <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                查询
+            </button>
+        </div>
+        <table id="receivergrid-table"></table>
+        <div id="receivergrid-pager"></div>
+    </div>
+
+    <div style="display:none;" id="goodsItemTeplament">
+        <div class="valueblock">
+            <div class="floatblock">
+                <label style="display:inline-block;width:5em;text-align:right">商品类型：</label>      <select class="table-selectheight" name="commodityName" onchange="changecommudity(this)" style="width:120px;"></select><span style="color:red">*</span>
+            </div>
+            <div class="floatblock">
+                <label style="display:inline-block;width:5em;text-align:right">中文品名：</label>    <input style="width:120px" value="" name="cproductname" /><span style="color:red">*</span>
+            </div>
+            <div class="floatblock">
+                <label style="display:inline-block;width:5em;text-align:right">英文品牌：</label>    <input style="width:120px" value="" name="cbrandname" /><span style="color:red">*</span>
+            </div>
+            <div class="floatblock">
+                <label style="display:inline-block;width:5em;text-align:right">数量：</label>    <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="cquantity" /><span style="color:red">*</span>
+
+            </div>
+            <div class="floatblock">
+                <label style="display:inline-block;width:5em;text-align:right">价值($)：</label>   <input type="number" style="width:60px;padding:2px 2px 3px 2px" name="cvalue" /><span style="color:red">*</span>
+
+            </div>
+
+            <div class="floatblock">
+                <label style="display:inline-block;width:5em;text-align:right">备注：</label>    <input type="text" style="width:120px;padding:2px 2px 3px 2px" name="cremark" />
+
+
+                <button type="button" onclick="delGoodsItem(this)" class="btn btn-danger btn-sm table-button"><i class="glyphicon glyphicon-remove"></i><strong>移除</strong></button>
+            </div>
+            <div style="clear:both"></div>
+        </div>
+    </div>
+
+    <div  id="divAdd" style="display:none;">
+        <div class="row">
+            
+            <div class=" col-xs-12 col-sm-12 col-md-12">
+                <form id="addrevaddress" action="" method="post" enctype="multipart/form-data" onsubmit="return false;">
+
+                    <div class="profile-user-info profile-user-info-striped" style="width:100%">
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">收货人： </div>
+
+                            <div class="profile-info-value">
+                                <input name="name" type="text" placeholder="必填项" />
+                            </div>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">收货地址： </div>
+
+                            <div class="profile-info-value">
+                                <span>&nbsp;&nbsp;省: </span><input name="province" style="width:120px" />
+
+
+                                <span>&nbsp;&nbsp;市: </span> <input name="city" style="width:100px" />
+
+
+                                <span>&nbsp;&nbsp;县/区：</span><input name="district" style="width:100px" />
+
+                            </div>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">详细地址： </div>
+
+                            <div class="profile-info-value">
+                                <input type="text" size="50" id="streetAddress" name="streetAddress" placeholder="必填项">
+                            </div>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">手机： </div>
+
+                            <div class="profile-info-value">
+                                <input type="text" size="30" id="sPhone" name="phone" placeholder="必填项" maxlength="11">
+                            </div>
+                        </div>
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">邮编： </div>
+
+                            <div class="profile-info-value">
+                                <input type="text" size="30" id="sZipCode" name="zipCode" placeholder="" maxlength="6">
+                            </div>
+                        </div>
+
+
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">身份证号： </div>
+
+                            <div class="profile-info-value">
+                                <input type="text" placeholder="" name="cardId" size="30" maxlength="18" /><span id="cardidresult"
+											style="color:red;"></span>
+                            </div>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <div class="profile-info-name">
+                                上传身份证：
+                                <br />
+                                <label for="hc">
+                                    正反面合成<input type="radio" checked="checked" name="sfz" id="hc" onclick="click_choose_tpe()" value="0" style="width:20px" />
+
+                                </label>
+                                <label for="dl">正反面单独<input type="radio" name="sfz" id="dl" onclick="click_choose_tpe()" value="1" style="width:20px" /></label>
+                            </div>
+
+                            <div class="profile-info-value">
+                                <span name="hc">
+                                    合成：<input type="file" name="cardurltogether" />（上传支持JPG，PNG，BMP,JPEG等图片格式，最大不超过4MB）
+                                </span>
+                                <span name="dl" style="display:none">
+                                    正面：<input type="file" name="cardUrl" />（上传支持JPG，PNG，BMP,JPEG等图片格式，最大不超过4MB）
+
+                                    <br /> 反面：<input type="file" name="cardurlother" />（上传支持JPG，PNG，BMP,JPEG等图片格式，最大不超过4MB）
+                                </span>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+                    <div class="clearfix form-buttons">
+                        <label class="control-label col-md-5"></label>
+                        <button type="submit" id="btnSaveAdd" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-ok"></i><strong>保存</strong></button>
+
+                        <button type="button" id="cancelAdd" class="btn btn-sub btn-sm btn-warning"><i class="glyphicon glyphicon-remove"></i><strong>取消</strong></button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <!--开关插件-->
+    <script src="../resources/bootstrap-switch/bootstrap-switch.min.js"></script>
+
+    <script src="../resources/js/fuelux/fuelux.spinner.min.js"></script>
+    <script src="../resources/scripts/common.js"></script>
+    <script src="../resources/scripts/cardId_veryfile.js"></script>
+    <script src="scripts/zhidan.js"></script>
+    <script src="../resources/js/jquery.bigautocomplete.js"></script>
+    <script src="../resources/scripts/area.js"></script>
+   
+    <script src="../resources/js/jquery.form.js"></script>
+
+    <script src="scripts/addreceiveraddress.js"></script>
+</body>
+</html>

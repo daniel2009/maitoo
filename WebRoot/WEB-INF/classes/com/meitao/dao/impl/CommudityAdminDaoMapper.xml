@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.CommudityAdminDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.CommudityAdmin">
+		<id column="id" property="id" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="remark" property="remark" javaType="String"/>
+		<result column="state" property="state" javaType="String"/>
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="channel_id" property="channelId" javaType="String" />
+		 <association property="channel" column="channel_id"
+			select="com.meitao.dao.ChannelDao.getChannelById"></association>
+	</resultMap>
+
+	<select id="getById" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from commudity_admin where id=#{id}
+	</select>
+	
+	<select id="getByChannelId" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from commudity_admin where channel_id=#{channelId}
+	</select>
+
+
+
+	<insert id="insert" parameterType="com.meitao.model.CommudityAdmin"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into commudity_admin(name,remark,state,modify_date,create_date,channel_id) values(#{name},#{remark},#{state},#{modifyDate},#{createDate},#{channelId})
+	</insert>
+
+	
+	<update id="modify">
+		update `commudity_admin`
+		set `name`=#{name},
+		`remark`=#{remark},
+		`state`=#{state},
+		`modify_date`=#{modifyDate}
+		where id = #{id} and channel_id = #{channelId}
+	</update>
+	
+	
+
+	
+	<select id="countByKeys" resultType="java.lang.Integer">
+		select count(distinct `commudity_admin`.id)
+		from commudity_admin
+		<where>
+			<if test="id!=null and id!=''">
+				and id =#{id}
+			</if>
+			<if test="channelId!=null and channelId!=''">
+				and channel_id =#{channelId}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (name like #{wordkey} or remark like #{wordkey})
+			</if>
+		</where>
+	</select>
+
+	<select id="searchByKeys" resultMap="basic_result_map">
+		select distinct `commudity_admin`.* 
+			from commudity_admin
+		<where>
+			<if test="id!=null and id!=''">
+				and id =#{id}
+			</if>
+			<if test="channelId!=null and channelId!=''">
+				and channel_id =#{channelId}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (name like #{wordkey} or remark like #{wordkey})
+			</if>
+		</where>
+		order by `commudity_admin`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+	
+	<delete id="delete">
+		delete from commudity_admin
+		where id =#{id} and channel_id =#{channelId}
+		
+	</delete>
+	
+	<select id="getByChannelIdandstate" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from commudity_admin 
+		<where>
+			<if test="channelId!=null and channelId!=''">
+				and channel_id =#{channelId}
+			</if>
+			<if test="state!=null and state!=''">
+				and state =#{state}
+			</if>
+		
+		</where>
+	</select>
+	
+</mapper>

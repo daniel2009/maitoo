@@ -1,0 +1,29 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>print</title>
+<link rel="shortcut icon" href="../img/favicon.ico" /> 
+</head>
+<body>
+	<div class="print">
+		<div>
+		<table id="print_table1" class="ptable"><tr>
+		<td><img  name="barcode" src="${pageContext.request.contextPath }/barcode/generate?code=${param.id }"/></td></tr>
+		<tr><td><label style="font-size:24px;">&nbsp;&nbsp;&nbsp;&nbsp;运单编号：<label name="order_id" style="font-size:36px;">${param.id }</label>
+		</td></tr>
+		</table>
+		</div>
+	</div>
+	<div id="param_div" style="display: none;">
+		<input type="hidden" value="${param.id }" name="oid"/>
+		<input type="hidden" value="${pageContext.request.contextPath }/barcode/generate?code=${param.id }" name="barcodeimg"/>
+	</div>
+</body>
+<script type="text/javascript">
+	window.print();
+	
+</script>
+</html>

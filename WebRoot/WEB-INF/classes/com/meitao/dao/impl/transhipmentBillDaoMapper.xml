@@ -1,0 +1,621 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.TranshipmentBillDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.TranshipmentBill">
+		<id column="id" property="id" javaType="String" />
+		<result column="transit_no" property="transitNo" javaType="String" />
+		<result column="transit_company" property="transitCompany"
+			javaType="String" />
+		<result column="warehouse_id" property="warehouseId" javaType="String" />
+		<result column="channel_id" property="channelId" javaType="String" />
+		<result column="parce_value" property="parcelValue" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="emp_id" property="empId" javaType="String" />
+		<result column="from_user" property="fromUser" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="eta" property="eta" javaType="String" />
+		<result column="awt" property="awt" javaType="String" />
+		<result column="remark" property="remark" javaType="String" />
+		<result column="weight" property="weight" javaType="String" />
+		<result column="tariff" property="tariff" javaType="String" />
+		<result column="or" property="or" javaType="String" />
+		
+		<result column="weight_kg" property="weightKg" javaType="String" />
+		<result column="premium" property="premium" javaType="String" />
+		<result column="mail" property="mail" javaType="String" />
+		<result column="total_money" property="totalMoney" javaType="String"/>
+		<result column="divide_money" property="divideMoney" javaType="String"/>
+		
+		<result column="transit_type" property="transitType" javaType="String" />
+		<result column="cName" property="cName" javaType="String" />
+		<result column="cProvince" property="cProvince" javaType="String" />
+		<result column="cCity" property="cCity" javaType="String" />
+		<result column="cDistrict" property="cDistrict" javaType="String" />
+		<result column="cStreetAddress" property="cStreetAddress" javaType="String" />
+		<result column="cZipCode" property="cZipCode" javaType="String" />
+		<result column="cPhone" property="cPhone" javaType="String" />
+		<result column="cardid" property="cardid" javaType="String" />
+		<result column="cardurl" property="cardurl" javaType="String" />
+		<result column="cardurlother" property="cardurlother" javaType="String" />
+		<result column="cardurltogether" property="cardurltogether" javaType="String" />	
+		<result column="user_name" property="userName" javaType="String"/>
+		<result column="user_realname" property="userRealName" javaType="String"/>
+		<result column="CommodityCost" property="CommodityCost" javaType="String" />
+		
+		<result column="warehouse_name" property="warehouseName"
+			javaType="String" />
+		<result column="channels_name" property="channelsName"
+			javaType="String" />
+		<result column="unpacking_num" property="unpackingNumber" javaType="Integer"/>
+		<result column="authorize_move_money" property="authorizeMoveMoney" javaType="String"/>
+		<result column="pretranwarehouseId" property="pretranwarehouseId" javaType="String"/>
+		<result column="order_id" property="orderId" javaType="String"/>
+		<result column="selfgetpackage_flag" property="selfgetpackageFlag" javaType="String"/>
+		<result column="self_paytype" property="selfPaytype" javaType="String"/>
+		<result column="wrong_emark" property="wrongRemark" javaType="String"/>
+		<!-- 添加查找用户唯一标识 -->
+	    <result column="usercode" property="usercode" javaType="String" />
+		<result column="useralias" property="useralias" javaType="String" />
+		<result column="route_state" property="routeState" javaType="String"/>
+		<result column="from_warehouse_price" property="fromWarehousePrice" javaType="String"/>
+		<result column="tran_warehouse_id" property="tranWarehouseId" javaType="String"/>
+		<result column="tran_warehouse_name" property="tranWarehouseName" javaType="String"/>
+		
+		<association property="storagePosition" javaType="com.meitao.model.StoragePosition">
+			<id property="id" column="storage_position_id"/>
+			<result property="storageId" column="storage_position_storage_id"/>
+			<result property="storageName" column="storage_position_storage_name"/>
+			<result property="colNumber" column="storage_position_col_number"/>
+			<result property="rowNumber" column="storage_position_row_number"/>
+		</association>
+		<collection property="commoditys" column="id"
+			select="com.meitao.dao.TranshipmentCommodityDao.getById"></collection>
+	</resultMap>
+
+	<insert id="insertTranshipmentBill" parameterType="com.meitao.model.TranshipmentBill"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		`transhipment_bill`(`transit_no`, `transit_company`, `warehouse_id`,
+		`parce_value`, `user_id`, `from_user`, `state`, `create_date`,
+		`modify_date`, `eta`,
+		`remark`,`length`,`width`,`height`,
+		`transit_type`,`cName`,`cProvince`,`cCity`,`cDistrict`,
+		`cStreetAddress`,`cZipCode`,`cPhone`,`cardid`,
+		`cardurl`,`cardurlother`,`cardurltogether`,`authorize_move_money`)
+		values( #{transitNo},#{transitCompany},
+		#{warehouseId},
+		#{parcelValue}, #{userId}, #{fromUser}, #{state},
+		#{createDate}, #{modifyDate},
+		#{eta}, #{remark},#{length},#{width},#{height},
+		#{transitType},#{cName},#{cProvince},#{cCity},#{cDistrict},
+		#{cStreetAddress},#{cZipCode},#{cPhone},#{cardid},
+		#{cardurl},#{cardurlother},#{cardurltogether},#{authorizeMoveMoney})
+	</insert>
+
+	<delete id="deleteTranshipmentBill">
+		delete from `transhipment_bill`
+		where `id` in
+		<foreach collection="list" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+		and `user_id`=#{userId} and state='0'
+	</delete>
+
+	<delete id="deleteMultiTranshipmentBill">
+		delete from `transhipment_bill`
+		where `id` in
+		<foreach collection="list" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+		and state=#{state}
+	</delete>
+
+	<update id="updateTranshipmentBill">
+		update `transhipment_bill`
+		set `awt`=#{awt},
+		`state`=#{state}, `weight`=#{weight},
+		`tariff`=#{tariff}, `or`=#{or},
+		`emp_id`=#{empId}, `remark`=#{remark},`CommodityCost`=#{CommodityCost},
+		`length`=#{length}, `width`=#{width}, `height`=#{height},
+		`other`=#{other},`warehouse_id`=#{warehouseId},`channel_id`=#{channelId}
+		,`parce_value`=#{parcelValue},`divide_money`=#{divideMoney},`selfgetpackage_flag`=#{selfgetpackageFlag},`self_paytype`=#{selfPaytype}
+		,`weight_kg`=#{weightKg},`mail`=#{mail},`premium`=#{premium},`tran_warehouse_id`=#{tranWarehouseId},`total_money`=#{totalMoney},`pretranwarehouseId`=#{pretranwarehouseId}
+		where
+		`id`=#{id}
+	</update>
+	<update id="updateTranshipmentBillquicktype">
+		update `transhipment_bill`
+		set `awt`=#{awt},
+		`state`=#{state}, `weight`=#{weight},
+		`tariff`=#{tariff}, `or`=#{or},
+		`emp_id`=#{empId}, `remark`=#{remark},`CommodityCost`=#{CommodityCost},
+		`length`=#{length}, `width`=#{width}, `height`=#{height},
+		`other`=#{other},`warehouse_id`=#{warehouseId},`channel_id`=#{channelId}
+		,`weight_kg`=#{weightKg},`mail`=#{mail},`premium`=#{premium}
+		,`cName`=#{cName},`cProvince`=#{cProvince},`cCity`=#{cCity}
+		,`cDistrict`=#{cDistrict},`cStreetAddress`=#{cStreetAddress},`cZipCode`=#{cZipCode}
+		,`cPhone`=#{cPhone},`cardid`=#{cardid},`cardurl`=#{cardurl}
+		,`parce_value`=#{parcelValue},`divide_money`=#{divideMoney},`selfgetpackage_flag`=#{selfgetpackageFlag},`self_paytype`=#{selfPaytype}
+		,`cardurlother`=#{cardurlother},`cardurltogether`=#{cardurltogether},`tran_warehouse_id`=#{tranWarehouseId},`total_money`=#{totalMoney},`pretranwarehouseId`=#{pretranwarehouseId}
+        where
+		`id`=#{id}
+	</update>
+	<update id="updateTranshipmentBillState">
+		update `transhipment_bill`
+		set `state`=#{state}
+		where `id` in 
+		<foreach collection="list" item="id" close=")" open="(" separator=",">
+			${id}
+		</foreach>
+	</update>
+
+	<select id="countByKey" resultType="java.lang.Integer">
+		select count(*) from `transhipment_bill`
+		left join users as u on u.id= transhipment_bill.user_id
+		<where>
+			<if test="tid != null and tid != ''">
+				`transhipment_bill`.`id` = #{tid}
+			</if>
+			<if test="column!=null and column!='' and key!=null and key!=''">
+				${column} like #{key}
+			</if>
+			<if test="sdate!=null and sdate!=''">
+				and transhipment_bill.`create_date` <![CDATA[>=]]> #{sdate}
+			</if>
+			<if test="edate!=null and edate!=''">
+				and transhipment_bill.`create_date` <![CDATA[<=]]> #{edate}
+			</if>
+			<if test="userId!=null and userId!=''">
+				and transhipment_bill.`user_id`=#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				and transhipment_bill.`state`=#{state}
+			</if>
+			
+			<if test="storeid!=null and storeid!=''">
+				<choose>
+					<when test="state==null or state==''">
+						and (transhipment_bill.`warehouse_id`=#{storeid} or transhipment_bill.`tran_warehouse_id`=#{storeid} or transhipment_bill.`state`='0' )
+					</when>
+					<otherwise>				
+						and (transhipment_bill.`warehouse_id`=#{storeid} or transhipment_bill.`tran_warehouse_id`=#{storeid})
+					</otherwise>
+				</choose>
+			</if>
+			
+		</where>
+	</select>
+	
+	<select id="countByKeynew" resultType="java.lang.Integer">
+		select count(*) from `transhipment_bill`
+		left join users as u on u.id= transhipment_bill.user_id
+		<where>
+			<if test="tid != null and tid != ''">
+				<!--  `transhipment_bill`.`id` = #{tid}-->
+				transhipment_bill.`transit_no` like #{tid}
+			</if>
+			<if test="column!=null and column!='' and key!=null and key!=''">
+				${column} like #{key}
+			</if>
+			<if test="usercode!=null and usercode!='' and key!=null and key!=''">			    
+				(upper(u.usercode) like upper(#{key}) or upper(u.useralias) like upper(#{key}))
+			</if>
+			<if test="sdate!=null and sdate!=''">
+				and transhipment_bill.`create_date` <![CDATA[>=]]> #{sdate}
+			</if>
+			<if test="edate!=null and edate!=''">
+				and transhipment_bill.`create_date` <![CDATA[<=]]> #{edate}
+			</if>
+			<if test="userId!=null and userId!=''">
+				and transhipment_bill.`user_id`=#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				and transhipment_bill.`state`=#{state}
+			</if>
+			
+			<if test="transitType!=null and transitType!=''">
+				and transhipment_bill.`transit_type`=#{transitType}
+			</if>
+			<if test="tranWarehouseId!=null and tranWarehouseId!=''">
+				and transhipment_bill.`tran_warehouse_id`=#{tranWarehouseId}
+			</if>
+			<if test="warehouseId!=null and warehouseId!=''">
+				and transhipment_bill.`warehouse_id`=#{warehouseId}
+			</if>		
+			<if test="storeid!=null and storeid!=''">
+				<choose>
+					<when test="state==null or state==''">
+						and (transhipment_bill.`warehouse_id`=#{storeid} or transhipment_bill.`tran_warehouse_id`=#{storeid} or transhipment_bill.`state`='0' )
+					</when>
+					<otherwise>
+						and (transhipment_bill.`warehouse_id`=#{storeid} or transhipment_bill.`tran_warehouse_id`=#{storeid})
+					</otherwise>
+				</choose>
+			</if>
+		</where>
+	</select>
+
+
+<select id="searchByKeynew" resultMap="basic_result_map">
+		select transhipment_bill.*,u.phone as user_name,u.usercode as usercode, u.useralias as useralias,u.real_name as user_realname,
+		od.num as unpacking_num, w.name as warehouse_name,tw.name as tran_warehouse_name,
+		s.name AS storage_position_storage_name, p.col_number AS storage_position_col_number, p.row_number AS storage_position_row_number, p.storage_id as storage_position_storage_id
+		from `transhipment_bill` left join `users` as u on u.id = user_id
+		left join
+			(select count(distinct order_id) as num, transhipment_id from order_detail group by transhipment_id)
+ 		as od on od.transhipment_id = transhipment_bill.id
+ 		left join `warehouse` as w on w.id = transhipment_bill.`warehouse_id`
+ 		left join `warehouse` as tw on tw.id = transhipment_bill.`tran_warehouse_id`
+ 		LEFT JOIN storage_position_record r ON r.relate_id=transhipment_bill.id
+ 		LEFT JOIN storage_position p ON p.id=r.storage_position_id
+ 		LEFT JOIN `storage` s ON s.id=p.storage_id AND (s.type='0' OR s.type='1')
+		<where>
+		    <if test="tid != null and tid != ''">
+				<!--  `transhipment_bill`.`id` = #{tid}-->
+				transhipment_bill.`transit_no` like #{tid}
+			</if>
+			<if test="column!=null and column!='' and key!=null and key!=''">			    
+				${column} like #{key}
+			</if>
+			<if test="usercode!=null and usercode!='' and key!=null and key!=''">			    
+				(upper(u.usercode) like upper(#{key}) or upper(u.useralias) like upper(#{key}))
+			</if>
+			<if test="sdate!=null and sdate!=''">
+				and transhipment_bill.`create_date` <![CDATA[>=]]> #{sdate}
+			</if>
+			<if test="edate!=null and edate!=''">
+				and transhipment_bill.`create_date` <![CDATA[<=]]> #{edate}
+			</if>
+			<if test="userId!=null and userId!=''">
+				and transhipment_bill.`user_id`=#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				and transhipment_bill.`state`=#{state}
+			</if>
+			
+			<if test="transitType!=null and transitType!=''">
+				and transhipment_bill.`transit_type`=#{transitType}
+			</if>
+				<if test="tranWarehouseId!=null and tranWarehouseId!=''">
+				and transhipment_bill.`tran_warehouse_id`=#{tranWarehouseId}
+			</if>
+			<if test="warehouseId!=null and warehouseId!=''">
+				and transhipment_bill.`warehouse_id`=#{warehouseId}
+			</if>	
+			<if test="storeid!=null and storeid!=''">
+				<choose>
+					<when test="state==null or state==''">
+						and (transhipment_bill.`warehouse_id`=#{storeid} or transhipment_bill.`tran_warehouse_id`=#{storeid} or transhipment_bill.`state`='0' )
+					</when>
+					<otherwise>
+						and (transhipment_bill.`warehouse_id`=#{storeid} or transhipment_bill.`tran_warehouse_id`=#{storeid})
+					</otherwise>
+				</choose>
+			</if>
+		</where>
+		order by create_date desc
+		limit
+		#{index},#{size}
+	</select>
+
+	<select id="searchByKey" resultMap="basic_result_map">
+		select transhipment_bill.*,u.phone as user_name,
+		od.num as unpacking_num, w.name as warehouse_name,ch.name as channels_name
+		from `transhipment_bill` left join `users` as u on u.id = user_id
+		left join
+			(select count(distinct order_id) as num, transhipment_id from order_detail group by transhipment_id)
+ 		as od on od.transhipment_id = transhipment_bill.id
+ 		left join `warehouse` as w on w.id = transhipment_bill.`warehouse_id`
+ 		left join `channels` as ch on ch.id = transhipment_bill.`channel_id`
+		<where>
+		    <if test="tid != null and tid != ''">
+				`transhipment_bill`.`id` = #{tid}
+			</if>
+			<if test="column!=null and column!='' and key!=null and key!=''">
+				${column} like #{key}
+			</if>
+			<if test="sdate!=null and sdate!=''">
+				and transhipment_bill.`create_date` <![CDATA[>=]]> #{sdate}
+			</if>
+			<if test="edate!=null and edate!=''">
+				and transhipment_bill.`create_date` <![CDATA[<=]]> #{edate}
+			</if>
+			<if test="userId!=null and userId!=''">
+				and transhipment_bill.`user_id`=#{userId}
+			</if>
+			<if test="state!=null and state!=''">
+				and transhipment_bill.`state`=#{state}
+			</if>
+			<if test="storeid!=null and storeid!=''">
+				<choose>
+					<when test="state==null or state==''">
+						and (transhipment_bill.`warehouse_id`=#{storeid} or transhipment_bill.`tran_warehouse_id`=#{storeid} or transhipment_bill.`state`='0' )
+					</when>
+					<otherwise>
+						and (transhipment_bill.`warehouse_id`=#{storeid} or transhipment_bill.`tran_warehouse_id`=#{storeid})
+					</otherwise>
+				</choose>
+			</if>			
+		</where>
+		order by create_date desc
+		limit
+		#{index},#{size}
+	</select>
+
+	<select id="getById" parameterType="java.lang.String" resultMap="basic_result_map">
+
+		select r.state AS routeState, transhipment_bill.*,u.phone as user_name,
+		od.num as unpacking_num, w.name as warehouse_name,
+		p.id AS storage_position_id, s.name AS storage_position_storage_name, p.col_number AS storage_position_col_number, p.row_number AS storage_position_row_number
+		from `transhipment_bill` left join `users` as u on u.id = user_id
+		left join
+			(select count(distinct order_id) as num, transhipment_id from order_detail group by transhipment_id)
+ 		as od on od.transhipment_id = transhipment_bill.id
+		LEFT JOIN (SELECT state, transhipment_id FROM transhipment_route WHERE id IN (SELECT MAX(id) FROM transhipment_route GROUP BY transhipment_id)) r ON r.transhipment_id=transhipment_bill.id
+ 		left join `warehouse` as w on w.id = transhipment_bill.`warehouse_id`
+ 		LEFT JOIN storage_position_record r ON r.relate_id=transhipment_bill.id
+ 		LEFT JOIN storage_position p ON p.id=r.storage_position_id
+ 		LEFT JOIN `storage` s ON s.id=p.storage_id AND (s.type='0' OR s.type='1')
+		where transhipment_bill.id=#{id}
+	</select>
+
+	<select id="getByIds" resultMap="basic_result_map">
+		select transhipment_bill.*,u.phone as user_name,
+		od.num as unpacking_num, w.name as warehouse_name,ch.name as channels_name
+		from `transhipment_bill` left join `users` as u on u.id = user_id
+		left join
+			(select count(distinct order_id) as num, transhipment_id from order_detail group by transhipment_id)
+ 		as od on od.transhipment_id = transhipment_bill.id
+ 		left join `warehouse` as w on w.id = transhipment_bill.`warehouse_id`
+ 		left join `channels` as ch on ch.id = transhipment_bill.`channel_id`
+		<foreach collection="list" item="id" open="where transhipment_bill.id in ("
+			close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
+
+	<select id="getByOrderId" resultMap="basic_result_map">
+		select distinct transhipment_bill.*,u.nick_name as user_name,
+		od.num as unpacking_num, w.name as warehouse_name
+		from `transhipment_bill` left join `users` as u on u.id = user_id
+		left join
+			(select count(distinct order_id) as num, transhipment_id from order_detail group by transhipment_id)
+ 		as od on od.transhipment_id = transhipment_bill.id
+    	left join order_detail on order_detail.transhipment_id=transhipment_bill.id
+    	left join `warehouse` as w on w.id = transhipment_bill.`warehouse_id`
+    	where order_detail.order_id=#{id}
+	</select>		
+	
+	
+	<select id="getidByOrderId" resultType="java.lang.Integer">
+		select  max(transhipment_bill.id)
+		from `transhipment_bill`
+		where transhipment_bill.`user_id`=#{userId}
+	</select>	
+	
+	<update id="updateTranshipmentBillremovecommditys">
+		update `transhipment_bill`
+		set `modify_date`=#{modifyDate},
+		`awt`=#{awt},
+		`transit_no`=#{tranistNo},
+		`weight`=#{weight},
+		`weight_kg`=#{weightkg}
+		where `id` =#{id}
+	</update>
+	
+	<update id="updateTranshipmentBillremovecommditysnew">
+		update `transhipment_bill`
+		set `modify_date`=#{modifyDate},
+		`weight`=#{weight},
+		`weight_kg`=#{weightkg}
+		where `id` =#{id}
+	</update>
+	
+	<delete id="deleteTranshipmentBillbyid">
+		delete from `transhipment_bill`
+		where `id` =#{id}
+	</delete>
+	
+		<update id="updateTranshipmentBillcomposed">
+		update `transhipment_bill`
+		set `awt`=#{awt},
+		`state`=#{state}, `weight`=#{weight},`transit_no`=#{transitNo},
+		`tariff`=#{tariff}, `or`=#{or},`CommodityCost`=#{CommodityCost},
+		`emp_id`=#{empId}, `remark`=#{remark},
+		`length`=#{length}, `width`=#{width}, `height`=#{height},
+		`other`=#{other},`warehouse_id`=#{warehouseId},`channel_id`=#{channelId}
+		,`weight_kg`=#{weightKg},`mail`=#{mail},`premium`=#{premium},`tran_warehouse_id`=#{tranWarehouseId}
+		where
+		`id`=#{id}
+	</update>
+
+	<insert id="addByClaimPackage" parameterType="com.meitao.model.TranshipmentBill" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO transhipment_bill(user_id, warehouse_id, emp_id, transit_no, transit_company, transit_type, state, create_date)
+		SELECT p.user_id, b.warehouse_id, b.emp_id, b.baoguo_id, b.company, #{transit_type}, #{state}, #{createDate} FROM renling_person p LEFT JOIN renling_bill b ON p.renling_id=b.id WHERE p.id=#{transitNo}
+	</insert>
+	<update id="updateToPreOrder">
+		UPDATE transhipment_bill SET 
+		state = #{state}, cName = #{cName}, cProvince = #{cProvince}, cCity = #{cCity}, cDistrict = #{cDistrict}, cStreetAddress = #{cStreetAddress}, cZipCode = #{cZipCode}, cPhone = #{cPhone}, modify_date = #{modifyDate}
+		WHERE id = #{id}
+	</update>
+	<update id="updateStateAndRemark">
+		UPDATE transhipment_bill SET state = #{state}, remark = #{remark}, modify_date = #{modifyDate} WHERE id = #{id}
+	</update>
+	<select id="countWithRouteByKey" resultType="java.lang.Integer">
+		select COUNT(id) from `transhipment_bill`
+		<where>
+		    <if test="id != null and id != ''">
+				`transhipment_bill`.`id` = #{id}
+			</if>
+			<if test="type!=null and type!='' and type!='-1' and key!=null and key!=''">
+				${type} like #{key}
+			</if>
+			<if test="createDateStart!=null and createDateStart !=''">
+				and transhipment_bill.`create_date` <![CDATA[>=]]> #{createDateStart}
+			</if>
+			<if test="createDateEnd!=null and createDateEnd!=''">
+				and transhipment_bill.`create_date` <![CDATA[<=]]> #{createDateEnd}
+			</if>
+			<if test="state!=null and state!='' and state!='-1'">
+				and transhipment_bill.`state`=#{state}
+			</if>
+			<if test="warehouseId!=null and warehouseId!=''">
+				and transhipment_bill.`warehouse_id`=#{warehouseId}
+			</if>			
+		</where>
+	</select>
+	<select id="searchWithRouteByKey" resultMap="basic_result_map">
+		select transhipment_bill.*,u.phone as user_name,
+		od.num as unpacking_num, w.name as warehouse_name,ch.name as channels_name
+		from `transhipment_bill` left join `users` as u on u.id = user_id
+		left join
+			(select count(distinct order_id) as num, transhipment_id from order_detail group by transhipment_id)
+ 		as od on od.transhipment_id = transhipment_bill.id
+ 		left join `warehouse` as w on w.id = transhipment_bill.`warehouse_id`
+ 		left join `channels` as ch on ch.id = transhipment_bill.`channel_id`
+		<where>
+		    <if test="id != null and id != ''">
+				`transhipment_bill`.`id` = #{id}
+			</if>
+			<if test="type!=null and type!='' and type!='-1' and key!=null and key!=''">
+				${type} like #{key}
+			</if>
+			<if test="createDateStart!=null and createDateStart !=''">
+				and transhipment_bill.`create_date` <![CDATA[>=]]> #{createDateStart}
+			</if>
+			<if test="createDateEnd!=null and createDateEnd!=''">
+				and transhipment_bill.`create_date` <![CDATA[<=]]> #{createDateEnd}
+			</if>
+			<if test="state!=null and state!='' and state!='-1'">
+				and transhipment_bill.`state`=#{state}
+			</if>
+			<if test="warehouseId!=null and warehouseId!=''">
+				and transhipment_bill.`warehouse_id`=#{warehouseId}
+			</if>			
+		</where>
+		order by create_date desc
+		limit #{firstResult}, #{pageSize}
+	</select>
+	<update id="updateWarehouseId">
+		UPDATE transhipment_bill SET warehouse_id=#{warehouseId} WHERE id=#{id}
+	</update>
+	<update id="updateFromWarehousePrice">
+		UPDATE transhipment_bill b, warehouse w
+		SET b.from_warehouse_price = IFNULL(b.from_warehouse_price,0) + IFNULL(w.change_warehouse_price,0)
+		WHERE b.id=#{id} AND w.id=#{warehouseId}
+	</update>
+	<select id="getlastidbyuser" resultType="java.lang.Integer">
+		select max(id) from transhipment_bill where `user_id`=#{userId}
+	</select>
+	<select id="getByIdAndUserId" resultMap="basic_result_map">
+		select * from transhipment_bill where id=#{id} AND user_id=#{userId}
+	</select>
+	<update id="updateState">
+		UPDATE transhipment_bill SET state=#{state} WHERE id=#{id}
+	</update>
+	<update id="cancelReturn">
+		UPDATE transhipment_bill t INNER JOIN return_package r ON t.id=r.transhipment_id SET t.state=r.transhipment_pre_state WHERE t.id=#{id} AND t.user_id=#{userId}
+	</update>
+	<update id="updateorderidbyid">
+		update `transhipment_bill` set
+		order_id=#{orderId}
+		where
+		`id`=#{id}
+	</update>
+	
+	
+	<select id="getByTransitNo" parameterType="java.lang.String" resultMap="basic_result_map">
+		select transhipment_bill.* from transhipment_bill 
+		<where>
+			 transit_no=#{transitNo} 
+			<if test="storeId!=null and storeId!=''">
+				and warehouse_id=#{storeId}
+			</if>
+		</where>
+	</select>
+	<!-- 更新转运入库和出库 及未入库-->
+	<update id="updateTranshipmentBilltranStatebyid">
+		update transhipment_bill
+		set state=#{state}
+		,warehouse_id=#{warehouseId}
+		<if test="tranWarehouseId!=null and tranWarehouseId!=''">
+		,tran_warehouse_id=#{tranWarehouseId}
+		</if>
+		<if test="pretranwarehouseId!=null and pretranwarehouseId!=''">
+		,pretranwarehouseId=#{pretranwarehouseId}	
+		</if>
+		<where>
+			 id=#{id} 
+			<if test="storeId!=null and storeId!=''">
+				and warehouse_id=#{storeId}
+			</if>
+		</where>
+	</update>
+	<!-- 更新转运本地入库，只更新状态和仓库id-->
+	<update id="updateTranshipmentBilltranStatebyid2">
+		update transhipment_bill
+		set state=#{state},warehouse_id=#{warehouseId}
+		<where>
+			id=#{id} 
+			<if test="storeId!=null and storeId!=''">
+				and warehouse_id=#{storeId}
+			</if>
+		</where>
+	</update>
+	
+	<!-- 更新转运入库和出库 及未入库-->
+	<update id="updateTranshipmentBilltranStatebytransit_no">
+		update transhipment_bill
+		set state=#{state}
+		,warehouse_id=#{warehouseId}
+		<if test="tranWarehouseId!=null and tranWarehouseId!=''">
+		,tran_warehouse_id=#{tranWarehouseId}
+		</if>
+		<if test="pretranwarehouseId!=null and pretranwarehouseId!=''">
+		,pretranwarehouseId=#{pretranwarehouseId}	
+		</if>
+		<where>
+			 transit_no=#{transitNo} 
+			<if test="storeId!=null and storeId!=''">
+				and warehouse_id=#{storeId}
+			</if>
+		</where>
+	</update>
+	<!-- 更新转运本地入库，只更新状态和仓库id-->
+	<update id="updateTranshipmentBilltranStatebytransit_no2">
+		update transhipment_bill
+		set state=#{state},warehouse_id=#{warehouseId}
+		<where>
+			transit_no=#{transitNo} 
+			<if test="storeId!=null and storeId!=''">
+				and warehouse_id=#{storeId}
+			</if>
+		</where>
+	</update>
+	
+	<update id="updateTranshipmentBillWrongState">
+		update transhipment_bill
+		set state=#{state},wrong_emark=#{wrongRemark}
+		<where>
+			id=#{id} 
+			<if test="storeId!=null and storeId!=''">
+				and warehouse_id=#{storeId}
+			</if>
+		</where>
+	</update>
+	<update id="updateTranshipmentBillStatebyid">
+		update transhipment_bill
+		set state=#{state}
+		<where>
+			id=#{id} 
+			<if test="storeId!=null and storeId!=''">
+				and warehouse_id=#{storeId}
+			</if>
+		</where>
+	</update>
+</mapper>

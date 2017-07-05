@@ -1,0 +1,60 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">有问必答-留言管理</p>
+
+		<div class="box_content">
+			<div class="content_title">
+				有问必答-留言管理
+				待回复留言：<span style="margin: 0 3px; color: #f00;">(<label id="totalReplayMessage">0</label>)</span>
+			<div class="content_text">
+				<div class="tab_box">
+					<table id="datatable" class="table">
+						<thead>
+							<tr>
+								<th style="width:60px">&nbsp;</th>
+								<th style="width:30px">序号</th>
+								<th>留言</th>
+								<th style="width:60px">留言时间</th>
+								<th style="width:60px">更新时间</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="8" align="right">共<span id="trsize">0</span>条
+									<a id="first_page" href="1" name="to_page">首页</a> | <a
+									id="pre_page" name="to_page">上一页</a> | <input type="text"
+									class="bor" size="2" /> /<span id="tpsize">0</span>| <a
+									id="next_page" name="to_page">下一页</a> | <a id="last_page"
+									name="to_page">未页</a>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+				<div class="tab_box" style="margin-top:10px;">
+					<table class="itable">
+						<tr>
+							<td align="center"><textarea name="newcontent" style="width:95%"
+									rows="5"></textarea>
+								<p style="margin:10px;text-align: center;">
+									<a href="#" onclick="savemsgclick()" class="bblue">新增留言</a>
+								</p></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

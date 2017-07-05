@@ -1,0 +1,344 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<% String id = (String)session.getAttribute("user_id_session_key");
+	String isLogin="0";
+	if(id!=null&&!id.equals("")){
+		isLogin = "1";
+	}
+%>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Webxury| Fleet</title>
+    <meta charset="utf-8" />
+    <!-- Page Loader - Needs to be placed in header for loading at top of all content -->
+    <script type="text/javascript" src="js/pace.min.js"></script>
+    <link href="css/pace-loading-bar.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/animate.shipping.css">
+    <link rel="stylesheet" type="text/css" href="css/ShippingIcon.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" id="main-style" type="text/css" href="css/style.css">
+</head>
+
+<body class="blue page-loading">
+	<input type="hidden" id="is_login" value="<%=isLogin%>"/>
+    <!-- Section Start - Header -->
+    <section class='header' id='header'>
+        <!-- Header Top Bar - Start -->
+         <div class="topbar-wrap">
+            <div class="container">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 logo-area">
+                    <div class="logo">
+                        <div>
+                         <a href="../fleet/index.html">
+                            <img id="logoHeader" src="img/logo_s.jpg" alt="Header Image" class="img-responsive"><!--<i class="icon icon-logo white"></i>-->
+                        </a>
+                        </div>
+                        <!--<span class="name">SHIPPING</span>
+                        <span class="small">Logistics & Transport</span>-->
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-9 col-sm-8 col-xs-5 menu-area pull-right">
+                    <!-- Menu Top Bar - Start -->
+                    <div class="topbar">
+                        <div class="menu">
+                            <div class="primary inviewport animated delay2" data-effect="">
+                                <div class='cssmenu'>
+                                    <!-- Menu - Start -->
+                                    <ul class='menu-ul'>
+                                        <li class='has-sub'>
+                                            <a href='index.html'><b>首页</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='price.html'><b>收费标准</b> </a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='about-us-2.html'><b>关于我们</b></a>
+                                        </li>
+                                        <li class='has-sub'>
+                                            <a href='contact.html'><b>联系我们</b></a>
+                                        </li>
+                                        <!--<li class='has-sub'>
+                                            <a href='location.html'><b>公司地点</b></a>
+                                        </li>-->
+                                       <!--  <li class='has-sub'>
+                                            <a href='News.html'><b>新闻公告</b></a>
+                                        </li> --> 
+                                         <li class='has-sub'>
+                                            <a href='login.jsp'><b>登陆</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='registe.html'><b>注册</b></a>
+                                        </li>
+                                         <li class='has-sub'>
+                                            <a href='upload.html'><b>上传ID</b></a>
+                                        </li>
+                                          
+                                    </ul>
+                                    <!-- Menu - End -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Menu Top Bar - End -->
+                    <!-- Mobile Menu - Start -->
+                    <div class="menu-mobile col-xs-10 pull-right cssmenu">
+                        <i class="icon icon-menu menu-toggle"></i>
+                        <ul class="menu" id='parallax-mobile-menu'>
+                        </ul>
+                    </div>
+                    <!-- Mobile Menu - End -->
+                </div>
+            </div>
+        </div>
+        <!-- Header Top Bar - End -->
+        <div class="header-bg header-small">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 slantbar hidden-xs"></div>
+            <!-- Header Tracking Box - Start -->
+            
+            <!-- Header Tracking Box - End -->
+            <!-- Header Content Slide - Start -->
+            <div style="position:relative;display:inline-block;width:100%;height:50%;">
+                <img src="img/banner-4s.jpg" alt="Header Image" class="img-responsive">
+                <div class="bg-overlay"></div>
+                <div class="main-wrap">
+                    <div class="container">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 main-content">
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Header Content Slide - End -->
+        </div>
+    </section>
+    <!-- Section End - Header -->
+    <!-- Section Start - Get In Touch -->
+    <section class='contact' id='contact'>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                    <!-- Contact Form - Start -->
+                    <div class='row'>
+                  		<p style="font-size:36px; color:#333;"> <b>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;用户登录</b></p><br/>
+                        <form id="form" method='post'>
+                            
+                             <div class='col-xs-12'>
+                                <input type='text' placeholder='请输入手机号/邮箱' class='transition' id="telphone" style="width:50%;">
+                            </div>
+                           
+                            <div class='col-xs-12'>
+                                <input type="password" placeholder='请输入密码（6-20位）' class='transition' id="password" style="width:50%;">
+                            </div>
+                            <div class='col-xs-7'>
+                               <input type='text' placeholder='请输入验证码' class='transition' id="verifycode" style="width:50%;">
+                               <img src="" id="code" alt="看不清，换一张" />
+                            </div>
+                             <div class='col-xs-5'>
+                               <img>
+                            </div>
+                            <div class='col-xs-12'>
+                               <input type='checkbox' checked class='transition' style="height:auto; width:auto;"><span>记住密码</span> 
+                               <a href="../resetPwd.html">忘记密码?</a>
+                            </div>
+                            <div id='response_email' class='col-xs-12'></div>
+                            <div class='col-xs-4'>
+                                <button type='button' class='btn btn-primary transition' onclick="login()">登录</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Contact Form - End -->
+                </div>
+               
+            </div>
+        </div>
+    </section>
+    <!-- Section End - Get In Touch 
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="row">
+            <div id="contact-map" class="gmap"></div>
+        </div>
+    </div>
+    <!-- Section Start - Footer -->
+    <section class='footer bg-black parallax ' id='footer'>
+        <div class="bg-overlay"></div>
+        <div class="container">
+            <div class="row">
+                <!-- Text Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 text-widget inviewport animated delay1" data-effect="fadeInUp">
+                    <div class="logo">
+                        <div>
+                        <a href="../fleet/index.html">
+                            <img src="img/logo.jpg" alt="Header Image" class="img-responsive" style="width:50%; height:50%;">
+                        </a>
+                        </div>
+                    </div>
+                    <p>公司简介</p>
+                    
+                </div>
+                <!-- Text Widget - End -->
+                <!-- News Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 news-widget inviewport animated delay2" data-effect="fadeInUp">
+                    <h4>微信公众号</h4>
+                    <div class="headul left-align"></div>
+                    <div class="news-wrap row">
+                        <div class="pic col-md-3 col-xs-3 col-sm-3 col-lg-3">
+                            <img alt="news-image" class="img-responsive" src="img/news-1.jpg">
+                        </div>
+                        <div class="info col-md-9 col-xs-9 col-sm-9 col-lg-9">
+                            <h5 class="title"><a href='#'>公众号名称(或微信号)</a></h5>
+                            <div class="date">william18559</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- News Widget - End -->
+                <!-- Contact Widget - Start -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 contact-widget inviewport animated delay3" data-effect="fadeInUp">
+                    <h4>公司地址</h4>
+                    <div class="headul left-align"></div>
+                    <p>地址: 2428 w valley blvd, alhambra  
+                        
+                        <br>CA 91803</p>
+                    <p>电子邮箱: williamliang111@yahoo.com
+                        <br> 联系电话:  (626)620-1616&nbsp;(626)382-3025&nbsp;(626)410-8845</p>
+                </div>
+                <!-- Contact Widget - End -->
+            </div>
+        </div>
+        <!-- Copyright Bar - Start -->
+        <div class="copyright">
+            <div class="col-md-12">
+                <div class="container">
+                    <div class="">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 message inviewport animated delay1" data-effect="fadeInUp">
+                            <span class="">&copy; Copyright WebXury Inc. 2016. ® All Rights Reserved </span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 social">
+                            <a href="#" class="inviewport animated delay1" data-effect="fadeInUp"><i class="icon icon-facebook text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay2" data-effect="fadeInUp"><i class="icon icon-twitter text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay3" data-effect="fadeInUp"><i class="icon icon-dribbble text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay4" data-effect="fadeInUp"><i class="icon icon-google-plus text-on-primary"></i></a>
+                            <a href="#" class="inviewport animated delay5" data-effect="fadeInUp"><i class="icon icon-youtube-play text-on-primary"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Copyright Bar - End -->
+    </section>
+    <!-- Section End - Footer -->
+    <!-- Javascript & CSS Files moved to bottom of page for faster loading -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/inviewport-1.3.2.js"></script>
+    <!-- Google Map -->
+   <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyArv9ALhBv6ihfhABHEAkFg0-JHywhtgjM&amp;sensor=false"></script>
+    <script type="text/javascript" src="js/gmap.js"></script> -->
+    <!--Fancybox -->
+    <script type="text/javascript" src="js/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" src="js/jquery.fancybox-media.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery.fancybox.css" media="screen" />
+    <!-- Bootstrap Carousel -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Main JS -->
+    <script type="text/javascript" src="js/main.js"></script>
+    
+    
+    <!-- original js -->
+    <script type="text/javascript" src="../js/user.validate.js"></script>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		loadGlobalArgs();
+		var isLogin = $("#is_login").val();
+		if(isLogin=="1"){
+			window.location.href = "../user/index.jsp";
+		}
+		$("#form").keydown(function(event) {
+			if (event.which == 13) {
+				login();
+			}
+		});
+		$("#code").click(function(){
+			resetValidateCode(this);
+		});
+		resetValidateCode($("#code"));
+	});
+	function resetValidateCode(event) {
+		$(event).attr('src','../code/generate?timestamp=' + new Date().getTime());
+	}
+
+
+	function login() {
+		var account = $("#telphone").val();
+		var password = $("#password").val();
+		var code = $("#verifycode").val();
+		
+		if(!validateAccount(account)||!validatePwd()){
+				return false;
+		}
+		
+		$.ajax({
+			type:"post",
+			url:"../user/login",
+			data:{
+				"account":account,
+				"password":password,
+				"vcode":code
+			},
+			success:function(response) {
+				var code = response.code;
+				
+				if (code == "200") {
+					window.location.href = "../user/index.jsp";
+					
+				} else {
+					alert("登录失败，失败原因是:" + response.message);
+					resetValidateCode($("#code"));
+				}
+			}
+		});
+		return false;
+	
+	}
+	
+	function validateAccount(account){
+		if(!checkUserPhone(account)&&!checkUserEmailRegex(account)){
+			alert("手机号或者邮箱是无效的,请输入正确的手机或者邮箱.");
+			return false;
+		}
+		return true;
+	}
+	function validatePwd(password){
+		if(!checkUserPassword(password)){
+			alert("密码长度不对.");
+			return false;
+		}
+		return true;
+	}
+    function loadGlobalArgs(){
+		$.ajax({
+   			type: "get",
+   			url: "../globalargs/getcontents",
+   			data : {
+   				"flags" : "logo_big"
+   			},
+   			success: function(response){
+   				var code = response.code;
+   				if("200" == code){
+   					var data = response.data;
+   					if(data != null){
+   					//	$("#logoHeader").attr("src", "../" + data);
+   					//	$("#logoFooter").attr("src", "../" + data);
+   					}
+   				}
+   			}
+		});
+    }
+</script>
+</body>
+
+</html>

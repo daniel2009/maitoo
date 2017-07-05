@@ -1,0 +1,328 @@
+package com.weiye.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.PageSplitUtil;
+import com.weiye.common.util.PaymentUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.ProductDao;
+import com.weiye.dao.ProductRecordDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Cart;
+import com.weiye.model.PageSplit;
+import com.weiye.model.Product;
+import com.weiye.model.ProductRecord;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.User;
+import com.weiye.service.AccountService;
+import com.weiye.service.ProductRecordService;
+import com.weiye.service.ProductService;
+
+@Service("productRecordService")
+public class ProductRecordServiceImpl implements ProductRecordService{
+	@Autowired
+	private ProductRecordDao productRecordDao;
+	@Autowired
+	private ProductDao productDao;
+	@Resource
+	private AccountService accountService;
+
+	@Override
+	public ResponseObject<Object> addByUser(ProductRecord productRecord) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == productRecord || StringUtil.isEmpty(productRecord.getProductId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				Product product = new Product();
+				product.setId(productRecord.getProductId());
+				product = productDao.findById(product);
+				int rest = Integer.valueOf(product.getQuantity()) - Integer.valueOf(productRecord.getQuantity());
+				if(rest >= 0 ){
+					User user = new User();
+					user.setId(productRecord.getUserId());
+					String payment = String.valueOf(StringUtil.string2Double(product.getPrice()) * StringUtil.string2Double(productRecord.getQuantity()));//price*quantity
+					responseObject = accountService.checkBalanceEnough(user, payment, product.getCurrency());
+					if(ResponseCode.SUCCESS_CODE.equals(responseObject.getCode())){
+						productRecord.setDate(DateUtil.date2String(new Date()));
+						productRecord.setState(Constant.PRODUCT_RECORD_STATE_CREATE);
+						int recordResult = productRecordDao.insert(productRecord);
+						if(recordResult > 0){
+							responseObject.setCode(ResponseCode.SUCCESS_CODE);
+						}else{
+							responseObject.setCode(ResponseCode.PRODUCT_RECORD_INSERT_FAIL);
+							responseObject.setMessage("购买记录添加失败");
+						}
+					}else{
+						responseObject.setCode(ResponseCode.ACCOUNT_BALANCE_NOT_ENOUGH);
+						responseObject.setMessage("账户余额不足");
+					}
+				}else{
+					responseObject.setCode(ResponseCode.PRODUCT_QUANTITY_NOT_ENOUGH);
+					responseObject.setMessage("商品库存不足");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Object> updateComment(ProductRecord productRecord) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == productRecord || StringUtil.isEmpty(productRecord.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			productRecord.setCommentDate(DateUtil.date2String(new Date()));
+			try {
+				int result = productRecordDao.updateComment(productRecord);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.PRODUCT_REMARK_UPDATE_FAIL);
+					responseObject.setMessage("更新商品评论失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Object> updateByUser(ProductRecord productRecord) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == productRecord || StringUtil.isEmpty(productRecord.getId()) || StringUtil.isEmpty(productRecord.getUserId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			productRecord.setDate(DateUtil.date2String(new Date()));
+			productRecord.setState(Constant.PRODUCT_RECORD_STATE_CREATE);
+			Product product = new Product();
+			product.setId(productRecord.getProductId());
+			try{
+				product = productDao.findById(product);
+				int rest = Integer.valueOf(product.getQuantity()) - Integer.valueOf(productRecord.getQuantity());
+				if(rest >= 0 ){
+					User user = new User();
+					user.setId(productRecord.getUserId());
+					String payment = String.valueOf(StringUtil.string2Double(product.getPrice()) * StringUtil.string2Double(productRecord.getQuantity()));//price*quantity
+					responseObject = accountService.checkBalanceEnough(user, payment, product.getCurrency());
+					if(ResponseCode.SUCCESS_CODE.equals(responseObject.getCode())){
+						productRecord.setDate(DateUtil.date2String(new Date()));
+						productRecord.setState(Constant.PRODUCT_RECORD_STATE_CREATE);
+						int recordResult = productRecordDao.updateByUser(productRecord);
+						if(recordResult > 0){
+							responseObject.setCode(ResponseCode.SUCCESS_CODE);
+						}else{
+							responseObject.setCode(ResponseCode.PRODUCT_RECORD_UPDATE_FAIL);
+							responseObject.setMessage("购买记录修改失败");
+						}
+					}else{
+						responseObject.setCode(ResponseCode.ACCOUNT_BALANCE_NOT_ENOUGH);
+						responseObject.setMessage("账户余额不足");
+					}
+				}else{
+					responseObject.setCode(ResponseCode.PRODUCT_QUANTITY_NOT_ENOUGH);
+					responseObject.setMessage("商品库存不足");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<PageSplit<ProductRecord>> findByKey(ProductRecord productRecord, String dateStart, String dateEnd, int pageIndex, int pageSize) throws ServiceException {
+		ResponseObject<PageSplit<ProductRecord>> responseObject = new ResponseObject<>();
+		if(StringUtils.hasText(productRecord.getRemark())){
+			productRecord.setRemark(StringUtil.escapeStringOfSearchKey(productRecord.getRemark()));
+		}
+		try {
+			int count = productRecordDao.countByKey(productRecord, dateStart, dateEnd);
+			if(count > 0){
+				PageSplit<ProductRecord> pageSplit = new PageSplit<>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, count);
+				List<ProductRecord> list = productRecordDao.findByKey(productRecord, dateStart, dateEnd, firstResult, pageSize);
+				if (list.isEmpty()) {
+					responseObject.setCode(ResponseCode.PRODUCT_RECORD_GET_LIST_FAIL);
+					responseObject.setMessage("获取商品记录列表失败");
+				} else {
+					pageSplit.setDatas(list);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(pageSplit);
+				}
+			}else{
+				responseObject.setCode(ResponseCode.PRODUCT_RECORD_EMPTY_LIST);
+				responseObject.setMessage("商品记录列表为空");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<PageSplit<ProductRecord>> findByKeyAndWithComment(ProductRecord productRecord, String dateStart, String dateEnd, int pageIndex, int pageSize) throws ServiceException {
+		ResponseObject<PageSplit<ProductRecord>> responseObject = new ResponseObject<>();
+		try {
+			int count = productRecordDao.countByKeyAndWithComment(productRecord, dateStart, dateEnd);
+			if(count > 0){
+				PageSplit<ProductRecord> pageSplit = new PageSplit<>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, count);
+				List<ProductRecord> list = productRecordDao.findByKeyAndWithComment(productRecord, dateStart, dateEnd, firstResult, pageSize);
+				if (list.isEmpty()) {
+					responseObject.setCode(ResponseCode.PRODUCT_RECORD_GET_LIST_FAIL);
+					responseObject.setMessage("获取商品记录列表失败");
+				} else {
+					pageSplit.setDatas(list);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(pageSplit);
+				}
+			}else{
+				responseObject.setCode(ResponseCode.PRODUCT_RECORD_EMPTY_LIST);
+				responseObject.setMessage("商品记录列表为空");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<ProductRecord> findById(ProductRecord productRecord) throws ServiceException {
+		ResponseObject<ProductRecord> responseObject = new ResponseObject<>();
+		if(null == productRecord || StringUtil.isEmpty(productRecord.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				productRecord = productRecordDao.findById(productRecord);
+				if (null == productRecord) {
+					responseObject.setCode(ResponseCode.PRODUCT_NO_EXISTS);
+					responseObject.setMessage("商品不存在");
+				} else {
+					responseObject.setData(productRecord);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> audit(ProductRecord productRecord) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == productRecord || StringUtil.isEmpty(productRecord.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else if(Constant.PRODUCT_RECORD_STATE_CREATE.equals(productRecord.getState())){
+			responseObject.setCode(ResponseCode.PRODUCT_REMARK_STATE_NOT_CORRECT);
+			responseObject.setMessage("请选择审核状态");
+		}else{
+			try {
+				int result = productRecordDao.updateStateByAdmin(productRecord);
+				if (result > 0) {
+					if(Constant.PRODUCT_RECORD_STATE_FINISHED.equals(productRecord.getState())){
+						String date = DateUtil.date2String(new Date());
+						Product product = new Product();
+						product.setId(productRecord.getProductId());
+						product = productDao.findById(product);
+						int rest = Integer.valueOf(product.getQuantity()) - Integer.valueOf(productRecord.getQuantity());
+						if(rest >= 0 ){
+							product.setQuantity(String.valueOf(rest));
+							product.setModifyDate(date);
+							int productResult = productDao.updateQuantity(product);
+							String payment = String.valueOf(StringUtil.string2Double(product.getPrice()) * StringUtil.string2Double(productRecord.getQuantity()));//price*quantity
+							User user = new User();
+							user.setId(productRecord.getUserId());
+							responseObject = accountService.addPayment(user, payment , product.getCurrency(), "商品购买");
+						}else{
+							throw new ServiceException("商品剩余数量不足");
+						}
+					}
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.PRODUCT_REMARK_UPDATE_FAIL);
+					responseObject.setMessage("更新商品下单反馈失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Object> delete(ProductRecord productRecord) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == productRecord || StringUtil.isEmpty(productRecord.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				int result = productRecordDao.delete(productRecord);
+				if(result > 0){
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				}else{
+					responseObject.setCode(ResponseCode.PRODUCT_RECORD_DELETE_FAIL);
+					responseObject.setMessage("购买记录删除失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<String[]> getAllStateCount() throws ServiceException {
+		ResponseObject<String[]> responseObject = new ResponseObject<String[]>();
+		try {
+			String[] array = new String[6];
+			int i = 0;
+			ProductRecord productRecord = new ProductRecord();
+			//1
+			productRecord.setState(Constant.PRODUCT_RECORD_STATE_CREATE);
+			array[i++] = "countProductRecordState0";
+			array[i++] = String.valueOf(this.productRecordDao.countByKey(productRecord, null, null));
+			productRecord.setState(Constant.PRODUCT_RECORD_STATE_ISSUE);
+			array[i++] = "countProductRecordState1";
+			array[i++] = String.valueOf(this.productRecordDao.countByKey(productRecord, null, null));
+			productRecord.setState(Constant.PRODUCT_RECORD_STATE_FINISHED);
+			array[i++] = "countProductRecordState2";
+			array[i++] = String.valueOf(this.productRecordDao.countByKey(productRecord, null, null));
+			responseObject.setCode(ResponseCode.SUCCESS_CODE);
+			responseObject.setData(array);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Integer> countPurchase(Product product) throws ServiceException {
+		ResponseObject<Integer> responseObject = new ResponseObject<>();
+		if(null == product || StringUtil.isEmpty(product.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				int result = productRecordDao.countPurchase(product);
+				responseObject.setData(result);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+}

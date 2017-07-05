@@ -1,0 +1,44 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body> 
+		<input type="hidden" name="userId" value="${param.userId }"/>
+		<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">预充值列表</p>
+
+		<div class="box_content">
+			<div class="content_title">预充值列表</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<fieldset>
+		            	<p>
+			              <label style="display: inline;">用户编号：</label>
+			              <label style="display: inline;" id="u_d_id">${param.userId }</label>
+			            </p>
+			            <hr/>
+			            <p>
+			              <label style="display: inline;">账户余额：</label>
+			              <label style="display: inline;" id="u_d_banlcen">&nbsp;</label>
+			            </p>
+			            <hr/>
+			            <p>
+			            	<label style="display: inline;">账户操作记录：</label>
+			            	<label style="display: inline;" id='account_detail_info'>&nbsp;</label>
+			            </p>
+			        </fieldset>
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav621Data();
+	});
+</script>
+</html>

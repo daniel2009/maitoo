@@ -1,0 +1,154 @@
+package com.weiye.common.util.sms;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.MessageFormat;
+import java.util.Properties;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.util.PropertiesReader;
+
+
+public class SmsSendUtil {
+	 
+	public static String sendGeneralMsg(String content, String mobile) throws Exception {
+		try {
+			SimpleSmsSender sender = SmsSenderFactory.generateSmsSender();
+			if(mobile.length()==10)
+				mobile="+1"+mobile;
+			else if(mobile.length()==11)
+				mobile="+86"+mobile;
+			return sender.sendSms(content, mobile);
+		} catch (Exception e) {
+			throw new Exception(e);
+		}
+	}
+	public static String sendResetPwdMsg(String password, String mobile) throws Exception {
+		try {
+			Properties prop = null;
+			if(mobile.length()==10){
+				mobile="+1"+mobile;
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_US));
+			}else if(mobile.length()==11){
+				mobile="+86"+mobile;
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_CN));
+			}else{
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_CN));
+			}
+			
+			String text = prop.getProperty("weiye.register.content");
+			text = MessageFormat.format(text, new Object[] {password});
+			SimpleSmsSender sender = SmsSenderFactory.generateSmsSender();
+			
+			return sender.sendSms(text, mobile);
+		} catch (Exception e) {
+			throw new Exception(e);
+		}
+	}
+	
+	
+	public static String sendRegisterMsg(String code, String mobile) throws Exception {
+		try {
+			Properties prop = null;
+			if(mobile.length()==10){
+				mobile="+1"+mobile;
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_US));
+			}else if(mobile.length()==11){
+				mobile="+86"+mobile;
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_CN));
+			}else{
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_CN));
+			}
+			String text = prop.getProperty("weiye.register.content");
+			text = MessageFormat.format(text, new Object[] {code});
+			SimpleSmsSender sender = SmsSenderFactory.generateSmsSender();
+			
+			return sender.sendSms(text, mobile);
+		} catch (Exception e) {
+			throw new Exception(e);
+		}
+	}
+	
+	public static String sendAdminAddUserMsg(String password, String mobile) throws Exception {
+		try {
+			Properties prop = null;
+			if(mobile.length()==10){
+				mobile="+1"+mobile;
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_US));
+			}else if(mobile.length()==11){
+				mobile="+86"+mobile;
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_CN));
+			}else{
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_CN));
+			}
+			String text = prop.getProperty("weiye.new.user.content");
+			text = MessageFormat.format(text, new Object[] {password});
+			SimpleSmsSender sender = SmsSenderFactory.generateSmsSender();
+			return sender.sendSms(text, mobile);
+		} catch (Exception e) {
+			throw new Exception(e);
+		}
+	}
+	
+	public static String sendOrderStateMsg(String orderId, String state,String mobile) throws Exception {
+		try {
+			Properties prop = null;
+			if(mobile.length()==10){
+				mobile="+1"+mobile;
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_US));
+			}else if(mobile.length()==11){
+				mobile="+86"+mobile;
+				prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_CN));
+			}else{
+				return null;
+				//prop = PropertiesReader.read(SmsConfigUtil.getSmsConfigFile(Constant.COUNTRY_CODE_CN));
+			}
+			String text ="";
+			if(state.equals(Constant.ORDER_STATE3)){
+				text = prop.getProperty("weiye.order.state.to3.content");
+			}else if(state.equals(Constant.ORDER_STATE4)){
+				text = prop.getProperty("weiye.order.state.to4.content");
+			}else if(state.equals(Constant.ORDER_STATE7)){
+				text = prop.getProperty("weiye.order.state.to7.content");
+			}else if(state.equals(Constant.ORDER_STATE8)){
+				text = prop.getProperty("weiye.order.state.to8.content");
+			}else if(state.equals(Constant.ORDER_STATE10)){
+				text = prop.getProperty("weiye.order.state.to10.content");
+			}else {
+				String strRet="{\"code\":-10,\"msg\":\"该状态不需要发短信！\"}";
+				return strRet;
+			}
+			if(text==null)
+			{
+				return null;
+			}
+			text = MessageFormat.format(text, new Object[] {orderId});
+			SimpleSmsSender sender = SmsSenderFactory.generateSmsSender();
+			return sender.sendSms(text, mobile);
+		} catch (Exception e) {
+			throw new Exception(e);
+		}
+	}
+	
+	
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        //修改为您要发送的手机号
+        String mobile = "+8615818853022"; //+16267104685
+
+        /**************** 使用通用接口发短信(推荐) *****************/
+        //设置您要发送的内容(内容必须和某个模板匹配。以下例子匹配的是系统提供的1号模板）
+       // String text = "【云片网】您的验证码是1234";
+        String text = "123456";  
+	     
+        //发短信调用示例
+        try {
+        	//{"code":0,"msg":"OK","result":{"count":1,"fee":0.06,"sid":2628225485}}
+			System.out.println(SmsSendUtil.sendRegisterMsg(text, mobile));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+}
+
+

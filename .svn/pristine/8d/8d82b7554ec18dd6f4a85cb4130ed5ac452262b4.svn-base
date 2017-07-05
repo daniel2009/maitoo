@@ -1,0 +1,39 @@
+// JavaScript Document
+$(function()
+{
+		//选项卡切换
+		$(".ul_tabs li").on("click",function()
+		{
+			if(!$(this).hasClass("active"))
+			{
+				var _id=$(this).find("a").data("target");
+				$(".ul_tabs li").removeClass("active");
+				$(this).addClass("active");
+				$(".tab_pane").hide();
+				$("#"+_id).fadeIn();
+			}
+			
+			$("#li_tabs").animate({"left":$(this).position().left},300);
+		});
+		
+		//产品图片切换
+		$(".ul_show li:lt(4)").on("click",function()
+		{
+			$("#li_border").animate({"left":$(this).position().left},300);
+			$(".show").find("img").attr("src",$(this).find("img").attr("src"));
+		});
+		
+		//加选商品
+		$(".i_add").on("click",function()
+		{
+			var num=parseInt($(".txt_num").val());
+			$(".txt_num").val(num+1);
+		});
+		
+		//减选商品
+		$(".i_min").on("click",function()
+		{
+			var num=$(".txt_num").val()==1?1:$(".txt_num").val()-1;
+			$(".txt_num").val(num);
+		});
+})

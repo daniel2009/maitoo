@@ -1,0 +1,705 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript">
+
+	// 用于标记区别每个order的id：child_order*，默认也就是最少也有两个分包
+	var orderCount = 2;
+	// 记录每个order的id
+	var submitOrderTableId = [];
+	// 预报运单的商品信息Map集合
+	var tcinfo = {};
+	// 分运单的商品信息map集合
+	var focinfo = {};
+	// 当前分运单 table的id
+	var currentId = '';
+	
+	$(function(){
+
+		$("table").delegate(".tanchukuang","click",function(){
+		//$(".tanchukuang").click(function(){
+	 		var id = $(this).attr("href");
+	 		if (id!=null && id!='') {
+	 			currentId = "child_order" + id;
+				$(".popup").bPopup();
+				// 设置初始值
+				cleanPopUp();
+				var ocinfo = focinfo[currentId];
+				if (typeof(ocinfo) != "undefined") {
+					var consigneeId = $("#" + currentId + " :hidden[name='consigneeId']").val();
+					var premium = $("#" + currentId + " :hidden[name='premium']").val();
+					var remark = $("#" + currentId + " :hidden[name='remark']").val();
+					var mail = $("#" + currentId + " :hidden[name='mail']").val();
+					$(":text[name='premium']").val(premium);
+					$("textarea[name='remark']").val(remark);
+					$("select[name='mail']").val(mail);
+					$(":radio[value='" + consigneeId + "']").attr("checked", true);
+					var index = 0;
+					$.each(ocinfo,function(key,value){
+						if (index == 0) {
+							// first
+							$("#commodify_div select[name='commodityName'] option[value='" + key + "']").attr("selected", true);
+							$("#commodify_div :text[name='commodifyQuantity']").val(value);
+						} else {
+							// 先增加在添加
+							addCommodifyInfoInputDiv();
+							var el = $("#commodify_div div:eq(" + (index-1) + ")");
+							el.find("select[name='commodityName'] option[value='" + key + "']").attr("selected", true);
+							el.find(":text[name='commodifyQuantity']").val(value);
+						}
+						index = index + 1;
+					});
+				}
+	 		}
+		//	alert("id：" + id)
+		});
+
+		showLocation();
+		loadCommoditySelectOption();
+		
+		// 设置添加分运单的信息
+		$("a[name='a_add_order_link']").click(function(){
+			orderCount += 1;
+			var id = "child_order" + orderCount;
+			var str = '<tr><td class="align_right">分运单：</td>'
+			+'<td class="align_left"><table id="' + id + '" class="mtable">'
+			+'<tbody><tr><td width="80px">'
+			+'<input type="hidden" name="consigneeId"/>'
+			+'<input type="hidden" name="premium"/>'
+			+'<input type="hidden" name="mail"/>'
+			+'<input type="hidden" name="remark"/>'
+			+'<input type="hidden" name="parceValue"/>货物信息:</td>'
+			+'<td class="citd">&nbsp;</td><td rowspan="2" width="120px">'
+			+'<a onclick="return false;" class="btn tanchukuang" href="' + orderCount + '" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">填写运单</a><a href="#" name="a_delete_order_link" class="mbtn">删除</a>'
+			+'</td></tr>'
+			+'<tr><td>收件人信息：</td>'
+			+'<td class="sjrtd">&nbsp;</td>'
+			+'</tr></tbody></table>'
+			+'</td></tr>';
+			$("#order_info_table").children("tbody").append(str);
+			$("#" + id + " a[name='a_delete_order_link']").click(function(){
+				// a<-td<-tr<-tbody<-table<-td<-tr
+				var id = $(this).parent().parent().parent().parent().attr("id");
+				removeIdFormArray(id);
+				$(this).parent().parent().parent().parent().parent().parent().remove();
+				return false;
+			});
+			//$(".tanchukuang").click(function(){
+		 	//	var id = $(this).attr("href");
+		 	//	if (id!=null && id!='') {
+		 	//		currentId = "child_order" + id;
+			//		$(".popup").bPopup();
+		 	//	}
+			//});
+			return false;
+		});
+		
+		// 设置操作action
+		$("#a_add_commodify_info").click(function(){
+			addCommodifyInfoInputDiv();
+			return false;
+		});
+		
+		// 设置收件人信息
+		loadCaddress();
+
+		// load the need cai bao transh info
+		var tid = $(":hidden[name='tid']").val();
+		if (tid != null && tid!=''){
+			loadchaibaoinfo(tid);
+		}
+
+		// set the search action
+		//$("a[name='a_search_transh_link']").click(function(){
+		//	var tid = $(":text[name='tid']").val();
+		//	if (tid != null && tid!=''){
+			//	loadchaibaoinfo(tid);
+			//} else {
+				//alert("请输入要进行拆包的预订单号!");
+			//}
+			//return false;
+		//});
+		
+		// 设置弹出框的相关事件
+		$(":button[name='ok_btn']").click(function(){
+			var consigneeId = $(":radio:checked").val();
+			var el = $(":radio:checked").parent().parent();
+			var sjrinfo = el.children().eq(1).html() + "&nbsp;&nbsp;" + el.children().eq(4).html();
+			
+			var premium = $(":text[name='premium']").val();
+			var remark = $("textarea[name='remark']").val();
+			var mail = $("select[name='mail']").val();
+			var parceValue = $(":text[name='parceValue']").val();
+			//focinfo
+			// check premium
+			if (/^\d+(.\d{0,2})?$/.test(premium)) {
+				// 验证通过
+				if (remark == null || remark.length < 150) {
+					// 验证通过
+					var pm = '';
+					var ocinfo = {};
+					var flag = true;
+					var hasCommodify = false;
+					$("select[name='commodityName']").each(function(){
+						var cvalue = $(this).val();
+						var cname = $(this).find("option:selected").text();
+						var cquantity = $(this).parent().find(":input[name='commodifyQuantity']").val();
+						hasCommodify = true;
+						if (/^[1-9]\d*$/.test(cquantity) && parseInt(cquantity) > 0) {
+							if (typeof(ocinfo[cvalue]) == "undefined") {
+								ocinfo[cvalue] = cquantity;
+								pm += cname +":"+cquantity+";";
+							} else {
+								// 不能重复添加
+								flag = false;
+								alert(cname + "商品已经添加，请合并！");
+								return false;
+							}
+						} else {
+							alert("商品数量只能是大于0的整数，请重新输入！");
+							flag = false;
+							return false;
+						}
+					});
+
+					if (hasCommodify) {
+						if (flag) {
+							// 验证通过
+							focinfo[currentId] = ocinfo;
+							addIdToArray(currentId); // 将已经写入详情的分运单table id加入到数组中
+							$("#" + currentId + " :hidden[name='consigneeId']").val(consigneeId);
+							$("#" + currentId + " :hidden[name='premium']").val(premium);
+							$("#" + currentId + " :hidden[name='remark']").val(remark);
+							$("#" + currentId + " :hidden[name='mail']").val(mail);
+							$("#" + currentId + " :hidden[name='parceValue']").val(parceValue);
+							$("#" + currentId + " .citd").html(pm);
+							$("#" + currentId + " .sjrtd").html(sjrinfo);							
+							cleanPopUp();
+							// 在这里关闭弹出框
+							$(".popup").bPopup().close();
+						} else {
+							// ignore
+						}
+					} else {
+						alert("请选择运单中包含的商品情况！");
+					}
+				} else {
+					alert("备注字符最长为200个字符，您现在输入的是" + remark.length + "个字符！");
+				}
+			} else {
+				alert("购买保险的金额值输入错误，请重新输入！");
+			}
+			return false;
+		});
+	});
+	
+	function cleanPopUp() {
+		$("a[name='a_delete_commodify_info']").click();
+		$("select[name='commodityName'] option[value='1']").attr("selected", true);
+		$(":text[name='commodifyQuantity']").val('0');
+		$("#cdatatable tbody :radio").first().attr("checked",true);
+		$(":text[name='premium']").val('0');
+		$("textarea[name='remark']").val('');
+		$("select[name='mail'] option[value='0']").attr("selected",true);
+		return false;
+	}
+	
+	function loadCaddress() {
+		$.ajax({
+			type:"get",
+			url:"consignee/all",
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					$("#cdatatable tbody").html("");
+					$.each(response.data, function(){
+						var str = "<tr>";
+						str += '<td><input type="radio" name="cid" value="' + this.id + '"/></td>';
+						str += '<td>' + this.name + '</td>';
+						str += '<td>' + this.phone + '</td>';
+						str += '<td>' + this.cardId + '</td>';
+						str += '<td>' + this.province + '&nbsp;' + this.city + '&nbsp;' + this.district + '&nbsp;' + this.streetAddress + '</td>';
+						str += '</tr>';
+						$("#cdatatable tbody").append(str);
+					});
+					$("#cdatatable tbody :radio").first().attr("checked",true);
+				} else if ("607" == code) {
+					window.location.href = "login.jsp";
+				} else {
+					// 失败
+					alert("获取地址信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	
+	function loadchaibaoinfo(tid) {
+		$.ajax({
+			type:"get",
+			url:transh_get_by_id_url,
+			data:{
+				"id":tid
+			},
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					// 获取数据成功
+					var data = response.data;
+					if (data == null || data.length == 0) {
+						// 没有数据 
+						alert("你提交的预订单中，没有预订单号为[" + tid + "]的预订单！请重新输入");
+						$(":text[name='tid']").val("");
+						$(":text[name='tid']").focus();
+					} else {
+						// 有数据
+						if (data.length == 1) {
+							var torder = data[0];
+							var tstate = torder.state;
+							if (tstate == "0") {
+								// 状态为0(未入库)，开始判断是否已经拆过包
+								 if (torder.unpackingNumber == 0){
+								 	// 未拆包
+								 	var strtr = "<tr>";
+								 	strtr += '<td>' + torder.id + '</td>';
+								 	strtr += '<td>' + torder.transitNo + '</td>';
+								 	var pm = '';
+								 	$.each(torder.commoditys,function(){
+								 		pm += this.commodityName + ":" + this.quantity + ";";
+								 		tcinfo[this.commodityId] = this.quantity;
+								 	});
+								 	strtr += '<td>' + pm + '</td>';
+								 	strtr += '</tr>';
+								 	$(":hidden[name='tid']").val(torder.id);
+								 	$("#tdatatable tbody").html(strtr);
+								 } else {
+								 	alert("该预订单已经被拆包，请到运到列表界面查看详情!");
+								 	$(":text[name='tid']").val("");
+									$(":text[name='tid']").focus();
+								 }
+							} else {
+								var strstate = "已完成";
+								if (tstate == "1") {
+									strstate = "已入库";
+								} else if (tstate == "2") {
+									strstate = "包裹丢失";
+								}
+								alert("该预订单状态为【" + strstate + "】，不能进行拆包操作！");
+								$(":text[name='tid']").val("");
+								$(":text[name='tid']").focus();
+							}
+						} else {
+							// 不能拆包
+							alert("拆包只能对一个预订单号进行拆包，请检查您输入的预订单号！");
+							$(":text[name='tid']").focus();
+						}
+					}
+				} else if (code == "607") {
+					// 没有权限操作
+					alert("Session过期，请重新登录！");
+					window.location.href="login.jsp";
+				} else {
+					alert("获取预订单数据失败，失败原因是:" + response.message);
+					$(":text[name='tid']").focus();
+				}
+				return false;
+			}
+		});
+	}
+	
+	function addIdToArray(id) {
+		var flag = true;
+		$.each(submitOrderTableId, function(index, value){
+			if (value == id) {
+				flag = false;
+				return false;
+			}
+		});
+		if (flag) {
+			submitOrderTableId.push(id);
+		}
+	}
+	
+	function removeIdFormArray(id) {
+		delete focinfo[id];
+		var i = -1;
+		$.each(submitOrderTableId, function(index, value){
+			if (value == id) {
+				i = index;
+				return false;
+			}
+		});
+		if (i != -1) {
+			submitOrderTableId.splice(i,1);
+		}
+	}
+	
+	
+	function loadCommoditySelectOption() {
+		
+		$.ajax( {
+			post : "get",
+			url : "commodity/all",
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					
+					//showCommodityList(response.data);;
+					var str="";
+					$.each(response.data, function() {
+						str += "<option value='" + this.id+"'  price='" + this.price+"' msPrice='" + this.msPrice+"' >"+this.name+"</option>";
+					});
+					$("select[name='commodityName']").html(str);
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+			}
+		});
+	}
+	
+	function addCommodifyInfoInputDiv() {
+		var commodity = $("select[name='commodityName']").html();
+		var str = '<div  class="d_tr">'+
+		'<label>商品类别：</label>'+
+		'<select name="commodityName"style="width:80px">'+
+		commodity+
+		'</select>包裹详情：<input type="text" name="commodifyxiangqing" placeholder="填写具体物品信息"style="width:120px" />商品数量：'+
+		'<input  name="commodifyQuantity" type="text" style="width:100px" />'+
+		'&nbsp;<a href="#" name="a_delete_commodify_info">删除</a></div>';
+		$("#commodify_div").append(str);
+		$("a[name='a_delete_commodify_info']").click(function(){
+			$(this).parent().remove();
+			return false;
+		});
+	}
+	
+	// 分包拆分提交
+	function preunSubmitOrder() {
+		// 检查分运单的商品数量和预报运单的商品数量是否一致
+		var checkCommodify = {};
+		var occount = 0; // 分运单的商品总数
+		var focount = 0; // 分运单的运单数量
+		$.each(focinfo,function(key,value){
+			$.each(value, function(ckey,cvalue){
+				var oldv = checkCommodify[ckey];
+				focount = focount + 1; 
+				if (typeof(oldv) == 'undefined') {
+					oldv = "0";
+					occount = occount + 1; // 商品加一 
+				}
+				checkCommodify[ckey] = parseInt(cvalue) + parseInt(oldv);
+			});
+		});
+		var flag = true;
+		var tccount = 0;
+		$.each(tcinfo,function(key,value){
+			tccount = tccount + 1; // 商品减一
+			if (tcinfo[key] != checkCommodify[key]) {
+				flag = false;
+				return false;
+			}
+		});
+		
+		if (focount < 2) {
+			alert("拆分运单，运单个数必须大于1个，请填写运单详情！");
+			return false;
+		}
+
+		if (flag && occount==tccount) {
+			// 商品数量一致
+			var tid = $(":hidden[name='tid']").val(); // 预报运单id
+			var str = '"type":"1"';
+			var index = 0;
+			$.each(submitOrderTableId,function(){
+				var key = this;
+				var el = $("#" + key);
+				var consigneeId = el.find(":hidden[name='consigneeId']").val();
+				var premium = el.find(":hidden[name='premium']").val();
+				var remark = el.find(":hidden[name='remark']").val();
+				var mail = el.find(":hidden[name='mail']").val();
+				var parceValue = el.find(":hidden[name='parceValue']").val();
+				str += ',"orders[' + index + '].consigneeId":"' + consigneeId + '",';
+				str += '"orders[' + index + '].premium":"' + premium + '",';
+				str += '"orders[' + index + '].remark":"' + remark + '",';
+				str += '"orders[' + index + '].parceValue":"' + parceValue + '",';
+				str += '"orders[' + index + '].mail":"' + mail + '"';
+				var i = 0;
+				$.each(focinfo[key],function(ckey,cvalue){
+					str += ',"orders[' + index + '].details[' + i + '].transhipmentId":"' + tid + '"';
+					str += ',"orders[' + index + '].details[' + i + '].commodityId":"' + ckey + '"';
+					str += ',"orders[' + index + '].details[' + i + '].quantity":"' + cvalue + '"';
+					i = i+1;
+				});
+				index = index + 1;
+			});
+			//console.log(str);
+			var obj = $.parseJSON("{" + str + "}");
+			//console.log(obj);
+			submitOrder(obj);
+		} else {
+			// 商品数量不对
+			alert("分运单的商品数量和预报运单的商品数量不一致，请查看！");
+		}
+		return false;
+	}
+	
+	function submitOrder(obj) {
+		$.ajax({
+			type:"post",
+			url:"order/submit",
+			data:obj,
+			success:function(response){
+				var code = response.code;
+				if (code == "200") {
+					alert("提交运单成功");
+					window.location.href = "daokubaoguocaihe.jsp";
+				} else if ("607" == code) {
+					window.location.href = "login.jsp";
+				} else {
+					// 失败
+					alert("提交运单信息失败，原因是:" + response.message);
+				}
+			}
+		});
+		return  false;
+	}
+		
+	
+</script>
+</head>
+
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">有问必答-留言管理</p>
+
+		<div class="box_content">
+			<div class="content_title">有问必答-留言管理</div>
+
+						<div class="content_text">
+							<div class="tab_box" id="box3">
+								<div class="package_box">
+									<ul class="tab">
+										<li><a href="daokubaoguocaihe.jsp" class="btn" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">包裹合箱</a>
+										</li>
+										<li><a href="daokubaoguocaihe.jsp" class="btn" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">包裹分箱</a>
+										</li>
+									</ul>
+									<div class="d_tr">
+										<label></label>
+									</div>
+									<table id="order_info_table" class="itable">
+										<thead>
+											<tr>
+												<td class="align_right">包裹明细：</td>
+												<td class="align_left"><input type="hidden" name="tid"
+													value="${param.tid }" />
+													<table id="tdatatable" class="mtable">
+														<thead>
+															<tr>
+																<td>预报单号</td>
+																<td>转运单号</td>
+																<td>货物说明</td>
+															</tr>
+														</thead>
+														<tbody>
+														</tbody>
+													</table></td>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td class="align_right">分运单：</td>
+												<td class="align_left">
+													<!-- 每个分运单下面都有很多个hidden标签，保存的值是在弹出框的里面填写的值，需要在这个保存，自己考虑怎么过保存，商品信息可以保存成功二维数组(未验证)，你可以填写完后，然后查看页面的源码就知道你这里的数据是已经保存好啦。如果你实现的话。 -->
+													<table id="child_order1" class="mtable">
+														<tbody>
+															<tr>
+																<td width="80px"><input type="hidden"
+																	name="consigneeId" /> <input type="hidden"
+																	name="premium" /> <input type="hidden" name="mail" /> <input
+																	type="hidden" name="remark" /> <input type="hidden"
+																	name="parceValue" /> 货物信息:</td>
+																<td class="citd">&nbsp;</td>
+																<td rowspan="2" width="120px"><a  class="btn tanchukuang"
+																	href="1" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">填写运单</a><a href="#" name="a_add_order_link"
+																	class="mbtn">添加</a></td>
+															</tr>
+															<tr>
+																<td>收件人信息：</td>
+																<td class="sjrtd">&nbsp;</td>
+															</tr>
+														</tbody>
+													</table></td>
+											</tr>
+											<tr>
+												<td class="align_right">分运单：</td>
+												<td class="align_left">
+													<table id="child_order2" class="mtable">
+														<tbody>
+															<tr>
+																<td width="80px"><input type="hidden"
+																	name="consigneeId" /> <input type="hidden"
+																	name="premium" /> <input type="hidden" name="mail" /> <input
+																	type="hidden" name="remark" /> <input type="hidden"
+																	name="parceValue" /> 货物信息:</td>
+																<td class="citd">&nbsp;</td>
+																<td rowspan="2" width="120px"><a  class="btn tanchukuang"
+																	href="2" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">填写运单</a></td>
+															</tr>
+															<tr>
+																<td>收件人信息：</td>
+																<td class="sjrtd">&nbsp;</td>
+															</tr>
+														</tbody>
+													</table></td>
+											</tr>
+										</tbody>
+										<tfoot>
+											<tr>
+												<td class="align_right"><a class="btn"
+													href="zhengjiadizi.jsp" target="_blank" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">地址管理</a>
+												</td>
+												<td class="align_left"><a name="mulitsub"
+														onclick="preunSubmitOrder();" class="btn"
+														href="#" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">提交订单</a>
+												</td>
+											</tr>
+										</tfoot>
+									</table>
+
+
+								</div>
+							</div>
+						</div>
+
+				</div>
+			</div>
+
+<div class="pop-box-wrap modal fade" id="historyModal" style="display: none;">
+    <div class="ui-mask"></div>
+    <div class="pop-xbox-show pop-historyState modal-dialog">
+        <a class="pop-close close" href="javascript:;" data-dismiss="modal">X</a>
+        <div class="pop-loading"></div>
+        <div class="pop-content">
+            <div class="hd clearfix">
+                <h2 class="tit tit-historyState">查看物流</h2>
+            </div>
+            <div class="con" style="max-height: 500px;overflow-y: scroll;">
+                <ul></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="pop-box-wrap modal fade" id="goodsModal" style="display: none;">
+    <div class="ui-mask"></div>
+    <div class="pop-xbox-show pop-proDes modal-dialog">
+        <a class="pop-close close" href="javascript:;" data-dismiss="modal">X</a>
+        <div class="pop-loading"></div>
+        <div class="pop-content">
+            <div class="hd clearfix">
+                <h2 class="tit tit-proDes">商品详情</h2>
+                <p class="des">商品申报总价值(￥)：<em>0.00</em>元</p>
+            </div>
+            <div class="con">
+                <table border="0" cellspacing="0" cellpadding="0" class="tbl tbl-newPackage">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="pop-box-wrap modal fade" id="addressModal" style="display:none;">
+    <div class="ui-mask"></div>
+    <div class="pop-xbox-show pop-proDes modal-dialog">
+        <a class="pop-close close" href="javascript:;" data-dismiss="modal">X</a>
+        <div class="pop-loading"></div>
+        <div class="pop-content">
+            <div class="hd clearfix">
+                <h2 class="tit tit-proDes">收货信息</h2>
+            </div>
+            <div class="con">
+                <h2 id="addr-title"></h2>
+                地址：<span id="addr-address"></span>
+                <br />
+                姓名：<span id="addr-name"></span>
+                <br />
+                手机：<span id="addr-mobile"></span>
+                邮编：<span id="addr-zipcode"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        var packageInfo = [];
+    </script>
+    
+
+<!--点击选择，弹出选择收货地址-->
+<div class="popup" >
+  <div class="between"><font class="typeface">运单详情填写</font><a href="shouhuodizi.jsp" class="manage" target="_blank">管理收货地址</a>
+   <div class="content_text" style="margin:10px; padding:0px;height:140px; max-height: 140px;overflow: auto; overflow-x: hidden;border: 1px solid #999;">
+       	<table id="cdatatable" class="mtable">
+			<thead>
+				<tr>
+					<td>选择</td><td>收货人</td><td>电话</td><td>身份证</td><td colspan="4">详细地址</td>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+    <table class="sheet" cellpadding="0" cellspacing="0">
+      <tr>
+        <td class="style">商品内容/数量:&nbsp;</td>
+        <td colspan="5">
+        	<div id="commodify_div">
+			<select name="commodityName" style="width:80px">
+				
+			</select>
+			/详情：<input type="text" name="commodifyxiangqing" placeholder="填写具体物品信息" style="width:120px" />/数量
+			<input type="text" name="commodifyQuantity"  maxlength="6" style="width:80px"/>
+			<a href="#" onclick="addCommodifyInfoInputDiv();" class="mbtn">添加</a>
+        	</div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="style">选择物流：</td>
+        <td colspan="5"><select name="mail">
+			<option value="0" selected="selected">
+				邮包
+			</option>
+			<option value="1">
+				电商
+			</option>
+			<option value="2">
+				快件
+			</option>
+		</select>
+		价值（￥）：<!--商品价值-->
+							<input type="text" name="parceValue"  maxlength="20"/>
+		</td>
+      </tr>
+      <tr>
+        <td class="style">购买保险($)：</td>
+        <td colspan="5"><input name="premium"  type="text" maxlength="10"/><span class="red">自愿购买(金额值，最多两位小数)</span></td>
+      </tr>
+      <tr>
+        <td class="style">客户备注：</td>
+        <td colspan="5"><textarea name="remark" class="beizhu" rows="3" cols="12"></textarea></td>
+      </tr>
+    </table>
+    <span class="queren">
+    	<input name="ok_btn" type="button" value="确定" />
+    </span> </div>
+</div>
+</body>
+</html>

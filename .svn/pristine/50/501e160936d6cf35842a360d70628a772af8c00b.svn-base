@@ -1,0 +1,6 @@
+weiye.register.content=\u3010meitao ex\u3011your verify code is {0}. www.usitao.net
+weiye.reset.pwd.content=\u3010meitao ex\u3011Dear customer, your cell phone number is your username, password is {0}. www.usitao.net
+weiye.new.user.content=\u3010meitao ex\u3011Dear customer, your cell phone number is your username, password is {0}. www.usitao.net
+weiye.order.state.to3.content=\u3010meitao ex\u3011Dear customer, your tracking number {0} has been successfully charged, we are in the process of arranging your shipments. www.usitao.net
+weiye.order.state.to8.content=\u3010meitao ex\u3011Dear customer, your tracking number {0} has been cleared by custom. Item(s) is on the way for delivery. www.usitao.net
+weiye.order.state.to10.content=\u3010meitao ex\u3011Dear customer, your tracking number is {0}. Item(s) has been received. www.usitao.net

@@ -1,0 +1,619 @@
+package com.weiye.common.util;
+
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import jxl.Sheet;
+import jxl.format.Colour;
+import jxl.write.Label;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
+import jxl.write.WritableSheet;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.util.excel.ExcelReader;
+import com.weiye.common.util.excel.ExcelUtil;
+import com.weiye.common.util.excel.ExcelWrite;
+import com.weiye.model.ConsigneeInfo;
+import com.weiye.model.Order;
+import com.weiye.model.TranshipmentBill;
+import com.weiye.model.TranshipmentCommodity;
+import com.weiye.model.User;
+import com.weiye.model.WayBill;
+import com.weiye.model.temp.ExportTranshipmentBill;
+import com.weiye.model.temp.ImportOrder;
+import com.weiye.model.temp.ImportthirdOrder;
+
+
+public class TranshipmentUtil {
+	public static String getSearchColumnByType(String type) {
+		if ("1".equals(type)) {
+			return "u.nick_name";
+		}
+		if ("2".equals(type)) {
+			return "u.phone";
+		}
+		if("3".equals(type)) {
+			return "u.email";
+		}
+		if ("4".equals(type)) {
+			return "u.qq";
+		}
+		if ("5".equals(type)) {
+			return "transit_no";
+		}
+		if("6".equals(type))//用户唯一标识
+		{
+			return "6";
+		}
+		return null;
+	}
+
+	public static boolean validateId(String id) {
+		return true;
+	}
+
+	public static boolean validateTransitNo(String transitNo) {
+		return !StringUtil.isEmpty(transitNo);
+	}
+
+	public static boolean validateTransitCompany(String transitCompany) {
+		return !StringUtil.isEmpty(transitCompany);
+	}
+
+	public static boolean validateParcelValue(String parcelValue) {
+		return true;
+	}
+
+	public static boolean validateFromUser(String fromUser) {
+		return true;
+	}
+
+	public static boolean validateRemark(String remark) {
+		return true;
+	}
+
+	public static boolean validateEta(String eta) {
+		return true;
+	}
+
+	public static boolean validateWeight(String weight) {
+		return true;
+	}
+
+	public static boolean validateTariff(String tariff) {
+		return true;
+	}
+
+	public static boolean validateOR(String or) {
+		return true;
+	}
+
+	public static boolean validateOther(String other) {
+		return true;
+	}
+	
+	/**
+	 * 设置运单地址
+	 * 
+	 * @param order
+	 * @param info
+	 * kai 20151003 created
+	 */
+	public static void setTranshipConsignee(TranshipmentBill order, ConsigneeInfo info) {
+		
+
+		order.setcCity(info.getCity());
+		order.setcDistrict(info.getDistrict());
+		order.setcName(info.getName());
+		order.setcPhone(info.getPhone());
+		order.setcProvince(info.getProvince());
+		order.setcStreetAddress(info.getStreetAddress());
+		order.setcZipCode(info.getZipCode());
+		
+		order.setCardid(info.getCardId());//kai
+		order.setCardurl(info.getCardUrl());
+		order.setCardurlother(info.getCardurlother());
+		order.setCardurltogether(info.getCardurltogether());
+	}
+	
+	public static WayBill transformTranshipment2WayBill(TranshipmentBill transhipmentBill, User user, String orderType, String type) {
+		if(transhipmentBill == null){
+			return null;
+		}else{
+			WayBill wayBill = new WayBill();
+			ConsigneeInfo consigneeInfo = new ConsigneeInfo();
+			Order order = new Order();
+			order.setPremium(transhipmentBill.getPremium());
+			order.setParceValue(transhipmentBill.getParcelValue());
+			order.setWarehouseId(transhipmentBill.getWarehouseId());
+			order.setChannelId(transhipmentBill.getChannelId());
+			List<Order> list = new ArrayList<Order>();
+			list.add(order);
+			wayBill.setOrders(list);
+			wayBill.setOrderType(orderType);
+			TranshipmentUtil.setTranshipConsignee(transhipmentBill, consigneeInfo);
+			int size = transhipmentBill.getCommoditys().size();
+			String[] ids = new String[size];
+			for(int i = 0; i < size; i++){
+				TranshipmentCommodity transhipmentCommodity = transhipmentBill.getCommoditys().get(i);
+				ids[i] = transhipmentCommodity.getId();
+			}
+			wayBill.setCommodityIdList(ids);
+			wayBill.setType(type);
+			wayBill.setUserId(user.getId());
+			wayBill.setName(transhipmentBill.getUserName());
+			wayBill.setConsigneeInfo(consigneeInfo);
+			wayBill.setUserType(user.getType());
+			return wayBill;
+		}
+	}
+	
+	/**
+	 * now: only have the properties use in auditPreOrder
+	 *  
+	 * use to set up the information of properties which needs to update, only null will not be set up
+	 * the original transhipmentBill is going to out put with those new properties;
+	 * @param transhipmentBillOriginal the original which is get before update
+	 * @param transhipmentBill set the update properties in here
+	 */
+	public static void setUpUpdateInfo(TranshipmentBill transhipmentBillOriginal, TranshipmentBill transhipmentBill) {
+		if(transhipmentBill.getState() != null){
+			transhipmentBillOriginal.setState(transhipmentBill.getState());
+		}
+		if(transhipmentBill.getWeight() != null){
+			transhipmentBillOriginal.setWeight(transhipmentBill.getWeight());
+		}
+		if(transhipmentBill.getOr() != null){
+			transhipmentBillOriginal.setOr(transhipmentBill.getOr());
+		}
+		if(transhipmentBill.getTariff() != null){
+			transhipmentBillOriginal.setTariff(transhipmentBill.getTariff());
+		}
+		if(transhipmentBill.getRemark() != null){
+			transhipmentBillOriginal.setRemark(transhipmentBill.getRemark());
+		}
+		if(transhipmentBill.getOther() != null){
+			transhipmentBillOriginal.setOther(transhipmentBill.getOther());
+		}
+		if(transhipmentBill.getLength() != null){
+			transhipmentBillOriginal.setLength(transhipmentBill.getLength());
+		}
+		if(transhipmentBill.getWidth() != null){
+			transhipmentBillOriginal.setWidth(transhipmentBill.getWidth());
+		}
+		if(transhipmentBill.getHeight() != null){
+			transhipmentBillOriginal.setHeight(transhipmentBill.getHeight());
+		}
+		if(transhipmentBill.getChannelId() != null){
+			transhipmentBillOriginal.setChannelId(transhipmentBill.getChannelId());
+		}
+		if(transhipmentBill.getWarehouseId() != null){
+			transhipmentBillOriginal.setWarehouseId(transhipmentBill.getWarehouseId());
+		}
+	}
+	
+	
+	
+	/**
+	 * @param type
+	 *            0表示从数字转换成为字符串，1表示从字符串转换为数字
+	 * @param value
+	 * @return
+	 */
+
+	public static String transformerState(int type, String value) {
+		if (type == 0) {
+			// 转换为字符串
+			if (Constant.TRANSHIPMENT_STATE_10.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE_10;
+			}
+			if (Constant.TRANSHIPMENT_STATE_9.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE_9;
+			}
+			if (Constant.TRANSHIPMENT_STATE_8.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE_8;
+			}
+			if (Constant.TRANSHIPMENT_STATE_7.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE_7;
+			}
+			if (Constant.TRANSHIPMENT_STATE_6.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE_6;
+			}
+			if (Constant.TRANSHIPMENT_STATE_5.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE_5;
+			}
+			if (Constant.TRANSHIPMENT_STATE0.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE0;
+			}
+			if (Constant.TRANSHIPMENT_STATE1.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE1;
+			}
+			if (Constant.TRANSHIPMENT_STATE2.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE2;
+			}
+			if (Constant.TRANSHIPMENT_STATE3.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE3;
+			}
+			if (Constant.TRANSHIPMENT_STATE4.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE4;
+			}
+			if (Constant.TRANSHIPMENT_STATE5.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_ROUTE5;
+			}
+		
+		} else if (type == 1) {
+			
+			
+			// 转换为数字
+			if (Constant.TRANSHIPMENT_STATE_ROUTE_10.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_10;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE_9.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_9;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE_8.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_8;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE_7.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_7;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE_6.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_6;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE_5.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE_5;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE0.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE0;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE1.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE1;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE2.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE2;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE3.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE3;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE4.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE4;
+			}
+			if (Constant.TRANSHIPMENT_STATE_ROUTE5.equals(value)) {
+				return Constant.TRANSHIPMENT_STATE5;
+			}
+		}
+		return value;
+	}
+	
+	//kai 20150918  导入唯一快递状态 
+	public static List<ExportTranshipmentBill> readTranStateExcel_update_state(InputStream input)
+			throws Exception {
+		return ExcelUtil.importExcel(new ExcelReader<ExportTranshipmentBill>() {
+			@Override
+			public List<ExportTranshipmentBill> read(Sheet sheet) throws Exception {
+				List<ExportTranshipmentBill> list = new ArrayList<ExportTranshipmentBill>();
+				int rows = sheet.getRows();
+				for (int i = 1; i < rows; i++) {
+					int j = 0;
+					
+					
+					ExportTranshipmentBill io = new ExportTranshipmentBill();
+					String Tranid=sheet.getCell(j++, i).getContents();//转运单号
+					String packageid=sheet.getCell(j++, i).getContents();//包裹单号
+					
+					if((StringUtil.isEmpty(Tranid))&&(StringUtil.isEmpty(packageid)))
+					{
+						break;
+					}
+					if(StringUtil.isEmpty(Tranid))
+					{
+						io.setId("");
+					}
+					else
+					{
+						io.setId(Tranid.trim());
+					}
+					
+					if(StringUtil.isEmpty(packageid))
+					{
+						io.setTransitNo("");;
+					}
+					else
+					{
+						io.setTransitNo(packageid.trim());
+					}
+					list.add(io);
+				}
+				return list;
+			}
+		}, input);
+	}
+	
+	
+	//导出批量导入状态结果导出
+		public static void export_tranorder_state_result(List<ExportTranshipmentBill> orders, File templetFile, OutputStream os) throws Exception {
+			if (templetFile != null && templetFile.exists()) {
+				// 模板复制
+				ExcelUtil.exportExcel(new ExcelWrite<ExportTranshipmentBill>() {
+					@Override
+					public void write(Map<String, String> headers, Collection<ExportTranshipmentBill> datas, WritableSheet sheet)
+					        throws Exception {
+						if (datas == null || datas.isEmpty()) {
+							sheet.mergeCells(0, 1, 11, 1);
+							Label cell = new Label(0, 1, "没有用户数据.....");
+							sheet.addCell(cell);
+							return;
+						}
+
+						int row = 1;
+						
+						for (ExportTranshipmentBill iorder : datas)
+						{
+							int columnIndex = 0;
+							WritableFont font = new WritableFont(WritableFont.createFont("宋体"),
+				                    10, WritableFont.NO_BOLD);// 字体样式
+							
+							WritableCellFormat redcolor = new WritableCellFormat(font);// 单元格样式
+							redcolor.setBackground(Colour.RED);
+							
+							WritableCellFormat oceanbluecolor = new WritableCellFormat(font);// 单元格样式
+							oceanbluecolor.setBackground(Colour.OCEAN_BLUE);
+							
+							if(!StringUtil.isEmpty(iorder.getState_result())&&(iorder.getState_result().indexOf("成功")!=-1))//成功信息
+							{
+								sheet.addCell(new Label(columnIndex++, row,iorder.getId()));// 导入的单号
+								sheet.addCell(new Label(columnIndex++, row,iorder.getTransitNo()));// 导入的包裹单号
+								sheet.addCell(new Label(columnIndex++, row,iorder.getState_result()));//结果
+							}
+							else
+							{
+								sheet.addCell(new Label(columnIndex++, row,iorder.getId(),redcolor));// 导入的单号
+								sheet.addCell(new Label(columnIndex++, row,iorder.getTransitNo(),redcolor));// 导入的包裹单号
+								sheet.addCell(new Label(columnIndex++, row,iorder.getState_result(),redcolor));//结果
+							}
+							row++;
+							
+							
+					
+						}
+					}
+				}, templetFile, orders, os);
+			} else {
+				// 重新写
+				ExcelUtil.exportExcel(new ExcelWrite<ExportTranshipmentBill>() {
+					@Override
+					public void write(Map<String, String> headers, Collection<ExportTranshipmentBill> datas, WritableSheet sheet)
+					        throws Exception {
+						if (datas == null || datas.isEmpty()) {
+							sheet.mergeCells(0, 1, 11, 1);
+							Label cell = new Label(0, 1, "没有用户数据.....");
+							sheet.addCell(cell);
+							return;
+						}
+
+						int row = 1;
+						
+						for (ExportTranshipmentBill iorder : datas)
+						{
+							int columnIndex = 0;
+							WritableFont font = new WritableFont(WritableFont.createFont("宋体"),
+				                    10, WritableFont.NO_BOLD);// 字体样式
+							
+							WritableCellFormat redcolor = new WritableCellFormat(font);// 单元格样式
+							redcolor.setBackground(Colour.RED);
+							
+							WritableCellFormat oceanbluecolor = new WritableCellFormat(font);// 单元格样式
+							oceanbluecolor.setBackground(Colour.OCEAN_BLUE);
+							
+							if(!StringUtil.isEmpty(iorder.getState_result())&&(iorder.getState_result().indexOf("成功")!=-1))//成功信息
+							{
+								sheet.addCell(new Label(columnIndex++, row,iorder.getId()));// 导入的单号
+								sheet.addCell(new Label(columnIndex++, row,iorder.getTransitNo()));// 导入的包裹单号
+								sheet.addCell(new Label(columnIndex++, row,iorder.getState_result()));//结果
+							}
+							else
+							{
+								sheet.addCell(new Label(columnIndex++, row,iorder.getId(),redcolor));// 导入的单号
+								sheet.addCell(new Label(columnIndex++, row,iorder.getTransitNo(),redcolor));// 导入的包裹单号
+								sheet.addCell(new Label(columnIndex++, row,iorder.getState_result(),redcolor));//结果
+							}
+							row++;
+							
+							
+					
+						}
+					}
+				}, "order-datas", null, orders, os);
+			}
+		}
+		
+		
+		//批量导出转运清单
+				public static void export_tranorder_list(List<TranshipmentBill> orders, File templetFile, OutputStream os) throws Exception {
+					if (templetFile != null && templetFile.exists()) {
+						// 模板复制
+						ExcelUtil.exportExcel(new ExcelWrite<TranshipmentBill>() {
+							@Override
+							public void write(Map<String, String> headers, Collection<TranshipmentBill> datas, WritableSheet sheet)
+							        throws Exception {
+								if (datas == null || datas.isEmpty()) {
+									sheet.mergeCells(0, 1, 11, 1);
+									Label cell = new Label(0, 1, "没有用户数据.....");
+									sheet.addCell(cell);
+									return;
+								}
+
+								int row = 1;
+								
+								for (TranshipmentBill iorder : datas)
+								{
+									int columnIndex = 0;
+									WritableFont font = new WritableFont(WritableFont.createFont("宋体"),
+						                    10, WritableFont.NO_BOLD);// 字体样式
+									
+									WritableCellFormat redcolor = new WritableCellFormat(font);// 单元格样式
+									redcolor.setBackground(Colour.RED);
+									
+									WritableCellFormat oceanbluecolor = new WritableCellFormat(font);// 单元格样式
+									oceanbluecolor.setBackground(Colour.OCEAN_BLUE);
+									sheet.addCell(new Label(columnIndex++, row,iorder.getId()));// 转运单号
+									
+									sheet.addCell(new Label(columnIndex++, row,iorder.getTransitNo()));// 快递公司单号
+									sheet.addCell(new Label(columnIndex++, row,iorder.getTransitCompany()));// 转运公司
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUseralias()));//收件标识
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUsercode()));//收件代码
+									
+									sheet.addCell(new Label(columnIndex++, row,TranshipmentUtil.transformerState(0, iorder.getState())));// 状态
+									
+									if((iorder.getTransitType()!=null)&&(iorder.getTransitType().equalsIgnoreCase(Constant.TRANSHIPMENT_TRAN_TYPE0)))
+									{
+										sheet.addCell(new Label(columnIndex++, row,"普通转运"));
+									}
+									else if((iorder.getTransitType()!=null)&&(iorder.getTransitType().equalsIgnoreCase(Constant.TRANSHIPMENT_TRAN_TYPE1)))
+									{
+										sheet.addCell(new Label(columnIndex++, row,"极速转运"));
+									}
+									else
+									{
+										sheet.addCell(new Label(columnIndex++, row,"未知类型"));
+									}
+									sheet.addCell(new Label(columnIndex++, row,TranshipmentUtil.transformerState(0, iorder.getTranWarehouseName())));// 转运仓库名称
+									sheet.addCell(new Label(columnIndex++, row,TranshipmentUtil.transformerState(0, iorder.getWarehouseName())));// 仓库名称
+									
+									//商品描述
+									List<TranshipmentCommodity> lists=iorder.getCommoditys();
+									String comstr="";
+									for(TranshipmentCommodity list:lists)
+									{
+										comstr+="商品名称："+list.getCommodityName()+";";
+										comstr+="商品详情："+list.getXiangqing()+";";
+										comstr+="商品数量："+list.getQuantity()+";";
+										comstr+="商品重量："+list.getSjweight()+";";
+										comstr+="商品sku："+list.getCommoditySku()+";";
+										comstr+="所属包裹："+list.getTransitNo()+";";
+										if(!StringUtil.isEmpty(list.getTranWarehouseId()))
+										{
+											comstr+="转运仓库id："+list.getTranWarehouseId()+";";
+										}
+										
+										comstr+=" | ";
+								
+									}
+									sheet.addCell(new Label(columnIndex++, row,comstr));//商品描述
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUserName()));//所属用户电话
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUserRealName()));//所属用户姓名
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUserId()));//所属用户id
+									
+									sheet.addCell(new Label(columnIndex++, row,iorder.getcPhone()));//收件人电话
+									sheet.addCell(new Label(columnIndex++, row,iorder.getcName()));//收件人名称
+									
+									String address="";
+									address=iorder.getcProvince()+" "+iorder.getcCity()+" "+iorder.getcDistrict()+" "+iorder.getcStreetAddress()+" "+iorder.getcZipCode();
+									
+									sheet.addCell(new Label(columnIndex++, row,address));//收件人地址
+									sheet.addCell(new Label(columnIndex++, row,iorder.getRemark()));//备注
+									sheet.addCell(new Label(columnIndex++, row,iorder.getWrongRemark()));//错误备注
+									row++;
+									
+									
+							
+								}
+							}
+						}, templetFile, orders, os);
+					} else {
+						// 重新写
+						ExcelUtil.exportExcel(new ExcelWrite<TranshipmentBill>() {
+							@Override
+							public void write(Map<String, String> headers, Collection<TranshipmentBill> datas, WritableSheet sheet)
+							        throws Exception {
+								if (datas == null || datas.isEmpty()) {
+									sheet.mergeCells(0, 1, 11, 1);
+									Label cell = new Label(0, 1, "没有用户数据.....");
+									sheet.addCell(cell);
+									return;
+								}
+
+								int row = 1;
+								
+								for (TranshipmentBill iorder : datas)
+								{
+									int columnIndex = 0;
+									WritableFont font = new WritableFont(WritableFont.createFont("宋体"),
+						                    10, WritableFont.NO_BOLD);// 字体样式
+									
+									WritableCellFormat redcolor = new WritableCellFormat(font);// 单元格样式
+									redcolor.setBackground(Colour.RED);
+									
+									WritableCellFormat oceanbluecolor = new WritableCellFormat(font);// 单元格样式
+									oceanbluecolor.setBackground(Colour.OCEAN_BLUE);
+									sheet.addCell(new Label(columnIndex++, row,iorder.getId()));// 转运单号
+									
+									sheet.addCell(new Label(columnIndex++, row,iorder.getTransitNo()));// 快递公司单号
+									sheet.addCell(new Label(columnIndex++, row,iorder.getTransitCompany()));// 转运公司
+									sheet.addCell(new Label(columnIndex++, row,TranshipmentUtil.transformerState(0, iorder.getState())));// 状态
+									
+									if((iorder.getTransitType()!=null)&&(iorder.getTransitType().equalsIgnoreCase(Constant.TRANSHIPMENT_TRAN_TYPE0)))
+									{
+										sheet.addCell(new Label(columnIndex++, row,"普通转运"));
+									}
+									else if((iorder.getTransitType()!=null)&&(iorder.getTransitType().equalsIgnoreCase(Constant.TRANSHIPMENT_TRAN_TYPE1)))
+									{
+										sheet.addCell(new Label(columnIndex++, row,"极速转运"));
+									}
+									else
+									{
+										sheet.addCell(new Label(columnIndex++, row,"未知类型"));
+									}
+									sheet.addCell(new Label(columnIndex++, row,TranshipmentUtil.transformerState(0, iorder.getTranWarehouseName())));// 转运仓库名称
+									sheet.addCell(new Label(columnIndex++, row,TranshipmentUtil.transformerState(0, iorder.getWarehouseName())));// 仓库名称
+									
+									//商品描述
+									List<TranshipmentCommodity> lists=iorder.getCommoditys();
+									String comstr="";
+									for(TranshipmentCommodity list:lists)
+									{
+										comstr+="商品名称："+list.getCommodityName()+";";
+										comstr+="商品详情："+list.getXiangqing()+";";
+										comstr+="商品数量："+list.getQuantity()+";";
+										comstr+="商品重量："+list.getSjweight()+";";
+										comstr+="商品sku："+list.getCommoditySku()+";";
+										comstr+="所属包裹："+list.getTransitNo()+";";
+										if(!StringUtil.isEmpty(list.getTranWarehouseId()))
+										{
+											comstr+="转运仓库id："+list.getTranWarehouseId()+";";
+										}
+								
+									}
+									sheet.addCell(new Label(columnIndex++, row,comstr));//商品描述
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUserName()));//所属用户电话
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUserRealName()));//所属用户姓名
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUserId()));//所属用户id
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUseralias()));//
+									sheet.addCell(new Label(columnIndex++, row,iorder.getUsercode()));//
+									sheet.addCell(new Label(columnIndex++, row,iorder.getcPhone()));//收件人电话
+									sheet.addCell(new Label(columnIndex++, row,iorder.getcName()));//收件人名称
+									
+									String address="";
+									address=iorder.getcProvince()+" "+iorder.getcCity()+" "+iorder.getcDistrict()+" "+iorder.getcStreetAddress()+" "+iorder.getcZipCode();
+									
+									sheet.addCell(new Label(columnIndex++, row,address));//收件人地址
+									sheet.addCell(new Label(columnIndex++, row,iorder.getRemark()));//备注
+									sheet.addCell(new Label(columnIndex++, row,iorder.getWrongRemark()));//错误备注
+									row++;
+									
+									
+							
+								}
+							}
+						}, "order-datas", null, orders, os);
+					}
+				}
+				
+			
+}

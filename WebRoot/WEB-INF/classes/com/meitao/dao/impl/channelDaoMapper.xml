@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.ChannelDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.Channel">
+		<id column="id" property="id" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="alias" property="alias" javaType="String"/>
+		<result column="state" property="state" javaType="String"/>
+		<result column="warehouse_id" property="warehouseId" javaType="String" />
+		<result column="additive_price" property="additivePrice" javaType="String" />
+		<result column="store_list" property="storeList" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="show_type" property="show_type" javaType="String" />
+		<result column="show_remark" property="show_remark" javaType="String" />
+		<result column="tran_type" property="tran_type" javaType="String" />
+		
+	</resultMap>
+
+	<select id="getChannelById" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from channels where id=#{id}
+	</select>
+	
+	<select id="getByWarhouseId" resultMap="basic_result_map">
+		select * from channels where warehouse_id = #{warehouseId} 
+		<if test="state!=null and state!=''">
+					and state= #{state}
+		</if>
+	</select>
+	
+	<select id="getByWarhouseIdandid" resultMap="basic_result_map">
+		select * from channels where warehouse_id = #{warehouseId} and id=#{id} and state= #{state}
+	</select>
+
+	<insert id="insertChannel" parameterType="com.meitao.model.Channel"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into channels(name,alias,state,warehouse_id,additive_price,store_list,modify_date,create_date,show_type,show_remark,tran_type) values(#{name},#{alias},#{state},#{warehouseId},#{additivePrice},#{storeList},#{modifyDate},#{createDate},#{show_type},#{show_remark},#{tran_type})
+	</insert>
+	
+	<insert id="insertChannelByList" parameterType="com.meitao.model.Channel">
+		 insert into channels(name,alias,state,warehouse_id,additive_price,store_list) 
+		 values
+		<foreach collection="list" item="channel" separator=",">
+			(#{channel.name},#{channel.alias},#{channel.state},#{channel.warehouseId},#{additivePrice},#{storeList})
+		</foreach>
+	</insert>
+	
+	<update id="modifyChannel">
+		update `channels`
+		set `name`=#{name},
+		`alias`=#{alias},
+		`state`=#{state},
+		`warehouse_id`=#{warehouseId},
+		`additive_price`=#{additivePrice},
+		`store_list`=#{storeList},
+		`show_type`=#{show_type},
+		`show_remark`=#{show_remark},
+		`modify_date`=#{modifyDate},
+		`tran_type`=#{tran_type}
+		where id = #{id} 
+	</update>
+	
+	
+	<select id="getall" resultMap="basic_result_map">
+		select * from channels
+		<where>
+			<if test="id!=null and id!=''">
+				id =#{id}
+			</if>
+		</where>
+	</select>
+	
+	<select id="countByKeys" resultType="java.lang.Integer">
+		select count(distinct `channels`.id)
+		from channels
+		<where>
+			<if test="id!=null and id!=''">
+				and id =#{id}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (name like #{wordkey} or alias like #{wordkey})
+			</if>
+		</where>
+	</select>
+
+	<select id="searchByKeys" resultMap="basic_result_map">
+		select distinct `channels`.* 
+			from channels
+			<where>
+			<if test="id!=null and id!=''">
+				and id =#{id}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (name like #{wordkey} or alias like #{wordkey})
+			</if>
+		</where>
+		order by `channels`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+	
+	<delete id="deletebyid">
+		delete from channels
+		where id =#{id}
+		
+	</delete>
+	
+	<select id="gettrantype" resultMap="basic_result_map">
+		select * from channels where tran_type = #{tran_type}
+	</select>
+	
+</mapper>

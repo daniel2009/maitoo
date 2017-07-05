@@ -1,0 +1,128 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+
+<body>
+
+	<input type="hidden" name="seaprintno" value="" />
+	<input type="hidden" name="pn" value="1" />
+<input type="hidden" name="state_new" value="false" />
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">
+			海关打单管理
+
+		</p>
+
+		<div class="box_content">
+			<div class="content_title">海关打单管理</div>
+			<div class="content_text">
+				
+				<div id="showcreatefly" style="display:none;">
+					<p>
+						<span>批次号：</span><input type="text" name="create_fly_no"
+							class="text-input" size="20" style="width:150px;">
+					</p>
+					
+				<!-- <p>
+						<span>上传运单表：</span><input type="file" name="file"
+							class="text-input"><a
+							href="/weiye/admin/order/download_weiyiorders">模板下载</a><br/>
+							上传说明：上传运单表是指把所有上传的运单归属于新创建的航班!
+							
+					</p> -->
+					<p>
+									<label style="display: inline;">
+										备注信息：
+									</label>
+									<textarea rows="2" cols="20" class="text-input" name="fly_remark" maxlength="100"></textarea>
+								</p>
+
+					<p style="color:red;">
+						<span><stong>创建打单批次说明：</stong></span><span>请注意，创建打单批次仅仅创建一个批次号，并没有关联运单，你必须在对应批次中导入运单才能够进行相应的操作!</span>
+					</p>
+				</div>
+				<input type="button" state="close" id="createprintseano" value="创建批次"
+					style=" width: 230px;height: 30px;font-size: 18px;background-color:pink;" />
+				<hr />
+				<div id="u520">
+					<form action="">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;批次号：<input type="text"
+							name="search_flyinfo_no" class="text-input" size="20"
+							style="width:100px;" /> <input class="button" type="submit"
+							value="搜索" name="searchSub" style="height:20px" /> <span>
+							
+						</span>
+					</form>
+					<br />
+				
+				</div>
+				<br />
+
+<label style="display: inline;font-size:18px"><strong>批次表：</strong>
+										
+								
+				
+				<div id="u520">
+					<table style="width: 100%">
+					<col width="100px" />
+						<col width="150px" />
+						<col />
+						<col width="120px" />
+						<col width="120px" />
+						<col width="120px" />
+						<col width="120px" />
+						<col width="120px" />
+						
+						<thead>
+							<tr>
+
+								<th >批次id</th>
+								<th>批次号</th>
+								<th>备注</th>
+								<th>所属门店</th>
+								<th>运单数量</th>
+								<th>创建时间</th>
+								<th>修改时间</th>
+								
+							
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="8">
+								
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp; <a href="">首页</a>| <a href="#">上一页</a> <input
+											style="width: 20px;" type="text" name="pageNow" /> <a
+											href="#">下一页</a>| <a href="#">尾页</a>
+									</div> <!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+
+				</div>
+
+
+
+			</div>
+		</div>
+	</div>
+	<div id="tmpmsgdiv2" style="display:none"></div>
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		//loadNav551Data();
+		//init_flyinfo();
+		init_printsea();
+	});
+</script>
+</html>

@@ -1,0 +1,348 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+
+<body>
+	<input type="hidden" name="orderId" value="${param.orderId }" />
+	<input type="hidden" name="transhipId" value="${param.transhipId }" />
+	<input type="hidden" name="type" value="0" />
+	<input type="hidden" name="userType" value="0" />
+	<input type="hidden" name="premiumratevalue" value="0" />
+	<input type="hidden" id="warehouseId" name="warehouseId" value="">
+	<input type="hidden" id="u_id" name="u_id" value="">
+	<input type="hidden" id="old_storagePositionId" name="old_storagePositionId" value="">
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">
+			修改运单信息 <a href="javascript:nav52Click();" id="a_back_order_list_link"
+				class="button">返回列表</a>
+				
+				
+		</p>
+
+		<div id="onlineorder_divide_id" class="box_content">
+			<div class="content_title">修改运单信息  &nbsp;<input id="bt_back_add_msj_order_list" class="button" type="submit" value="添加运单"></div>
+			<div class="content_text">
+				<input type="text" style="display: none;" id="weightRoundUpText" readonly>
+				<div class="tab-content" id="tab2">
+					<form action="#" id="modify_online_order_pic" method="post" enctype="multipart/form-data">
+						<fieldset>
+							<div id="tranship_info"></div>
+							<div id="order_info">
+								<div id="oi1">
+									<p>
+										<label style="display: inline;"> 运单号： </label> <label
+											style="display: inline;" id="order_id"> &nbsp; </label>											
+										</label><br/>
+										<label style="display: inline;"> 运单类型： </label> <label
+											style="display: inline;" id="order_type_t"> &nbsp; </label>											
+										</label>
+											 
+											<input value="0" class="text-input" size="20" type="text"
+											name="orderidname" style="display:none"/> 
+											<input value="0" class="text-input" size="20" type="text"
+											name="ordername_id" style="display:none"/> 
+										<label style="display: inline;"> <br>发件人信息： </label> <label
+											style="display: inline;" id="from_user_info"> &nbsp;
+										</label> <br /> <label style="display: inline;"> 保险费(￥)： </label> <label
+											style="display: inline;" id="premium_info"> &nbsp; </label>
+									</p>
+									<hr />
+									<label> 选择门店和渠道 </label> <span id="span_wid">选择门店：</span> <select
+										class="text-input" name="wid">
+									</select> &nbsp;&nbsp;&nbsp;&nbsp;选择渠道： <select class="text-input"
+										name="cid">
+									</select>
+									<span >
+							
+								&nbsp;&nbsp;渠道附加费
+							
+						</span>
+						<input type="text" name="addtivePrice" style="width:60px" class="text-input" readonly="readonly"/>
+									&nbsp;&nbsp;&nbsp;&nbsp;<span id="tran_progress_s" style="display:none">转运单处理状态：  </span><select class="text-input"
+										id="tran_progress" style="display:none;">
+										<option value="0">待处理</option>
+											<option value="1">已处理</option>
+											
+									</select>
+								<input type="hidden" id="storagePositionId">
+								储藏间<select type="text"
+								id="storageName" name="storageName" ></select><input type="number" style="margin: 0;" id="storagePositionRowNumber" min="0" step="1" onchange="javascript: storagePositionRowNumberChangeOrder();">行<input type="number" style="margin: 0;" id="storagePositionColNumber" onchange="javascript: storagePositionRowNumberChangeOrder();">列
+								<label id="storagePositionSuggestion" style="display: inline; color: #d77;"></label>
+									<input type="hidden" name="tran_no_flag" />
+									<div style="margin: 0px;" id=commodity_lists_show>
+										<label> 商品列表：&nbsp;&nbsp; <a href="#"
+											id="a_add_commodity_quantity_link">添加</a>
+										</label>
+										<div style="margin: 0px; width: 100%;">
+											<table id="commodity_list_table">
+												<col width="160px" />
+												<col width="160px" />
+												<col width="120px" />
+												<col width="120px" />
+												<col width="120px" />
+												<col width="120px" />
+												<col width="50px" />
+												<thead>
+													<tr>
+														<th style="text-align: center;">商品类别</th>
+														<th style="text-align: center;">商品详情</th>
+														<th style="text-align: center;">品牌</th>
+														<th style="text-align: center;">数量</th>
+														<th style="text-align: center;">实际重量</th>
+														<th style="text-align: center;">计费重量</th>
+														<!-- <th style="text-align: center;">
+															计费重量
+														</th> -->
+														<th style="text-align: center;">操作</th>
+													</tr>
+												</thead>
+												<tbody>
+												</tbody>
+											</table>
+										</div>
+									</div>
+									<div id="third_commiditylist_show" style="display:none">
+									<p>
+										<label style="display: inline;"> 商品信息： </label>
+										<textarea name="third_commidtylist" rows="2" cols="20" class="text-input"></textarea>
+									</p>
+									<p>
+										<label style="display: inline;"> 品牌信息： </label>
+										<textarea name="third_brands" rows="2" cols="20" class="text-input"></textarea>
+									</p>
+									</div>
+									
+									<p>
+										<label id="state_label" style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;状态：
+										</label> <select id="state_id" name="state" class="text-input" onChange="javascript: state_idChangeGetStoragePosition();">
+											<option value="0">待审核</option>
+											<option value="1">待付款</option>
+											<option value="2">门店扣款</option>
+										</select>
+									</p>
+									<!-- 临时保存修改订单的状态 -->
+									<p id="curstateid" style="display:none;">
+										
+									</p>
+									
+									<p>
+										<label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;重量：
+										</label> <input value="0" class="text-input" size="15" type="text"
+											name="weight" /> <small>磅</small> 
+											<label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;重量(kg)：
+										</label> <input value="0" class="text-input" size="15" type="text"
+											name="weightKg" /> <small>kg</small>
+											
+											&nbsp;&nbsp;&nbsp;实际重量(kg)：
+										</label> <input value="0" class="text-input" size="15" type="text"
+											name="sum_weight" /> <small>磅</small>
+											
+											<label
+											style="display: inline;"> &nbsp;&nbsp;包裹长度： </label> <input
+											class="text-input" size="15" type="text" name="length"
+											value="0" maxlength="10" /> <label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;包裹宽度：
+										</label> <input class="text-input" size="15" type="text" name="width"
+											value="0" maxlength="10" /> <label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;包裹高度： </label>
+										<input class="text-input" size="15" type="text" name="height"
+											value="0" maxlength="10" />
+
+									</p>
+									<p>
+										<!-- <label style="display: inline;">
+											OR转运费：
+										</label>
+										<input value="0" class="text-input" size="15" type="text" name="or" /> 
+										<small>美元</small>   -->
+
+										<label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;其他费用： </label>
+										<input value="0" class="text-input" size="15" type="text"
+											name="other" />
+											
+											
+											<label
+											style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保险： </label> <input
+											class="text-input" size="15" type="text" name="premium"
+											value="0" maxlength="10" /> <small>美元</small>
+											
+											<label
+											style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;保险额度： </label> <input
+											class="text-input" size="15" type="text" name="premiumtotal"
+											value="0" maxlength="10" readonly= "true"/> <small>美元</small>
+											 <!--  <input type="hidden" name="premium" /> <small>美元</small>-->
+
+										<label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;关税： </label> <input
+											value="0" class="text-input" size="15" type="text"
+											name="tariff" /> <small>美元</small> <label
+											style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;申报价值： </label> <input
+											class="text-input" size="15" type="text" name="parceValue"
+											value="0" maxlength="10" /> <small>美元</small>
+
+									</p>
+									<p>
+										<label style="display: none;" >
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;邮寄方式： </label>
+										<select class="text-input" name="mail" style="display:none;">
+											<option value="0">邮包</option>
+											<option value="1">电商</option>
+											<option value="2">快件</option>
+										</select> <label style="display: inline;">
+											  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总费用： </label> <input
+											class="text-input" size="15" type="text" name="totalmoney"
+											placeholder="0.00" disabled="disabled" />
+
+									</p>
+									<p>
+										<label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;收件人姓名： </label> <input
+											type="text" class="text-input" name="cName" /> <br /> <label
+											style="display: inline;"> 收件人省/市/区： </label> <input
+											type="text" class="text-input" size="10" name="cProvince" />
+										/ <input type="text" class="text-input" size="10" name="cCity" />
+										/ <input type="text" class="text-input" size="10"
+											name="cDistrict" /> <br /> <label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;详细地址： </label>
+										<input type="text" class="text-input medium-input"
+											name="cStreetAddress" /> <br /> <label
+											style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;联系电话： </label>
+										<input type="text" class="text-input" name="cPhone" /> <label
+											style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;邮 编： </label> <input
+											type="text" class="text-input" name="cZipCode" /> <br />
+									</p>
+                                    <!-- kai 20150911-1 modify -->
+                                    
+                                    <div id="showallpic" style="">
+<p>
+									 	<label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;身份证号： </label> <input
+											name="cardidname" type="text" class="text-input" style="width:150px"
+											maxlength="18" /> <br /> <label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;身份证正面图： </label> <input id="cardpicid"
+											class="text-input" name="file" type="file" /><label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;身份证反面图： </label> <input id="cardpicidother"
+											class="text-input" name="fileother" type="file" /><br />
+										注意：支持JPG，PNG，BMP等图片格式的身体证图片，最大不超过4MB <br />
+										
+</p>
+
+									
+								
+									<input type="text" name="idurlcard"
+										style="width:120px;display:none;" />
+									<p id="showcardpicid" style="display:none;">
+										<label style="display: inline;"> &nbsp;&nbsp;身份证正面图预览:
+										</label> <a href="" target="_blank" id="imacardurlid"><img
+											width="150px" height="150px" src=""></a>
+									</p>
+
+									<input type="text" name="idurlcardother"
+										style="width:120px;display:none;" />
+									<p id="showcardpicidother" style="display:none;">
+										<label style="display: inline;"> &nbsp;&nbsp;身份证反面图预览:
+										</label> <a href="" target="_blank" id="imacardurlidother"><img
+											width="150px" height="150px" src=""></a>
+									</p>
+									
+									<input type="text" name="idurlcardtogether"
+										style="width:120px;display:none;" />
+									<p id="showcardpicidtogether" style="display:none;">
+										<label style="display: inline;"> &nbsp;&nbsp;身份证合成图预览:
+										</label> <a href="" target="_blank" id="imacardurlidtogether"><img
+											width="150px" height="150px" src=""></a>
+									</p>
+									
+									</div>
+									
+									
+									<p>
+										<label style="display: inline;"> 备注信息： </label>
+										<textarea name="remark" rows="2" cols="20" class="text-input"></textarea>
+									</p>
+									<hr />
+									<div id="show_third_otherinfo" style="display:none;">
+									<p >
+										<label style="display: inline;"> 第三方信息： </label><br/>
+										<label style="display: inline;">
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;收件日期： </label> 
+											<input type="text" class="text-input" name="thirdCreateDate" />
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;航班号： </label> 
+											<input type="text" class="text-input" name="flight" />
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;装箱号： </label> 
+											<input type="text" class="text-input" name="boxNo" />
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;是否付款： </label> 
+											<input type="text" class="text-input" name="payOrNot" /><br/>
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;基本运费$： </label> 
+											<input type="text" class="text-input" name="baseMoney" />
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;快递公司： </label> 
+											<input type="text" class="text-input" name="expressName" />
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;是否有身份证： </label> 
+											<input type="text" class="text-input" name="cardOrNot" /><br>
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;发件人地址： </label> 
+											<input type="text" class="text-input" name="t_s_address" />
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;发件人城市： </label> 
+											<input type="text" class="text-input" name="t_s_city" />
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;发件人州： </label> 
+											<input type="text" class="text-input" name="t_s_state" />
+											&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;发件人邮编： </label> 
+											<input type="text" class="text-input" name="t_s_zipcode" />
+											<br/>
+											
+											<p>
+										<label style="display: inline;"> 导入备注： </label>
+										<textarea name="importRemark" rows="2" cols="20" class="text-input"></textarea>
+									</p>
+									</div>
+								</div>
+							</div>
+							<p style="margin-left: 50px;">
+								<input id="bt_modify_order" class="button" type="submit"
+									value="提交" />
+							</p>
+						</fieldset>
+						<div class="clear"></div>
+						<!-- End .clear -->
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+		</div>
+	<!--不要删除这个div-->
+	<div id="tmpmsgdiv2" style="display:none;"></div>
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav522Data();
+	});
+	
+	function storagePositionRowNumberChangeOrder(){
+		
+		console.log("我变了!");
+		//var storagePositionRowNumber = $("storagePositionRowNumber").val();
+		var storagePositionColNumber = $("storagePositionColNumber").val();
+		if('' != storagePositionColNumber || null !=storagePositionColNumber || 0 !=storagePositionColNumber){
+			findStoragePositionByWarehouseIdAndTypeAndRelateIdRowColOrder();
+		}
+		
+	}
+	function storagePositionColNumberChangeOrder(){
+		console.log("我也改变了！");
+		//console.log($("select[name='storageName']").val()); 
+		findStoragePositionByWarehouseIdAndTypeAndRelateIdRowColOrder();
+	}
+</script>
+</html>

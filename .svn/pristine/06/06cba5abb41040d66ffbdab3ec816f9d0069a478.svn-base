@@ -1,0 +1,206 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">单子详情
+			<a  href="#" onclick="javascript: navProductRecordClick();">返回列表</a>
+		</p>
+		<div class="box_content">
+			<div class="content_title">单子详情</div>
+			<div class="content_text">
+				<div class="tab-content" id="tab2">
+					<input type="hidden" id="idHidden">
+					<input type="hidden" id="productIdHidden">
+					状态:<label id="state"></label><br/>
+					反馈信息:<label id="empRemark"></label><br/>
+					<hr/>
+					<article style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">购买数量：</label>
+							<label id="quantity"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">下单时间：</label>
+							<label id="date"></label>
+						</div>
+					</article>
+					<article style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+						<label class="center">运单收发用户信息：</label>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">寄件人手机号码：</label>
+							<label id="fromUserPhone"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">寄件人姓名：</label>
+							<label id="fromUserRealName"></label>
+						</div>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">收件人姓名：</label>
+							<label id="cName"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">详&nbsp;细&nbsp;地&nbsp;址：</label>
+							<label id="cAddress"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编：</label>
+							<label id="cZipCode"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">联&nbsp;系&nbsp;电&nbsp;话：</label>
+							<label id="cPhone"></label>
+						</div>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">身份证号：</label>
+							<label id="cCardId"></label>
+						</div>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">身份证正面：</label>
+							<img id="cIdCardImg">
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">身份证反面：</label>
+							<img id="cIdCardOtherImg">
+						</div>
+					</article>
+					<hr />
+					<article style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+						<label class="center">用户评价信息：</label>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">用户评级：</label>
+							<label id="rate"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">用户评论：</label>
+							<label id="comment"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">评论时间：</label>
+							<label id="commentDate"></label>
+						</div>
+					</article>
+					<hr/>
+					<article style="flex: 1; margin: 30px; display: flex; flex-wrap: wrap;">
+						<label class="center">商品信息：</label>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">名称：</label>
+							<label id="productName"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">类型：</label>
+							<label id="productTypeName"></label>
+						</div>
+						<div style="flex-basis: 100%;"></div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">价格：</label>
+							<label id="productPrice"></label>
+						</div>
+						<div style="flex-basis: 300px;">
+							<label style="display: inline;">剩余：</label>
+							<label id="productQuantity"></label>
+						</div>
+						<div style="flex-basis: 100%;">
+							<label style="display: inline;">详情：</label>
+							<label id="productDescription"></label>
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">图片：</label>
+							<img id="productPic1">
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">图片：</label>
+							<img id="productPic2">
+						</div>
+						<div style="flex-basis: 500px;">
+							<label style="display: inline;">图片：</label>
+							<img id="productPic3">
+						</div>
+					</article>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		        </div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+$("#main-content").ready(function(){
+	$("#idHidden").val(window.sessionStorage.getItem("productRecordId"));
+	window.sessionStorage.clear();
+	loadProductRecord();
+});
+function loadProductRecord(){
+	$.ajax({
+		type : "post",
+		url : "../admin/productRecord/findById",
+		data : {id : $("#idHidden").val()},
+		success : function(response){
+			if("200" == response.code){
+				var productRecord = response.data;
+				var state = "用户下单";
+				if(productRecord.state == "1"){
+					state = "有问题";
+				}else if(productRecord.state == "2"){
+					state = "完成";
+				}
+				$("#state").html(state);
+				$("#empRemark").html(productRecord.empRemark);
+				$("#quantity").html(productRecord.quantity);
+				$("#date").html(productRecord.date);
+				
+				$("#fromUserPhone").html(productRecord.userPhone);
+				$("#fromUserRealName").html(productRecord.userName);
+				$("#cName").html(productRecord.cName);
+				$("#cAddress").html(productRecord.cAddress);
+				$("#cZipCode").html(productRecord.cZipCode);
+				$("#cPhone").html(productRecord.cPhone);
+				$("#cardid").html(productRecord.cCardId);
+				$("#cIdCardImg").attr("src", "../"+productRecord.cIdCardPic);
+				$("#cIdCardOtherImg").attr("src", "../"+productRecord.cIdCardOtherPic);
+				$("#rate").html(productRecord.rate);
+				$("#comment").html(productRecord.comment);
+				$("#commentDate").html(productRecord.commentDate);
+				
+				$("#productIdHidden").val(productRecord.productId);
+				loadProduct();
+			}else{
+				alert("获取商品记录失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+function loadProduct(){
+	$.ajax({
+		type : "post",
+		url : "../admin/product/findById",
+		data : {id : $("#productIdHidden").val()},
+		success : function(response){
+			if("200" == response.code){
+				var product = response.data;
+				$("#productName").html(product.name);
+				$("#productTypeName").html(product.typeName);
+				$("#productPrice").html(product.currency + product.price);
+				$("#productQuantity").html(product.quantity);
+				$("#productDescription").html(product.description);
+				$("#productPic1").attr("src", "../" + product.pic1);
+				$("#productPic2").attr("src", "../" + product.pic2);
+				$("#productPic3").attr("src", "../" + product.pic3);
+				clearWrongImg();
+			}else{
+				alert("获取商品失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+</script>
+</html>

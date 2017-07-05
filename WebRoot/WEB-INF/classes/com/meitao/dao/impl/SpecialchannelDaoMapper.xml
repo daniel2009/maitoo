@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.SpencialChannelDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.SpencialChannel">
+		<id column="id" property="id" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="alias" property="alias" javaType="String"/>
+		<result column="state" property="state" javaType="String"/>
+		<result column="warehouse_id" property="warehouseId" javaType="String" />
+		<result column="additive_price" property="additivePrice" javaType="String" />
+		<result column="carry" property="carry" javaType="String" />
+		<result column="premium_rate" property="premiumRate" javaType="String" />
+		<result column="premium_max" property="premiumMax" javaType="String" />
+		<result column="spencialChannelNameId" property="spencialChannelNameId" javaType="String" />
+		
+		
+		
+	</resultMap>
+
+	<select id="getChannelById" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from spencial_channels where id=#{id}
+	</select>
+	
+	<select id="getByWarhouseId" resultMap="basic_result_map">
+		select * from spencial_channels where warehouse_id = #{warehouseId} 
+		<if test="state!=null and state!=''">
+					and state= #{state}
+		</if>
+	</select>
+	
+	<select id="getByWarhouseIdandid" resultMap="basic_result_map">
+		select * from spencial_channels where warehouse_id = #{warehouseId} and id=#{id} and state= #{state}
+	</select>
+
+	<insert id="insertChannel" parameterType="com.meitao.model.SpencialChannel"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into spencial_channels(name,alias,state,warehouse_id,additive_price,carry,premium_rate,premium_max,spencialChannelNameId) values(#{name},#{alias},#{state},#{warehouseId},#{additivePrice},#{carry},#{premiumRate},#{premiumMax},#{spencialChannelNameId})
+	</insert>
+	
+	<insert id="insertChannelByList" parameterType="com.meitao.model.SpencialChannel">
+		 insert into spencial_channels(name,alias,state,warehouse_id,carry,premium_rate,premium_max,spencialChannelNameId) 
+		 values
+		<foreach collection="list" item="channel" separator=",">
+			(#{channel.name},#{channel.alias},#{channel.state},#{channel.warehouseId},#{channel.carry},#{channel.premiumRate},#{channel.premiumMax},#{channel.spencialChannelNameId})
+		</foreach>
+	</insert>
+	
+	<update id="modifyChannel">
+		update `spencial_channels`
+		set `name`=#{name},
+		`alias`=#{alias},
+		`state`=#{state},
+		`warehouse_id`=#{warehouseId},
+		`additive_price`=#{additivePrice},
+		`carry`=#{carry},
+		`premium_rate`=#{premiumRate},
+		`premium_max`=#{premiumMax}
+		where id = #{id} 
+	</update>
+
+		
+</mapper>

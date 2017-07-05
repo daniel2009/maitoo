@@ -1,0 +1,2346 @@
+package com.weiye.controller;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.weiye.common.composepics.imgcompose;
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ParameterConstants;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.ConsigneeInfoUtil;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.OrderUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.common.util.TranshipmentUtil;
+import com.weiye.common.util.UserUtil;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.DaoHuoYuBao;
+import com.weiye.model.Order;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ProductRecord;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.StoragePosition;
+import com.weiye.model.StoragePositionRecord;
+import com.weiye.model.TranshipmentBill;
+import com.weiye.model.TranshipmentCommodity;
+import com.weiye.model.WayBill;
+import com.weiye.model.temp.ExportOrder;
+import com.weiye.model.temp.ExportTranshipmentBill;
+import com.weiye.model.temp.ImportOrder;
+import com.weiye.model.temp.ImportthirdOrder;
+import com.weiye.service.StoragePositionRecordService;
+import com.weiye.service.StoragePositionService;
+import com.weiye.service.TranshipmentBillService;
+
+@Controller
+public class TranshipmentBillController extends BasicController {
+
+	private static final long serialVersionUID = -3106382965634883711L;
+	private static final Logger log = Logger
+			.getLogger(TranshipmentBillController.class);
+	@Resource(name = "transhipmentBillService")
+	private TranshipmentBillService transhipmentBillService;
+	@Resource(name = "storagePositionService")
+	private StoragePositionService storagePositionService;
+	@Resource(name = "storagePositionRecordService")
+	private StoragePositionRecordService storagePositionRecordService;
+	@Value(value = "${page_size}")
+	private int defaultPageSize;
+
+	@Value(value = "${default_img_size}")
+	private long defaultCardFileSize;
+	@Value(value = "${save_card_dir}")
+	private String saveCardDir;
+	@Value(value = "${default_img_type}")
+	private String defaultCardFileType;
+	
+	@Value(value = "${default_excel_type}")
+	private String defaultExcelFileType;
+	
+	@Value("${tranorder.output.to.state.result.templets}")
+	private String tranorderoutputtostateresulttemplets;
+	
+	@Value(value = "${tranorder.import.tranordersstateTemplets}")
+	private String tranorderimporttranorderssstateTempletsFile;
+	
+	@Value("${tranorder.output.to.lists.templets}")
+	private String tranorderoutputtoliststemplets;
+	
+//	@Value("${tranorder.output.to.state.result.templets}")
+//	private String tranorderoutputtostateresulttemplets;
+	
+
+	@RequestMapping(value = "/transh/add", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addTranshipmentOfUser(
+			HttpServletRequest request, DaoHuoYuBao dhyb) {
+		if (dhyb == null /*
+						 * || dhyb.getCommodity() == null ||
+						 * dhyb.getCommodity().length == 0
+						 */) {
+			return generateResponseObject(
+					ResponseCode.TRANSHIPMENT_COMMODITY_ERROR, "运单商品参数错误!");
+		}
+
+		if (!TranshipmentUtil.validateTransitNo(dhyb.getTransitNo())) {
+			return generateResponseObject(
+					ResponseCode.TRANSHIPMENT_TRANSIT_NO_ERROR,
+					"包裹运单号有误，请重新输入！");
+		}
+		if (dhyb.getTransitType().equalsIgnoreCase("1")) {
+			if (!ConsigneeInfoUtil.validateCardId(dhyb.getCardid())) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+						"身份证号码填写错误，请重新填写！");
+			}
+		} else if (dhyb.getTransitType().equalsIgnoreCase("0")) {
+
+		} else {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"用户类型出错");
+		}
+
+		/*
+		 * if
+		 * (!TranshipmentUtil.validateTransitCompany(dhyb.getTransitCompany()))
+		 * { return
+		 * generateResponseObject(ResponseCode.TRANSHIPMENT_TRANSIT_COMPANY_ERROR
+		 * , "转运公司有误，请重新输入！"); }
+		 */
+
+		// if (!TranshipmentUtil.validateParcelValue(parcelValue)) {
+		// return
+		// generateResponseObject(ResponseCode.TRANSHIPMENT_PARCEL_VALUE_ERROR,
+		// "包裹价值输入有误，请重新输入!");
+		// }
+
+		/*
+		 * if (!TranshipmentUtil.validateRemark(dhyb.getRemark())) { return
+		 * generateResponseObject(ResponseCode.TRANSHIPMENT_REMARK_ERROR,
+		 * "备注信息输入有误，请重新输入"); }
+		 */
+
+		// if (!TranshipmentUtil.validateFromUser(fromUser)) {
+		// return
+		// generateResponseObject(ResponseCode.TRANSHIPMENT_FROM_USER_ERROR,
+		// "寄件人输入有误，请重新输入！");
+		// }
+
+		/*
+		 * if (!TranshipmentUtil.validateEta(dhyb.getEta())) { return
+		 * generateResponseObject(ResponseCode.TRANSHIPMENT_ETA_ERROR,
+		 * "预计到达时间输入有误，请重新输入"); }
+		 */
+
+		/*
+		 * boolean isError = true; List<TranshipmentCommodity> list = new
+		 * ArrayList<TranshipmentCommodity>(); for (TranshipmentCommodity tc :
+		 * dhyb.getCommodity()) { try { if (Integer.valueOf(tc.getQuantity()) >
+		 * 0) { list.add(tc); isError = false; } } catch (Exception e) { //
+		 * error break; } } if (isError) { return
+		 * generateResponseObject(ResponseCode.TRANSHIPMENT_COMMODITY_ERROR,
+		 * "商品数量错误错误，商品数量必须是数字，并且商品数量不能全是0"); }
+		 */
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+		// 开始创建对象，并插入
+
+		TranshipmentBill tb = new TranshipmentBill();
+		tb.setUserId(userId);
+		if (dhyb.getTransitType().equalsIgnoreCase("0"))// 普通类型
+		{
+			tb.setTransitNo(dhyb.getTransitNo());
+			tb.setTransitCompany(dhyb.getTransitCompany());
+			tb.setRemark(dhyb.getRemark());
+			tb.setTransitType("0");
+
+		} else if (dhyb.getTransitType().equalsIgnoreCase("1"))// 极速类型
+		{
+			tb.setTransitNo(dhyb.getTransitNo());
+			tb.setTransitCompany(dhyb.getTransitCompany());
+			tb.setRemark(dhyb.getRemark());
+			tb.setTransitType("1");
+
+			// 转运收件地止
+			tb.setcName(dhyb.getcName());
+			tb.setcProvince(dhyb.getcProvince());
+			tb.setcCity(dhyb.getcCity());
+			tb.setcDistrict(dhyb.getcDistrict());
+			tb.setcStreetAddress(dhyb.getcStreetAddress());
+			tb.setcPhone(dhyb.getcPhone());
+			tb.setcZipCode(dhyb.getcZipCode());
+			tb.setCardid(dhyb.getCardid());
+			tb.setCardurl(dhyb.getCardurl());
+			tb.setCardurlother(dhyb.getCardurlother());
+			tb.setCardurltogether(dhyb.getCardurltogether());
+
+		} else {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+					"用户类型出错");
+		}
+
+		/*
+		 * tb.setTransitNo(dhyb.getTransitNo());
+		 * tb.setTransitCompany(dhyb.getTransitCompany());
+		 * tb.setParcelValue(""); tb.setRemark(dhyb.getRemark());
+		 * tb.setFromUser(""); tb.setEta(dhyb.getEta()); tb.setUserId(userId);
+		 * tb.setWarehouseId(dhyb.getWarehouseId());
+		 */
+		tb.setState(Constant.TRANSHIPMENT_STATE0);
+
+		try {
+
+			String url = dhyb.getCardurl();
+			if ((url != "") && (url != null))// 进行解码
+			{
+				String str = URLDecoder.decode(url, "UTF-8");
+				tb.setCardurl(str);
+
+			}
+
+			url = dhyb.getCardurlother();
+			if ((url != "") && (url != null))// 进行解码
+			{
+				String str = URLDecoder.decode(url, "UTF-8");
+				tb.setCardurlother(str);
+
+			}
+			url = dhyb.getCardurltogether();
+			if ((url != "") && (url != null))// 进行解码
+			{
+				String str = URLDecoder.decode(url, "UTF-8");
+				tb.setCardurltogether(str);
+
+			}
+
+			// return this.transhipmentBillService.addTranshipment(tb, list);
+			return this.transhipmentBillService.addTranshipment(tb, null);
+		} catch (Exception e) {
+			log.error("到货预报出现异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "到货预报失败");
+		}
+	}
+
+	@RequestMapping(value = "/transh/delete", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> deleteByIdOfUser(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.TRANSH_ID) String[] ids) {
+		if (ids == null || ids.length == 0) {
+			return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+					"运单id有误，请重新操作！");
+		}
+
+		try {
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			return this.transhipmentBillService.deleteTranshipmentByUserId(
+					Arrays.asList(ids), userId);
+		} catch (Exception e) {
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/transh/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<TranshipmentBill>> getPageSplitOfUser(
+			HttpServletRequest request,
+			@RequestParam(value = "tid", required = false, defaultValue = "") String tid,
+			@RequestParam(value = "state", required = false, defaultValue = "") String state,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		try {
+			/**
+			 * this method only use for user, why validate the fucking authority of admin or emp?
+			 * it will test before 2015.12.25, you can delete those code after it;  
+			 
+			String storeid=null;
+			String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+			{
+				storeid=null;//表示可以查找所有门店
+				
+			}else
+			{
+				storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+				if((storeid==null)||(storeid.equalsIgnoreCase("")))
+				{
+					return generateResponseObject(ResponseCode.NEED_LOGIN,
+							"你没有登陆!");
+				}
+			}
+			*/
+			
+			tid = StringUtil.isEmpty(tid) ? null : tid;
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			if((userId==null)||(userId.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+			
+			pageIndex = Math.max(pageIndex, 1);
+			return this.transhipmentBillService.searchByUserId(tid, userId, state, null, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取用户运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取用户运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/transh/get_by_id", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<TranshipmentBill>> getTranshipmentByIds(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.TRANSH_ID) String[] ids) {
+		if (ids == null || ids.length == 0) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+			return this.transhipmentBillService.getByIds(userId,
+					Arrays.asList(ids));
+		} catch (Exception e) {
+			log.error("获取用户运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取用户运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/transh/search", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<TranshipmentBill>> searchOfAdmin(
+			HttpServletRequest request,
+			@RequestParam(value = "tid", required = false, defaultValue = "") String tid,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false, defaultValue = "") String key,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false, defaultValue = "") String sdate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false, defaultValue = "") String edate,
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+		
+		
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+		}
+		
+		if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+			sdate = "";
+		} else {
+			sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+		}
+
+		if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+			edate = "";
+		} else {
+			edate = UserUtil.transformerDateString(edate, " 23:59:59");
+		}
+
+		try {
+			tid = StringUtil.isEmpty(tid) ? null : tid;
+			String column = TranshipmentUtil.getSearchColumnByType(type);
+			pageIndex = Math.max(pageIndex, 1);
+			return this.transhipmentBillService.searchByKey(tid, key, column,
+					sdate, edate,storeid, defaultPageSize, pageIndex);
+		} catch (Exception e) {
+			log.error("获取用户运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取用户运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/transh/getbyorderid", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<List<TranshipmentBill>> getTranshipmentByOrderId(
+			@RequestParam(value = "oid") String id) {
+		if (StringUtil.isEmpty(id)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			return this.transhipmentBillService.getTranshipmentByOrderId(id);
+		} catch (Exception e) {
+			log.error("根据运单id获取转运单出现异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"根据运单id获取转运单出现异常");
+		}
+	}
+
+	@RequestMapping(value = "/admin/transh/get_one", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<TranshipmentBill> showOneOfAdmin(
+			@RequestParam(value = ParameterConstants.TRANSH_ID) String id) {
+		if (!TranshipmentUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+					"参数无效");
+		}
+
+		try {
+			return this.transhipmentBillService.getById(id);
+		} catch (Exception e) {
+			log.error("根据id获取运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"根据id获取运单失败");
+		}
+	}
+	@RequestMapping(value = "/user/transhipment/getById", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<TranshipmentBill> getByIdOfUser(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.TRANSH_ID) String id) {
+		if (!TranshipmentUtil.validateId(id)) {
+			return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+					"参数无效");
+		}
+		String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+		if(StringUtil.isEmpty(userId))
+		{
+			return generateResponseObject(ResponseCode.NEED_LOGIN,
+					"请先登陆!");
+		}
+		
+		try {
+			return this.transhipmentBillService.getByIdAndUser(id, userId);
+		} catch (Exception e) {
+			log.error("根据id获取运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"根据id获取运单失败");
+		}
+	}
+	@RequestMapping(value = "/admin/transh/delete", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> deleteOfAdmin(
+			@RequestParam(value = ParameterConstants.TRANSH_ID) String[] ids) {
+		if (ids == null || ids.length == 0) {
+			return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+					"参数无效");
+		}
+		try {
+			return this.transhipmentBillService.deleteTranshipment(
+					Arrays.asList(ids), Constant.TRANSHIPMENT_STATE4);
+		} catch (Exception e) {
+			log.error("删除运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除运单失败");
+		}
+	}
+
+	@RequestMapping(value = "/admin/transh/modify", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyOfAdmin(
+			HttpServletRequest request,
+			DaoHuoYuBao dhyb,
+			@RequestParam(value = "paybool", required = false, defaultValue = "") String paybool) {
+		if (dhyb == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+		}
+		
+		if(storeid!=null)
+		{
+			if(!storeid.equalsIgnoreCase(dhyb.getWarehouseId()))
+			{
+				if(storeid.equalsIgnoreCase(dhyb.getTranWarehouseId())&&(Constant.TRANSHIPMENT_STATE_6.equalsIgnoreCase(dhyb.getState())))//修改为转运出库
+				{}
+				else
+				{
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "对不起，你只能把转动单归属于你的门店或仓库!");
+				}
+			}
+		}
+		
+		
+		String state = dhyb.getState();
+		if (Constant.TRANSHIPMENT_STATE0.equals(state)) {
+			// 不能讲状态置为0，即未入库状态
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数错误，不能设置成为未入库状态。");
+		}
+		
+		
+
+		TranshipmentBill bt = new TranshipmentBill();
+		
+		if((Constant.TRANSHIPMENT_STATE_7.equalsIgnoreCase(state))||(Constant.TRANSHIPMENT_STATE_6.equalsIgnoreCase(state)))
+		{
+			bt.setPretranwarehouseId(dhyb.getPretranwarehouseId());
+		}
+		
+		List<TranshipmentCommodity> list = new ArrayList<TranshipmentCommodity>();
+		//要款时，检查信息是否正确
+		if ((!StringUtil.isEmpty(paybool))&&(paybool.equalsIgnoreCase("yes"))) {
+			// 仓库已经收到邮件，将入库
+			if (!TranshipmentUtil.validateWeight(dhyb.getWeight())) {
+				return generateResponseObject(
+						ResponseCode.TRANSHIPMENT_WEIGHT_ERROR, "重量输入有误，请重新输入");
+			}
+
+			if (!TranshipmentUtil.validateTariff(dhyb.getTariff())) {
+				return generateResponseObject(
+						ResponseCode.TRANSHIPMENT_THRIFF_ERROR, "关税输入有误，请重新输入");
+			}
+
+			if (!TranshipmentUtil.validateOR(dhyb.getOr())) {
+				return generateResponseObject(
+						ResponseCode.TRANSHIPMENT_OR_ERROR, "OR转运费输入有误，请重新输入");
+			}
+		}
+			boolean isError = true;
+			if(dhyb.getCommodity()!=null)
+			{
+				for (TranshipmentCommodity tc : dhyb.getCommodity()) {
+					try {
+						if (Integer.valueOf(tc.getQuantity()) > 0) {
+							
+							list.add(tc);
+							isError = false;
+						}
+					} catch (Exception e) {
+						// error
+						break;
+					}
+				}
+			}
+			
+			
+			if ((isError)&&(!StringUtil.isEmpty(dhyb.getState()))&&(Double.parseDouble(dhyb.getState())>0)) {
+				if((dhyb.getTransitType().equalsIgnoreCase("1"))&&(Double.parseDouble(dhyb.getState())>0))
+				{
+				return generateResponseObject(
+						ResponseCode.TRANSHIPMENT_COMMODITY_ERROR,
+						"商品数量错误错误，商品数量必须是数字，并且商品数量不能全是0");
+				}
+				else
+				{
+					if(Double.parseDouble(dhyb.getState())>1)
+					{
+						return generateResponseObject(
+								ResponseCode.TRANSHIPMENT_COMMODITY_ERROR,
+								"商品数量错误错误，商品数量必须是数字，并且商品数量不能全是0");
+					}
+				}
+			}
+
+		
+
+		if (!TranshipmentUtil.validateRemark(dhyb.getRemark())) {
+			return generateResponseObject(
+					ResponseCode.TRANSHIPMENT_REMARK_ERROR, "备注输入有误，请重新输入");
+		}
+
+		String empId = StringUtil.obj2String(request.getSession().getAttribute(
+				Constant.EMP_ID_SESSION_KEY));
+		String empName = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+		bt.setId(dhyb.getId());
+		bt.setEmpId(empId);
+		bt.setRemark(dhyb.getRemark());
+		bt.setState(state);
+
+		bt.setWeight(dhyb.getWeight());
+
+		bt.setWeightKg(dhyb.getWeightKg());
+		bt.setPremium(dhyb.getPremium());
+		bt.setMail(dhyb.getMail());
+		bt.setParcelValue(dhyb.getParcelValue());
+
+		bt.setTariff(dhyb.getTariff());
+		bt.setOr(dhyb.getOr());
+		bt.setOther(dhyb.getOther());
+		bt.setLength(dhyb.getLength());
+		bt.setWidth(dhyb.getWidth());
+		bt.setHeight(dhyb.getHeight());
+		bt.setWarehouseId(dhyb.getWarehouseId());
+		
+		bt.setTotalMoney(dhyb.getTotalMoney());
+		bt.setDivideMoney(dhyb.getDivideMoney());
+		bt.setSelfgetpackageFlag(dhyb.getSelfgetpackageFlag());
+		bt.setSelfPaytype(dhyb.getSelfPaytype());
+		
+		//li zhang 020916
+		//查询出StoragePosition的
+		
+		String storagPositionId = dhyb.getStoragePosition().getId();
+		if(!"".equals(storagPositionId)){
+			bt.setStoragePosition(dhyb.getStoragePosition());	
+		}
+		
+		
+		if(StringUtil.isEmpty(dhyb.getCommodityCost()))
+		{
+			bt.setCommodityCost("0");
+		}
+		else
+		{
+			bt.setCommodityCost(dhyb.getCommodityCost());
+		}
+		//标记转运州仓库
+	   /*if((dhyb.getTranstateflag()!=null)&&(dhyb.getTranstateflag().equalsIgnoreCase("1")))
+		{
+			bt.setTranWarehouseId(dhyb.getWarehouseId());
+		}*/
+		bt.setTranWarehouseId(dhyb.getTranWarehouseId());
+		
+		
+		bt.setChannelId(dhyb.getChannelId());
+		bt.setAwt(DateUtil.date2String(new Date())); // 修改到库时间
+		bt.setTransitType(dhyb.getTransitType());
+		if ((dhyb.getTransitType().equalsIgnoreCase("1"))||(Double.parseDouble(bt.getState())>Double.parseDouble(Constant.TRANSHIPMENT_STATE1)))// 极速转运，要保存地址信息
+		{
+
+			bt.setcName(dhyb.getcName());
+			bt.setcProvince(dhyb.getcProvince());
+			bt.setcCity(dhyb.getcCity());
+			bt.setcDistrict(dhyb.getcDistrict());
+			bt.setcStreetAddress(dhyb.getcStreetAddress());
+			bt.setcPhone(dhyb.getcPhone());
+			bt.setcZipCode(dhyb.getcZipCode());
+
+			if(!StringUtil.isEmpty(dhyb.getCardid()))
+			{
+				if (!ConsigneeInfoUtil.validateCardId(dhyb.getCardid())) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+							"身份证号码填写错误，请重新填写！");
+				}
+			}
+			bt.setCardid(dhyb.getCardid());
+
+		}
+
+		try {
+			String url = dhyb.getCardurl();
+			if ((url != "") && (url != null))// 进行解码
+			{
+				url = URLDecoder.decode(url, "UTF-8");
+
+			}
+			bt.setCardurl(url);
+			url = dhyb.getCardurlother();
+			if ((url != "") && (url != null))// 进行解码
+			{
+				url = URLDecoder.decode(url, "UTF-8");
+
+			}
+			bt.setCardurlother(url);
+			url = dhyb.getCardurltogether();
+			if ((url != "") && (url != null))// 进行解码
+			{
+				url = URLDecoder.decode(url, "UTF-8");
+
+			}
+			bt.setCardurltogether(url);
+
+			String userId = StringUtil.obj2String(request.getSession()
+					.getAttribute(Constant.USER_ID_SESSION_KEY));
+
+			ResponseObject<Object> obj = this.transhipmentBillService
+					.modifyTranshipment(bt, list, empName);
+			if (obj.getCode().equalsIgnoreCase(ResponseCode.SUCCESS_CODE)) {
+				if (paybool.equalsIgnoreCase("yes")
+						&& (bt.getTransitType().equalsIgnoreCase("1")))// 是极速转运并直接支付,支付之后要修改原来的运单状态
+				{
+					Order order = new Order();
+					String[] ids = new String[1];
+					ids[0] = bt.getId();
+
+					ResponseObject<List<TranshipmentBill>> bill = this.transhipmentBillService
+							.getByIds(userId, Arrays.asList(ids));
+					List<TranshipmentBill> billdata = bill.getData();
+
+					if ((billdata != null) && (billdata.size() == 1)) {
+						TranshipmentBill billnew = billdata.get(0);
+						order.setWarehouseId(billnew.getWarehouseId());
+						order.setUserId(billnew.getUserId());
+						order.setWeight(billnew.getWeight());
+						order.setTariff(billnew.getTariff());
+						order.setOr(billnew.getOr());
+						order.setOther(billnew.getOther());
+						order.setPremium(billnew.getPremium());
+						order.setParceValue(billnew.getParcelValue());
+						order.setcName(billnew.getcName());
+						order.setcProvince(billnew.getcProvince());
+						order.setcCity(billnew.getcCity());
+						order.setcDistrict(billnew.getcDistrict());
+						order.setcStreetAddress(billnew.getcStreetAddress());
+						order.setcZipCode(billnew.getcZipCode());
+						order.setMail(billnew.getMail());
+						// order.
+						// order.setCardid(billnew.getCardid());
+					} else {
+
+					}
+
+				}
+				return obj;
+
+			} else {
+				return obj;
+			}
+
+		} catch (Exception e) {
+			log.error("修改运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改运单失败");
+		}
+	}
+
+	// kai 20150925 添加类型和状态的招搜索
+	@RequestMapping(value = "/admin/transh/searchnew", method = { RequestMethod.GET })
+	@ResponseBody
+	public ResponseObject<PageSplit<TranshipmentBill>> searchnewitemsOfAdmin(
+			HttpServletRequest request,
+			@RequestParam(value = "tid", required = false, defaultValue = "") String tid,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_KEY, required = false, defaultValue = "") String key,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TYPE, required = false, defaultValue = "") String type,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_SDATE, required = false, defaultValue = "") String sdate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_EDATE, required = false, defaultValue = "") String edate,
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_TRAN_TYPE, required = false, defaultValue = "") String trantype,// 转运类型
+			@RequestParam(value = ParameterConstants.COMMON_SEARCH_STATE, required = false, defaultValue = "") String state,// 转运状态
+			@RequestParam(value = "tran_wid", required = false, defaultValue = "") String tran_wid,// 转运仓库
+			@RequestParam(value = "to_wid", required = false, defaultValue = "") String to_wid,// 去往仓库或目的仓库
+			@RequestParam(value = ParameterConstants.COMMON_PAGESPLIT_PAGE_INDEX, required = false, defaultValue = "1") int pageIndex) {
+	
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+			else
+			{
+				if(!StringUtil.isEmpty(to_wid))//不等于空，即表示要搜索相应的仓库，如果不是自己所属仓库，不能搜索
+				{
+					if(!to_wid.equalsIgnoreCase(storeid))
+					{
+						return new ResponseObject<PageSplit<TranshipmentBill>>(ResponseCode.PARAMETER_ERROR,
+								"对不起，你只能搜索自己所属门店。");
+					}
+				}
+			}
+		}
+		
+		
+		
+		if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+			sdate = "";
+		} else {
+			sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+		}
+
+		if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+			edate = "";
+		} else {
+			edate = UserUtil.transformerDateString(edate, " 23:59:59");
+		}
+
+		if ((state == null) || state.equalsIgnoreCase("")) {
+			state = null;
+		}
+		if ((trantype == null) || trantype.equalsIgnoreCase("")) {
+			trantype = null;
+		}
+
+		try {
+			tid = StringUtil.isEmpty(tid) ? null : tid;
+			
+			String column = TranshipmentUtil.getSearchColumnByType(type);
+			pageIndex = Math.max(pageIndex, 1);
+			return this.transhipmentBillService.searchByKeynew(tid, key,
+					column, sdate, edate, defaultPageSize, pageIndex, state,
+					trantype,storeid,tran_wid,to_wid);
+		} catch (Exception e) {
+			log.error("获取用户运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"获取用户运单失败");
+		}
+	}
+
+	/*
+	 * 用于用户在线提交转运单预报时，包含图片的处理方式 //kai 20150925 modify
+	 */
+
+	@RequestMapping(value = "/transh/submit_tran_order_pics", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> submittranorderpicurl(
+			HttpServletRequest request,
+			@RequestParam(value = "expecttype", required = false, defaultValue = "") String trantype,
+			@RequestParam(value = "tcompany", required = false, defaultValue = "") String tcompany,
+			@RequestParam(value = "tno", required = false, defaultValue = "") String tno,
+			@RequestParam(value = "cName", required = false, defaultValue = "") String cName,
+			@RequestParam(value = "province", required = false, defaultValue = "") String province,
+			@RequestParam(value = "city", required = false, defaultValue = "") String city,
+			@RequestParam(value = "dist", required = false, defaultValue = "") String dist,
+			@RequestParam(value = "cStreetAddress", required = false, defaultValue = "") String cStreetAddress,
+			@RequestParam(value = "cPhone", required = false, defaultValue = "") String cPhone,
+			@RequestParam(value = "cZipCode", required = false, defaultValue = "") String cZipCode,
+			@RequestParam(value = "cardidname", required = false, defaultValue = "") String cardidname,
+			@RequestParam(value = "remark", required = false, defaultValue = "") String remark,
+			@RequestParam(value = "idurlcard", required = false, defaultValue = "") String cardurl,// 身份证正面原路径
+			@RequestParam(value = "idurlcardother", required = false, defaultValue = "") String cardurlother,// 身份证反面原路径
+			@RequestParam(value = "idurlcardtogether", required = false, defaultValue = "") String cardurltogether,// 身份证合成原路径
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+		DaoHuoYuBao dhyb = new DaoHuoYuBao();
+		dhyb.setTransitCompany(tcompany);
+		dhyb.setTransitNo(tno);
+		dhyb.setcName(cName);
+		dhyb.setcProvince(province);
+		dhyb.setcCity(city);
+		dhyb.setcDistrict(dist);
+		dhyb.setcStreetAddress(cStreetAddress);
+		dhyb.setcPhone(cPhone);
+		dhyb.setcZipCode(cZipCode);
+		dhyb.setCardid(cardidname);
+		dhyb.setRemark(remark);
+		dhyb.setTransitType(trantype);
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+
+		// 处理提交上来的图片
+
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator = "";
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+		String fileName = null;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+				fileName = null;
+			} else {
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ cardurl);
+				if (file3.exists()) {
+					fileName = cardurl;
+				} else {
+					fileName = null;
+				}
+			}
+		}
+		dhyb.setCardurl(fileName);
+
+		String fileNameother = null;
+		if (fileother != null && fileother.getSize() > 0) {
+			if (fileother.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = fileother.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileNameother = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file2 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother);
+				fileother.transferTo(file2);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurlother == null) || cardurlother.equalsIgnoreCase("")) {
+				fileNameother = null;
+			} else {
+				// fileNameother = cardurlother;
+				File file3 = new File(request.getSession().getServletContext()
+						.getRealPath("/")
+						+ cardurlother);
+				if (file3.exists()) {
+					fileNameother = cardurlother;
+				} else {
+					fileNameother = null;
+				}
+			}
+		}
+		dhyb.setCardurlother(fileNameother);
+
+		// kai 20150921 合成图片
+		String fileNametogether = null;
+		if ((fileName != null) && (fileNameother != null)) {
+			imgcompose img = new imgcompose();
+			String str1 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileName;
+			String str2 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileNameother;
+			String str3 = this.saveCardDir + File.separator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "together"
+					+ "_" + StringUtil.generateRandomInteger(5);
+			String filecardtemp = str3;
+			str3 = request.getSession().getServletContext().getRealPath("/")
+					+ str3;
+			if (img.createcompics(str1, str2, str3)) {
+				filecardtemp = filecardtemp + ".jpg";
+
+				fileNametogether = filecardtemp;
+			}
+		}
+
+		if (fileNametogether == null) {
+			dhyb.setCardurltogether(cardurltogether);
+		} else {
+			dhyb.setCardurltogether(fileNametogether);
+		}
+
+		try {
+			ResponseObject<Object> obj = addTranshipmentOfUser(request, dhyb);
+			if (obj.getCode().equalsIgnoreCase("200")) {
+				ResponseObject<Map<String, String>> result = new ResponseObject<Map<String, String>>(
+						ResponseCode.SUCCESS_CODE);
+				return result;
+			} else {
+				return new ResponseObject<Map<String, String>>(obj.getCode(),
+						obj.getMessage());
+			}
+
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"提交运单失败:" + e.getMessage());
+		}
+
+	}
+
+	@RequestMapping(value = "/admin/transh/modify_have_pics", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Map<String, String>> submitmodifytranorderpicurl(
+			HttpServletRequest request,
+			@RequestParam(value = "id", required = false, defaultValue = "") String id,
+			@RequestParam(value = "t_tran_type", required = false, defaultValue = "") String trantype,
+			@RequestParam(value = "state", required = false, defaultValue = "") String state,// 修改的状态
+			@RequestParam(value = "warehouse", required = false, defaultValue = "") String warehouse,// 仓库id
+			@RequestParam(value = "Towarehouse", required = false, defaultValue = "") String tranwarehouse,// 转运目的仓库id
+			@RequestParam(value = "t_tran_wid_no", required = false, defaultValue = "") String oldtranwarehouse,// old转运目的仓库id		
+			@RequestParam(value = "cid", required = false, defaultValue = "") String cid,// 渠道id
+			@RequestParam(value = "commodityId", required = false, defaultValue = "") String[] commodityId,
+			@RequestParam(value = "commodifysku", required = false, defaultValue = "") String[] commodifysku,
+			@RequestParam(value = "commodifyxiangqing", required = false, defaultValue = "") String[] commodifyxiangqing,
+			@RequestParam(value = "quantity", required = false, defaultValue = "") String[] quantity,
+			@RequestParam(value = "eachsjweight", required = false, defaultValue = "") String[] eachsjweight,
+			@RequestParam(value = "commodify_transitno", required = false, defaultValue = "") String[] comtransitNo,
+			@RequestParam(value = "weight", required = false, defaultValue = "") String weight,
+			@RequestParam(value = "weightKg", required = false, defaultValue = "") String weightKg,
+			@RequestParam(value = "length", required = false, defaultValue = "") String length,
+			@RequestParam(value = "width", required = false, defaultValue = "") String width,
+			@RequestParam(value = "height", required = false, defaultValue = "") String height,
+			@RequestParam(value = "other", required = false, defaultValue = "") String other,
+			@RequestParam(value = "premium", required = false, defaultValue = "") String premium,
+			@RequestParam(value = "or", required = false, defaultValue = "") String or,
+			@RequestParam(value = "tariff", required = false, defaultValue = "") String tariff,
+			@RequestParam(value = "parceValue", required = false, defaultValue = "") String parceValue,
+			@RequestParam(value = "t_totalmoney", required = false, defaultValue = "") String totalMoney,
+			@RequestParam(value = "mail", required = false, defaultValue = "") String mail,
+			@RequestParam(value = "cName", required = false, defaultValue = "") String cName,
+			@RequestParam(value = "cProvince", required = false, defaultValue = "") String cProvince,
+			@RequestParam(value = "cCity", required = false, defaultValue = "") String cCity,
+			@RequestParam(value = "cDistrict", required = false, defaultValue = "") String cDistrict,
+			@RequestParam(value = "cStreetAddress", required = false, defaultValue = "") String cStreetAddress,
+			@RequestParam(value = "cPhone", required = false, defaultValue = "") String cPhone,
+			@RequestParam(value = "cZipCode", required = false, defaultValue = "") String cZipCode,
+			@RequestParam(value = "cardidname", required = false, defaultValue = "") String cardid,
+			@RequestParam(value = "remark", required = false, defaultValue = "") String remark,
+			@RequestParam(value = "idurlcard", required = false, defaultValue = "") String cardurl,// 身份证正面原路径
+			@RequestParam(value = "idurlcardother", required = false, defaultValue = "") String cardurlother,// 身份证反面原路径
+			@RequestParam(value = "idurlcardtogether", required = false, defaultValue = "") String cardurltogether,// 身份证合成原路径
+			@RequestParam(value = "t_divide_money", required = false, defaultValue = "") String divideMoney,// 分合箱手续费	
+			@RequestParam(value = "self_paytype", required = false, defaultValue = "") String selfPaytype,
+			@RequestParam(value = "t_CommodityCost", required = false, defaultValue = "") String commodityCost,
+			@RequestParam(value = "t_selfgetpackageFlag", required = false, defaultValue = "") String selfgetpackageFlag,
+			@RequestParam(value = "storagePositionId", required = false, defaultValue = "") String storagePositionId,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother) {
+
+		// public ResponseObject<Object> modifyOfAdmin(HttpServletRequest
+		// request, DaoHuoYuBao dhyb) {
+		
+		
+		if((Constant.TRANSHIPMENT_STATE_7.equalsIgnoreCase(state))||(Constant.TRANSHIPMENT_STATE_6.equalsIgnoreCase(state)))
+		{
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "对不起，此状态下不能提交图片等信息!!");
+		}
+
+		String storeid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+		{
+			storeid=null;//表示可以查找所有门店
+			
+		}else
+		{
+			storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+			if((storeid==null)||(storeid.equalsIgnoreCase("")))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"你没有登陆!");
+			}
+		}
+		
+		if(storeid!=null)
+		{
+			if(!storeid.equalsIgnoreCase(warehouse))
+			{
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR, "对不起，你只能把转动单归属于你的门店或仓库!");
+			}
+			if(!storeid.equalsIgnoreCase(warehouse))
+			{
+				if(storeid.equalsIgnoreCase(oldtranwarehouse)&&(Constant.TRANSHIPMENT_STATE_6.equalsIgnoreCase(state)))//修改为转运出库
+				{}
+				else
+				{
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR, "对不起，你只能把转动单归属于你的门店或仓库!");
+				}
+			}
+		}
+		
+		DaoHuoYuBao dhyb = new DaoHuoYuBao();
+		dhyb.setOr(or);
+		dhyb.setId(id);
+		dhyb.setTransitType(trantype);
+		dhyb.setState(state);
+		dhyb.setDivideMoney(divideMoney);
+		
+		if((!StringUtil.isEmpty(dhyb.getState()))&&(dhyb.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6)))
+		{
+			dhyb.setWarehouseId(tranwarehouse);
+			dhyb.setTranWarehouseId(warehouse);
+		}
+		else
+		{
+			dhyb.setWarehouseId(warehouse);
+			dhyb.setTranWarehouseId(oldtranwarehouse);
+			
+		}
+		dhyb.setWarehouseId(warehouse);
+		dhyb.setChannelId(cid);
+		dhyb.setWeight(weightKg);
+		dhyb.setWeightKg(weightKg);
+		dhyb.setLength(length);
+		dhyb.setWidth(width);
+		dhyb.setHeight(height);
+		dhyb.setOther(other);
+		dhyb.setPremium(premium);
+		dhyb.setTariff(tariff);
+		dhyb.setParcelValue(parceValue);
+		dhyb.setMail(mail);
+		dhyb.setSelfPaytype(selfPaytype);
+		dhyb.setSelfgetpackageFlag(selfgetpackageFlag);
+		
+		dhyb.setCommodityCost(commodityCost);
+		//storagePosition
+		StoragePosition storagePosition=new StoragePosition();
+		storagePosition.setId(storagePositionId);
+		dhyb.setStoragePosition(storagePosition);
+		
+		
+		if((!StringUtil.isEmpty(dhyb.getState()))&&((dhyb.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6))||(dhyb.getState().equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_7))))
+		{
+			if(StringUtil.isEmpty(totalMoney))
+			{
+				totalMoney="0";
+			}
+		}
+		dhyb.setTotalMoney(totalMoney);
+		
+		
+		if((Constant.TRANSHIPMENT_STATE_7.equalsIgnoreCase(state))||(Constant.TRANSHIPMENT_STATE_6.equalsIgnoreCase(state)))
+		{
+			dhyb.setPretranwarehouseId(tranwarehouse);
+		}
+
+		String userId = StringUtil.obj2String(request.getSession()
+				.getAttribute(Constant.USER_ID_SESSION_KEY));
+		if ((trantype.equalsIgnoreCase("1"))||(Double.parseDouble(state)>Double.parseDouble(Constant.TRANSHIPMENT_STATE1)))// 极速转运
+		{
+			dhyb.setcName(cName);
+			dhyb.setcProvince(cProvince);
+			dhyb.setcCity(cCity);
+			dhyb.setcDistrict(cDistrict);
+			dhyb.setcStreetAddress(cStreetAddress);
+			dhyb.setcPhone(cPhone);
+			dhyb.setcZipCode(cZipCode);
+			dhyb.setCardid(cardid);
+			// 处理提交上来的图片
+
+			// 解决火狐的反斜杠问题 kai 20151006
+			String filetype = this.defaultCardFileType;// 要上传的文件类型
+			String strtest = this.saveCardDir;
+			String strseparator = "";
+			if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+			{
+				strseparator = "/";
+			} else {
+				strseparator = File.separator;
+			}
+
+			String fileName = null;
+			if (file != null && file.getSize() > 0) {
+				if (file.getSize() > this.defaultCardFileSize) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+				}
+
+				String originalName = file.getOriginalFilename();
+
+				if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR,
+							"上传图像文件格式不对,请重新尝试!");
+				}
+
+				int index = originalName.lastIndexOf('.');
+				index = Math.max(index, 0);
+				fileName = this.saveCardDir + strseparator + userId + "_"
+						+ StringUtil.generateRandomString(5) + "_"
+						+ StringUtil.generateRandomInteger(5)
+						+ originalName.substring(index);
+				try {
+					File file1 = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ fileName);
+					file.transferTo(file1);
+				} catch (Exception e) {
+					log.error("保存用户图像失败,请不要上传图像！", e);
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR,
+							"保存用户图像失败，请去除上传图像后再尝试!");
+				}
+			} else {
+				if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+					fileName = null;
+				} else {
+					File file3 = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ cardurl);
+					if (file3.exists()) {
+						fileName = cardurl;
+					} else {
+						fileName = null;
+					}
+				}
+			}
+			dhyb.setCardurl(fileName);
+
+			String fileNameother = null;
+			if (fileother != null && fileother.getSize() > 0) {
+				if (fileother.getSize() > this.defaultCardFileSize) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+				}
+
+				String originalName = fileother.getOriginalFilename();
+
+				if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR,
+							"上传图像文件格式不对,请重新尝试!");
+				}
+
+				int index = originalName.lastIndexOf('.');
+				index = Math.max(index, 0);
+				fileNameother = this.saveCardDir + strseparator + userId + "_"
+						+ StringUtil.generateRandomString(5) + "_"
+						+ StringUtil.generateRandomInteger(5)
+						+ originalName.substring(index);
+				try {
+					File file2 = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ fileNameother);
+					fileother.transferTo(file2);
+				} catch (Exception e) {
+					log.error("保存用户图像失败,请不要上传图像！", e);
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR,
+							"保存用户图像失败，请去除上传图像后再尝试!");
+				}
+			} else {
+				if ((cardurlother == null) || cardurlother.equalsIgnoreCase("")) {
+					fileNameother = null;
+				} else {
+					// fileNameother = cardurlother;
+					File file3 = new File(request.getSession()
+							.getServletContext().getRealPath("/")
+							+ cardurlother);
+					if (file3.exists()) {
+						fileNameother = cardurlother;
+					} else {
+						fileNameother = null;
+					}
+				}
+			}
+			dhyb.setCardurlother(fileNameother);
+
+			// kai 20150921 合成图片
+			String fileNametogether = null;
+			if ((fileName != null) && (fileNameother != null)) {
+				imgcompose img = new imgcompose();
+				String str1 = request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileName;
+				String str2 = request.getSession().getServletContext()
+						.getRealPath("/")
+						+ fileNameother;
+				String str3 = this.saveCardDir + File.separator + userId + "_"
+						+ StringUtil.generateRandomString(5) + "_" + "together"
+						+ "_" + StringUtil.generateRandomInteger(5);
+				String filecardtemp = str3;
+				str3 = request.getSession().getServletContext()
+						.getRealPath("/")
+						+ str3;
+				if (img.createcompics(str1, str2, str3)) {
+					filecardtemp = filecardtemp + ".jpg";
+
+					fileNametogether = filecardtemp;
+				}
+			}
+
+			if (fileNametogether == null) {
+				dhyb.setCardurltogether(cardurltogether);
+			} else {
+				dhyb.setCardurltogether(fileNametogether);
+			}
+
+		}
+
+		dhyb.setRemark(remark);
+
+		try {
+
+			if (commodityId.length > 0) {
+				TranshipmentCommodity[] commodity;
+				commodity = new TranshipmentCommodity[commodityId.length];
+				for (int i = 0; i < commodityId.length; i++) {
+					commodity[i] = new TranshipmentCommodity();
+					commodity[i].setCommodityId(commodityId[i]);
+					commodity[i].setCommoditySku(commodifysku[i]);
+					commodity[i].setXiangqing(commodifyxiangqing[i]);
+					commodity[i].setQuantity(quantity[i]);
+					commodity[i].setEachjfweight(eachsjweight[i]);
+					commodity[i].setTransitNo(comtransitNo[i]);
+					float sjweight = 0;
+					float num = Float.parseFloat(quantity[i]);
+					float each = Float.parseFloat(eachsjweight[i]);
+					sjweight = num * each;
+					String str = Float.toString(sjweight);
+					commodity[i].setSjweight(str);
+				}
+				dhyb.setCommodity(commodity);
+			}
+
+			ResponseObject<Object> obj = modifyOfAdmin(request, dhyb, "");// 直接调用订单修改接口处理
+			if (obj.getCode().equalsIgnoreCase("200")) {
+				ResponseObject<Map<String, String>> result = new ResponseObject<Map<String, String>>(
+						ResponseCode.SUCCESS_CODE);
+				return result;
+			} else {
+				return new ResponseObject<Map<String, String>>(obj.getCode(),
+						obj.getMessage());
+			}
+
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			// return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+			// "提交运单失败:"+e.getMessage());
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"提交运单失败:" + e.getMessage());
+		}
+
+	}
+	
+	@RequestMapping(value = "/user/transhipment/createPreOrder", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> createPreOrder(HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.TRANSH_ID) String id,
+			WayBill wayBill){//use wayBill just because easier to move original code(no need to change js)
+		if (wayBill == null || wayBill.getOrders() == null || wayBill.getOrders().isEmpty() || wayBill.getCommodityIdList().length == 0 || wayBill.getConsigneeInfo() == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		if (!ConsigneeInfoUtil.validateCardId(wayBill.getConsigneeInfo().getCardId())) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR, "身份证号码填写错误，请重新填写！");
+		}
+
+		try {
+			String url = wayBill.getConsigneeInfo().getCardUrl();
+			if (url != "" && (url != null)){
+				String str = URLDecoder.decode(url, "UTF-8");
+				wayBill.getConsigneeInfo().setCardUrl(str);
+			}
+			url = wayBill.getConsigneeInfo().getCardurlother();
+			if (url != "" && (url != null)){
+				String str = URLDecoder.decode(url, "UTF-8");
+				wayBill.getConsigneeInfo().setCardurlother(str);
+			}
+			url = wayBill.getConsigneeInfo().getCardurltogether();
+			if (url != "" && (url != null)){
+				String str = URLDecoder.decode(url, "UTF-8");
+				wayBill.getConsigneeInfo().setCardurltogether(str);
+			}
+
+			String userId = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY));
+			String userName = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_NICK_NAME_SESSION_KEY));
+			String userType = StringUtil.obj2String(request.getSession().getAttribute(Constant.USER_TYPE_SESSION_KEY));
+			wayBill.setUserId(userId);
+			wayBill.setName(userName);
+			wayBill.setUserType(userType);
+			wayBill.setOrderType(Constant.ORDER_TYPE_WEB);
+			
+			return transhipmentBillService.createPreOrder(id, wayBill);
+		} catch (Exception e) {
+			log.error("提交运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交运单失败");
+		}
+	}
+	@RequestMapping(value = "/admin/transhipment/auditPreOrder", method=RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> auditTranshipmentPreOrder(HttpServletRequest request, TranshipmentBill transhipmentBill){
+		if(Constant.TRANSHIPMENT_STATE_PRE_ORDER.equals(transhipmentBill.getState())){
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "请修改审核状态");
+		}else if(Constant.TRANSHIPMENT_STATE_PRE_ORDER_FAIL.equals(transhipmentBill.getState()) && StringUtil.isEmpty(transhipmentBill.getRemark())){
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "请提示用户失败原因");
+		}
+		String empId = (String) request.getSession().getAttribute(Constant.EMP_ID_SESSION_KEY);
+		transhipmentBill.setEmpId(empId);
+		try{
+			return transhipmentBillService.auditPreOrder(transhipmentBill);
+		}catch(Exception e){
+			log.error("审核运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "审核运单失败");
+		}
+	}
+	@RequestMapping(value = "/admin/transhipment/addTranshipment", method=RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> addTranshipmentByAdmin(HttpServletRequest request, TranshipmentBill transhipmentBill){
+		HttpSession session = request.getSession();
+		transhipmentBill.setWarehouseId((String) session.getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		transhipmentBill.setEmpId((String) session.getAttribute(Constant.EMP_ID_SESSION_KEY));
+		try{
+			return this.transhipmentBillService.addByAdmin(transhipmentBill);
+		}catch(Exception e){
+			log.error("添加运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "添加运单失败");
+		}
+	}
+	@RequestMapping(value = "/admin/transhipment/addByProductRecord", method=RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> addByProductRecord(HttpServletRequest request, TranshipmentBill transhipmentBill, ProductRecord productRecord){
+		HttpSession session = request.getSession();
+		transhipmentBill.setWarehouseId((String) session.getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		transhipmentBill.setEmpId((String) session.getAttribute(Constant.EMP_ID_SESSION_KEY));
+		transhipmentBill.setState(null);
+		productRecord.setId(productRecord.getRate());//先用这个来存储要传递的id吧
+		try{
+			return this.transhipmentBillService.addByProductRecord(transhipmentBill, productRecord);
+		}catch(ServiceException e){
+			log.error("根据商品添加运单失败", e);
+			String message = e.getLocalizedMessage().replace("com.weiye.exception.ServiceException:", "");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, message);
+		}catch(Exception e){
+			log.error("根据商品添加运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据商品添加运单失败");
+		}
+	}
+	@RequestMapping(value = "/admin/transhipmentBill/takeBySelf", method=RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<Object> addTranshipmentByAdmin(HttpServletRequest request, 
+		@RequestParam(value = ParameterConstants.TRANSH_ID, required = false) String id){
+		HttpSession session = request.getSession();
+		String warehouseId = (String) session.getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+		String empId = (String) session.getAttribute(Constant.EMP_ID_SESSION_KEY);
+		try{
+			return this.transhipmentBillService.takeBySelf(id, warehouseId);
+		}catch(Exception e){
+			log.error("提交自提转运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "提交自提转运单失败");
+		}
+	}
+	
+	//入库后，用户组合提交，修改运单
+	@RequestMapping(value = "/user/transh/mux_modify", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> modifyOfUser(
+			HttpServletRequest request,
+			DaoHuoYuBao dhyb,
+			@RequestParam(value = "commodityIdList", required = false, defaultValue = "") String[] commodityIdList) {
+		if (dhyb == null) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+
+		if(!StringUtil.isEmpty(dhyb.getCardid()))
+		{
+			if (!ConsigneeInfoUtil.validateCardId(dhyb.getCardid())) {
+				return generateResponseObject(ResponseCode.CONSIGNEE_CARD_ID_ERROR,
+						"身份证号码填写错误，请重新填写！");
+			}
+		}
+		
+		if (!ConsigneeInfoUtil.validateStreetAddress(dhyb.getcStreetAddress())) {
+			return generateResponseObject(
+					ResponseCode.CONSIGNEE_STREET_ADDRESS_ERROR,
+					"街道地址填写不正确，请重新输入！");
+		}
+
+		
+
+		if (!ConsigneeInfoUtil.validatePhone(dhyb.getcPhone())) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_PHONE_ERROR,
+					"手机号码填写不正确，请重新输入！");
+		}
+		
+		if (!ConsigneeInfoUtil.validateConsigneeName(dhyb.getcName())) {
+			return generateResponseObject(ResponseCode.CONSIGNEE_NAME_ERROR,
+					"收货人姓名不正确，请重新输入!");
+		}
+
+		
+		
+			String userId = (String)request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY);
+			if(StringUtil.isEmpty(userId))
+			{
+				return generateResponseObject(ResponseCode.NEED_LOGIN,
+						"请先登陆!");
+			}
+			else
+			{
+				
+			}
+		
+			TranshipmentBill bt = new TranshipmentBill();
+			bt.setUserId(userId);
+			bt.setAuthorizeMoveMoney(dhyb.getAuthorizeMoveMoney());
+			bt.setWarehouseId(dhyb.getWarehouseId());
+			bt.setChannelId(dhyb.getChannelId());
+			bt.setcName(dhyb.getcName());
+			bt.setcProvince(dhyb.getcProvince());
+			bt.setcCity(dhyb.getcDistrict());
+			bt.setcStreetAddress(dhyb.getcStreetAddress());
+			bt.setcPhone(dhyb.getcPhone());
+			bt.setcZipCode(dhyb.getcZipCode());
+			bt.setCardid(dhyb.getCardid());
+			bt.setParcelValue(dhyb.getParcelValue());
+			bt.setPremium(dhyb.getPremium());
+			bt.setRemark(dhyb.getRemark());
+			bt.setCardurlother(dhyb.getCardurlother());
+			bt.setCardurl(dhyb.getCardurl());
+			bt.setCardurltogether(dhyb.getCardurltogether());
+			
+			if(StringUtil.isEmpty(dhyb.getCommodityCost()))
+			{
+				bt.setCommodityCost("0");
+			}
+			else
+			{
+				bt.setCommodityCost(dhyb.getCommodityCost());
+			}
+			
+			bt.setOr(dhyb.getOr());
+		try{
+			
+			//li zhang 02/12/2016
+			//-1代表本地库没有关联
+			ResponseObject<StoragePosition> resStorageByUser = this.storagePositionService.findStoragePositionByWarehoseIdTypeRelateUser(dhyb.getWarehouseId(), Constant.STORAGE_TYPE_AFTER_OPEN, "-1", userId);
+			
+			if(null == resStorageByUser.getData()){
+					resStorageByUser = this.storagePositionService.findNextEmptyStoragePositionByWarehoseIdTypeRelate(dhyb.getWarehouseId(), Constant.STORAGE_TYPE_AFTER_OPEN, "-1");
+			}
+			if(ResponseCode.STORAGE_POSITION_OF_EMPTY_IN_STORAGE_NOT_EXISTS != resStorageByUser.getCode()){
+				StoragePosition storagePosition =  resStorageByUser.getData();
+				bt.setStoragePosition(storagePosition);
+			}
+			
+			ResponseObject<Object> responseObj=this.transhipmentBillService.check_mux_Submit(bt, commodityIdList);
+			if (responseObj != null
+					&& ResponseCode.SUCCESS_CODE.equals(responseObj.getCode())) {
+				// 数据正确, 进行运单/订单添加到数据中
+
+				// responseObj = this.orderService.addOrdersOfWayBill(wayBill);
+				responseObj = this.transhipmentBillService.muxboxSubmit(bt, commodityIdList);
+				
+				//li zhang 02152016 把生成的单号和储藏间关联
+				if(null != bt.getStoragePosition().getId()){
+					StoragePositionRecord storagePositionRecord = new StoragePositionRecord(bt.getStoragePosition().getId(), responseObj.getData().toString());
+					this.storagePositionRecordService.insertByRelate(storagePositionRecord);
+				}
+			}
+			
+
+			responseObj.setCode(responseObj.getCode());
+			responseObj.setMessage(responseObj.getMessage());
+			List<String> obj = new ArrayList<String>();
+
+			return responseObj;
+
+		
+
+		} catch (Exception e) {
+			log.error("修改运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "修改运单失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/user/transh/mux_modify_havepic", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> muxsubmittranorderpicurl(
+			HttpServletRequest request,
+			@RequestParam(value = "s_warehouseid", required = false, defaultValue = "") String wid,
+			@RequestParam(value = "s_channelid", required = false, defaultValue = "") String cid,
+			@RequestParam(value = "name", required = false, defaultValue = "") String cName,
+			@RequestParam(value = "province", required = false, defaultValue = "") String province,
+			@RequestParam(value = "city", required = false, defaultValue = "") String city,
+			@RequestParam(value = "dist", required = false, defaultValue = "") String dist,
+			@RequestParam(value = "sadd", required = false, defaultValue = "") String cStreetAddress,
+			@RequestParam(value = "phone", required = false, defaultValue = "") String cPhone,
+			@RequestParam(value = "zcode", required = false, defaultValue = "") String cZipCode,
+			@RequestParam(value = "cid", required = false, defaultValue = "") String cardidname,			
+			@RequestParam(value = "parceValue", required = false, defaultValue = "") String parceValue,
+			@RequestParam(value = "premium", required = false, defaultValue = "") String premium,
+			@RequestParam(value = "moneyor", required = false, defaultValue = "") String or,
+			@RequestParam(value = "totalmoney", required = false, defaultValue = "") String totalmoney,
+			@RequestParam(value = "au_protocol_use_money", required = false, defaultValue = "") String auusemoney,		
+			@RequestParam(value = "remark", required = false, defaultValue = "") String remark,
+			@RequestParam(value = "t_CommodityCost", required = false, defaultValue = "") String commodityCost,
+			@RequestParam(value = "idurlcard", required = false, defaultValue = "") String cardurl,// 身份证正面原路径
+			@RequestParam(value = "idurlcardother", required = false, defaultValue = "") String cardurlother,// 身份证反面原路径
+			@RequestParam(value = "idurlcardtogether", required = false, defaultValue = "") String cardurltogether,// 身份证合成原路径
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILE, required = false) MultipartFile file,
+			@RequestParam(value = ParameterConstants.CONSIGNEE_CARD_FILEOTHER, required = false) MultipartFile fileother,
+			@RequestParam(value = "s_commidty_list", required = false, defaultValue = "") String[] commodityIdList) {
+		String trantype="0";//组合之后的类型固定为普通类型
+		DaoHuoYuBao dhyb = new DaoHuoYuBao();
+		dhyb.setcName(cName);
+		dhyb.setcProvince(province);
+		dhyb.setcCity(city);
+		dhyb.setcDistrict(dist);
+		dhyb.setcStreetAddress(cStreetAddress);
+		dhyb.setcPhone(cPhone);
+		dhyb.setcZipCode(cZipCode);
+		dhyb.setCardid(cardidname);
+		dhyb.setParcelValue(parceValue);
+		dhyb.setPremium(premium);
+		dhyb.setOr(or);
+		dhyb.setTotalMoney(totalmoney);
+		dhyb.setRemark(remark);
+		dhyb.setTransitType(trantype);
+		dhyb.setWarehouseId(wid);
+		dhyb.setChannelId(cid);
+		dhyb.setCardid(cardidname);
+		dhyb.setAuthorizeMoveMoney(auusemoney);
+		dhyb.setCommodityCost(commodityCost);
+		
+		String userId = (String)request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY);
+		if(StringUtil.isEmpty(userId))
+		{
+			return generateResponseObject(ResponseCode.NEED_LOGIN,
+					"请先登陆!");
+		}
+		else
+		{
+			
+		}
+		// 解决火狐的反斜杠问题 kai 20151006
+		String filetype = this.defaultCardFileType;// 要上传的文件类型
+		String strtest = this.saveCardDir;
+		String strseparator = "";
+		if (strtest.indexOf("/") >= 0)// 包含有“/”字符，分隔符用此字符
+		{
+			strseparator = "/";
+		} else {
+			strseparator = File.separator;
+		}
+
+		String fileName = null;
+		if (file != null && file.getSize() > 0) {
+			if (file.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = file.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileName = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file1 = new File(request.getSession()
+						.getServletContext().getRealPath("/")
+						+ fileName);
+				file.transferTo(file1);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurl == null) || cardurl.equalsIgnoreCase("")) {
+				fileName = null;
+			} else {
+				File file3 = new File(request.getSession()
+						.getServletContext().getRealPath("/")
+						+ cardurl);
+				if (file3.exists()) {
+					fileName = cardurl;
+				} else {
+					fileName = null;
+				}
+			}
+		}
+		dhyb.setCardurl(fileName);
+
+		String fileNameother = null;
+		if (fileother != null && fileother.getSize() > 0) {
+			if (fileother.getSize() > this.defaultCardFileSize) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR, "图像文件过大,请重新尝试!");
+			}
+
+			String originalName = fileother.getOriginalFilename();
+
+			if (!StringUtil.boolpicisgoodornot(originalName, filetype)) {
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"上传图像文件格式不对,请重新尝试!");
+			}
+
+			int index = originalName.lastIndexOf('.');
+			index = Math.max(index, 0);
+			fileNameother = this.saveCardDir + strseparator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_"
+					+ StringUtil.generateRandomInteger(5)
+					+ originalName.substring(index);
+			try {
+				File file2 = new File(request.getSession()
+						.getServletContext().getRealPath("/")
+						+ fileNameother);
+				fileother.transferTo(file2);
+			} catch (Exception e) {
+				log.error("保存用户图像失败,请不要上传图像！", e);
+				return generateResponseObject(
+						ResponseCode.CONSIGNEE_CARD_ERROR,
+						"保存用户图像失败，请去除上传图像后再尝试!");
+			}
+		} else {
+			if ((cardurlother == null) || cardurlother.equalsIgnoreCase("")) {
+				fileNameother = null;
+			} else {
+				// fileNameother = cardurlother;
+				File file3 = new File(request.getSession()
+						.getServletContext().getRealPath("/")
+						+ cardurlother);
+				if (file3.exists()) {
+					fileNameother = cardurlother;
+				} else {
+					fileNameother = null;
+				}
+			}
+		}
+		dhyb.setCardurlother(fileNameother);
+
+		// kai 20150921 合成图片
+		String fileNametogether = null;
+		if ((fileName != null) && (fileNameother != null)) {
+			imgcompose img = new imgcompose();
+			String str1 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileName;
+			String str2 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ fileNameother;
+			String str3 = this.saveCardDir + File.separator + userId + "_"
+					+ StringUtil.generateRandomString(5) + "_" + "together"
+					+ "_" + StringUtil.generateRandomInteger(5);
+			String filecardtemp = str3;
+			str3 = request.getSession().getServletContext()
+					.getRealPath("/")
+					+ str3;
+			if (img.createcompics(str1, str2, str3)) {
+				filecardtemp = filecardtemp + ".jpg";
+
+				fileNametogether = filecardtemp;
+			}
+		}
+
+		if (fileNametogether == null) {
+			dhyb.setCardurltogether(cardurltogether);
+		} else {
+			dhyb.setCardurltogether(fileNametogether);
+		}
+
+				
+
+		
+		try{
+			return this.modifyOfUser(request, dhyb, commodityIdList);//直接转到
+			
+			} catch (Exception e) {
+				log.error("删除运单失败", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "删除运单失败");
+			}
+
+	}
+	
+	
+	
+	
+	@RequestMapping(value = "/user/transh/paymoney", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> paymoneybyuser(
+			HttpServletRequest request,
+			@RequestParam(value = ParameterConstants.TRANSH_ID) String id) {
+		if (StringUtil.isEmpty(id)) {
+			return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+					"参数无效");
+		}
+		String userId = (String)request.getSession().getAttribute(Constant.USER_ID_SESSION_KEY);
+		if(StringUtil.isEmpty(userId))
+		{
+			return generateResponseObject(ResponseCode.NEED_LOGIN,
+					"请先登陆!");
+		}
+		
+		try {
+			ResponseObject<TranshipmentBill> obj=this.transhipmentBillService.getById(id);
+			if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))
+			{
+				if(obj.getData()==null)
+				{
+					return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+							"获取转运单信息出错!");
+				}
+				else
+				{
+					if(!Constant.TRANSHIPMENT_STATE3.equalsIgnoreCase(obj.getData().getState()))
+					{
+						return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+								"对不起，当前状态不能提交!");
+					}
+				}
+			}
+			else
+			{
+				return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+						"获取转运单信息出错!");
+			}
+			
+			
+			
+			
+			
+			
+			return this.transhipmentBillService.trantToOrder(id);
+		} catch (Exception e) {
+			log.error("删除运单失败", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "支付运单失败");
+		}
+	}
+	
+	
+	@RequestMapping(value = "/admin/tran/import_order_state", method = { RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> importOrderDataFromWeiyiStateExcel(
+			HttpServletResponse response,
+			@RequestParam(value = "import_tran_state_ex", required = false) String state,//导入状态
+			@RequestParam(value = "import_self_wid_ex", required = false) String inwid,//导入仓库import_to_wid_ex
+			@RequestParam(value = "import_to_wid_ex", required = false) String Towid,//导入仓库
+			HttpServletRequest request, MultipartFile file) {
+		
+		if(StringUtil.isEmpty(inwid))
+		{
+			return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+					"参数无效");
+		}
+		if(StringUtil.isEmpty(state))
+		{
+			return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+					"参数出错，状态不能为空!");
+		}
+		
+		if((state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE5))||(state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE3))||(state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_5))||(state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6))||(state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_7)))
+		{
+			
+		}
+		else
+		{
+			return generateResponseObject(ResponseCode.TRANSHIPMENT_ID_ERROR,
+					"此状态不能批量更新状态!");
+		}
+		String wid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			//return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权批量上传修改状态!");
+			
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(
+					Constant.EMP_STORE_ID_SESSION_KEY));
+			if((!StringUtil.isEmpty(empId))&&(empId.equalsIgnoreCase(inwid)))
+			{
+				wid=empId;
+			}
+			else
+			{
+				return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作或没登陆!");
+			}
+			
+			
+			
+		}
+		OutputStream os=null;
+		if (file != null && file.getSize() > 0) {
+			List<ExportTranshipmentBill> bills = null;
+			try {
+				
+				//kai 20151006 判定是不是excel表格
+				String originalName = file.getOriginalFilename();
+				if (!StringUtil.boolpicisgoodornot(originalName, defaultExcelFileType)) {
+					return generateResponseObject(
+							ResponseCode.CONSIGNEE_CARD_ERROR, "必须上传excel 2003表格,请重新尝试!");
+				}
+				
+				bills=TranshipmentUtil.readTranStateExcel_update_state(file
+						.getInputStream());
+				
+				if((bills==null)||(bills.size()<1))
+				{
+					return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+							"读取数据为空，请检查!");
+				}
+				
+			
+			} catch (OutOfMemoryError e) {
+				log.error("内存不够", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"内存不够");
+			} catch (Exception e) {
+				log.error("读取数据出错", e);
+				return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"读取数据出错");
+			}
+			if (!bills.isEmpty()) {
+				try {
+					// 导入员工名称,转动状态
+					if(state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_7))
+					{
+						for(ExportTranshipmentBill bill: bills)
+						{
+							bill.setWarehouseId(inwid);
+							bill.setTranWarehouseId(Towid);
+							bill.setPretranwarehouseId(Towid);
+							bill.setState(state);
+						}
+					}
+					// 转运出库要把仓库id倒过来
+					else if(state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_6))
+					{
+						for(ExportTranshipmentBill bill: bills)
+						{
+							bill.setWarehouseId(Towid);
+							bill.setTranWarehouseId(inwid);
+							bill.setPretranwarehouseId(Towid);
+							bill.setState(state);
+						}
+					}
+					// 待检入库，之后的状态只会更新状态
+					else if(state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE_5)||state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE3)||state.equalsIgnoreCase(Constant.TRANSHIPMENT_STATE5))
+					{
+						for(ExportTranshipmentBill bill: bills)
+						{
+							bill.setWarehouseId(inwid);
+							bill.setState(state);
+						}
+					}
+					else
+					{
+						return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+								"状态"+TranshipmentUtil.transformerState(0, state)+"不能批量修改!");
+					}
+					
+					String empName = StringUtil.obj2String(request.getSession()
+							.getAttribute(Constant.EMP_ACCOUNT_SESSION_KEY));
+					ResponseObject<Object> objdata= this.transhipmentBillService.importExcelOfOrderState(
+							bills, empName,wid);
+					
+					
+
+					if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(objdata.getCode()))
+					{
+						
+						String fileName = "tran_orders_tran_" + bills.size() + ".xls";
+						// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+						response.setContentType("application/vnd.ms-excel");
+						response.setHeader("Content-disposition",
+								"attachment;filename="
+										+ new String(fileName.getBytes(), "iso-8859-1"));
+						// orders = this.orderService.getExportOrders(sdate, edate);
+						
+						/*File templeFile = new File(request.getSession()
+								.getServletContext().getRealPath("/")
+								+ this.orderOutputToWeiyiWrongthirdTempletsFile);*/
+						File templeFile= new File(request.getSession()
+								.getServletContext().getRealPath("/")
+								+ this.tranorderoutputtostateresulttemplets);
+						
+						
+						 os = response.getOutputStream();
+	
+						List<ExportTranshipmentBill> list=(List<ExportTranshipmentBill>)objdata.getData();
+						if((list!=null)&&(list.size()>0))
+						{
+							TranshipmentUtil.export_tranorder_state_result(list, templeFile, os);
+						}
+						else
+						{
+							return generateResponseObject(ResponseCode.PARAMETER_ERROR, "返回修改状态结果出错!");
+						}
+					}
+					else
+					{
+						return objdata;
+					}
+				
+					
+					
+					
+					//ResponseObject<Object> obj= this.orderService.importExcelOfOrderState(
+					//		importOrders, empName,wid);
+					
+				
+				} catch (Exception e) {
+					log.error("修改数据库失败", e);
+					return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+							"修改数据库失败,原因" + e.getMessage());
+				}
+				finally {
+				if (os != null) {
+					try {
+						os.close();
+					} catch (IOException e) {
+						// ignore
+					}
+				}
+			}
+
+				
+				
+				
+				
+			} else {
+				return generateResponseObject(ResponseCode.PARAMETER_ERROR,
+						"文件内容不能为空,请检查是否有空行或转运号为空!");
+			}
+		}
+		return generateResponseObject(ResponseCode.PARAMETER_ERROR, "文件不能为空");
+	}
+	
+	// 下载转运单批量修改状态模板
+	@RequestMapping(value = "/admin/tran/download_excelstate", method = { RequestMethod.GET })
+	public void getImporttranOrdersStateDataExcelFile(
+			HttpServletRequest request, HttpServletResponse response) {
+		InputStream input = null;
+		ServletOutputStream os=null;
+		try {
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-disposition", "attachment;filename="
+					+ new String("upload_tran_orders_state_templet.xls".getBytes(),
+							"iso-8859-1"));
+			input = request
+					.getSession()
+					.getServletContext()
+					.getResourceAsStream(
+							this.tranorderimporttranorderssstateTempletsFile);
+			os = response.getOutputStream();
+			byte[] buffer = new byte[1024];
+			int n = 0;
+			while ((n = input.read(buffer)) > 0) {
+				os.write(buffer, 0, n);
+			}
+			os.flush();
+		} catch (Exception e) {
+			log.error("下载文件失败", e);
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
+	}
+	//包裹异常时的修改
+	@RequestMapping(value = "/admin/transh/wrongsave", method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<Object> addTranshipmentwrongsave(
+			HttpServletRequest request,
+			@RequestParam(value = "id") String id,
+			@RequestParam(value = "message") String message) {
+		
+		String wid=null;
+		String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+		
+		if((supperadmin==null)||(!supperadmin.equalsIgnoreCase("1")))
+		{
+			//return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权批量上传修改状态!");
+			
+			String empId = StringUtil.obj2String(request.getSession().getAttribute(
+					Constant.EMP_STORE_ID_SESSION_KEY));
+			if((!StringUtil.isEmpty(empId)))
+			{
+				wid=empId;
+			}
+			else
+			{
+				return generateResponseObject(ResponseCode.EMPLOYEE_STORE_NAME_ERROR, "对不起，你无权进行此操作或没登陆!");
+			}
+			
+			
+			
+		}
+		
+		if (StringUtil.isEmpty(id)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		if (StringUtil.isEmpty(message)) {
+			return generateResponseObject(ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			return this.transhipmentBillService.savewrongmessage(id,message,wid);
+		} catch (Exception e) {
+			log.error("根据运单id获取转运单出现异常", e);
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+					"根据运单id获取转运单出现异常");
+		}
+	}
+
+	
+
+	
+	// kai 20160108 转运单下载
+		@RequestMapping(value = "/admin/transh/downlist", method = { RequestMethod.GET,RequestMethod.POST })
+		@ResponseBody
+		public void downlisttemsOfAdmin(
+				HttpServletRequest request,
+				HttpServletResponse response,
+				@RequestParam(value = "tid", required = false, defaultValue = "") String tid,
+				@RequestParam(value = "key", required = false, defaultValue = "") String key,
+				@RequestParam(value = "type", required = false, defaultValue = "") String type,
+				@RequestParam(value = "sdate", required = false, defaultValue = "") String sdate,
+				@RequestParam(value = "edate", required = false, defaultValue = "") String edate,
+				@RequestParam(value = "tran_type", required = false, defaultValue = "") String trantype,// 转运类型
+				@RequestParam(value = "tran_state", required = false, defaultValue = "") String state,// 转运状态
+				@RequestParam(value = "tran_wid_search", required = false, defaultValue = "") String tran_wid,// 转运仓库
+				@RequestParam(value = "self_wid_search", required = false, defaultValue = "") String to_wid// 去往仓库或目的仓库
+			) {
+			 int pageIndex=1;
+		
+			String storeid=null;
+			String supperadmin = (String)request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY);
+			if((supperadmin!=null)&&(supperadmin.equalsIgnoreCase("1")))
+			{
+				storeid=null;//表示可以查找所有门店
+				
+			}else
+			{
+				storeid = (String)request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY);
+				if((storeid==null)||(storeid.equalsIgnoreCase("")))
+				{
+					//return generateResponseObject(ResponseCode.NEED_LOGIN,
+					//		"你没有登陆!");
+					return;
+				}
+				else
+				{
+					if(!StringUtil.isEmpty(to_wid))//不等于空，即表示要搜索相应的仓库，如果不是自己所属仓库，不能搜索
+					{
+						if(!to_wid.equalsIgnoreCase(storeid))
+						{
+//							return new  ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+//									"对不起，你只能搜索自己所属门店。");
+							return;
+						}
+					}
+//					return;
+				}
+			}
+			
+			
+			
+			
+			
+			if ((!StringUtil.isEmpty(state))&&(state.equalsIgnoreCase("-1"))) {
+				state = "";
+			}
+			
+			if ((!StringUtil.isEmpty(trantype))&&(trantype.equalsIgnoreCase("-1"))) {
+				trantype = "";
+			}
+			
+			
+			if ((!StringUtil.isEmpty(tran_wid))&&(tran_wid.equalsIgnoreCase("-1"))) 
+			{
+				tran_wid="";
+			}
+			
+			if ((!StringUtil.isEmpty(to_wid))&&(to_wid.equalsIgnoreCase("-1"))) 
+			{
+				to_wid="";
+			}
+			
+			// alert(key);
+			if (!StringUtil.isEmpty(tid)) {
+				
+				sdate ="";
+				edate = "";
+				key = "";
+				type = "";
+				trantype = "";
+				state = "";
+				tran_wid="";
+				to_wid="";
+			}
+			
+			
+			ResponseObject<Object> reobj=new  ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			
+			if (StringUtil.isEmpty(sdate) || !UserUtil.validateExportDate(sdate)) {
+				sdate = "";
+			} else {
+				sdate = UserUtil.transformerDateString(sdate, " 00:00:00");
+			}
+
+			if (StringUtil.isEmpty(edate) || !UserUtil.validateExportDate(edate)) {
+				edate = "";
+			} else {
+				edate = UserUtil.transformerDateString(edate, " 23:59:59");
+			}
+
+			if ((state == null) || state.equalsIgnoreCase("")) {
+				state = null;
+			}
+			if ((trantype == null) || trantype.equalsIgnoreCase("")) {
+				trantype = null;
+			}
+
+			try {
+				tid = StringUtil.isEmpty(tid) ? null : tid;
+				
+				String column = TranshipmentUtil.getSearchColumnByType(type);
+				pageIndex = Math.max(pageIndex, 1);
+				ResponseObject<PageSplit<TranshipmentBill>> obj= this.transhipmentBillService.searchByKeynew(tid, key,
+						column, sdate, edate, 0x7fffffff, pageIndex, state,
+						trantype,storeid,tran_wid,to_wid);
+				
+				if(ResponseCode.SUCCESS_CODE.equalsIgnoreCase(obj.getCode()))
+				{
+					
+					PageSplit<TranshipmentBill> pageSplit = null;
+					pageSplit=obj.getData();
+					List<TranshipmentBill> datas=null;
+					if(pageSplit!=null)
+					{
+						datas=pageSplit.getDatas();
+					}
+					else
+					{
+						/*return  new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+								"对不起，没有可下载的数据!");*/
+						return;
+					}
+					OutputStream os = null;
+					try {
+						
+
+						if((datas==null)||(datas.size()<1))
+						{
+							/*return new  ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+									"对不起，没有可下载的数据!");*/
+							return;
+						}
+						/*
+						 * for (ExportOrder o : result.getData()) {
+						 * 
+						 * orders.add(o); }
+						 */
+					
+						String fileName = "tranorders_list_" + datas.size() + ".xls";
+						// key = new String(key.getBytes("ISO-8859-1"), "utf-8");
+						response.setContentType("application/vnd.ms-excel");
+						response.setHeader("Content-disposition",
+								"attachment;filename="
+										+ new String(fileName.getBytes(), "iso-8859-1"));
+					
+						File templeFile;
+						templeFile = new File(request.getSession()
+								.getServletContext().getRealPath("/")
+								+ this.tranorderoutputtoliststemplets);
+						
+						os = response.getOutputStream();
+						TranshipmentUtil.export_tranorder_list(datas, templeFile, os);
+						
+						
+						
+
+					} catch (Exception e) {
+						log.error("获取运单数据失败", e);
+						throw new Exception("获取导出运单数据出现异常，无法获取数据", e);
+					} finally {
+						
+						if (os != null) {
+							try {
+								os.close();
+							} catch (IOException e) {
+								// ignore
+							}
+						}
+					}
+				}
+				else
+				{
+					reobj.setMessage(obj.getMessage()+",表格下载失败! ");
+					//return reobj;
+				}
+				//return reobj;
+			} catch (Exception e) {
+				log.error("获取用户运单失败", e);
+				/*return generateResponseObject(ResponseCode.SHOW_EXCEPTION,
+						"获取用户运单失败");*/
+			}
+			//return null;
+		}
+			
+	@RequestMapping(value = "/admin/transhipmentBill/getAllStateCount", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseObject<String[]> getAllStateCount(HttpServletRequest request){
+		String warehouseId = StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_ID_SESSION_KEY));
+		if("1".equals(StringUtil.obj2String(request.getSession().getAttribute(Constant.EMP_STORE_SUPPERADMIN_SESSION_KEY)))){
+			warehouseId = null;
+		}
+		try{
+			return this.transhipmentBillService.getAllStateCount(warehouseId);
+		}catch(Exception e){
+			log.error("根据用户获取事件数量出现异常");
+			return generateResponseObject(ResponseCode.SHOW_EXCEPTION, "根据用户获取事件数量出现异常");
+		}
+	}
+}

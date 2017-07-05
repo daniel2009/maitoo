@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="css/libs/CSSRESET.css">
+<link rel="stylesheet" type="text/css" href="css/gou.css">
+</head>
+<body>
+	<div class="_container clear">
+        <header class="header">
+            <ul class="ul_nav">
+                <li><a href="../91gou/index.html">首页</a></li>
+                <li><a href="javascript:;">限时特卖</a></li>
+                <li><a href="javascript:;">海外直邮</a></li>
+                <li><a href="javascript:;">单晶秒杀</a></li>
+                <li><a href="../r/login.jsp">登陆</a></li>
+                <li><a href="../r/register.html">免费注册</a></li>
+                <li><a href="javascript:;">91闪购</a></li>
+                <li><a href="javascript:;">帮助</a></li>
+            </ul>
+        </header>
+        <section class="main clear">
+            <h1><a href="javascript:;"></a></h1>
+            <div class="search">
+                <input type="text" id="spiderOrderUrl" placeholder="请输入宝贝关键词或商品链接" onkeyup="javascript: if(event.keyCode==13){searchSpiderOrder();};"><input type="submit" value="" onclick="javascript: searchSpiderOrder(); "/>
+            </div>
+            <ul class="ul_link">
+            	<li><a href="amazon.com"><img src="img/icon_link_1.png" alt="amazon" /></a></li>
+            	<li><a href="6pm.com"><img src="img/icon_link_3.png" alt="6PM" /></a></li>
+            	<li><a href="macys.com"><img src="img/icon_link_macys.png" alt="macys" /></a></li>
+            	<li><a href="nordstrom.com"><img src="img/icon_link_nordstrome.jpg" alt="nordstrom" /></a></li>
+            	<li><a href="bloomingdales.com"><img src="img/icon_link_bloomingdales.png" alt="bloomingdales" /></a></li>
+            	<li><a href="levi.com"><img src="img/icon_link_levis.jpg" alt="levi" /></a></li>
+            	<li><a href="lacoste.com"><img src="img/icon_link_lacoste.jpg" alt="lacoste" /></a></li>
+            	<li><a href="jomashop.com"><img src="img/icon_link_jomashop.jpg" alt="jomashop" /></a></li>
+            	<li><a href="gnc.com"><img src="img/icon_link_gnc.jpg" alt="gnc" /></a></li>
+            	<li><a href="groupon.com"><img src="img/icon_link_groupon.jpg" alt="groupon" /></a></li>
+            	<li><a href="walmart.com"><img src="img/icon_link_walmart.png" alt="walmart" /></a></li>
+            	<li><a href="abercrombie.com"><img src="img/icon_link_abercrombie.jpg" alt="abercrombie" /></a></li>
+            	<li><a href="costco.com"><img src="img/icon_link_costco.png" alt="costco" /></a></li>
+            	<li><a href="hollisterco.com"><img src="img/icon_link_hollister.png" alt="hollisterco" /></a></li>
+            	<li><a href="ae.com"><img src="img/icon_link_ae.png" alt="ae" /></a></li>
+            	<li><a href="uggaustralia.com"><img src="img/icon_link_uggaustralia.jpg" alt="ugg" /></a></li>
+            	<li><a href="ebay.com"><img src="img/icon_link_ebay.jpg" alt="ebay" /></a></li>
+            	<li><a href="peterthomasroth.com"><img src="img/icon_link_peterthomasroth.png" alt="peterthomasroth" /></a></li>
+            	<li><a href="charlotteolympia.com"><img src="img/icon_link_charlotteolympia.jpg" alt="charlotteolympia" /></a></li>
+            	<li><a href="carters.com"><img src="img/icon_link_4.png" alt="carter's" /></a></li>
+            	<li><a href="stuartweitzman.com"><img src="img/icon_link_stuartweitzman.png" alt="stuartweitzman" /></a></li>
+            	<li><a href="gmpvitas.com"><img src="img/icon_link_gmpvitas.png" alt="gmpvitas" /></a></li>
+            </ul>
+        </section>
+        
+        <footer class="footer">
+            Copyright ©2014-2016 91闪淘 渝ICP备14007659号   招商合作
+        </footer>
+    </div>
+</body>
+<script>
+function searchSpiderOrder(){
+	sessionStorage.setItem("spiderOrderUrlKeep", document.getElementById("spiderOrderUrl").value);
+	sessionStorage.removeItem("productIdKeep");
+	location.href="../91gou/product_detail.html";
+}
+</script>
+</html>

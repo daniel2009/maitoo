@@ -1,0 +1,65 @@
+package com.weiye.service;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Cart;
+import com.weiye.model.PageSplit;
+import com.weiye.model.Product;
+import com.weiye.model.ProductRecord;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.User;
+
+public interface ProductService {
+
+	ResponseObject<Object> add(Product product) throws ServiceException;
+
+	ResponseObject<Product> findById(Product product) throws ServiceException;
+
+	ResponseObject<Object> update(Product product) throws ServiceException;
+
+	/**
+	 * 
+	 * @param product 查询条件name存放key，
+	 * @param priceStart
+	 * @param priceEnd
+	 * @param userId 
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 * @throws ServiceException
+	 */
+	ResponseObject<PageSplit<Product>> findByKey(Product product, String priceStart, String priceEnd, String userId, int pageIndex, int pageSize) throws ServiceException;
+	ResponseObject<PageSplit<Product>> findByKeyAndUser(Product product, String priceStart, String priceEnd, int pageIndex, int defaultPageSize) throws ServiceException;
+
+	ResponseObject<Object> delete(Product product) throws ServiceException;
+
+	ResponseObject<Object> add2Cart(Cart cart) throws ServiceException;
+	ResponseObject<PageSplit<Cart>> findByCart(User user, int pageIndex, int pageSize) throws ServiceException;
+	
+	ResponseObject<Object> purchase(Cart cart, ProductRecord productRecord) throws ServiceException;
+	ResponseObject<Object> purchaseByUserAllCart(ProductRecord productRecord) throws ServiceException;
+
+	ResponseObject<Object> delete(Cart cart) throws ServiceException;
+	ResponseObject<Object> deleteAllCartByUser(User user) throws ServiceException;
+
+	ResponseObject<Object> addProductAndRecordByUser(Product product, ProductRecord productRecord) throws ServiceException;
+
+	ResponseObject<PageSplit<Product>> findByIds(String[] ids, int pageIndex, int pageSize) throws ServiceException;
+
+	ResponseObject<Integer> countByUser(User user) throws ServiceException;
+
+	/**
+	 * 如果user= null， 按照ids来查询，否则无事ids
+	 * @param user
+	 * @param ids
+	 * @param pageIndex
+	 * @param pageSize
+	 * @return
+	 * @throws ServiceException
+	 */
+	ResponseObject<PageSplit<Cart>> findByUserCart(User user, String[] ids, int pageIndex, int pageSize) throws ServiceException;
+
+	ResponseObject<Cart> findCartById(Cart cart) throws ServiceException;
+
+	ResponseObject<Object> addCartByArray(Cart[] cartArray) throws ServiceException;
+
+}

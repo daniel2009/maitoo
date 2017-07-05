@@ -1,0 +1,13 @@
+package com.weiye.service;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.StoragePositionRecord;
+
+public interface StoragePositionRecordService {
+
+	ResponseObject<Object> deleteByRelate(StoragePositionRecord storagePositionRecord) throws ServiceException;
+
+	ResponseObject<Object> insertByRelate(StoragePositionRecord storagePositionRecord) throws ServiceException;
+
+}

@@ -1,0 +1,9 @@
+//把datetime-local的2001-01-01T12:12格式中的T去掉，用于显示
+function transformInputDatetimeLocal(datetimeLocal){
+	if(null != datetimeLocal){
+		var regExp = new RegExp("T");
+		return datetimeLocal.replace(regExp, " ");
+	}else{
+		return "";
+	}
+}

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.CommudityPriceDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.model.Commodity_price">
+		<id column="id" property="id" javaType="String" />
+		<result column="cost" property="cost" javaType="String" />
+		<result column="price" property="price" javaType="String" />
+		<result column="vip_0_Price" property="vip_0_Price" javaType="String"/>
+		<result column="vip_1_Price" property="vip_1_Price" javaType="String"/>
+		<result column="vip_2_Price" property="vip_2_Price" javaType="String"/>
+		<result column="vip_3_Price" property="vip_3_Price" javaType="String"/>
+		<result column="vip_4_Price" property="vip_4_Price" javaType="String"/>
+		<result column="vip_5_Price" property="vip_5_Price" javaType="String"/>
+		<result column="vip_6_Price" property="vip_6_Price" javaType="String"/>
+		<result column="vip_7_Price" property="vip_7_Price" javaType="String"/>
+		<result column="state" property="state" javaType="String"/>
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="channel_id" property="channelId" javaType="String" />
+		<result column="store_id" property="storeId" javaType="String" />
+		<result column="commudityId" property="commudityId" javaType="String" />
+		<result column="channel_id" property="channelId" javaType="String" />
+		<result column="m_price" property="m_price" javaType="String" />
+		<result column="s_price" property="s_price" javaType="String" />
+	 	 <association property="channel" column="channel_id"
+			select="com.meitao.dao.ChannelDao.getChannelById"></association>
+			
+		<association property="commudityAdmin" column="commudityId"
+			select="com.meitao.dao.CommudityAdminDao.getById"></association> 
+	</resultMap>
+
+
+
+
+
+	<select id="getPriceById" resultType="java.lang.String">
+		select 
+			<if test="priceType=='price'">
+					price
+			</if>
+			<if test="priceType=='vip_0_Price'">
+					vip_0_Price
+			</if>
+			<if test="priceType=='vip_1_Price'">
+					vip_1_Price
+			</if>
+			<if test="priceType=='vip_2_Price'">
+					vip_2_Price
+			</if>
+			<if test="priceType=='vip_3_Price'">
+					vip_3_Price
+			</if>
+			<if test="priceType=='vip_4_Price'">
+					vip_4_Price
+			</if>
+			<if test="priceType=='vip_5_Price'">
+					vip_5_Price
+			</if>
+			<if test="priceType=='vip_6_Price'">
+					vip_6_Price
+			</if>
+			<if test="priceType=='vip_7_Price'">
+					vip_7_Price
+			</if>
+			<if test="priceType=='cost'">
+					cost
+			</if>
+			<if test="priceType=='m_price'">
+					m_price
+			</if>
+			<if test="priceType=='s_price'">
+					s_price
+			</if>
+			
+		 from `commodity_price` where id = #{id} 
+	</select>
+
+
+	<select id="getById" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from commodity_price where id=#{id}
+	</select>
+	
+	<select id="getByChannelId" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from commodity_price where channel_id=#{channelId}
+		<if test="state!=null and state!=''">
+			and state=#{state}
+		</if>
+	</select>
+	
+	<select id="getByInfo" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from commodity_price where commudityId = #{commudityId} and channel_id = #{channelId} and store_id = #{storeId}
+		<if test="state!=null and state!=''">
+			and state=#{state}
+		</if>
+		limit 1
+	</select>
+
+
+
+	<insert id="insert" parameterType="com.meitao.model.Commodity_price"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into commodity_price(cost,price,vip_0_Price,vip_1_Price,vip_2_Price,vip_3_Price,vip_4_Price,vip_5_Price,vip_6_Price,vip_7_Price,state,modify_date,create_date,channel_id,store_id,commudityId) 
+		values(#{cost},#{price},#{vip_0_Price},#{vip_1_Price},#{vip_2_Price},#{vip_3_Price},#{vip_4_Price},#{vip_5_Price},#{vip_6_Price},#{vip_7_Price},#{state},#{modifyDate},#{createDate},#{channelId},#{storeId},#{commudityId})
+	</insert>
+
+	
+	<update id="modifyCost">
+		update `commodity_price`
+		set `cost`=#{cost},
+		<if test="state!=null and state!=''">
+			`state`=#{state},
+		</if>
+		`modify_date`=#{modifyDate}
+		where commudityId = #{commudityId} and channel_id = #{channelId} and store_id = #{storeId}
+	</update>
+	
+	<update id="modifyPrice">
+		update `commodity_price`
+		set `state`=#{state},
+		`price`=#{price},
+		`vip_1_Price`=#{vip_1_Price},
+		`vip_2_Price`=#{vip_2_Price},
+		`vip_3_Price`=#{vip_3_Price},
+		`vip_4_Price`=#{vip_4_Price},
+		`vip_5_Price`=#{vip_5_Price},
+		`vip_6_Price`=#{vip_6_Price},
+		`vip_7_Price`=#{vip_7_Price},
+		`m_price`=#{m_price},
+		`s_price`=#{s_price},
+		`modify_date`=#{modifyDate}
+		where commudityId = #{commudityId} and channel_id = #{channelId} and store_id = #{storeId}
+	</update>
+	
+	
+	<update id="modifyPricebyid">
+		update `commodity_price`
+		set `state`=#{state},
+		`price`=#{price},
+		`vip_0_Price`=#{vip_0_Price},
+		`vip_1_Price`=#{vip_1_Price},
+		`vip_2_Price`=#{vip_2_Price},
+		`vip_3_Price`=#{vip_3_Price},
+		`vip_4_Price`=#{vip_4_Price},
+		`vip_5_Price`=#{vip_5_Price},
+		`vip_6_Price`=#{vip_6_Price},
+		`vip_7_Price`=#{vip_7_Price},
+		`m_price`=#{m_price},
+		`s_price`=#{s_price},
+
+		`modify_date`=#{modifyDate}
+		where id = #{id}
+	</update>
+
+
+	<select id="countByKeys" resultType="java.lang.Integer">
+		select count(distinct `commodity_price`.id)
+		
+		<if test="ch_state!=null and ch_state!=''">
+			left join `channels` as ch
+			on ch.id=`commodity_price`.channel_id
+		</if>
+		<if test="c_state!=null and c_state!=''">
+			left join `commudity_admin` as co
+			on co.id=`commodity_price`.commudityId
+		</if>
+		from commodity_price
+		<where>
+			<if test="id!=null and id!=''">
+				and id =#{id}
+			</if>
+			<if test="channelId!=null and channelId!=''">
+				and channel_id =#{channelId}
+			</if>
+			<if test="ch_state!=null and ch_state!=''">
+				and ch.state=#{ch_state}
+			</if>
+			<if test="c_state!=null and c_state!=''">
+				and co.state=#{c_state}
+			</if>
+			<if test="state!=null and state!=''">
+				and state=#{state}
+			</if>
+		</where>
+	</select>
+
+	<select id="searchByKeys" resultMap="basic_result_map">
+		select distinct `commodity_price`.* 
+			<if test="ch_state!=null and ch_state!=''">
+				left join `channels` as ch
+				on ch.id=`commodity_price`.channel_id
+			</if>
+			<if test="c_state!=null and c_state!=''">
+				left join `commudity_admin` as co
+				on co.id=`commodity_price`.commudityId
+			</if>
+			from commodity_price
+		<where>
+			<if test="id!=null and id!=''">
+				and id =#{id}
+			</if>
+			<if test="channelId!=null and channelId!=''">
+				and channel_id =#{channelId}
+			</if>
+			<if test="ch_state!=null and ch_state!=''">
+				and ch.state=#{ch_state}
+			</if>
+			<if test="c_state!=null and c_state!=''">
+				and co.state=#{c_state}
+			</if>
+			<if test="state!=null and state!=''">
+				and state=#{state}
+			</if>
+			
+		</where>
+		order by `commodity_price`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+	
+	<delete id="deletebyid">
+		delete from commodity_price
+		where id =#{id}
+		
+	</delete>
+	<delete id="deletebyinfo" >
+	delete from commodity_price
+		where commudityId = #{commudityId} and channel_id = #{channelId} and store_id = #{storeId}
+	</delete>
+	
+	
+	<select id="countinfo" resultMap="basic_result_map">
+		select distinct `commodity_price`.`id` 
+			from commodity_price
+			where commudityId = #{commudityId} and channel_id = #{channelId} and store_id = #{storeId}
+	</select>
+	
+	
+	
+	
+	<select id="countBysearchPrice" resultType="java.lang.Integer">
+		select count(distinct `commodity_price`.id)
+		from commodity_price
+		<if test="(wordkey!=null and wordkey!='')||(cstate!=null and cstate!='')">
+		left join `commudity_admin` as com
+		on com.id=`commodity_price`.commudityId
+		left join `channels` as ch
+		on ch.id=`commodity_price`.channel_id
+		</if>
+		<where>
+			<if test="commudityId!=null and commudityId!=''">
+				and `commodity_price`.commudityId =#{commudityId}
+			</if>
+			<if test="channelId!=null and channelId!=''">
+				and `commodity_price`.channel_id =#{channelId}
+			</if>
+			<if test="storeId!=null and storeId!=''">
+				and `commodity_price`.store_id =#{storeId}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (com.name like #{wordkey} or com.remark like #{wordkey} or ch.name like #{wordkey} or ch.alias like #{wordkey})
+				
+			</if>
+			<if test="cstate!=null and cstate!=''">
+				and  com.state = #{cstate} 
+			</if>
+			<if test="state!=null and state!=''">
+				and  `commodity_price`.state = #{state} 
+			</if>
+		</where>
+	</select>
+
+	<select id="searchPrice" resultMap="basic_result_map">
+		select distinct `commodity_price`.* 
+			from commodity_price
+		<if test="(wordkey!=null and wordkey!='')||(cstate!=null and cstate!='')">
+		left join `commudity_admin` as com
+		on com.id=`commodity_price`.commudityId
+		left join `channels` as ch
+		on ch.id=`commodity_price`.channel_id
+		</if>
+		<where>
+			<if test="commudityId!=null and commudityId!=''">
+				and `commodity_price`.commudityId =#{commudityId}
+			</if>
+			<if test="channelId!=null and channelId!=''">
+				and `commodity_price`.channel_id =#{channelId}
+			</if>
+			<if test="storeId!=null and storeId!=''">
+				and `commodity_price`.store_id =#{storeId}
+			</if>
+			<if test="wordkey!=null and wordkey!=''">
+				and (com.name like #{wordkey} or com.remark like #{wordkey} or ch.name like #{wordkey} or ch.alias like #{wordkey})
+				
+			</if>
+			<if test="cstate!=null and cstate!=''">
+				and  com.state = #{cstate} 
+			</if>
+			<if test="state!=null and state!=''">
+				and  `commodity_price`.state = #{state} 
+			</if>
+			
+		</where>
+		order by `commodity_price`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+
+
+
+	<delete id="deletebycommudityId" >
+		delete from commodity_price
+			where `commodity_price`.commudityId = #{commudityId}
+	</delete>
+	<delete id="deletebychannelId">
+		delete from commodity_price
+			where `commodity_price`.channel_id = #{channelId}
+	</delete>	
+	<delete id="deletebystoreId">
+		delete from commodity_price
+			where `commodity_price`.store_id = #{storeId}
+	</delete>		
+	<select id="getByChannelIdandStoreId" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from commodity_price where `commodity_price`.channel_id=#{channelId} and `commodity_price`.store_id = #{storeId}
+	</select>
+</mapper>

@@ -1,0 +1,529 @@
+package com.weiye.service.impl;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.OrderUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.FlyInfoDao;
+import com.weiye.dao.OrderDao;
+import com.weiye.dao.RouteDao;
+import com.weiye.dao.WarehouseDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.FlyInfo;
+import com.weiye.model.Order;
+import com.weiye.model.OrderDetail;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.Route;
+import com.weiye.model.Warehouse;
+import com.weiye.model.temp.ImportFlyInfo;
+import com.weiye.service.FlyInfoService;
+import com.weiye.service.OrderService;
+import com.weiye.service.StoragePositionService;
+import com.weiye.service.WarehouseService;
+import com.weiye.common.constants.ResponseCode;
+
+@Service("flyinfoService")
+public class FlyInfoServiceImpl implements FlyInfoService {
+	@Autowired
+	private FlyInfoDao flyinfoDao;
+	@Autowired
+	private OrderDao orderDao;
+	@Autowired
+	private RouteDao routeDao;
+	@Autowired
+	private WarehouseDao warehouseDao;
+	@Resource(name = "orderService")
+	private OrderService orderService;
+
+	public ResponseObject<Object> addFlyInfo(FlyInfo flyinfo)
+			throws ServiceException {
+		if (flyinfo == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+		try {
+			if (StringUtil.isEmpty(flyinfo.getFlightno())) {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"参数无效");
+			}
+			flyinfo.setCreateDate(DateUtil.date2String(new Date()));
+			flyinfo.setModifyDate(DateUtil.date2String(new Date()));
+
+			FlyInfo flyinfo1 = this.flyinfoDao.getByflightno(flyinfo
+					.getFlightno());
+			if (flyinfo1 != null) {
+				return new ResponseObject<Object>(
+						ResponseCode.WAREHOUSE_FLYINFO_FAILURE, "插入失败,航班号已经存在！");
+			}
+			int i = this.flyinfoDao.insertFlyInfo(flyinfo);
+
+			if (i > 0) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(
+						ResponseCode.WAREHOUSE_FLYINFO_FAILURE, "插入失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	// kai 20151028 包含仓库信息的搜索
+	public ResponseObject<PageSplit<FlyInfo>> searchFlyInfo(String flightno,
+			String key, String sdate, String edate, String state, int pageSize,
+			int pageNow,String storeId) throws ServiceException {
+		try {
+			key = StringUtil.escapeStringOfSearchKey(key);
+			if (!StringUtil.isEmpty(flightno)) {
+				flightno = StringUtil.escapeStringOfSearchKey(flightno);
+			}
+
+			int rowCount = 0;
+			try {
+				rowCount = this.flyinfoDao.countOfSearchKeys(flightno, key,
+						state, sdate, edate,storeId);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取运单个数失败", e);
+			}
+
+			ResponseObject<PageSplit<FlyInfo>> responseObj = new ResponseObject<PageSplit<FlyInfo>>(
+					ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize
+						+ (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<FlyInfo> pageSplit = new PageSplit<FlyInfo>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<FlyInfo> flyinfos = this.flyinfoDao.searchByKeys(
+							flightno, key, state, sdate, edate, startIndex,
+							pageSize,storeId);
+					
+					if (flyinfos != null && !flyinfos.isEmpty()) {
+						for (FlyInfo o : flyinfos) {
+							
+							o.setOrdersno(Integer.toString(this.orderDao.countOfflights(o.getFlightno())));
+							
+							if(!StringUtil.isEmpty(o.getWarehouseId()))
+							{
+								Warehouse house =this.warehouseDao.getById(o.getWarehouseId());
+								if(house!=null)
+								{
+									o.setWarehouseName(house.getName());
+								}
+							}
+							
+							pageSplit.addData(o);
+						}
+					}
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取航班表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有航班信息!");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+	public ResponseObject<Object> modifyFlyInfo(FlyInfo flyinfo,
+			String changeorderflag, String empName) throws ServiceException {
+		if (flyinfo == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+		try {
+			if (StringUtil.isEmpty(flyinfo.getFlightno())) {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"参数无效");
+			}
+			flyinfo.setModifyDate(DateUtil.date2String(new Date()));
+			int i = this.flyinfoDao.updateFlyInfo(flyinfo);
+			if (i > 0) {
+				if ((changeorderflag != null)
+						&& (changeorderflag.equalsIgnoreCase("true"))
+						&& (flyinfo.getState() != null)
+						&& (!flyinfo.getState().equalsIgnoreCase(
+								Constant.ORDER_STATE10)))// 修改订单状态
+				{
+					List<Order> orders = this.orderDao
+							.searchordersbyflight(flyinfo.getFlightno());
+					if (orders.size() > 0) {
+
+						int ii = this.orderDao.modifyOrderStatebyflightno(
+								flyinfo.getFlightno(), flyinfo.getState(),
+								DateUtil.date2String(new Date()));
+						// 进行路由的插入
+						// 插入完成后，新建一个Route并插入到数据库中
+						if (ii > 0) {
+							for (Order ord : orders) {
+								Route route = new Route();
+								route.setOrderId(ord.getOrderId());
+								route.setName(empName);
+								route.setDate(DateUtil.date2String(new Date()));
+								route.setState(OrderUtil.transformerState(0,
+										ord.getState()));
+								route.setAddress("航班状态修改!");
+								this.routeDao.insertRoute(route);
+							}
+						}
+					}
+				}
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+
+			} else {
+				return new ResponseObject<Object>(
+						ResponseCode.WAREHOUSE_MODIFY_FAILURE,
+						"修改失败，数据库中没有对应的数据");
+			}
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> deleteFlyInfoById(String id)
+			throws ServiceException {
+		if (id == null || id.equalsIgnoreCase("")) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+
+		try {
+			FlyInfo flyinfo = this.flyinfoDao.getById(id);
+			if (flyinfo != null) {
+				if ((flyinfo.getFlightno() != null)
+						&& (flyinfo.getFlightno().equalsIgnoreCase(""))) {
+					int ii = this.orderDao.modifyOrderflightnobyflightno(
+							flyinfo.getFlightno(), "",
+							DateUtil.date2String(new Date()));
+				}
+
+				int i = this.flyinfoDao.deleteFlyInfoById(id);
+				if (i > 0) {
+					return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+				} else {
+					throw new Exception();
+				}
+			} else {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Map<String, String>> modifyFlyInfohaveexcel(
+			FlyInfo flyinfo, String changeorderflag, String empName,
+			List<String> orderid) throws ServiceException {
+		if (flyinfo == null) {
+			return new ResponseObject<Map<String, String>>(
+					ResponseCode.PARAMETER_ERROR, "参数无效");
+		}
+		try {
+			if (StringUtil.isEmpty(flyinfo.getId())) {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.PARAMETER_ERROR, "参数无效");
+			}
+			flyinfo.setModifyDate(DateUtil.date2String(new Date()));
+			FlyInfo info = this.flyinfoDao.getById(flyinfo.getId());
+			if (info == null) {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.PARAMETER_ERROR, "获取航班信息失败");
+			}
+			flyinfo.setFlightno(info.getFlightno());
+			if (StringUtil.isEmpty(flyinfo.getFlightno())) {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.PARAMETER_ERROR, "参数无效");
+			}
+
+			// 检查导入的运单是否存在
+			int number = 0;
+			for (String orid : orderid) {
+				number = number + 1;
+				Order order = this.orderDao.getByOrderId(orid);
+				if (order == null)// 订单不存在
+				{
+					return new ResponseObject<Map<String, String>>(
+							ResponseCode.PARAMETER_ERROR, "第" + number
+									+ "行的订单号为(" + orid + ")不存在,导入失败!");
+				}
+			}
+
+			int i = this.flyinfoDao.updateFlyInfo(flyinfo);// 更新当前航班信息
+			if (i > 0) {
+
+				int aa = this.orderDao.modifyOrderflightnobyorderids(orderid,
+						null, flyinfo.getFlightno(),
+						DateUtil.date2String(new Date()));// 先更新航班号
+				if ((changeorderflag != null)
+						&& (changeorderflag.equalsIgnoreCase("true"))
+						&& (flyinfo.getState() != null)
+						&& (!flyinfo.getState().equalsIgnoreCase(
+								Constant.ORDER_STATE10)))// 修改订单状态
+				{
+
+					List<Order> orders = this.orderDao
+							.searchordersbyflight(flyinfo.getFlightno());
+					if (orders.size() > 0) {
+
+						int ii = this.orderDao.modifyOrderStatebyflightno(
+								flyinfo.getFlightno(), flyinfo.getState(),
+								DateUtil.date2String(new Date()));
+						// 进行路由的插入
+						// 插入完成后，新建一个Route并插入到数据库中
+						if (ii > 0) {
+							for (Order ord : orders) {
+								Route route = new Route();
+								route.setOrderId(ord.getOrderId());
+								route.setName(empName);
+								route.setDate(DateUtil.date2String(new Date()));
+								route.setState(OrderUtil.transformerState(0,
+										ord.getState()));
+								route.setAddress("航班状态修改!");
+								this.routeDao.insertRoute(route);
+							}
+						}
+					}
+				}
+
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.SUCCESS_CODE);
+
+			} else {
+				return new ResponseObject<Map<String, String>>(
+						ResponseCode.PARAMETER_ERROR, "修改失败，数据库中没有对应的数据");
+			}
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> modifyFlyInfohaveexcelbyflyinfo(
+			FlyInfo flyinfo, String changeorderflag, String empName,
+			List<ImportFlyInfo> importflyInfo,String storeId) throws ServiceException {
+
+		if (flyinfo == null) {
+			return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+					"参数无效");
+		}
+		try {
+			if (StringUtil.isEmpty(flyinfo.getId())) {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"参数无效");
+			}
+			flyinfo.setModifyDate(DateUtil.date2String(new Date()));
+			FlyInfo info = this.flyinfoDao.getById(flyinfo.getId());
+			if (info == null) {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"获取航班信息失败");
+			}
+			flyinfo.setFlightno(info.getFlightno());
+			if (StringUtil.isEmpty(flyinfo.getFlightno())) {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"参数无效");
+			}
+
+			// 检查导入的运单是否存在
+
+			int i = this.flyinfoDao.updateFlyInfo(flyinfo);// 更新当前航班信息
+			if (i > 0) {
+
+				int number = 0;
+				for (ImportFlyInfo orid : importflyInfo) {
+					number = number + 1;
+					Order order=null;
+					try{
+						order= this.orderDao.getByOrderIdonlyorder(orid.getOrderId(),storeId);
+					}
+					 catch (Exception e) {
+						throw new Exception("");
+					}
+					if (order != null) {
+						if (StringUtil.isEmpty(order.getState())
+								|| (Double.parseDouble(order.getState()) < Double
+										.parseDouble(Constant.ORDER_STATE1))) {
+							orid.setResult("失败：原订单状态还没处理，如在线置单，空运单等!");
+						} else {
+							// int
+							// aa=this.orderDao.modifyOrderflightnobyorderid(orid.getOrderId(),null,
+							// flyinfo.getFlightno(), DateUtil.date2String(new
+							// Date()));//先更新航班号
+							try {
+								/*
+								int aa = this.orderDao
+										.modifyOrderflightnobyorderid(orid
+												.getOrderId(), null, flyinfo
+												.getFlightno(), DateUtil
+												.date2String(new Date()),storeId);// 先更新航班号
+								*/
+								//li zhang 02282016
+								//将运单状态做修改
+								int aa = this.orderDao
+										.modifyOrderflightnobyorderid(orid
+												.getOrderId(), flyinfo.getState(), flyinfo
+												.getFlightno(), DateUtil
+												.date2String(new Date()),storeId);// 先更新航班号
+
+								if (aa > 0) {
+									
+									//li zhang 02282016
+									//更新成功后查询获得状态，再调用useStoragePosition更新仓位
+									Order order1 = this.orderDao.getByOrderIdonlyorder(orid.getOrderId(),storeId);
+									boolean usePositionBoolean = this.orderService.useStoragePosition(order1);
+									//li zhang 02282016
+									if(usePositionBoolean){
+										orid.setResult("成功!更新仓位成功!");
+									}else{
+										orid.setResult("成功!");
+									}
+									
+//									orid.setResult("成功!");
+								} else {
+									orid.setResult("失败：请检查单号是否存在或字符格式!");
+								}
+							} catch (Exception e) {
+								throw ExceptionUtil
+										.handle2ServiceException("修改数据库出现异常，请检查第"
+												+ number
+												+ "行,单号为："
+												+ orid.getOrderId());
+							}
+
+						}
+					} else {
+						orid.setResult("失败：请检查单号是否存在或字符格式或是否属于本门店!");
+					}
+					/*
+					 * Order order=this.orderDao.getByOrderId(orid);
+					 * if(order==null)//订单不存在 { return new
+					 * ResponseObject<ImportFlyInfo>(
+					 * ResponseCode.PARAMETER_ERROR,
+					 * "第"+number+"行的订单号为("+orid+")不存在,导入失败!"); }
+					 */
+				}
+
+				// int
+				// aa=this.orderDao.modifyOrderflightnobyorderid(orderid,null,
+				// flyinfo.getFlightno(), DateUtil.date2String(new
+				// Date()));//先更新航班号
+
+				if ((changeorderflag != null)
+						&& (changeorderflag.equalsIgnoreCase("true"))
+						&& (flyinfo.getState() != null)
+						&& (!flyinfo.getState().equalsIgnoreCase(
+								Constant.ORDER_STATE10)))// 修改订单状态
+				{
+
+					List<Order> orders = this.orderDao
+							.searchordersbyflight(flyinfo.getFlightno());
+					if (orders.size() > 0) {
+
+						int ii = this.orderDao.modifyOrderStatebyflightno(
+								flyinfo.getFlightno(), flyinfo.getState(),
+								DateUtil.date2String(new Date()));
+						// 进行路由的插入
+						// 插入完成后，新建一个Route并插入到数据库中
+						if (ii > 0) {
+							for (Order ord : orders) {
+								Route route = new Route();
+								route.setOrderId(ord.getOrderId());
+								route.setName(empName);
+								route.setDate(DateUtil.date2String(new Date()));
+								route.setState(OrderUtil.transformerState(0,
+										ord.getState()));
+								route.setAddress("航班状态修改!");
+								this.routeDao.insertRoute(route);
+							}
+						}
+					}
+				}
+				ResponseObject<Object> obj = new ResponseObject<Object>(
+						ResponseCode.SUCCESS_CODE);
+				obj.setData(importflyInfo);
+
+				return obj;
+
+			} else {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR,
+						"修改失败，数据库中没有对应的数据");
+			}
+
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+
+	}
+
+	public ResponseObject<FlyInfo> getbyid(String id) throws ServiceException {
+		if (StringUtil.isEmpty(id)) {
+			return new ResponseObject<FlyInfo>(ResponseCode.PARAMETER_ERROR,
+					"获取信息出错，id不能为空!");
+		}
+		FlyInfo info=null;
+		try {
+			info = this.flyinfoDao.getById(id);
+			if (info != null) {
+				Warehouse house = this.warehouseDao.getById(info
+						.getWarehouseId());
+				if (house != null) {
+					info.setWarehouseName(house.getName());
+				}
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		ResponseObject<FlyInfo> obj=new ResponseObject<FlyInfo>(ResponseCode.SUCCESS_CODE);
+		obj.setData(info);
+		return obj;
+	}
+	
+
+	public ResponseObject<FlyInfo> getbyflyno(String flyno) throws ServiceException {
+		if (StringUtil.isEmpty(flyno)) {
+			return new ResponseObject<FlyInfo>(ResponseCode.PARAMETER_ERROR,
+					"获取信息出错，航班号不能为空!");
+		}
+		FlyInfo info=null;
+		try {
+			info = this.flyinfoDao.getByflightno(flyno);
+			if (info != null) {
+				Warehouse house = this.warehouseDao.getById(info
+						.getWarehouseId());
+				if (house != null) {
+					info.setWarehouseName(house.getName());
+				}
+				info.setOrdersno(Integer.toString(this.orderDao.countOfflights(info.getFlightno())));
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		ResponseObject<FlyInfo> obj=new ResponseObject<FlyInfo>(ResponseCode.SUCCESS_CODE);
+		obj.setData(info);
+		return obj;
+	}
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.OceanStoreDao">
+	<resultMap id="basic_result_map" type="com.meitao.model.OceanStore">
+		<id column="id" property="id" javaType="String"/>
+		<result column="imgUrl" property="imgUrl" javaType="String"/>
+		<result column="name" property="name" javaType="String"/>
+		<result column="note" property="note" javaType="String"/>
+		<result column="url" property="url" javaType="String"/>
+	</resultMap>
+	<insert id="insert" parameterType="com.meitao.model.OceanStore" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `ocean_store`(`imgUrl`, `name`, `note`, `url`)
+		VALUES(#{imgUrl}, #{name}, #{note}, #{url})
+	</insert>
+	<update id="update" parameterType="com.meitao.model.OceanStore">
+		UPDATE `ocean_store` SET 
+		`imgUrl`=#{imgUrl}, `name`=#{name}, `note`=#{note}, `url`=#{url}
+		WHERE `id`=#{id}
+	</update>
+	<delete id="delete" parameterType="java.lang.String">
+		DELETE FROM `ocean_store` WHERE 
+		`id`=#{id}
+	</delete>
+	<select id="getAll" resultMap="basic_result_map">
+		SELECT * FROM `ocean_store`
+	</select>
+	<select id="getById" resultMap="basic_result_map">
+		SELECT * FROM `ocean_store` WHERE `id`=#{id}
+	</select>
+</mapper>

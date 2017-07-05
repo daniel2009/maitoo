@@ -1,0 +1,137 @@
+package com.weiye.service.impl;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.ErrorTranshipmentBillDao;
+import com.weiye.dao.TranshipmentBillDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ErrorTranshipmentBillInfo;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.ErrorTranshipmentBillService;
+
+@Service("errorTranshipmentBillService")
+public class ErrorTranshipmentBillServiceImpl implements ErrorTranshipmentBillService {
+	@Autowired
+	private ErrorTranshipmentBillDao errorTranshipmentBillDao;
+	@Autowired
+	private TranshipmentBillDao transhipmentBillDao;
+
+	public ResponseObject<Object> deleteErrorTranshipmentBillInfos(List<String> eids) throws ServiceException {
+		try {
+			// 删除异常预报运单
+			int k = this.errorTranshipmentBillDao.deleteErrorTranshInfoByIds(eids);
+			if (k > 0) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "数据库中没有对应id的异常预报运单");
+			}
+			// 现在删除前获取异常预报运单的预报运单id，然后修改预报运单状态为未入库
+			// this.transhipmentBillDao.updateTranshipmentBillState(Constant.TRANSHIPMENT_STATE1,
+			// tids);
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> modifyErrorTranshipmentBillInfo(ErrorTranshipmentBillInfo info)
+	        throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			info.setModifyDate(date);
+			info.setState(Constant.ERROR_TRANSH_STATE2); // 表示异常处理完成
+			int k = this.errorTranshipmentBillDao.updateState(info);
+			if (k > 0) {
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "数据库中没有对应id的异常件");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<Object> saveErrorTranshipmentBillInfo(ErrorTranshipmentBillInfo info) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			info.setModifyDate(date);
+			info.setCreateDate(date);
+			if (StringUtil.isEmpty(info.getParentId())) {
+				info.setParentId("-1");
+			}
+			info.setContent(StringUtil.dealHtmlSpecialCharacters(info.getContent()));
+
+			int k = this.errorTranshipmentBillDao.insertErrorTranshInfo(info);
+			if (k > 0) {
+				// 判断是否是提交异常件，也就是是不是有transh id
+				if (!StringUtil.isEmpty(info.getTranshId())) {
+					// 修改预订单的状态为包裹丢失
+					k = this.transhipmentBillDao.updateTranshipmentBillState(Constant.TRANSHIPMENT_STATE3, Arrays
+					        .asList(new String[] { info.getTranshId() }));
+				}
+				if (k > 0) {
+					return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+				} else {
+					throw new Exception("数据库中没有对应id的预报单信息");
+				}
+			} else {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "插入异常件信息失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<PageSplit<ErrorTranshipmentBillInfo>> searchByTranshipmentId(String tId, int pageSize,
+	        int pageNow) throws ServiceException {
+		try {
+			tId = StringUtil.escapeStringOfSearchKey(tId);
+			int rowCount = 0;
+			try {
+				rowCount = this.errorTranshipmentBillDao.countSearchOfTranshId(tId);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取异常件个数失败", e);
+			}
+
+			ResponseObject<PageSplit<ErrorTranshipmentBillInfo>> responseObj = new ResponseObject<PageSplit<ErrorTranshipmentBillInfo>>(
+			        ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<ErrorTranshipmentBillInfo> pageSplit = new PageSplit<ErrorTranshipmentBillInfo>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<ErrorTranshipmentBillInfo> infos = this.errorTranshipmentBillDao.searchByTranshId(tId,
+					        startIndex, pageSize);
+					pageSplit.setDatas(infos);
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取异常件信息列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有异常件");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Body>
+		<GetPostageLabel xmlns="www.envmgr.com/LabelService">
+			<LabelRequest>
+				<RequesterID></RequesterID>
+				<AccountID></AccountID>
+				<PassPhrase></PassPhrase>
+				<MailClass></MailClass>
+				<DateAdvance></DateAdvance>
+				<WeightOz></WeightOz>
+				<Quantity></Quantity>
+				<Weight></Weight>
+				<MailpieceShape></MailpieceShape>
+				<Stealth>TRUE</Stealth>
+				<Services InsuredMail="OFF" SignatureConfirmation="OFF" />
+				<Value></Value>
+				<PartnerTransactionID></PartnerTransactionID>
+				<Description></Description>
+				<ToName></ToName>
+				<ToCompany></ToCompany>
+				<ToAddress1></ToAddress1>
+				<ToCity></ToCity>
+				<ToState></ToState>
+				<ToCountry></ToCountry>
+        		<ToCountryCode></ToCountryCode>
+				<ToPostalCode></ToPostalCode>					
+				<ToPhone></ToPhone>
+				<FromName></FromName>
+				<ReturnAddress1></ReturnAddress1>
+				<FromCity></FromCity>
+				<FromState></FromState>
+				<FromPostalCode></FromPostalCode>
+				<FromZIP4></FromZIP4>
+				<FromPhone></FromPhone>
+				<ResponseOptions PostagePrice="TRUE" />
+			</LabelRequest>
+		</GetPostageLabel>
+	</soap:Body>
+</soap:Envelope>

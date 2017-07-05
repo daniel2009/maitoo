@@ -1,0 +1,14 @@
+package com.weiye.service;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.News;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+
+
+/**
+ * 提供新闻服务的接口
+ */
+public interface TranPriceService {
+	public ResponseObject<Object> getalltranprice() throws ServiceException;
+}

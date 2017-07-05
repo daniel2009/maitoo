@@ -1,0 +1,273 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0041)http://www.xlobo.com/public/solution.aspx -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script type="text/javascript" charset="utf-8" async="" src="./shining_files/crmqq.php"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/contains.js"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/localStorage.js"></script><script type="text/javascript" charset="utf-8" async="" src="./shining_files/Panel.js"></script>
+    
+    <title>阳光国际速递</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+   
+    <link href="./shining_files/reset.css" rel="stylesheet">
+<link href="./shining_files/site.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="./shining_files/bootstrap.css">
+     <script src="./shining_files/Ymt.min.js"></script>
+<script src="./shining_files/jquery-1.5.2.min.js"></script>
+
+</head>
+<body><iframe style="display: none;"></iframe><style type="text/css">.WPA3-SELECT-PANEL { z-index:2147483647; width:463px; height:292px; margin:0; padding:0; border:1px solid #d4d4d4; background-color:#fff; border-radius:5px; box-shadow:0 0 15px #d4d4d4;}.WPA3-SELECT-PANEL * { position:static; z-index:auto; top:auto; left:auto; right:auto; bottom:auto; width:auto; height:auto; max-height:auto; max-width:auto; min-height:0; min-width:0; margin:0; padding:0; border:0; clear:none; clip:auto; background:transparent; color:#333; cursor:auto; direction:ltr; filter:; float:none; font:normal normal normal 12px "Helvetica Neue", Arial, sans-serif; line-height:16px; letter-spacing:normal; list-style:none; marks:none; overflow:visible; page:auto; quotes:none; -o-set-link-source:none; size:auto; text-align:left; text-decoration:none; text-indent:0; text-overflow:clip; text-shadow:none; text-transform:none; vertical-align:baseline; visibility:visible; white-space:normal; word-spacing:normal; word-wrap:normal; -webkit-box-shadow:none; -moz-box-shadow:none; -ms-box-shadow:none; -o-box-shadow:none; box-shadow:none; -webkit-border-radius:0; -moz-border-radius:0; -ms-border-radius:0; -o-border-radius:0; border-radius:0; -webkit-opacity:1; -moz-opacity:1; -ms-opacity:1; -o-opacity:1; opacity:1; -webkit-outline:0; -moz-outline:0; -ms-outline:0; -o-outline:0; outline:0; -webkit-text-size-adjust:none; font-family:Microsoft YaHei,Simsun;}.WPA3-SELECT-PANEL a { cursor:auto;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-TOP { height:25px;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-CLOSE { float:right; display:block; width:47px; height:25px; background:url(http://combo.b.qq.com/crm/wpa/release/3.3/wpa/views/SelectPanel-sprites.png) no-repeat;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-CLOSE:hover { background-position:0 -25px;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-MAIN { padding:23px 20px 45px;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-GUIDE { margin-bottom:42px; font-family:"Microsoft Yahei"; font-size:16px;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-SELECTS { width:246px; height:111px; margin:0 auto;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-CHAT { float:right; display:block; width:88px; height:111px; background:url(http://combo.b.qq.com/crm/wpa/release/3.3/wpa/views/SelectPanel-sprites.png) no-repeat 0 -80px;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-CHAT:hover { background-position:-88px -80px;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-AIO-CHAT { float:left;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-QQ { display:block; width:76px; height:76px; margin:6px; background:url(http://combo.b.qq.com/crm/wpa/release/3.3/wpa/views/SelectPanel-sprites.png) no-repeat -50px 0;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-QQ-ANONY { background-position:-130px 0;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-LABEL { display:block; padding-top:10px; color:#00a2e6; text-align:center;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-BOTTOM { padding:0 20px; text-align:right;}.WPA3-SELECT-PANEL .WPA3-SELECT-PANEL-INSTALL { color:#8e8e8e;}</style><style type="text/css">.WPA3-CONFIRM { z-index:2147483647; width:285px; height:141px; margin:0; background:url(data:image/png;base64, no-repeat;}.WPA3-CONFIRM { *background-image:url(http://combo.b.qq.com/crm/wpa/release/3.3/wpa/views/panel.png);}.WPA3-CONFIRM * { position:static; z-index:auto; top:auto; left:auto; right:auto; bottom:auto; width:auto; height:auto; max-height:auto; max-width:auto; min-height:0; min-width:0; margin:0; padding:0; border:0; clear:none; clip:auto; background:transparent; color:#333; cursor:auto; direction:ltr; filter:; float:none; font:normal normal normal 12px "Helvetica Neue", Arial, sans-serif; line-height:16px; letter-spacing:normal; list-style:none; marks:none; overflow:visible; page:auto; quotes:none; -o-set-link-source:none; size:auto; text-align:left; text-decoration:none; text-indent:0; text-overflow:clip; text-shadow:none; text-transform:none; vertical-align:baseline; visibility:visible; white-space:normal; word-spacing:normal; word-wrap:normal; -webkit-box-shadow:none; -moz-box-shadow:none; -ms-box-shadow:none; -o-box-shadow:none; box-shadow:none; -webkit-border-radius:0; -moz-border-radius:0; -ms-border-radius:0; -o-border-radius:0; border-radius:0; -webkit-opacity:1; -moz-opacity:1; -ms-opacity:1; -o-opacity:1; opacity:1; -webkit-outline:0; -moz-outline:0; -ms-outline:0; -o-outline:0; outline:0; -webkit-text-size-adjust:none;}.WPA3-CONFIRM * { font-family:Microsoft YaHei,Simsun;}.WPA3-CONFIRM .WPA3-CONFIRM-TITLE { height:40px; margin:0; padding:0; line-height:40px; color:#2b6089; font-weight:normal; font-size:14px; text-indent:80px;}.WPA3-CONFIRM .WPA3-CONFIRM-CONTENT { height:55px; margin:0; line-height:55px; color:#353535; font-size:14px; text-indent:29px;}.WPA3-CONFIRM .WPA3-CONFIRM-PANEL { height:30px; margin:0; padding-right:16px; text-align:right;}.WPA3-CONFIRM .WPA3-CONFIRM-BUTTON { position:relative; display:inline-block!important; display:inline; zoom:1; width:99px; height:30px; margin-left:10px; line-height:30px; color:#000; text-decoration:none; font-size:12px; text-align:center;}.WPA3-CONFIRM .WPA3-CONFIRM-BUTTON-FOCUS { width:78px;}.WPA3-CONFIRM .WPA3-CONFIRM-BUTTON .WPA3-CONFIRM-BUTTON-TEXT { line-height:30px; text-align:center; cursor:pointer;}.WPA3-CONFIRM-CLOSE { position:absolute; top:7px; right:7px; width:10px; height:10px; cursor:pointer;}</style>
+    <!-- header S -->
+   <div class="xlobo_hd">
+        <div class="ly_in">
+           <h1> <img src="./shining_files/shining_logo_.png"></h1>
+           
+            <div class="main_nav">
+                <ul class="main_nav_list">
+                    <li class="cur"><a href="./index.html">首页</a></li>
+                    <li><a href="./pricing.html">收费标准</a></li>
+                    <li><a href="./about_us.html">关于我们</a></li>
+                    <li><a href="./location.html">地点</a></li>
+		    <li><a href="./../newsandgonggao.jsp"  target="_blank">公告</a>/ <a href="./xieyi_mt.html" target="_blank">协议</a> </li>
+                    <li><a href="./../login.jsp">注册</a> &nbsp;/&nbsp; <a href="./../login.jsp">登陆</a> </li>
+                    <li><a href="./../shangchuan.jsp" target="_blank">上传身份证</a></li> 
+
+            	    <li> <a class="qqOn" target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=76085666&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:2278808484:41 &r=0.8940031429092906" alt="美国洛杉矶" title="美国洛杉矶"></a> </li>
+
+                </ul>
+            </div>
+            
+
+
+            </div>
+
+
+<script>
+    function gocn(url) {
+        
+    $.ajax({
+        url: "/api/changelanguageapi/ChangeLanguageToCn",
+        type: 'post',
+
+        contentType: 'application/json',
+        success: function (result) {
+            location.href = url;
+        }
+    });
+    }
+</script>
+        </div>
+    </div>
+    <!-- header E -->
+    <!-- main S -->
+    <div class="main">
+        <!-- banner S -->
+        <div class="worth_banner">
+            <div class="ly_in">
+                <h2>地点</h2>
+                <!--<p>跨境电子商务国际物流解决方案专家</p>-->
+            </div>
+        </div>
+        <!-- banner E -->
+        <!-- banner E -->
+        <div class="ly_in solutions" style="background-image: url('./location_files/background.png');">
+            <ul class="solutions_list">
+                <li class="so1"><span class="icon"><i></i></span>
+                    <div class="solution_inf">
+                       
+                        <dl class="solotion_sprial">
+                            <dt><s> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</s> </dt>
+                            <dd> 
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            </dd>
+                        </dl>
+                       
+                        
+                    </div>
+                </li>
+                <li class="so2"><span class="icon"><i></i></span>
+                    <div class="solution_inf">
+                        <h3> &nbsp;&nbsp;&nbsp;&nbsp;   </h3>
+                        <p>
+                              &nbsp;&nbsp;&nbsp;&nbsp;  
+                             </p>
+                        <dl class="solotion_sprial">
+                            <dt><s> &nbsp;&nbsp;&nbsp;&nbsp;  </s> 
+                            </dt>
+                            <dd> 
+                             &nbsp;&nbsp;&nbsp;&nbsp;  
+                            </dd>
+                        </dl>
+                        <dl class="solotion_sprial">
+                            <dt><s> &nbsp;&nbsp;&nbsp;&nbsp;  </s> 
+                            </dt>
+                            <dd> 
+                             &nbsp;&nbsp;&nbsp;&nbsp;  
+                            </dd>
+                        </dl>
+                        <dl class="solotion_sprial">
+                            <dt><s> &nbsp;&nbsp;&nbsp;&nbsp;  </s> 
+                            </dt>
+                            <dd>
+                             &nbsp;&nbsp;&nbsp;&nbsp;    
+
+                            </dd>
+                        </dl>
+                    </div>
+                </li>
+                <li class="so3"><span class="icon"><i></i></span>
+                <div class="solution_inf">
+                <div class="row">
+                <div class="col-xs-6">
+                    
+                        <h3>总公司 洛杉矶 <br/>Los Angeles, CA</h3>
+                        <p style="font-size:12px;">
+                            18513 Gale Ave, City of Industry, CA 91748<br/>
+                            Tel：(310)997-0057<br/>
+                            营业时间：<br/>Mon-Sat：11am-6pm.<br/>
+                        </p>
+                        <h3>San Diego, CA</h3>
+                        <p style="font-size:12px;">
+                            7297 Ronson Rd, Suite J,San Diego, CA 92111<br/>
+                            Tel：(858)668-6529<br/>
+                            营业时间：<br/>Mon-Sat：10:30am-6:30pm.<br/>
+                        </p>
+                        <h3>Las Vegas, NV</h3>
+                        <p style="font-size:12px;">
+                            4570 Spring Mountain Rd., Las Vegas, NV 89102<br/>
+                            Tel:(702)908-8868<br/>
+                             营业时间：<br/>Mon-Sat：11am-6pm.<br/>
+                        </p>
+                        <h3>Ontario, CA</h3>
+                        <p style="font-size:12px;">
+                            4385 E Lowell St Ste B, CA 91761<br/>
+                           Tel:(951)358-9757<br/>
+                            营业时间：<br/>Mon-Sat：11am-6pm.<br/>
+                        </p>
+                        
+                       
+                       
+                    </div>
+                  
+                     
+                <div class="col-xs-6">
+                    	<h3>San Francisco, CA</h3>
+                        <p style="font-size:12px;">
+                            43100 Christy St.,Fremont, CA 94538<br/>
+                            Tel:(510)378-8967<br/>
+                            营业时间：<br/>Mon-Sat：11am-6pm<br/>
+                        </p>
+                        <h3>Vancouver, Canada</h3>
+                        <p style="font-size:12px;">
+                            103-6020 No.3 Rd. Richmond, British Columbia, Canada V6Y2B3<br/>
+                            Tel:(604)285-1667<br/>
+                            营业时间：<br/>Mon-Sun：10:30am-6:30pm.<br/>
+                        </p>
+                        <h3>Monterey Park, CA</h3>
+                        <p style="font-size:12px;">
+                            669 West Garvey Ave.,#B, Monterey Park, CA, <br/>
+                            Tel:(310)997-0057<br/>
+                            营业时间：<br/>Mon-Sat：10:30am-6:30pm.<br/>
+                        </p>
+                        <h3>Irvine, CA</h3>
+                        <p style="font-size:12px;">
+                            2777 Alton Pkwy Apt 454, CA 92606<br/>
+                            Tel:(949)529-6486<br/>
+                            营业时间：<br/>Mon-Fri：10:30am-5:30pm.<br/>
+                        </p>
+                       
+                       
+                    </div>
+                    </div>
+                </li>
+                <li class="so4"><span class="icon"><i></i></span>
+                    <div class="solution_inf">
+                        <h3> </h3>
+                        <p> 
+                        </p>
+                        <dl class="solotion_sprial">
+                            <dt><s></s> 
+                            </dt>
+                            <dd> 
+                            </dd>
+                        </dl>
+                        <dl class="solotion_sprial">
+                            <dt><s></s> 
+                            </dt>
+                            <dd> 
+                            </dd>
+                        </dl>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- main E -->
+    <!-- 合作伙伴 S
+    
+ <div class="friend_box">
+    <div class="ly_in"> <span class="friend_tit">合作伙伴：</span>
+        <ul class="friend_list" style="width:1100px">
+            <li><a href="http://www.ymatou.com/" target="_blank"><img src="./shining_file/8.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.jd.com/" target="_blank"><img src="./shining_file/f2.jpg" width="148" height="58" alt=""></a></li>
+            <li><a href="http://g.taobao.com/" target="_blank"><img src="./shining_file/5.png" width="148" height="58" alt=""></a></li>
+            
+            <li><a href="http://tmall.hk/" target="_blank"><img src="./shining_file/f4.jpg" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.suning.com/" target="_blank"><img src="./shining_file/f5.jpg" width="148" height="58" alt=""></a></li>
+         
+            <li><a href="http://www.redbaby.com.cn/" target="_blank"><img src="./shining_file/f1.jpg" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.ckair.com/" target="_blank"><img src="./shining_file/1.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.airchinacargo.com/" target="_blank"><img src="./shining_file/2.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.ontrac.com/" target="_blank"><img src="./shining_file/3.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.csair.com/" target="_blank"><img src="./shining_file/4.png" width="148" height="58" alt=""></a></li>
+            
+            <li><a href="http://www.chinapost.com.cn/" target="_blank"><img src="./shining_file/7.png" width="148" height="58" alt=""></a></li>
+            <li><a href="http://www.fedex.com/us/" target="_blank"><img src="./shining_file/6.png" width="148" height="58" alt=""></a></li>
+        </ul>
+    </div>
+</div> -->
+  
+    <!-- 合作伙伴 E -->
+    <!-- footer S -->
+    
+
+<div class="xlobo_ft">
+    <div class="ly_in">
+       
+        
+         <div class="global_site"> <span>联系我们：</span>
+            <ul class="global_site_list">
+                <li class="st1"><i></i><a href="./location.html">地址：18513 Gale Ave. City of Industry CA 91748</a></li>
+                <li class="st2"><i></i><a href="#" target="_blank">联系电话：(310)997-0057</a></li>
+                <li class="st3"><i></i><a href="#" target="_blank">Email(电子邮箱)：info@shiningexpress.com</a></li>
+                <li class="st4"><i></i><a href="#" target="_blank"></a></li>
+            </ul>
+        </div>
+
+       
+       
+        <div class="copy_right">
+            <p>
+            
+           
+                <a href="#">帮助及问答</a>
+                <a href="#">资源下载</a>
+                <a href="#">加盟合作</a>
+                <a href="#">服务协议</a>
+
+          
+                
+            </p>
+            <p>Copyright © 2015 Shining Express. All Rights Reserved.</p>
+        </div>
+    </div>
+</div>
+    
+    <!-- footer E -->
+
+    
+  <script src="./shining_files/main.js"></script>
+<script src="./shining_files/changeLang.js"></script>
+
+
+
+
+</body></html>

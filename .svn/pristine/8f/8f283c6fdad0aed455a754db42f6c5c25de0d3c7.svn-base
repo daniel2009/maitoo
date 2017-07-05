@@ -1,0 +1,141 @@
+package com.weiye.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.PageSplitUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.ProductTypeDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ProductType;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.ProductTypeService;
+
+@Service("productTypeService")
+public class ProductTypeServiceImpl implements ProductTypeService{
+	@Autowired
+	private ProductTypeDao productTypeDao;
+
+	@Override
+	public ResponseObject<Object> add(ProductType productType) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == productType){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				int result = productTypeDao.insert(productType);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.PRODUCT_TYPE_INSERT_FAIL);
+					responseObject.setMessage("添加商品类型失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<ProductType> findById(ProductType productType) throws ServiceException {
+		ResponseObject<ProductType> responseObject = new ResponseObject<ProductType>();
+		if(null == productType || StringUtil.isEmpty(productType.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				productType = productTypeDao.findById(productType);
+				if (null == productType) {
+					responseObject.setCode(ResponseCode.PRODUCT_TYPE_NO_EXISTS);
+					responseObject.setMessage("商品类型不存在");
+				} else {
+					responseObject.setData(productType);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> update(ProductType productType) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == productType || StringUtil.isEmpty(productType.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				int result = productTypeDao.update(productType);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.PRODUCT_TYPE_UPDATE_FAIL);
+					responseObject.setMessage("修改商品类型失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<PageSplit<ProductType>> findByKey(String key, int pageIndex, int pageSize) throws ServiceException {
+		ResponseObject<PageSplit<ProductType>> responseObject = new ResponseObject<PageSplit<ProductType>>();
+		key = StringUtil.escapeStringOfSearchKey(key);
+		try {
+			int count = productTypeDao.countByKey(key);
+			if(count > 0){
+				PageSplit<ProductType> pageSplit = new PageSplit<>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, count);
+				List<ProductType> list = productTypeDao.findByKey(key, firstResult, pageSize);
+				if (list.isEmpty()) {
+					responseObject.setCode(ResponseCode.PRODUCT_TYPE_GET_LIST_FAIL);
+					responseObject.setMessage("获取商品列表失败");
+				} else {
+					pageSplit.setDatas(list);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(pageSplit);
+				}
+			}else{
+				responseObject.setCode(ResponseCode.PRODUCT_TYPE_EMPTY_LIST);
+				responseObject.setMessage("商品列表为空");
+			}
+			
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> delete(ProductType productType) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == productType || StringUtil.isEmpty(productType.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				int result = productTypeDao.delete(productType);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.PRODUCT_TYPE_DELETE_FAIL);
+					responseObject.setMessage("删除商品类型失败,或已不存在");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+}

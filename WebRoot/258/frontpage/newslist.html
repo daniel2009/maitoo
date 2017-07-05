@@ -1,0 +1,420 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>美淘转运(MEITAO EXPRESS MAIL) - 准时、高效、经济的帮您转运个人物品到中国！</title>
+        <link rel="icon" href="/images/logo_io.jpg" type="image/x-icon"/>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="applicable-device" content="pc,mobile">
+
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+        .tabs-left > .nav-tabs {
+            top: auto;
+            margin-bottom: 0;
+            border-color: #c5d0dc;
+            float: left;
+        }
+
+        .nav-tabs {
+            border-color: #c5d0dc;
+            margin-bottom: 0;
+            margin-left: 0;
+            position: relative;
+            top: 1px;
+        }
+
+        .tabs-left > .nav-tabs > li {
+            float: none;
+        }
+
+            .tabs-left > .nav-tabs > li > a, .tabs-left > .nav-tabs > li > a:focus, .tabs-left > .nav-tabs > li > a:hover {
+                border-color: #c5d0dc;
+                margin: 0 -1px 0 0;
+            }
+
+            .tabs-left > .nav-tabs > li > a, .tabs-right > .nav-tabs > li > a {
+                min-width: 60px;
+            }
+
+        .nav-tabs > li:first-child > a {
+            margin-left: 0;
+        }
+
+        .nav-tabs > li > a, .nav-tabs > li > a:focus {
+            border-radius: 0 !important;
+            background-color: #f9f9f9;
+            color: #999;
+            margin-right: -1px;
+            line-height: 26px;
+            position: relative;
+            z-index: 11;
+            border-color: #c5d0dc;
+        }
+
+        .nav-tabs > li > a {
+            padding: 8px 12px;
+        }
+
+        .tabs-left > .nav-tabs > li.active > a, .tabs-left > .nav-tabs > li.active > a:focus, .tabs-left > .nav-tabs > li.active > a:hover {
+            border-color: #c5d0dc;
+            border-top-width: 1px;
+            border-left: 2px solid #4c8fbd;
+            border-right-color: transparent;
+            margin: 0 -1px 0 -1px;
+            -webkit-box-shadow: -2px 0 3px 0 rgba(0,0,0,0.15);
+            box-shadow: -2px 0 3px 0 rgba(0,0,0,0.15);
+        }
+
+        .tabs-left > .nav-tabs > li > a, .tabs-left > .nav-tabs > li > a:focus, .tabs-left > .nav-tabs > li > a:hover {
+            border-color: #c5d0dc;
+            margin: 0 -1px 0 0;
+        }
+
+        .tabs-left > .nav-tabs > li > a, .tabs-right > .nav-tabs > li > a {
+            min-width: 60px;
+        }
+
+        .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+            color: #576373;
+            border-color: #c5d0dc;
+            border-top: 2px solid #4c8fbd;
+            border-bottom-color: transparent;
+            background-color: #FFF;
+            z-index: 12;
+            line-height: 26px;
+            margin-top: -1px;
+            box-shadow: 0 -2px 3px 0 rgba(0,0,0,0.15);
+        }
+
+        .tabs-left .tab-content, .tabs-right .tab-content {
+            overflow: auto;
+        }
+
+        .tab-content {
+            border: 1px solid #c5d0dc;
+            padding: 16px 12px;
+            position: relative;
+            z-index: 11;
+        }
+
+        span.badge.badge-danger {
+            padding: 0 4px;
+            line-height: 15px;
+            opacity: .7;
+        }
+
+        .badge {
+            text-shadow: none;
+            font-size: 12px;
+            padding-top: 1px;
+            padding-bottom: 3px;
+            font-weight: normal;
+            line-height: 15px;
+            background-color: #abbac3 !important;
+        }
+
+        .label-danger, .badge-danger {
+            background-color: #d15b47 !important;
+        }
+        .nav-tabs a {
+            font-size:14px;
+        }
+        .information{min-height:100px;}
+
+
+        *{ margin:0; padding:0; list-style:none;}
+a{ text-decoration:none;}
+a:hover{ text-decoration:none;}
+.tcdPageCode{padding: 15px 20px;text-align: left;color: #ccc;}
+.tcdPageCode a{display: inline-block;color: #428bca;display: inline-block;height: 25px;	line-height: 25px;	padding: 0 10px;border: 1px solid #ddd;	margin: 0 2px;border-radius: 4px;vertical-align: middle;}
+.tcdPageCode a:hover{text-decoration: none;border: 1px solid #428bca;}
+.tcdPageCode span.current{display: inline-block;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;color: #fff;background-color: #428bca;	border: 1px solid #428bca;border-radius: 4px;vertical-align: middle;}
+.tcdPageCode span.disabled{	display: inline-block;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;	color: #bfbfbf;background: #f2f2f2;border: 1px solid #bfbfbf;border-radius: 4px;vertical-align: middle;}
+    </style>
+
+    <link href="css/bxslider.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/bxslider.min.js"></script>
+    <script src="scripts/common.js"></script>
+    <script src="bootstrap/js/bootstrap.js"></script>
+    <!--[if lt IE 9]>
+      <script src="../resources/js/html5shiv.min.js"></script>
+      <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="otherbody">
+
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-4 col-md-4">
+                    <a href="index.html"><img src="images/logo2.png" class="logo" alt="" /></a>
+                </div>
+
+                <div id="topsearch" class="col-xs-12 col-sm-5 col-md5">
+                    <div class="input-group search_group" id="phonesearch">
+
+                        <textarea type="text" name="name" class="form-control input-sm" style="font-size:13px; height:45px; padding:2px 2px; color:#333;" placeholder="请输入要查询的单号，多个单号请用Enter(回车)键隔开"></textarea>
+                        <span class="input-group-btn">
+                            <button onclick="search('#phonesearch textarea')" class="btn btn-sm mysearch_btn" type="button" style="width:75px; height:45px;line-height:35px;font-size:18px;">查 询</button>
+                        </span>
+
+                    </div>
+                    <div id="zaixiandadan" style="margin-top:0px; color:#013677; font-family:SimSun;">
+                        <a href="../user/index.html?type=1">
+                            <img src="images/zaixiandadan1.png">
+                        </a>
+                        <a href="../user/index.html?type=0">
+                            <img src="images/yuyuequjian1.png">
+                        </a>
+                    </div>
+                </div>
+
+
+
+                <div id="weixinhao" class="col-xs-12 col-sm-3 col-md3">
+                    <a href="index.html">
+                        <img src="images/q2code.png" width="100" height="90" title="扫一扫，惊喜多多!" />
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <span id="small_search" class="glyphicon glyphicon-search" aria-hidden="true"></span>
+
+                    <a class="navbar-brand" href="#">导航菜单</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="index.html">首页</a></li>
+
+                        <li><a href="aboutus.html">关于我们</a></li>
+                        <li class="dropdown">
+                            <a href="channel.html">渠道说明</a>
+
+                        </li>
+                        <li class="dropdown">
+                            <a href="newslist.html">新闻公告</a>
+
+                        </li>
+                        <li class="dropdown">
+                            <a href="contact.html">找到我们</a>
+
+                        </li>
+                        <li class="dropdown">
+                            <a href="uploadid.html">上传身份证</a>
+
+                        </li>
+                        <li class="dropdown">
+                            <a href="/258/user/index.html">会员中心</a>
+
+                        </li>
+                        <li><a href="registe.html">注册</a></li>
+                        <li><a href="login.html">登录</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </nav>
+        <!-- bxslider -->
+
+    </header>
+
+    <!-- main --><main>
+        <div class="container">
+            <script type="text/javascript">
+                $(function () {
+
+                })
+            </script>
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 content" >
+                    <div class="breadcrumbs" style="border:0; margin-top:-15px;">
+                        <label>
+                            您当前位置：
+                        </label>
+                        <a href="index.html">首页</a> &gt; <a href="newslist.html">新闻公告</a>
+
+                    </div>
+
+                    <div class="tabbable tabs-left">
+                        <ul class="nav nav-tabs">
+                            <li class="" id="newtab">
+                                <a data-toggle="tab" href="#new">
+                                    新闻
+                                    <span class="badge badge-danger">0</span>
+                                </a>
+                            </li>
+
+                            <li class="" id="gonggaotab">
+                                <a data-toggle="tab" href="#gonggao">
+                                    公告
+                                    <span class="badge badge-danger">0</span>
+                                </a>
+                            </li>
+
+
+                        </ul>
+
+                        <div class="tab-content">
+                            <div id="new" class="tab-pane">
+                                <div class="information">
+                                    <ul>
+                                        <li class="last">
+                                            <table>
+                                                <tbody>
+
+                                                    <!--<tr>
+                                                        <td>
+                                                            <p>
+                                                                •<a href="newsdetail.html">海关布控查验“双随机”</a>
+                                                            </p>
+
+                                                        </td>
+                                                        <td class="date">
+                                                            2015-12-11 19:43:32
+                                                        </td>
+                                                    </tr>-->
+
+                                                </tbody>
+                                            </table>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="tcdPageCode" style="text-align:center"></div>
+                            </div>
+
+                            <div id="gonggao" class="tab-pane">
+                                <div class="information">
+                                    <ul>
+                                        <li class="last">
+                                            <table>
+                                                <tbody>
+
+                                                  
+                                                </tbody>
+                                            </table>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="tcdPageCode" style="text-align:center"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <nav class="navbar navbar-default navbar-fixed-bottom footer_nav">
+            <div class="foot_nav btn-group dropup">
+                <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#">
+                    <span class="glyphicon glyphicon-share btn-lg" aria-hidden="true"></span>
+                    分享
+                </a>
+                <div class="dropdown-menu webshare">
+                    <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a><a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a><a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网"></a><a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a><a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a></div>
+                    <script>window._bd_share_config = { "common": { "bdSnsKey": {}, "bdText": "", "bdMini": "2", "bdMiniList": false, "bdPic": "", "bdStyle": "0", "bdSize": "24" }, "share": {} }; with (document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];</script>
+                </div>
+            </div>
+            <div class="foot_nav"><a href="tel:6268721082"><span class="glyphicon glyphicon-phone btn-lg" aria-hidden="true"></span>手机</a></div>
+            <div class="foot_nav"><a id="gotocate" href="#"><span class="glyphicon glyphicon-th-list btn-lg" aria-hidden="true"></span>导航</a></div>
+            <div class="foot_nav"><a id="gototop" href="#"><span class="glyphicon glyphicon-circle-arrow-up btn-lg" aria-hidden="true"></span>顶部</a></div>
+        </nav>
+    </main> <footer>
+        <div class="copyright">
+            <p>usitao.com All rights reserved. 美淘转运 版权所有 © 2016 本网站受国际著作权法和商标法的保护 <a href="" target="_blank">Global Postal Service Inc</a></p>
+            <p class="copyright_p">地址:357 E Garvey Ave， Monterey Park CA 91755 &nbsp;电话：+1(626)872-1082  +1(626)593-5872 </p>
+        </div>
+
+    </footer>
+
+    <!--客服面板-->
+    <link rel="stylesheet" type="text/css" href="css/online.css" />
+    <div id="cmsFloatPanel">
+        <div class="ctrolPanel">
+            <a class="service" href="#"></a>
+            <a class="message" href="#"></a>
+            <a class="qrcode" href="#"></a>
+            <a class="arrow" title="返回顶部" href="#"></a>
+        </div>
+        <div class="servicePanel">
+            <div class="servicePanel-inner">
+                <div class="serviceMsgPanel">
+                    <div class="serviceMsgPanel-hd"><a href="#"><span>关闭</span></a></div>
+                    <div class="serviceMsgPanel-bd">
+                        <!--在线QQ-->
+                        <div class="msggroup">
+                            <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=2569458125&site=qq&menu=yes"><img class="qqimg" src="http://wpa.qq.com/pa?p=2:2569458125:52" alt="QQ在线客服" />洛杉矶客服</a>
+                        </div>                          <!--在线MSN-->
+                        <div class="msggroup">
+                            <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=2717990880&site=qq&menu=yes"><img class="qqimg" src="http://wpa.qq.com/pa?p=2:2717990880:52" alt="QQ在线客服" />上海客服</a>
+                        </div>
+                        <div class="msggroup">
+                            <a target="_blank" href="weixin.html"><img class="qqimg" width="25px" height=25px src="/images/weixin.jpg" alt="微信客服" />微信客服</a>
+                        </div>
+                    </div>
+                    <div class="serviceMsgPanel-ft"></div>
+                </div>
+                <div class="arrowPanel">
+                    <div class="arrow02"></div>
+                </div>
+            </div>
+        </div>
+        <div class="messagePanel">
+            <div class="messagePanel-inner">
+                <div class="formPanel">
+
+                    <div class="formPanel-bd">
+                        <div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a><a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a><a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网"></a><a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a><a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a></div>
+                        <script>window._bd_share_config = { "common": { "bdSnsKey": {}, "bdText": "", "bdMini": "2", "bdMiniList": false, "bdPic": "", "bdStyle": "0", "bdSize": "24" }, "share": {} }; with (document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];</script>
+                                  <a type="button" class="btn btn-default btn-xs" href="#" style="margin: 6px 0px 0px 10px;">关闭</a>
+                    </div>
+
+                </div>
+                <div class="arrowPanel">
+                    <div class="arrow01"></div>
+                    <div class="arrow02"></div>
+                </div>
+            </div>
+        </div>
+        <div class="qrcodePanel">
+            <div class="qrcodePanel-inner">
+                <div class="codePanel">
+                    <div class="codePanel-hd"><span style="float:left">微信公众号</span><a href="#"><span>关闭</span></a></div>
+                    <div class="codePanel-bd">
+                        <img src="images/usitao2q.jpg" alt="二维码" />
+                    </div>
+                </div>
+                <div class="arrowPanel">
+                    <div class="arrow01"></div>
+                    <div class="arrow02"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="scripts/jquery.page.js"></script>
+    <script type="text/javascript" src="scripts/online.js"></script>
+    <script src="scripts/newlist.js"></script>
+</body>
+
+</html>

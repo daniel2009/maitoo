@@ -1,0 +1,73 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+</head>
+
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">预报记录</p>
+		<div class="box_content">
+			<div class="content_title">预报记录&nbsp;&nbsp;
+			<a href="#" onclick="javascript: forwardPage('transhipment', 1);">已入库<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentState1">0</label>)</span></a>
+				<a href="#" onclick="javascript: forwardPage('transhipment', 3);">待支付<span style="margin: 0 3px; color: #f00;">(<label id="countTranshipmentState3">0</label>)</span></a>
+			
+			</div>
+			<div class="content_text">
+				<span>&nbsp;&nbsp;&nbsp;&nbsp;转运单状态：</span>
+				<select id="stateSelect" onchange="javascript: loadNav13Data();">
+					<option value="" selected>全部</option>
+					<option value="0">未入库</option>
+									<option value="-7">转运入库</option>
+									<option value="-6">转运出库</option>
+									<option value="-5">待检入库</option>
+					              	<option value="1">已入库</option>
+					              	<option value="2">等待审核</option>
+					              	<option value="3">等待付款</option>
+					              	<option value="4">已付款</option>
+					              	<option value="5">分拣完成</option>
+					              	<option value="-9">退货中</option>
+									<option value="-8">已退货</option>
+									<option value="-10">包裹异常</option>
+					
+					
+					
+				</select>
+				</div>
+				<div class="content_text">
+					<div class="tab_box" >
+						<table id="datatable" class="table">
+							<thead>
+								<tr>
+									<th style="width:60px">预报单号</th><th style="width:80px">包裹运单号</th><th>货物说明</th><th>备注</th><th style="width:100px">入库时间</th><th style=" width:40px">重量</th><th>到货仓库</th><th>货运渠道</th><th style="width:60px">是否入库</th><th style="width:30px" >选择</th><th style="width:30px" >操作</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+							<tfoot>
+								<tr id="page">
+									<td colspan="8" align="right">共<span id="trsize">0</span>条 <a id="first_page" href="1" name="to_page">首页</a> | <a id="pre_page" name="to_page">上一页</a> | <input type="text" class="bor" size="2" /> /<span id="tpsize">0</span>| <a id="next_page" name="to_page">下一页</a> | <a id="last_page" name="to_page">未页</a></td>
+								</tr>
+								<tr>
+									<td colspan="8"  align="center"><span class="red"><a href="#">同意本站转运协议 </a><input type="checkbox" name="protocol_namep" value="0" checked="checked">&nbsp;&nbsp;&nbsp;&nbsp;</span><a  onclick="bgcxsubmit()" class="btn" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">组合包裹</a>
+									<!--  &nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:caibao()" class="btn" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">包裹拆包</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:bgcxsubmit()" class="btn" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">运单提交</a>-->
+								</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+</body>
+<script>
+    var packageInfo = [];
+    function search(){
+    	loadList(form);
+    }
+</script>
+</html>

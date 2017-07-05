@@ -1,0 +1,778 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+    <title>打印页面</title>
+    <style type="text/css">
+        * {
+            font-family: 'Microsoft YaHei';
+            font-size:18px;
+            word-break: break-all;
+            padding:0px; 
+        }
+       p{margin:3px 0px;}
+        .fontsize14{font-size:20px;}
+        .fontsize16{font-size:22px; font-weight:bold;}
+        td{padding-left:2px; padding-top:5px; padding-bottom:5px;}
+       div{padding:2px;}
+    </style>
+</head>
+<body>
+    <table style="BORDER-COLLAPSE: collapse" bordercolor=#000000  cellpadding=1 width=1000 align=center border=1>
+        <tbody>
+            <tr >
+           
+                <td colspan="" style="width:22.5%;"><span></span>美国电话：<br/><span id="usa_phone"></span></td>
+                <td rowspan="2" style="width:9.5%;;text-align:center;"><strong style="font-size:30px">美淘</strong><br/><strong style="font-size:20px">转运全球</strong></td>
+                <td rowspan="2" style="width:18%;;text-align:center;"><img src="" width="170px" height="60px" id="qrcodeurl"/></td>
+                <td rowspan="3" colspan="2" style="width:50%;">
+                    <img src="" width="300" height="60" style="padding:1px 1px;" id="barcode1"/>
+                </td>
+            </tr>
+         <tr>
+         <td><span>中国电话:</span><br/><span id="china_phone"></span></td>
+         
+         </tr>
+          <tr>
+          <td colspan="3"><span></span>Website/网址：<span id="print_site_url"></span></td>
+         
+         </tr>
+            <tr>
+                <td style="padding:0" borderthin="true" >
+                    <p>
+                        <span>Send Date/寄件日期：</span>
+                    </p>
+                    <p>
+                        <span class="fontsize14" id="send_date"></span>
+
+                    </p>
+                </td>
+                <td style="padding:0" borderthin="true" colspan="2">
+                    <p>
+                        <span>Phone/电话：</span>
+                    </p>
+                    <p>
+                        <span class="fontsize14" id="send_phone"></span>
+                    </p>
+                </td>
+                <td style="padding:0" borderthin="true" >
+
+                    <p>
+                        <span>Receiver/收件人：</span>
+                    </p>
+                    <p>
+                        <span class="fontsize16" id="receive_name"></span>
+                    </p>
+                </td>
+                <td style="padding:0" borderthin="true">
+
+                    <p>
+                        <span>Cell Phone/手机：</span>
+                    </p>
+                    <p>
+                        <span class="fontsize16" id="receive_phone"></span>
+                    </p>
+                </td>
+            </tr>
+          
+            <tr >
+                <td rowspan="1" colspan="3" borderthin="true">
+                    <span>Sender/寄件人：</span><span class="fontsize14" id="send_name"></span>
+                </td>
+                <td borderthin="true" rowspan="2" valign="top" >
+                    <p>Tracking Number/运单号：</p>
+                <p borderthin="true"  class="fontsize16" id="orderId_1"></p>
+              
+                </td>
+                <td borderthin="true" rowspan="2" valign="top">
+                 <p> Zip Code/邮编：</p>  
+                <p borderthin="true"  class="fontsize16" id="receive_zipcode"></p>
+                </td>
+            </tr>
+            <tr>
+                  <td rowspan="1" colspan="1">
+                    <span>始发地：</span><span class="fontsize14" id="send_address2_1">美国</span>
+                </td>
+                <td rowspan="1" colspan="2">
+                    <span>目的地：</span><span class="fontsize14">中国 </span><span class="fontsize14" id="toprivince1"></span>
+                </td>
+              
+            </tr>
+            <tr>
+                <td rowspan="2" colspan="3" style="padding:0;" valign="top">
+                    <span>包裹信息：</span><br>
+                   <span id="commudityinfo"></span>
+                </td>
+                <td rowspan="1" colspan="2" style="padding:0">
+                    <p>
+                        <span>Address/地址：</span>
+                    </p>
+                    <p class="fontsize16" id="receive_address">
+                       
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:0">
+                    <p><span>Signed By Shipper/寄件人签名</span></p>
+
+                    <p>&nbsp;</p>
+                </td>
+                <td style="padding:0">
+                    <p>
+                        <span>Signed By Courier/操作员签名</span>
+                    </p>
+                    <p>
+                        <span style="font-size:20px">操作员:<span id="employeeId"></span></span><span style="font-size:20px"> 店名编号:<span id="storeId"></span></span><span style="font-size:20px"> 会员:<span id="userId"></span></span>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td >
+                    <span>CUSTOMS Total Value/海关申报价:</span><span class="fontsize16" id="sea_value"></span>
+                </td>
+                <td colspan="2" valign="top">
+                    <span>Duties/关税:</span><span class="fontsize16" id="tariff"></span>
+                </td>
+                <td rowspan="4" colspan="2">
+                    <span id="print_order_hit"><br /></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span>Weight/重量(kg)：</span>
+                </td>
+                <td colspan="2">
+                    <span>体积费:</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span>Weight/重量(bl)：</span><span class="fontsize16" id="sjweight"></span>
+                </td>
+                <td colspan="2">
+                    <span>Other/其他：</span><span class="fontsize16" id="others"></span>
+                </td>
+            </tr>
+            <tr>
+                <td >
+                    <span>Insurance/保险：</span><span class="fontsize16" id="insurance"></span>
+                </td>
+                <td colspan="2" >
+                    <span>Total/总金额:</span><span class="fontsize16" id="totalmoney"></span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5" rowspan="1">
+                   <span>门市地址:</span> <span id="warehouseAddress"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+<br/>
+<br/>
+    <table style="BORDER-COLLAPSE: collapse; margin-top:50px;" bordercolor=#000000  cellpadding=1 width=1000 align=center border=1>
+        <tbody>
+        
+         <tr >
+           
+                <td colspan="" style="width:22.5%;"><span></span>美国电话：<br/><span id="usa_phone2"></span></td>
+                <td rowspan="2" style="width:9.5%;;text-align:center;"><strong style="font-size:30px">美淘</strong><br/><strong style="font-size:20px">转运全球</strong></td>
+                <td rowspan="2" style="width:18%;;text-align:center;"><img src="" width="170px" height="60px" id="qrcodeurl2"/></td>
+                <td rowspan="3" colspan="2" style="width:50%;">
+                    <img src="" width="300" height="60" style="padding:1px 1px;" id="barcode2"/>
+                </td>
+            </tr>
+        
+               
+         <tr>
+         <td><span>中国电话:</span><br/><span id="china_phone2"></span></td>
+         
+         </tr>
+          <tr>
+          <td colspan="3"><span></span>Website/网址：<span id="print_site_url2"></span></td>
+         
+         </tr>
+            <tr>
+                <td style="padding:0" borderthin="true">
+                    <p>
+                        <span>Send Date/寄件日期：</span>
+                    </p>
+                    <p>
+                        <span class="fontsize14" id="send_date2"></span>
+
+                    </p>
+                </td>
+                <td style="padding:0" borderthin="true" colspan="2">
+                    <p>
+                        <span>Phone/电话：</span>
+                    </p>
+                    <p>
+                        <span class="fontsize14" id="send_phone2"></span>
+                    </p>
+                </td>
+                <td style="padding:0" borderthin="true">
+
+                    <p>
+                        <span>Receiver/收件人：</span>
+                    </p>
+                    <p>
+                        <span class="fontsize16" id="receive_name2"></span>
+                    </p>
+                </td>
+                <td style="padding:0" borderthin="true">
+
+                    <p>
+                        <span>Cell Phone/手机：</span>
+                    </p>
+                    <p>
+                        <span class="fontsize16" id="receive_phone2"></span>
+                    </p>
+                </td>
+            </tr>
+
+            <tr>
+                <td rowspan="1" colspan="3" borderthin="true">
+                    <span>Sender/寄件人：</span><span class="fontsize14" id="send_name2"></span>
+                </td>
+                <td borderthin="true" rowspan="2" valign="top" >
+                    <p>Tracking Number/运单号：</p>
+                <p borderthin="true"  class="fontsize16" id="orderId_2"></p>
+              
+                </td>
+                <td borderthin="true"  rowspan="2" valign="top">
+                   <p> Zip Code/邮编：</p>
+                    <p borderthin="true" class="fontsize16" id="receive_zipcode2"></p>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="1" colspan="1">
+                    <span>始发地：</span><span class="fontsize14" id="send_address2_2">美国</span>
+                </td>
+                <td rowspan="1" colspan="2">
+                    <span>目的地：</span><span class="fontsize14">中国 </span><span class="fontsize14" id="toprivince2"></span>
+                </td>
+                <!--<td style="border-top:0px;" class="fontsize16" id="receive_company2"></td>
+                <td style="border-top:0px;" class="fontsize16" id="receive_zipcode2"></td>-->
+            </tr>
+            <tr>
+                <td rowspan="2" colspan="3" style="padding:0;" valign="top">
+                    <span>包裹信息：</span><br/>
+                    <span id="commudityinfo2"></span>
+                </td>
+                <td rowspan="1" colspan="2" style="padding:0">
+                    <p>
+                        <span>Address/地址：</span>
+                    </p>
+                    <p class="fontsize16" id="receive_address2">
+                        
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:0">
+                    <p><span>Signed By Shipper/寄件人签名</span></p>
+
+                    <p>&nbsp;</p>
+                </td>
+                <td style="padding:0">
+                    <p>
+                        <span>Signed By Courier/操作员签名</span>
+                    </p>
+                    <p>
+                        <span style="font-size:20px">操作员:<span id="employeeId2"></span> </span><span style="font-size:20px"> 店名编号:<span id="storeId2"></span></span><span style="font-size:20px"> 会员:<span id="userId2"></span></span>
+                    </p>
+                </td>
+            </tr>
+       
+        </tbody>
+    </table>
+
+</body>
+<script type="text/javascript">
+
+var isload_barcode1=false;
+var isload_barcode2=false;
+var isload_qrcodeurl1=false;
+var isload_qrcodeurl2=false;
+
+function removenull(str)
+{
+	if((str=="null")||(str=="")||(str==null)||(str=="undefined"))
+	{
+	    return "";
+	}
+	else
+	{
+		return str;
+	}
+}
+ function getPar(par){
+	    //获取当前URL
+	    var local_url = document.location.href; 
+	    //获取要取得的get参数位置
+	    var get = local_url.indexOf(par +"=");
+	    if(get == -1){
+	        return false;   
+	    }   
+	    //截取字符串
+	    var get_par = local_url.slice(par.length + get + 1);    
+	    //判断截取后的字符串是否还有其他get参数
+	    var nextPar = get_par.indexOf("&");
+	    if(nextPar != -1){
+	        get_par = get_par.slice(0, nextPar);
+	    }
+	    return get_par;
+	}
+$(document)
+			.ready(
+					function() {
+					id=getPar("id");
+					//alert(id);
+					$.ajax({
+								type : "get",
+								url : "/m_order/get_one_by_user",
+								data : {
+											"id" : id
+										},
+								success : function(
+												response) {
+											var code = response.code;
+											if ("200" == code) {
+												$("#send_date").html(response.data.nowtime);//保存当前发件日期
+												$("#send_phone").html(response.data.suser.phone);//发件人电话
+												$("#send_name").html(response.data.suser.name);//发件人姓名
+												var send_address=removenull(response.data.suser.address);
+												if(removenull(response.data.suser.dist)!="")
+												{
+													send_address=send_address+"&nbsp;"+removenull(response.data.suser.dist);
+												}
+												if(removenull(response.data.suser.city)!="")
+												{
+													send_address=send_address+"&nbsp;"+removenull(response.data.suser.city);
+												}
+												if(removenull(response.data.suser.state)!="")
+												{
+													send_address=send_address+"&nbsp;"+removenull(response.data.suser.state);
+												}
+												if(removenull(response.data.suser.zipcode)!="")
+												{
+													send_address=send_address+"&nbsp;"+removenull(response.data.suser.zipcode);
+												}
+												$("#send_address").html(send_address);//发件人地址
+												
+												//收件人信息
+												
+												$("#receive_company").html(response.data.ruser.company);//收件人公司
+												$("#receive_phone").html(response.data.ruser.phone);//收件人电话
+												$("#receive_name").html(response.data.ruser.name);//收件人姓名
+												$("#receive_zipcode").html(response.data.ruser.zipcode);//收件人姓名
+												$("#toprivince2").html(removenull(response.data.ruser.state));
+												$("#toprivince1").html(removenull(response.data.ruser.state));
+												
+												var receive_address=removenull(response.data.ruser.address);
+												if(removenull(response.data.ruser.dist)!="")
+												{
+													receive_address=removenull(response.data.ruser.dist)+"&nbsp;"+receive_address;
+												}
+												if(removenull(response.data.ruser.city)!="")
+												{
+													receive_address=removenull(response.data.ruser.city)+"&nbsp;"+receive_address;
+												}
+												if(removenull(response.data.ruser.state)!="")
+												{
+													receive_address=removenull(response.data.ruser.state)+"&nbsp;"+receive_address;
+												}
+												/*if(removenull(response.data.ruser.zipcode)!="")
+												{
+													receive_address=removenull(response.data.ruser.zipcode)+"&nbsp;"+receive_address;
+												}*/
+												
+												
+												$("#orderId_2").html(response.data.orderId);
+												$("#orderId_1").html(response.data.orderId);
+												
+												$("#receive_address").html(receive_address);//收件人地址
+												$("#storeId").html(response.data.storeId);//门店id
+												$("#employeeId").html(response.data.employeeId);//员工id号
+												$("#userId").html(removenull(response.data.userId));//会员id号
+												$("#userId2").html(removenull(response.data.userId));//会员id号
+												//获取商品信息
+												var commudityinfo="";
+												var i=0;
+												$.each(response.data.detail,function() {
+													commudityinfo=commudityinfo +this.productName+"*"+this.quantity+";";
+													i=i+1;
+													if(i==response.data.detail.length)
+													{}
+													else
+													{
+														commudityinfo=commudityinfo +"&nbsp;&nbsp;";
+													}
+												});
+												$("#commudityinfo").html(commudityinfo);//商品信息
+												
+												
+												if(response.data.payornot=="1")//表示已经支付
+												{
+													$("#others").html(response.data.other);//其它费用
+													$("#insurance").html(response.data.insurance);//保险
+													
+													$("#totalmoney").html(response.data.totalmoney);//总价钱
+													$("#tariff").html(response.data.tariff);//关税
+													//$("#sjweight").html(response.data.sjweight);//实际重量
+													$("#sjweight").html(response.data.weight);//进位重量
+													$("#sea_value").html(response.data.value);//海关申报价
+												}
+												//表格2数据
+												$("#send_date2").html(response.data.nowtime);//保存当前发件日期
+												$("#send_phone2").html(response.data.suser.phone);//发件人电话
+												$("#send_name2").html(response.data.suser.name);//发件人姓名
+												
+												$("#send_address2").html(send_address);//发件人地址
+												
+												//收件人信息
+												
+												$("#receive_company2").html(response.data.ruser.company);//收件人公司
+												$("#receive_phone2").html(response.data.ruser.phone);//收件人电话
+												$("#receive_name2").html(response.data.ruser.name);//收件人姓名
+												$("#receive_zipcode2").html(response.data.ruser.zipcode);//收件人姓名
+												$("#receive_address2").html(receive_address);//收件人地址
+												$("#storeId2").html(response.data.storeId);//门店id
+												$("#employeeId2").html(response.data.employeeId);//员工id号
+												$("#commudityinfo2").html(commudityinfo);//商品信息
+												//var rannumber1=Math.random();
+												//var src1="../../barcode4j/generate?msg="+response.data.orderId+"&type=code39&height=12&ranno="+rannumber1;
+												//$("#barcode1").attr("src",src1);//二维码
+												//$("#barcode2").attr("src",src1);//二维码
+												
+												//$("#barcode1").attr("onload","onload_barcode1()");//加装函数
+												//$("#barcode2").attr("onload","onload_barcode2()");//加装函数
+												
+												
+												
+												
+												
+												var storeid=response.data.storeId;
+												 var rannumber1=Math.random();
+			                                        //var src1 = "/barcode4j/generate1?msg=" + response.data.orderId + "&type=code128&hrsize=2mm&height=6.5&mw=0.2&ranno="+rannumber1;
+			                                       // var src1 = "/barcode4j/generate1?msg=" + response.data.orderId + "&type=code128&hrsize=2mm&height=6.5&mw=0.2&ranno="+rannumber1;
+			                                        var src1 = "/barcode4j/generate1?msg=" + response.data.orderId + "&type=code39&hrsize=2mm&height=7&ranno="+rannumber1;
+			                                          //获取二维码长度
+			                                            $(function(){
+			  											getImageWidth(src1,function(w,h){
+			  											//var width1="398.4px";
+			  											
+			  											//var height1="63.6px";
+			  											
+			  											$("#barcode1").attr("width", w+"px");//设定宽度
+			  											$("#barcode1").attr("height", h+"px");//设定高度度
+			  											
+			  											
+			  											$("#barcode2").attr("width", w+"px");//设定宽度
+			  											$("#barcode2").attr("height", h+"px");//设定高度度
+			  											$("#barcode1").attr("src", src1);//条形码
+			  											$("#barcode2").attr("src", src1);//条形码
+			  											getprintwarehouse(storeid);
+			  											})});
+												
+											
+											
+											}
+											else if ("607" == code) {
+												alert("您尚未登录或登录已失效！");
+												top.location.href = "../frontpage/login.html";
+											}
+											else
+											{
+												alert("提交出错，出错原因："+response.message);
+											}
+											
+									}
+							});
+					
+		
+});
+
+function getprintwarehouse(warehouseid)
+{
+		$.ajax({async : true,
+			type : "get",
+			url : "/user/warehouse/get_one",
+			data : {
+				"id" : warehouseid
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					
+					var addressall=removenull(response.data.address);
+					if(removenull(response.data.city)=="")
+					{
+						addressall=removenull(response.data.city);
+					}
+					else
+					{
+						addressall=addressall+",&nbsp;"+removenull(response.data.city);
+					}
+					if(removenull(response.data.province)=="")
+					{
+						addressall=removenull(response.data.province);
+					}
+					else
+					{
+						addressall=addressall+",&nbsp;"+removenull(response.data.province);
+					}
+					
+					if(removenull(response.data.country)=="")
+					{
+						addressall=removenull(response.data.country);
+					}
+					else
+					{
+						addressall=addressall+",&nbsp;"+removenull(response.data.country);
+					}
+					
+					if(removenull(response.data.zipCode)!="")
+					{
+						addressall=addressall+",&nbsp;"+removenull(response.data.zipCode);
+					}
+			
+					
+					$("#warehouseAddress").html(addressall);
+					
+					
+					if (removenull(response.data.printP_USA) == "") {
+						$("#usa_phone").html("");
+						$("#usa_phone2").html("");
+					} else {
+						$("#usa_phone").html( response.data.printP_USA);
+						$("#usa_phone2").html(response.data.printP_USA);
+					}
+					if (removenull(response.data.printP_CN)=="") {
+						$("#china_phone").html("");
+						$("#china_phone2").html("");
+					} else {
+						$("#china_phone").html( response.data.printP_CN);
+						$("#china_phone2").html( response.data.printP_CN);
+					}
+
+						
+				
+				
+				
+						//logo处理
+					/*	if (removenull(response.data.printLogo) == "") {
+
+						} else {
+
+							$("#print_logo").attr("src","../.."+ response.data.printLogo);
+							$("#print_logo2").attr("src","../.."+ response.data.printLogo);
+						}
+						*/
+						
+
+				
+						setTimeout("getglobalargs()", 100);
+						//getglobalargs();
+				}
+				else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					top.location.href = "../frontpage/login.html";
+				}
+				else
+				{
+					alert("获取门店信息出错，原因："+response.message);
+				}
+			}});
+}
+
+function getglobalargs() {
+		//var flags="print_logo_flag,print_order_hit,print_site_url";//获取logo图片,包裹提示,网站的url
+		var flags = "print_order_hit,print_site_url,print_commudity_ornot,print_label_send_name,print_label_send_phone,print_2code_url,print_site_url,print_logo_flag";//获取logo图片,包裹提示,网站的url
+		$.ajax({
+			type : "post",
+			url : "/globalargs/getcontents",
+			data : {
+				"flags" : flags
+			},
+			success : function(response) {
+				var code = response.code;
+
+				if ("200" == code) {
+
+					if (response.data != null) {
+
+						/*if((response.data[0]=="")||(response.data[0]=="null")||(response.data[0]=="undefined")||(response.data[0]==null))
+						{
+							
+						}
+						else
+						{
+							
+							//$("#print_logo").attr("src",getRootPath()+response.data[0]);
+							//$("#print_logo2").attr("src",getRootPath()+response.data[0]);
+						}*/
+
+						if ((response.data[0] == "")
+								|| (response.data[0] == "null")
+								|| (response.data[0] == "undefined")
+								|| (response.data[0] == null)) {
+
+						} else {
+							$("#print_order_hit").html(response.data[0]);
+
+						}
+
+						if ((response.data[1] == "")
+								|| (response.data[1] == "null")
+								|| (response.data[1] == "undefined")
+								|| (response.data[1] == null)) {
+
+						} else {
+							//$("#print_site_url").html(response.data[1]);
+							//$("#print_site_url2").html(response.data[1]);
+							if($("#print_site_url").html()=="")
+							{
+								$("#print_site_url").html(response.data[1]);
+							}
+							
+							if($("#print_site_url2").html()=="")
+							{
+								$("#print_site_url2").html(response.data[1]);
+							}
+
+						}
+						
+						var print_commudity_ornot=response.data[2];
+						//alert(print_commudity_ornot);
+						//alert($("#print_table1 div[name='remark2']").html());
+						if(print_commudity_ornot!="yes")
+						{
+							$("#commudityinfo2").html("");
+						}
+						
+						var print_label_send_name=response.data[3];
+						if(print_label_send_name=="no")
+						{
+							//id="from_user2"
+							$("#send_name2").html("&nbsp;");//不显示发件人信息
+						}
+						var print_label_send_phone=response.data[4];
+						if(print_label_send_phone=="no")
+						{
+							$("#send_phone2").html("&nbsp;");//不显示发件人的电话
+							
+						}
+						
+						//var url = response.data[5];
+						var url = response.data[7];
+						if (removenull(url)=="") {
+
+							$("#qrcodeurl").attr("src","");
+							$("#qrcodeurl2").attr("src","");
+							isload_qrcodeurl1=true;
+							isload_qrcodeurl2=true;
+						
+						} else {							
+							$("#qrcodeurl").attr("src","../.."+url);
+							$("#qrcodeurl2").attr("src","../.."+url);
+							$("#qrcodeurl").attr("onload","onload_qrcodeurl()");
+							$("#qrcodeurl2").attr("onload","onload_qrcodeurl2()");
+							
+						}
+						
+						
+						
+						//var site="Website/网址:";
+						var site=response.data[6];
+						
+						$("#print_site_url").html(site);
+						$("#print_site_url2").html(site);
+						
+						setTimeout("printA4_user()", 100);
+						isLoad = true;
+
+					} else {
+
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					top.location.href = "../frontpage/login.html";
+				}
+				else
+				{
+					alert("获取打印参数，原因："+response.message);
+				}
+				
+			}
+		});
+	}
+	
+
+	
+	
+
+var numberprint=0;//记录次数
+function onload_barcode1()
+{
+	isload_barcode1=true;
+}
+function onload_barcode2()
+{
+	isload_barcode2=true;
+}
+function onload_qrcodeurl()
+{
+	isload_qrcodeurl1=true;
+}
+function onload_qrcodeurl2()
+{
+	isload_qrcodeurl2=true;
+}
+ function printA4_user()
+ {
+
+	 if(numberprint>35)
+	{
+	     window.print();
+	     window.close();
+	}
+	 else
+	{
+		 if(isload_qrcodeurl2&&isload_qrcodeurl1&&isload_barcode2&&isload_barcode1)
+		 {
+
+		     window.print();
+		     window.close();
+			 return false;
+		 }
+		 else
+		 {
+			 numberprint++;
+			 setTimeout("printA4_user()", 100);
+		 }
+	}
+	 numberprint++;
+ }
+ 
+var isLoad = false; // 控制变量
+ 
+function getImageWidth(url,callback){
+	var img = new Image();
+	img.src = url;
+	
+	// 如果图片被缓存，则直接返回缓存数据
+	if(img.complete){
+	    callback(img.width, img.height);
+	}else{
+            // 完全加载完毕的事件
+	    img.onload = function(){
+		callback(img.width, img.height);
+	    }
+        }
+	
+}
+</script>
+</html>

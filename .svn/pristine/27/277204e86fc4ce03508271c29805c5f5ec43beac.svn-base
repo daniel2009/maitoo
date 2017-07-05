@@ -1,0 +1,794 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+</head>
+
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">
+			修改包裹信息 <a href="#" id="a_back_tranship_list_link">返回列表</a>
+		</p>
+
+		<div class="box_content">
+			<div class="content_title">修改包裹信息</div>
+			<div class="content_text">
+
+				<div class="tab-content" id="tab2">
+						<input type="hidden" name="t_tran_type"  />
+						<input type="hidden" name="t_user_rmbBalance"  />
+						<input type="hidden" name="t_user_usdBalance"  />
+							<p>
+								<label class="cllabel" style="padding: 0px">包裹编号：</label> <label
+									class="vallabel" style="padding: 0px" id="t_id">${param.id }</label>
+								 <label class="cllabel" style="padding: 0px">用户编号：</label>
+								<label class="vallabel" style="padding: 0px" id="u_id">&nbsp;</label>
+								<label class="cllabel" style="padding: 0px">所属用户：</label> <label
+									class="vallabel" style="padding: 0px" id="u_nick_name">&nbsp;</label>
+									<label class="cllabel" style="padding: 0px">用户余额：</label> <label
+									class="vallabel" style="padding: 0px" id="t_user_balance">&nbsp;</label>
+								<br />
+								</p>
+								<p>
+								<!-- <label class="cllabel" style="padding: 0px">拆包数量：</label>
+			              <label class="vallabel" style="padding: 0px" id="t_c_b_num">&nbsp;</label> -->
+								<label class="cllabel" style="padding: 0px">包裹运单号：</label> <label
+									class="vallabel" style="padding: 0px" id="t_c_b_tranno">&nbsp;</label>
+									
+									<label class="cllabel" style="padding: 0px">转运公司：</label> <label
+									class="vallabel" style="padding: 0px" id="t_c_b_tran_company">&nbsp;</label>
+
+								<label class="cllabel" style="padding: 0px">包裹状态：</label> <label
+									class="vallabel" style="padding: 0px" id="t_old_state">&nbsp;</label>
+								<label class="cllabel" style="padding: 0px">转运类型：</label> <label
+									class="vallabel" style="padding: 0px" id="t_tran_type">&nbsp;</label>
+							</p>
+							<div style="clear: both;"></div>
+							<br />
+							
+							<hr />
+							<label style="display: inline;">入库仓库：</label><select name="warehouse"></select> &nbsp;&nbsp;&nbsp;&nbsp;
+							选择渠道： <select class="text-input" name="cid"></select> &nbsp;&nbsp;&nbsp;&nbsp;
+							商品SKU录入：&nbsp;&nbsp;<input  class="text-input"  type="text" onkeypress="skuaddcommodify(event)" name="skuscan" />
+							<label>商品列表：&nbsp;&nbsp;<a href="#" id="a_add_commodity_quantity_link">添加</a></label>
+							
+							<div style="margin: 0px;width: 90%;">
+								<table id="commodity_list_table">
+									<col width="140px" />
+									<col width="140px" />
+									<col width="140px" />
+									<col width="120px" />
+									<col width="120px" />
+									<col width="120px" />
+									<col width="60px" />
+									<thead>
+										<tr>
+											<th style="text-align: center;">商品类别</th>
+											<th style="text-align: center;">SKU</th>
+											<th style="text-align: center;">商品详情</th>
+											<th style="text-align: center;">数量</th>
+											<th style="text-align: center;">单件重量</th>
+											<th style="text-align: center;">重量小计</th>
+											<th style="text-align: center;">操作</th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+							</div>
+							<section style="margin: 50px; display: flex; flex-flow: wrap;">
+								<div style="flex-basis: 250px;"><label style="display: inline-flex; width: 70px;">重量：</label><input class="text-input" type="number" id="weight" name="weight"  size="15"  value="0"><small style="display: inline;">磅</small></div>
+								<div style="flex-basis: 250px;"><label style="display: inline-flex; width: 70px;">总重量(kg)：</label><input class="text-input" type="number" id="weightKg" name="weightKg"  size="15"  value="0" onChange="orderModifyCalcFreight_dhyb()"><small style="display: inline;">kg</small></div>
+								<div style="flex-basis: 250px;"><label style="display: inline-flex; width: 70px;">包裹长度： </label><input class="text-input" type="number" id="length" name="length"  size="15"  value="0" onChange="orderModifyCalcFreight_dhyb()"></div>
+								<div style="flex-basis: 250px;"><label style="display: inline-flex; width: 70px;">包裹宽度：</label><input class="text-input" type="number" id="width" name="width"  size="15"  value="0" onChange="orderModifyCalcFreight_dhyb()"></div>
+								<div style="flex-basis: 250px;"><label style="display: inline-flex; width: 70px;">包裹高度： </label><input class="text-input" type="number" id="height" name="height"  size="15"  value="0" onChange="orderModifyCalcFreight_dhyb()"></div>
+								
+								<div style="flex-basis: 250px;"><label style="display: inline-flex; width: 70px;">其他费用： </label><input class="text-input" type="number" id="other" name="other"  size="15"  value="0" onChange="orderModifyCalcFreight_dhyb()"><small>美元</small></div>
+								<div style="flex-basis: 250px;"><label style="display: inline-flex; width: 70px;">保险： </label><input class="text-input" type="number" id="premium" name="premium"  size="15"  value="0" onChange="orderModifyCalcFreight_dhyb()"><small>美元</small></div>
+								<div style="flex-basis: 250px;"><label style="display: inline-flex; width: 70px;">关税： </label><input class="text-input" type="number" id="tariff" name="tariff"  size="15"  value="0" onChange="orderModifyCalcFreight_dhyb()"><small>美元</small></div>
+								<div style="flex-basis: 250px;"><label style="display: inline-flex; width: 70px;">申报价值:</label><input class="text-input" type="number" id="parceValue" name="parceValue"  size="15"  value="0" onChange="orderModifyCalcFreight_dhyb()"><small>美元</small></div>
+								
+								<div style="flex-basis: 100%;"><label style="display: inline-flex; width: 70px;">邮寄方式：</label><input class="text-input" type="text" name="mail"  size="15"  value="0"></div>
+								<div style="flex-basis: 100%;"><label style="display: inline-flex; width: 70px;">总费用：</label><input class="text-input" type="number" id="totalMoney" name="totalMoney"  size="15"  value="0" readonly><small>美元</small></div>
+							</section>
+							<section style="margin: 50px; display: flex; flex-flow: wrap;">
+								<div style="flex-basis: 100%;"><label style="display: inline;">收件人姓名：</label><label style="display: inline;" id="cName">&nbsp;</label></div>
+								<div style="flex-basis: 100%;">
+									<label style="display: inline;">收件人省/市/区：</label>
+									<label style="display: inline;" id="cProvince">&nbsp;</label>
+									<label style="display: inline;" id="cCity">&nbsp;</label>
+									<label style="display: inline;" id="cDistrict">&nbsp;</label>
+								</div>
+								<div style="flex-basis: 100%;"><label style="display: inline;">详细地址： </label><label style="display: inline;" id="cStreetAddress">&nbsp;</label></div>
+								
+								<div style="flex-basis: 250px;"><label style="display: inline;">联系电话： </label><label style="display: inline;" id="cPhone">&nbsp;</label></div>
+								<div style="flex-basis: 250px;"><label style="display: inline;">邮 编： </label><label style="display: inline;" id="cZipCode">&nbsp;</label></div>
+								<div style="flex-basis: 100%;"><label style="display: inline;">身份证号： </label><label style="display: inline;" id="cardid">&nbsp;</label></div>
+							</section>
+							<img id="cardurl">
+							<img id="cardotherurl">
+							<img id="cardtogetherurl">
+							<hr />
+							<form id="form">
+								<input type="text" id="id" name="id" style="display:none;" readonly>
+								<p>
+									<label style="display: inline;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;修改状态：</label>
+									<select name="state" class="text-input">
+										<option value="4" selected="selected">待审核</option>
+										<option value="5">审核不过</option>
+										<option value="3">完成</option>
+									</select>
+								</p>
+								<p>
+									<label style="display: inline;">备注信息：</label>
+									<textarea rows="2" cols="20" class="text-input" name="remark" maxlength="100"></textarea>
+								</p>
+							</form>
+							<hr />
+							<p style="margin-left: 50px;">
+								<input id="bt_tranship_modify" class="button" type="button" value="提交结果" />&nbsp;&nbsp;
+							</p>
+						<div class="clear"></div>
+						<!-- End .clear -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 不要删除这个div -->
+	<div id="tmpmsgdiv1" style="display:none;"></div>
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		var sessionStorage = window.sessionStorage;
+		var id = sessionStorage.getItem("transhipmentId");
+		sessionStorage.removeItem("transhipmentId");
+		document.getElementById("t_id").innerHTML = id;
+		$("#a_back_tranship_list_link").click(function() {
+			nav51Click();
+			return false;
+		});
+		$.ajax({
+			type : "get",
+			url : admin_tranship_show_one_url,
+			data : {
+				id : id
+			},
+			success : function(response) {
+				var code = response.code;
+				var tranship = response.data;
+				if (code == '200') {
+					if (tranship != null) {
+						$("#u_id").html(tranship.userId);
+						$("#u_nick_name").html(tranship.userName);
+						$("#t_c_b_tranno").html(tranship.transitNo);
+						$("#t_c_b_tran_company").html(tranship.transitCompany);
+						var money="$"+tranship.usdBalance+",￥"+tranship.rmbBalance;
+						$("#t_user_balance").html(money);
+
+						$(":hidden[name='t_user_rmbBalance']").val(tranship.rmbBalance);
+						$(":hidden[name='t_user_usdBalance']").val(tranship.usdBalance);
+						
+						var str_temp = "";
+						if (tranship.transitType == 0) {
+							str_temp = "普通转运";
+						} else if (tranship.transitType == 1) {
+							str_temp = "极速转运";
+						} else {
+							str_temp = "未知类型";
+						}
+						$("#t_tran_type").html(str_temp);
+						$(":hidden[name='t_tran_type']").val(tranship.transitType);
+
+						var s = "没正确的获取到审核状态";
+						if (tranship.state == "4") {
+							s = "待审核";
+						} else if (tranship.state == "5") {
+							s = "审核不过";
+						} else if (tranship.state == "3") {
+							s = "完成";
+						}
+						document.getElementById("id").value = id;
+						$("#t_old_state").html(s);
+						if (tranship.warehouseId != null && tranship.warehouseId != '') {
+							$("select[name='warehouse'] option[value='"+ tranship.warehouseId + "']").attr("selected", true);
+							if (tranship.commoditys != null && tranship.commoditys != '') {
+								showChannelTableInTM_dhyb(tranship.commoditys);
+							}
+						}
+						$("select[name='cid'] option[value='" + tranship.channelId + "']").attr("selected", true);
+						$("#weight").val(tranship.weight);
+						$("#width").val(tranship.width);
+						$("#length").val(tranship.length);
+						$("#height").val(tranship.height);
+						$("#tariff").val(tranship.tariff);
+						$("#premium").val(tranship.premium);
+						$("#other").val(tranship.other);
+						$("#parcelValue").val(tranship.parcelValue);
+						$("#mail").val(tranship.mail);
+						$("#totalmoney").val(tranship.totalmoney);
+						$("#remark").html(tranship.remark);
+						$("#cName").html(tranship.cName);
+						$("#cProvince").html(tranship.cProvince);
+						$("#cCity").html(tranship.cCity);
+						$("#cDistrict").html(tranship.cDistrict);
+						$("#cStreetAddress").html(tranship.cStreetAddress);
+						$("#cPhone").html(tranship.cPhone);
+						$("#cZipCode").html(tranship.cZipCode);
+						$("#cardid").html(tranship.cardid);
+						$("#cardurl").attr("src", tranship.cardurl);
+						$("#cardurlother").attr("src", tranship.cardurlother);
+						$("#cardurltogether").attr("src", tranship.cardurltogether);
+						
+					} else {
+						alert("数据库中没有对应id的转运单信息.");
+						nav51Click();
+					}
+				} else if (code == '607') {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("根据id获取转运单信息失败,失败原因是：" + response.message);
+					nav51Click();
+				}
+			}
+		});
+		$("#bt_tranship_modify")
+		.click(
+				function() {
+
+					var id = $("#id").val();
+					var warehouseId = $("select[name='warehouse']").val();
+					var state = $("select[name='state']").val();
+					var weight = $("#weight").val();
+					var tariff = $("#tariff").val();
+					var or = $("#other").val();
+					var other = $("#other").val();
+					var remark = $("#remark").val();
+
+					var length = $("#length").val();
+					var width = $("#width").val();
+					var height = $("#height").val();
+					var cid = $("select[name='cid']").val();
+					var validate = true;
+					if (cid == null || cid == "请选择渠道" || cid == "-1") {
+						$("select[name='cid']").css({
+							"border-color" : "red"
+						});
+						$("select[name='cid']")
+								.change(
+										function() {
+											if ($("select[name='cid']")
+													.val() != null
+													&& !$(
+															"select[name='cid']")
+															.val() == "请选择渠道"
+													&& !$(
+															"select[name='cid']")
+															.val() == "-1")
+												$("select[name='cid']")
+														.css(
+																{
+																	"border-color" : ""
+																});
+										});
+						validate = false;
+					}
+
+					if (weight == "" || weight == null || isNaN(weight)
+							|| weight == "0") {
+						$("#weight").css({
+							"border-color" : "red"
+						});
+						$("#weight")
+								.change(
+										function() {
+											if ($("#weight")
+													.val() != null
+													&& !isNaN($(
+															"#weight")
+															.val())
+													&& $(
+															"#weight")
+															.val() > 0)
+												$("#weight")
+														.css(
+																{
+																	"border-color" : ""
+																});
+										});
+						validate = false;
+					}
+
+					if (length == "" || length == null || isNaN(length)) {
+						$(":text[name='length']").css({
+							"border-color" : "red"
+						});
+						$(":text[name='length']")
+								.change(
+										function() {
+											if ($(":text[name='length']")
+													.val() != null
+													&& !isNaN($(
+															":text[name='length']")
+															.val()))
+												$(":text[name='length']")
+														.css(
+																{
+																	"border-color" : ""
+																});
+										});
+						validate = false;
+					}
+
+					if (width == "" || width == null || isNaN(width)) {
+						$(":text[name='width']").css({
+							"border-color" : "red"
+						});
+						$(":text[name='width']")
+								.change(
+										function() {
+											if ($(":text[name='width']")
+													.val() != null
+													&& !isNaN($(
+															":text[name='width']")
+															.val()))
+												$(":text[name='width']")
+														.css(
+																{
+																	"border-color" : ""
+																});
+										});
+						validate = false;
+					}
+
+					if (height == "" || height == null || isNaN(height)) {
+						$(":text[name='height']").css({
+							"border-color" : "red"
+						});
+						$(":text[name='height']")
+								.change(
+										function() {
+											if ($(":text[name='height']")
+													.val() != null
+													&& !isNaN($(
+															":text[name='height']")
+															.val()))
+												$(":text[name='height']")
+														.css(
+																{
+																	"border-color" : ""
+																});
+										});
+						validate = false;
+					}
+
+					var str = '"id":"' + id + '",' + '"state":"' + state
+							+ '",' + '"weight":"' + weight + '",'
+							+ '"or":"' + or + '",' + '"tariff":"' + tariff
+							+ '",' + '"remark":"' + remark + '",'
+							+ '"other":"' + other + '",' +
+
+							'"length":"' + length + '",' + '"width":"'
+							+ width + '",' + '"height":"' + height + '",'
+							+ '"channelId":"' + cid + '",'
+							+ '"warehouseId":"' + warehouseId + '"';
+
+					var i = 0;
+					$("select[name='commodityId']")
+							.each(
+									function() {
+										var cname = $(this).val();
+										var cquantity = $(this)
+												.parent()
+												.parent()
+												.find(
+														":input[name='quantity']")
+												.val();
+										// var cjfweight =
+										// $(this).parent().parent().find(":input[name='jfweight']").val();
+										var csjweight = $(this)
+												.parent()
+												.parent()
+												.find(
+														":input[name='sjweight']")
+												.val();
+										var cxiangqing = $(this)
+												.parent()
+												.parent()
+												.find(
+														":input[name='commodifyxiangqing']")
+												.val();
+										str += ',"commoditys[' + i
+												+ '].commodityId":"'
+												+ cname + '"';
+										str += ',"commoditys[' + i
+												+ '].quantity":"'
+												+ cquantity + '"';
+										str += ',"commoditys[' + i
+												+ '].sjweight":"'
+												+ csjweight + '"';
+										// str += ',"commodity[' + i +
+										// '].jfweight":"' + cjfweight +
+										// '"';
+										str += ',"commoditys[' + i
+												+ '].xiangqing":"'
+												+ cxiangqing + '"';
+										i = i + 1;
+									});
+
+					var obj = $.parseJSON("{" + str + "}");
+					if (!validate) {
+						alert("红色框中的信息必须正确填写，才可以提交！");
+						return false;
+					}
+					$
+							.ajax({
+								type : "post",
+								url : "../admin/transhipment/auditPreOrder",
+								data : obj,
+								success : function(response) {
+									var code = response.code;
+									if ("200" == code) {
+										alert("修改成功");
+										// $("#nav51").click();
+										nav51Click();
+									} else if ("607" == code) {
+										alert("您尚未登录或登录已失效！");
+										logout();
+									} else {
+										alert("修改订单(转运单)失败，原因是:"
+												+ response.message);
+									}
+									return false;
+								}
+							});
+					return false;
+				});
+		$.ajax({
+			type : "get",
+			async : true,
+			url : admin_warehosue_all,
+			success : function(response) {
+				var code = response.code;
+				if (code == '200') {
+					if (response.data != null) {
+						var str = "";
+						$.each(response.data, function() {
+							str += "<option value='" + this.id + "'>" + this.name + "</option>";
+						});
+						$("select[name='warehouse']").html(str);
+						showChannelTableInTM();
+						$("select[name='warehouse']").change(showChannelTableInTM);
+					}
+				}
+			}
+		});
+		$("#a_add_commodity_quantity_link").click(function() {
+			var commodity = $("select[name='commodityId']").html();
+			var str = '<tr><td>' + '<select style="width:100px" name="commodityId" onChange="orderModifyCalcFreight()">' + commodity + '</select></td>';
+			str += '<td><input type="text" class="text-input"type="text" name="commodifyxiangqing" placeholder="填写具体物品信息"style="width:140px" /></td>';
+			str += '<td><input type="text" class="text-input"type="text" name="commodifybrands" placeholder="填写具体物品牌"style="width:140px" /></td>';
+			str += '<td><input name="quantity" class="text-input" size="3" type="text" value="1" onChange="orderModifyCalcFreight_dhyb()"/></td>';
+			str += '<td><input name="eachsjweight" class="text-input" size="3" type="text" value="0" onChange="orderModifyCalcFreight_dhyb();"></td>';
+			str += '<td><input name="sjweight" class="text-input" size="3" type="text" value="0" onChange="orderModifyCalcFreight_dhyb()" readonly/></td>';
+			str += '<td><a href="#" name="a_delete_commodity">删除</a></td></tr>';
+			$("#commodity_list_table tbody").append(str);
+			$("a[name='a_delete_commodity']").click(function() {
+				if ($("a[name='a_delete_commodity']").length > 1) {
+					$(this).parent().parent().remove();
+				}
+				return false;
+			});
+			return false;
+		});
+	});
+	function auditPreOrder(){
+		var httpRequest = new XMLHttpRequest();
+		var url = "../admin/transhipment/auditPreOrder";
+		httpRequest.onreadystatechange = function(){
+			if(4 == httpRequest.readyState){
+				if(200 == httpRequest.status){
+					var response = eval("(" + httpRequest.responseText + ")");
+					var code = response.code;
+					if("200" == code){
+						alert("审核成功");
+						nav51Click();
+					}else if("607" == code){
+						alert("您尚未登录或登录已失效");
+						logout();
+					}else{
+						alert("添加失败，失败原因:" + response.message);
+					}
+					return false;
+				}
+			}
+		};
+		httpRequest.open("post", url, true);
+		httpRequest.send(new FormData(document.getElementById("form")));
+		return false;
+	}
+	function showChannelTableInTM() {
+		var wid = $("select[name='warehouse']").val();
+		//alert(wid);
+		$("select[name='cid']").html("<option >请选择渠道</option>");
+		$.ajax({
+			post : "get",
+			url : admin_channel_list_url,
+			data : {
+				"wid" : wid
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if (response.data == null) {
+						alert("门店中没有该运单的渠道，请联系系统管理员！");
+					} else {
+						var str = "";
+						$.each(response.data, function() {
+							str += '<option value="' + this.id + '">' + this.name
+									+ '</option>';
+						});
+						$("select[name='cid']").html(str);
+						showCommodityTableInTM();
+						$("select[name='cid']").change(showCommodityTableInTM);
+
+					}
+
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+			}
+		});
+	}
+
+	//kai 20150928
+	function showCommodityTableInTM() {
+		$("#commodity_list_table tbody").html("");
+		var wid = $("select[name='warehouse']").val();
+		var cid = $("select[name='cid']").val();
+		$
+				.ajax({
+					post : "get",
+					url : admin_commodity_list_url,
+					data : {
+						"wid" : wid,
+						"cid" : cid
+					},
+					success : function(response) {
+						var code = response.code;
+						if ("200" == code) {
+							if (response.data == null) {
+								$("#commodity_list_table tbody")
+										.html(
+												"<tr><td colspan='5'>您的运单中，有该渠道禁运商品类别，请选择其他渠道！</td></tr>");
+								return;
+							}
+							var str_option = "";
+							// alert("sdafa");
+							$.each(response.data, function() {
+								str_option += "<option value='" + this.id
+										+ "'  price='" + this.price + "' msPrice='"
+										+ this.msPrice + "' vipOnePrice='"
+										+ this.vipOnePrice + "' vipTwoPrice='"
+										+ this.vipTwoPrice + "' vipThreePrice='"
+										+ this.vipThreePrice + "' firstFee='"
+										+ this.firstFee + "'>" + this.name
+										+ "</option>";
+							});
+							var str = "";
+							// $.each(details,function(){
+							str += '<tr><td>';
+							str += '<select style="width:100px" name="commodityId" onChange="orderModifyCalcFreight_dhyb()" >'
+									+ str_option + '</select>';
+							str += '</td>';
+							str += '<td><input name="commodifysku" class="text-input" style="width:140px" type="text" value="" placeholder="商品唯一标志(条形码)" /></td>';
+							str += '<td><input name="commodifyxiangqing" class="text-input" style="width:140px" type="text" value="" placeholder="填写具体物品信息"/></td>';
+							str += '<td><input name="quantity" class="text-input" size="3" type="text" value="0" onChange="orderModifyCalcFreight_dhyb()"/></td>';
+							str += '<td><input name="eachsjweight" class="text-input" size="5" type="text" value="0" onChange="orderModifyCalcFreight_dhyb()" /></td>';
+							str += '<td><input name="sjweight" readonly= "true" class="text-input" size="5" type="text" value="0" onChange="orderModifyCalcFreight_dhyb()" /></td>';
+							str += '<input name="transhipmentId" type="hidden" value="-1"/>';
+							str += '<td><a href="#" name="a_delete_commodity">删除</a></td></tr>';
+							// });
+							$("#commodity_list_table tbody").html(str);
+
+							$("a[name='a_delete_commodity']").click(function() {
+								if ($("a[name='a_delete_commodity']").length > 1)
+									$(this).parent().parent().remove();
+								return false;
+							});
+						} else if ("607" == code) {
+							alert("您尚未登录或登录已失效！");
+							logout();
+						}
+					}
+				});
+	}
+	function showChannelTableInTM_dhyb(details) {
+		var wid = $("select[name='warehouse']").val();
+		$("select[name='cid']").html("<option >请选择渠道</option>");
+		$.ajax({
+			post : "get",
+			url : admin_channel_list_url,
+			data : {
+				"wid" : wid
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if (response.data == null) {
+						alert("门店中没有该运单的渠道，请联系系统管理员！");
+					} else {
+						var str = "";
+						$.each(response.data, function() {
+							str += '<option value="' + this.id + '">' + this.name + '</option>';
+						});
+						$("select[name='cid']").html(str);
+						showCommodityTable_dhyb(details);
+						$("select[name='cid']").change(showCommodityTableInTM);
+					}
+
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+			}
+		});
+	}
+	function showCommodityTable_dhyb(details) {
+		$("#commodity_list_table tbody").html("");
+		var wid = $("select[name='warehouse']").val();
+		var cid = $("select[name='cid']").val();
+		$.ajax({
+			post : "get",
+			url : admin_commodity_list_url,
+			data : {
+				"wid" : wid,
+				"cid" : cid
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					var str_option = "";
+					$.each(response.data, function() {
+						str_option += "<option value='" + this.id + "'  price='" + this.price + "' msPrice='" + this.msPrice 
+						+ "' vipOnePrice='" + this.vipOnePrice + "' vipTwoPrice='" + this.vipTwoPrice + "' vipThreePrice='" + this.vipThreePrice 
+						+ "' firstFee='" + this.firstFee + "'>" + this.name + "</option>";
+					});
+					var str = "";
+					$.each(details,function() {
+						if ((this.sjweight == null) || this.sjweight == "null") {
+							this.sjweight = 0;
+						}
+						if ((this.eachjfweight == null) || this.eachjfweight == "null") {
+							this.eachjfweight = 0;
+						}
+						if ((this.xiangqing == null) || this.xiangqing == "null") {
+							this.xiangqing = "";
+						}
+						if ((this.quantity == null) || this.quantity == "null") {
+							this.quantity = 0;
+						}
+						if ((this.commoditySku == null) || this.commoditySku == "null") {
+							this.commoditySku = "";
+						}
+
+						str += '<tr name="' + this.commodityId + '">';
+						str += '<td><select style="width:100px" name="commodityId" onChange="orderModifyCalcFreight_dhyb()">' + str_option + '</select></td>';
+						str += '<td><input type="text" class="text-input"type="text" name="commodifysku" id="commodifyskuid" style="width:140px" value="' + this.commoditySku + '"' + ' /></td>';
+						str += '<td><input type="text" class="text-input"type="text" name="commodifyxiangqing" placeholder="填写具体物品信息"style="width:140px" value="' + this.xiangqing +'" /></td>';
+						str += '<td><input name="quantity" class="text-input" size="3" type="text"  onChange="orderModifyCalcFreight_dhyb()" value="' + this.quantity + '"/></td>';
+						str += '<td><input name="eachsjweight" class="text-input" size="3" type="text" onChange="orderModifyCalcFreight_dhyb()" value="' + this.eachjfweight +'"/></td>';
+						str += '<td><input name="sjweight" class="text-input" size="3" type="text" onChange="orderModifyCalcFreight_dhyb()" value="' + this.sjweight + '"/></td>';
+						str += '<input name="transhipmentId" type="hidden" value="' + this.transhipmentId + '"/>';
+						str += '<td><a href="#" name="a_delete_commodity">删除</a></td></tr>';
+					});
+					$("#commodity_list_table tbody").html(str);
+
+					$("a[name='a_delete_commodity']").click(function() {
+						if ($("a[name='a_delete_commodity']").length > 1){
+							$(this).parent().parent().remove();
+						}
+						orderModifyCalcFreight_dhyb();
+						return false;
+					});
+
+					$.each(details, function() {
+						$("tr[name='" + this.commodityId + "'] select option[value='" + this.commodityId + "']").attr("selected", true);
+					});
+					if(details!=null){
+						orderModifyCalcFreight_dhyb();
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+			}
+		});
+	}
+	
+	function orderModifyCalcFreight_dhyb() {
+		var userType = $(":hidden[name='userType']").val();
+		var moneyType = "price";
+		if (userType == "0") {
+			moneyType = "price";
+		} else if (userType == "1") {
+			moneyType = "msPrice";
+		} else if (userType == "2") {
+			moneyType = "vipOnePrice";
+		} else if (userType == "3") {
+			moneyType = "vipTwoPrice";
+		} else if (userType == "4") {
+			moneyType = "vipThreePrice";
+		} else {
+			moneyType = "price";
+		}
+		var commodityPrice = 0.00;
+		var commodityweighttotal = 0.00;
+		$("select[name='commodityId']").each(function() {
+			var eachjweight=$(this).parent().parent().find(":text[name='eachsjweight']").val();
+			var quantity=$(this).parent().parent().find(":text[name='quantity']").val();
+			jweight=parseFloat(quantity)*parseFloat(eachjweight);
+			if(jweight=="NaN"){
+				alert("单件数量或重量格式不对，请检查!");
+				return false;
+			}
+			
+			$(this).parent().parent().find(":text[name='sjweight']").val(jweight);
+			
+			var sjweight = $(this).parent().parent().find(":text[name='sjweight']").val();
+			commodityPrice = commodityPrice + parseFloat($(this).find("option:selected").attr("firstFee")) + parseFloat($(this).find("option:selected").attr(moneyType)) * sjweight;
+			commodityweighttotal = commodityweighttotal + parseFloat(sjweight);
+		});
+		var weight = parseFloat($("#weight").val());
+		var tariff = parseFloat($("#tariff").val());
+		var other = parseFloat($("#other").val());
+		var premium = parseFloat($("#premium").val());
+		if (premium == "NaN") {
+			premium = parseFloat($("#premium").val());
+		}
+		var length = parseFloat($("#length").val());
+		var width = parseFloat($("#width").val());
+		var height = parseFloat($("#height").val());
+		var totalMoney = commodityPrice + tariff + other + premium + length * width * height / 166;
+
+		// kai 20150912
+		$("#weight").val(commodityweighttotal.toString());
+		var f_x = parseFloat(totalMoney);
+		if (isNaN(commodityPrice)) {
+			alert('商品类型中的重量填写错误！');
+			return false;
+		}
+		if (isNaN(weight)) {
+			alert('重量输入错误！');
+			return false;
+		}
+
+		if (isNaN(length * width * height / 166)) {
+			alert('长宽高输入错误！');
+			return false;
+		}
+		if (isNaN(f_x)) {
+			alert('计算总价钱错误，可能是参数填写错误！');
+			return false;
+		}
+
+		var f_x = Math.round(totalMoney * 100) / 100;
+
+		var s_x = f_x.toString();
+		var pos_decimal = s_x.indexOf('.');
+		if (pos_decimal < 0) {
+			pos_decimal = s_x.length;
+			s_x += '.';
+		}
+		while (s_x.length <= pos_decimal + 2) {
+			s_x += '0';
+		}
+		$("#totalMoney").val(s_x);
+	}
+</script>
+</html>

@@ -1,0 +1,21 @@
+package com.weiye.service;
+
+import java.util.List;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.TranshipmentRoute;
+
+public interface TranshipmentRouteService {
+
+	ResponseObject<List<TranshipmentRoute>> findByTranshipmentBill(String transhipmentId) throws ServiceException;
+
+	ResponseObject<Object> add(String transhipmentId, String state, String warehouseId) throws ServiceException;
+
+	ResponseObject<Object> add(TranshipmentRoute transhipmentRoute)
+			throws ServiceException;
+	//根据id修改状态
+	public ResponseObject<Object> modifystate(String state,String id,String storeId)
+			throws ServiceException;
+
+}

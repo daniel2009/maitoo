@@ -1,0 +1,198 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+
+
+<body>
+	<div class="block">
+		<h2 style="color:#F13B3E">退货需缴纳$<label id="returnFee"></label>的退货服务费</h2>
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">退货管理</p>
+		<div class="box_content">
+			<div class="content_title">退货记录&nbsp;&nbsp;<a href="#" onclick="javascript: forwardPage('returnPackage', 2);">有问题<span style="margin: 0 3px; color: #f00;">(<label id="countReturnPackageState2">0</label>)</span></a></div>
+				<div class="content_text">
+				<span>&nbsp;&nbsp;&nbsp;&nbsp;退货状态：</span>
+				<select id="stateSelect" onchange="javascript: loadList();">
+					<option value="" selected>全部</option>
+					<option value="0">还没处理</option>
+					<option value="1">已处理</option>
+					<option value="2">有问题</option>
+				</select>
+				</div>
+				<div class="content_text">
+					<div class="tab_box" >
+						<table id="datatable" class="table">
+							<thead>
+								<tr>
+									<th align="center" scope="col" style="width:30px;"><input id="CheckAll" type="checkbox" /></th>
+									<th scope="col">包裹单号</th>
+									<th scope="col">备注</th>
+									<th scope="col">登记时间</th>
+									<th scope="col">运费</th>
+									<th scope="col">状态</th>
+									<th scope="col">操作</th>
+								</tr>
+							</thead>
+							<tbody id="tbody">
+							</tbody>
+							<tfoot>
+								<tr id="page">
+									<td colspan="7">
+										<div id="pagination" class="pagination" style="font-size: 15px;">
+											共0条/共0页&nbsp;&nbsp;
+											<a href="">首页</a>|
+											<a href="#">上一页</a>
+											<input style="width: 20px;" type="text" name="pageNow" />
+											<a href="#">下一页</a>|
+											<a href="#">尾页</a>
+										</div>
+										<!-- End .pagination -->
+										<div class="clear"></div>
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+</body>
+<script>
+	$("#main-content").ready(function(){
+		var forwardState = window.sessionStorage.getItem("searchState");
+		if(forwardState != null){
+			$("#stateSelect").val(forwardState);
+		}
+		window.sessionStorage.clear();
+		getNeedFocusCount();
+		loadList(1);
+		$.ajax({
+			type: "get",
+			url: "../globalArgs/getReturnPackageReturnFee",
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var data = response.data;
+					if(data != null){
+						document.getElementById("returnFee").innerHTML = data;
+					}
+				}else{
+					alert("审核失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function loadList(pageIndex){
+		$.ajax({
+			type: "get",
+			url: "../user/returnPackage/findByLoginUser",
+			data : {
+				pageIndex : pageIndex,
+				state : $("#stateSelect").val()
+			},
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					if(response.data!=null){
+						var list = response.data.datas;
+						var tbody = document.getElementById("tbody");
+						var string = "";
+						if(list != null && list.length > 0){
+							for(var i = 0; i < list.length; i++){
+								string += "<tr>";
+								string += "<td></td>";
+								string += "<td>" + list[i].packageNo +  "</td>";
+								string += "<td>" + list[i].remark +  "</td>";
+								string += "<td>" + list[i].createDate +  "</td>";
+								string += "<td>$" + list[i].shippingFee +  "</td>";
+								if(list[i].state == "1"){
+									string += "<td>已处理</td>";
+									string += "<td><a onclick='javascript:info("+list[i].id+");'>查看</a></td>";
+								}else if(list[i].state == "2"){
+									string += "<td>有问题</td>";
+									string += "<td><a onclick='javascript:info("+list[i].id+")'>修改</a>|<a onclick='javascript:cancel("+list[i].transhipmentId+")'>取消</a></td>";
+								}else{
+									string += "<td>未处理</td>";
+									string += "<td><a onclick='javascript:info("+list[i].id+")'>修改</a>|<a onclick='javascript:cancel("+list[i].transhipmentId+")'>取消</a></td>";
+								}
+								string += "</tr>";
+							}
+						}else{
+							string += "<tr><td cols='6'></td></tr>";
+						}
+						tbody.innerHTML = string;
+						var rowCount = response.data.rowCount;
+						var pageSize = response.data.pageSize;
+						var pageNow = response.data.pageNow;
+						var pageCount = response.data.pageCount;
+						$("#pagination").html(createPaginationHtmlStr(rowCount, pageSize, pageNow,pageCount));
+						$("#pagination a").click(function() {
+							var page = $(this).attr("href");
+							loadList(page);
+							return false;
+						});
+					}else{
+						document.getElementById("tbody").innerHTML = "";
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					//alert("获取元数据失败，失败原因：" + response.message);
+				}
+				return false;
+			}
+		});
+	}
+	function createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount) {
+		var prePage = pageNow - 1;
+		prePage = prePage < 1 ? 1 : prePage;
+		var nextPage = pageNow + 1;
+		nextPage = nextPage > pageCount ? pageCount : nextPage;
+		var info = "共" + rowCount + "条/共" + pageCount + "页&nbsp;";
+		info += "当前第" + pageNow + "页&nbsp;&nbsp;";
+		info += "<a href='1' id='a_first_page'>首页</a>|";
+		info += "<a href='" + prePage + "' id='a_pre_page'>上一页</a>";
+		info += "<input style='width: 30px;' type='text' name='pageNow' />";
+		info += "<a href='" + nextPage + "' id='a_next_page'>下一页</a>|";
+		info += "<a href='" + pageCount + "' id='a_last_page'>尾页</a>";
+		return info;
+	}
+	
+	function info(id){
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("returnPackageId", id);
+		$("#main-content").load("../user/returnPackageInfo.jsp");
+		return false;
+	}
+	function cancel(id){
+		if (confirm("确认取消退货?")) {
+			$.ajax({
+				type : "post",
+				url : "../user/returnPackage/cancel",
+				data : {
+					transhipmentId : id
+				},
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("取消成功");
+						nav14Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						// 失败
+						alert("删除信息失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+	}
+</script>
+</html>
+
+

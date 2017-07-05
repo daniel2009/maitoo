@@ -1,0 +1,121 @@
+package com.weiye.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.ErrorOrderInfoDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ErrorOrderInfo;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.ErrorOrderInfoService;
+
+@Service("errorOrderInfoService")
+public class ErrorOrderInfoServiceImpl implements ErrorOrderInfoService {
+	@Autowired
+	private ErrorOrderInfoDao errorOrderInfoDao;
+
+	public ResponseObject<Object> deleteErrorOrderInfos(List<String> eids) throws ServiceException {
+		try {
+			int k = this.errorOrderInfoDao.deleteErrorOrderInfoByIds(eids);
+			if (k == eids.size()) {
+				// 删除回复
+				this.errorOrderInfoDao.deleteErrorOrderInfoByParentIds(eids);
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				throw new Exception("需要删除" + eids.size() + "个数据，实际删除" + k + "个数据。");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+	
+	public ResponseObject<Object> modifyErrorOrderInfo(ErrorOrderInfo info) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			info.setModifyDate(date);
+			info.setState(Constant.ERROR_ORDER_STATE2); //表示异常处理完成
+	        int k = this.errorOrderInfoDao.updateState(info);
+	        if (k > 0) {
+	        	return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+	        } else {
+	        	return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "数据库中没有对应id的异常件");
+	        }
+        } catch (Exception e) {
+        	throw ExceptionUtil.handle2ServiceException(e);
+        }
+    }
+
+	public ResponseObject<Object> saveErrorOrderInfo(ErrorOrderInfo info) throws ServiceException {
+		try {
+			String date = DateUtil.date2String(new Date());
+			info.setModifyDate(date);
+			info.setCreateDate(date);
+			if (StringUtil.isEmpty(info.getParentId())) {
+				info.setParentId("-1");
+			}
+			info.setContent(StringUtil.dealHtmlSpecialCharacters(info.getContent()));
+			int k = this.errorOrderInfoDao.insertErrorOrderInfo(info);
+			if (k > 0) {
+				// 修改时间
+				if (!"-1".equals(info.getParentId())) {
+					this.errorOrderInfoDao.updateErrorOrderModifyDate(info.getParentId(), date);
+				}
+				return new ResponseObject<Object>(ResponseCode.SUCCESS_CODE);
+			} else {
+				return new ResponseObject<Object>(ResponseCode.PARAMETER_ERROR, "插入异常件信息失败");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+	}
+
+	public ResponseObject<PageSplit<ErrorOrderInfo>> searchByOrderId(String orderId, int pageSize, int pageNow)
+	        throws ServiceException {
+		try {
+			orderId = StringUtil.escapeStringOfSearchKey(orderId);
+			int rowCount = 0;
+			try {
+				rowCount = this.errorOrderInfoDao.countSearchOfOrderId(orderId);
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException("获取异常件个数失败", e);
+			}
+
+			ResponseObject<PageSplit<ErrorOrderInfo>> responseObj = new ResponseObject<PageSplit<ErrorOrderInfo>>(ResponseCode.SUCCESS_CODE);
+			if (rowCount > 0) {
+				pageSize = Math.max(pageSize, 1);
+				int pageCount = rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1);
+				pageNow = Math.min(pageNow, pageCount);
+				PageSplit<ErrorOrderInfo> pageSplit = new PageSplit<ErrorOrderInfo>();
+				pageSplit.setPageCount(pageCount);
+				pageSplit.setPageNow(pageNow);
+				pageSplit.setRowCount(rowCount);
+				pageSplit.setPageSize(pageSize);
+
+				int startIndex = (pageNow - 1) * pageSize;
+				try {
+					List<ErrorOrderInfo> infos = this.errorOrderInfoDao.searchByOrderId(orderId, startIndex, pageSize);
+					pageSplit.setDatas(infos);
+				} catch (Exception e) {
+					throw ExceptionUtil.handle2ServiceException("获取异常件信息列表失败", e);
+				}
+				responseObj.setData(pageSplit);
+			} else {
+				responseObj.setMessage("没有异常件");
+			}
+			return responseObj;
+		} catch (ServiceException e) {
+			throw e;
+		}
+	}
+
+}

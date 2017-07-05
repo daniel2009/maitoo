@@ -1,0 +1,517 @@
+package com.weiye.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.weiye.common.constants.Constant;
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.common.util.DateUtil;
+import com.weiye.common.util.ExceptionUtil;
+import com.weiye.common.util.PageSplitUtil;
+import com.weiye.common.util.ProductUtil;
+import com.weiye.common.util.StringUtil;
+import com.weiye.dao.CartDao;
+import com.weiye.dao.ProductDao;
+import com.weiye.dao.ProductRecordDao;
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Cart;
+import com.weiye.model.PageSplit;
+import com.weiye.model.Product;
+import com.weiye.model.ProductRecord;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.User;
+import com.weiye.service.AccountService;
+import com.weiye.service.ProductRecordService;
+import com.weiye.service.ProductService;
+
+@Service("productService")
+public class ProductServiceImpl implements ProductService{
+
+	@Autowired
+	private ProductDao productDao;
+	@Autowired
+	private ProductRecordDao productRecordDao;
+	@Autowired
+	private CartDao cartDao;
+	@Resource
+	private AccountService accountService;
+	@Resource
+	private ProductRecordService  productRecordService;
+	@Override
+	public ResponseObject<Object> add(Product product) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == product){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			product.setCreateDate(DateUtil.date2String(new Date()));
+			product.setModifyDate(DateUtil.date2String(new Date()));
+			try {
+				int result = productDao.insert(product);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.PRODUCT_INSERT_FAIL);
+					responseObject.setMessage("添加商品失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Object> addProductAndRecordByUser(Product product, ProductRecord productRecord) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		try{
+			responseObject = this.add(product);
+			if(ResponseCode.SUCCESS_CODE.equals(responseObject.getCode())){
+				productRecord.setProductId(product.getId());
+				responseObject = productRecordService.addByUser(productRecord);
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Product> findById(Product product) throws ServiceException {
+		ResponseObject<Product> responseObject = new ResponseObject<Product>();
+		if(null == product || StringUtil.isEmpty(product.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				product = productDao.findById(product);
+				if (null == product) {
+					responseObject.setCode(ResponseCode.PRODUCT_NO_EXISTS);
+					responseObject.setMessage("商品不存在");
+				} else {
+					responseObject.setData(product);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<Object> update(Product product) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == product || StringUtil.isEmpty(product.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			product.setModifyDate(DateUtil.date2String(new Date()));
+			try {
+				int result = productDao.update(product);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.PRODUCT_UPDATE_FAIL);
+					responseObject.setMessage("修改商品失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<PageSplit<Product>> findByKey(Product product, String priceStart, String priceEnd, String userId, int pageIndex, int pageSize) throws ServiceException {
+		ResponseObject<PageSplit<Product>> responseObject = new ResponseObject<>();
+		product.setName(StringUtil.escapeStringOfSearchKey(product.getName()));
+		try {
+			int count = productDao.countByKey(product, priceStart, priceEnd, userId);
+			if(count > 0){
+				PageSplit<Product> pageSplit = new PageSplit<>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, count);
+				List<Product> list = productDao.findByKey(product, priceStart, priceEnd, userId, firstResult, pageSize);
+				if (list.isEmpty()) {
+					responseObject.setCode(ResponseCode.PRODUCT_GET_LIST_FAIL);
+					responseObject.setMessage("获取商品列表失败");
+				} else {
+					pageSplit.setDatas(list);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(pageSplit);
+				}
+			}else{
+				responseObject.setCode(ResponseCode.PRODUCT_EMPTY_LIST);
+				responseObject.setMessage("商品列表为空");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<PageSplit<Product>> findByKeyAndUser(Product product, String priceStart, String priceEnd, int pageIndex, int pageSize) throws ServiceException {
+		ResponseObject<PageSplit<Product>> responseObject = new ResponseObject<>();
+		product.setName(StringUtil.escapeStringOfSearchKey(product.getName()));
+		try {
+			int count = productDao.countByKeyAndUser(product, priceStart, priceEnd);
+			if(count > 0){
+				PageSplit<Product> pageSplit = new PageSplit<>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, count);
+				List<Product> list = productDao.findByKeyAndUser(product, priceStart, priceEnd, firstResult, pageSize);
+				if (list.isEmpty()) {
+					responseObject.setCode(ResponseCode.PRODUCT_GET_LIST_FAIL);
+					responseObject.setMessage("获取商品列表失败");
+				} else {
+					pageSplit.setDatas(list);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(pageSplit);
+				}
+			}else{
+				responseObject.setCode(ResponseCode.PRODUCT_EMPTY_LIST);
+				responseObject.setMessage("商品列表为空");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<PageSplit<Product>> findByIds(String[] ids, int pageIndex, int pageSize) throws ServiceException {
+		ResponseObject<PageSplit<Product>> responseObject = new ResponseObject<>();
+		try {
+			int count = ids.length;
+			if(count > 0){
+				PageSplit<Product> pageSplit = new PageSplit<>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, count);
+				List<Product> list = productDao.findByIds(ids, firstResult, pageSize);
+				if (list.isEmpty()) {
+					responseObject.setCode(ResponseCode.PRODUCT_GET_LIST_FAIL);
+					responseObject.setMessage("获取商品列表失败");
+				} else {
+					pageSplit.setDatas(list);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(pageSplit);
+				}
+			}else{
+				responseObject.setCode(ResponseCode.PRODUCT_EMPTY_LIST);
+				responseObject.setMessage("商品列表为空");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	
+	@Override
+	public ResponseObject<Cart> findCartById(Cart cart) throws ServiceException {
+		ResponseObject<Cart> responseObject = new ResponseObject<>();
+		if(null == cart || StringUtil.isEmpty(cart.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				cart = cartDao.findById(cart);
+				if (null == cart) {
+					responseObject.setCode(ResponseCode.CART_NO_EXISTS);
+					responseObject.setMessage("购物车 不存在");
+				} else {
+					responseObject.setData(cart);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<PageSplit<Cart>> findByUserCart(User user, String[] ids, int pageIndex, int pageSize) throws ServiceException {
+		ResponseObject<PageSplit<Cart>> responseObject = new ResponseObject<>();
+		boolean byUser = true;
+		if(null == user || StringUtil.isEmpty(user.getId())){
+			byUser = false;
+		}
+		try {
+			int count = byUser ? cartDao.countByUser(user) : ids.length;
+			if(count > 0){
+				PageSplit<Cart> pageSplit = new PageSplit<>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, count);
+				List<Cart> list = byUser ? 
+						cartDao.findByUser(user, firstResult, pageSize) : 
+						cartDao.setByProductIdsIncludeSame(ids, firstResult, pageSize); 
+				if (list.isEmpty()) {
+					responseObject.setCode(ResponseCode.PRODUCT_GET_LIST_FAIL);
+					responseObject.setMessage("获取商品列表失败");
+				} else {
+					pageSplit.setDatas(list);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(pageSplit);
+				}
+			}else{
+				responseObject.setCode(ResponseCode.PRODUCT_EMPTY_LIST);
+				responseObject.setMessage("商品列表为空");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+//	@Override
+//	public ResponseObject<Object> purchase(ProductRecord productRecord) throws ServiceException {
+//		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+//		if(null == productRecord || StringUtil.isEmpty(productRecord.getProductId())){
+//			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+//			responseObject.setMessage("参数无效");
+//		}else{
+//			String date = DateUtil.date2String(new Date());
+//			try {
+//				Product product = new Product();
+//				product.setId(productRecord.getProductId());
+//				product = productDao.findById(product);
+//				int rest = Integer.valueOf(product.getQuantity()) - Integer.valueOf(productRecord.getQuantity());
+//				if(rest >= 0 ){
+//					productRecord.setDate(date);
+//					productRecord.setState(Constant.PRODUCT_RECORD_STATE_CREATE);
+//					int recordResult = productRecordDao.insert(productRecord);
+//					product.setQuantity(String.valueOf(rest));
+//					product.setModifyDate(date);
+//					int result = productDao.updateQuantity(product);
+//					String payment = String.valueOf(StringUtil.string2Double(product.getPrice()) * StringUtil.string2Double(productRecord.getQuantity()));//price*quantity
+//					User user = new User();
+//					user.setId(productRecord.getUserId());
+//					responseObject = accountService.addPayment(user, payment , product.getCurrency(), "商品购买");
+//				}
+//			} catch (Exception e) {
+//				throw ExceptionUtil.handle2ServiceException(e);
+//			}
+//		}
+//		return responseObject;
+//	}
+	@Override
+	public ResponseObject<Object> purchase(Cart cart, ProductRecord productRecord) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == cart || StringUtil.isEmpty(cart.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				cart.setProductId(cartDao.findById(cart).getProductId());
+				if(checkQuantity(cart)){
+					ProductUtil.transfer(cart, productRecord);
+					this.delete(cart);
+					responseObject = productRecordService.addByUser(productRecord);
+				}else{
+					responseObject.setCode(ResponseCode.PRODUCT_QUANTITY_NOT_ENOUGH);
+					responseObject.setMessage("商品库存不足");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Object> purchaseByUserAllCart(ProductRecord productRecord) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<>();
+		try {
+			User user = new User();
+			user.setId(productRecord.getUserId());
+			ResponseObject<PageSplit<Cart>> cartResponse = findByCart(user, 0, 9999);
+			if(ResponseCode.SUCCESS_CODE.equals(responseObject.getCode())){
+				for(Cart cart : cartResponse.getData().getDatas()){
+					this.purchase(cart, productRecord);
+				}
+				responseObject.setCode(ResponseCode.SUCCESS_CODE);
+			}else{
+				responseObject.setCode(ResponseCode.PRODUCT_EMPTY_LIST);
+				responseObject.setMessage("购物车列表为空");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	
+	private boolean checkQuantity(Object object) {
+		int customerQuantity = 0;
+		Product product = new Product();
+		if(object instanceof Cart){
+			customerQuantity = StringUtil.string2Integer(((Cart) object).getQuantity());
+			product.setId(((Cart) object).getProductId());
+		}else if(object instanceof ProductRecord){
+			customerQuantity = StringUtil.string2Integer(((ProductRecord) object).getQuantity());
+			product.setId(((ProductRecord) object).getProductId());
+		}
+		try {
+			product = productDao.findById(product);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return StringUtil.string2Integer(product.getQuantity()) >= customerQuantity;
+	}
+	@Override
+	public ResponseObject<Object> delete(Product product) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == product || StringUtil.isEmpty(product.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				int result = productDao.delete(product);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.PRODUCT_DELETE_FAIL);
+					responseObject.setMessage("删除商品失败,或已不存在");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+
+	@Override
+	public ResponseObject<PageSplit<Cart>> findByCart(User user, int pageIndex, int pageSize) throws ServiceException {
+		ResponseObject<PageSplit<Cart>> responseObject = new ResponseObject<>();
+		try {
+			int count = cartDao.countByUser(user);
+			if(count > 0){
+				PageSplit<Cart> pageSplit = new PageSplit<>();
+				int firstResult = PageSplitUtil.setPageAndGetFirstResult(pageSplit, pageIndex, pageSize, count);
+				List<Cart> list = cartDao.findByUser(user, firstResult, pageSize);
+				if (list.isEmpty()) {
+					responseObject.setCode(ResponseCode.PRODUCT_GET_LIST_FAIL);
+					responseObject.setMessage("获取购物车失败");
+				} else {
+					pageSplit.setDatas(list);
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+					responseObject.setData(pageSplit);
+				}
+			}else{
+				responseObject.setCode(ResponseCode.PRODUCT_EMPTY_LIST);
+				responseObject.setMessage("购物车列表为空");
+			}
+		} catch (Exception e) {
+			throw ExceptionUtil.handle2ServiceException(e);
+		}
+		return responseObject;
+	}
+	
+	@Override
+	public ResponseObject<Object> add2Cart(Cart cart) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == cart){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		} else if(StringUtil.isEmpty(cart.getUserId())){
+			responseObject.setCode(ResponseCode.NEED_LOGIN);
+		}else{
+			try {
+				int result = cartDao.insert(cart);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.PRODUCT_INSERT_FAIL);
+					responseObject.setMessage("添加购物车失败");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	
+	@Override
+	public ResponseObject<Object> delete(Cart cart) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == cart || StringUtil.isEmpty(cart.getId())){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else if(StringUtil.isEmpty(cart.getUserId())){
+			responseObject.setCode(ResponseCode.NEED_LOGIN);
+		}else{
+			try {
+				int result = cartDao.delete(cart);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.CART_DELETE_FAIL);
+					responseObject.setMessage("删除购物车失败,或已不存在");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Object> deleteAllCartByUser(User user) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == user){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else if(StringUtil.isEmpty(user.getId())){
+			responseObject.setCode(ResponseCode.NEED_LOGIN);
+		}else{
+			try {
+				int result = cartDao.deleteByUser(user);
+				if (result > 0) {
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.CART_DELETE_FAIL);
+					responseObject.setMessage("删除购物车失败,或已不存在");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Integer> countByUser(User user) throws ServiceException {
+		ResponseObject<Integer> responseObject = new ResponseObject<>();
+		if(null == user){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		} else if(StringUtil.isEmpty(user.getId())){
+			responseObject.setCode(ResponseCode.NEED_LOGIN);
+		}else{
+			try {
+				int result = cartDao.countByUser(user);
+				if (result > 0) {
+					responseObject.setData(result); 
+					responseObject.setCode(ResponseCode.SUCCESS_CODE);
+				} else {
+					responseObject.setCode(ResponseCode.CART_LIST_EMPTY);
+					responseObject.setMessage("购物车列表为空");
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+	@Override
+	public ResponseObject<Object> addCartByArray(Cart[] cartArray) throws ServiceException {
+		ResponseObject<Object> responseObject = new ResponseObject<Object>();
+		if(null == cartArray || cartArray.length <= 0){
+			responseObject.setCode(ResponseCode.PARAMETER_ERROR);
+			responseObject.setMessage("参数无效");
+		}else{
+			try {
+				for(Cart cart : cartArray){
+					this.add2Cart(cart);
+				}
+			} catch (Exception e) {
+				throw ExceptionUtil.handle2ServiceException(e);
+			}
+		}
+		return responseObject;
+	}
+}

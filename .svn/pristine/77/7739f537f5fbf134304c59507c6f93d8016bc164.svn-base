@@ -1,0 +1,147 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="oid" value=""/>
+	<input type="hidden" name="key" value=""/>
+	<input type="hidden" name="type" value=""/>
+	<input type="hidden" name="state" value=""/>
+	<input type="hidden" name="sdate" value=""/>
+	<input type="hidden" name="edate" value=""/>
+	<input type="hidden" name="pn" value="1"/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">批量修改运单路由状态
+			<a href="#" id="a_back_route_list_link_554">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">批量修改运单路由状态</div>
+			<div class="content_text">
+	
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u55" style="padding-top: 5px; width:550px;">
+						<div id="u550" style="padding-bottom: 0">
+							<form action="" >
+								原运单状态：
+								<select class="text-input" name="oldState">
+									<option value="-1">
+										请选择旧状态
+									</option>
+									<option value="0">等待审核</option>
+									<option value="1">未付款</option>
+									<option value="2">已入库</option>
+									<option value="3">送往集散中心</option>
+									<option value="4">集散中心已入库</option>
+									<option value="5">送往机场</option>
+									<option value="6">空运中</option>
+									<option value="7">海关清关</option>
+									<option value="8">目的地第三方快递</option>
+									<option value="9">收件人已接收</option>
+								</select>
+								&nbsp;&nbsp;
+								原运单航班信息：<input type="text" class="text-input" size="10" name="oldFlight"/>
+								<input class="button" type="button" value="搜索" name="searchBt554" />
+								<a href="#" name="a_clean_input_link">清空</a>
+							</form>
+						</div>
+						<hr/>
+						<div name="modify_state_div554" id="u550" style="padding-top: 5px; padding-bottom: 0">
+							<form action="" >
+								新运单状态：
+								<select class="text-input" name="newState">
+									<option value="-1">
+										请选择新状态
+									</option>
+									<option value="0">等待审核</option>
+									<option value="1">未付款</option>
+									<option value="2">已入库</option>
+									<option value="3">送往集散中心</option>
+									<option value="4">集散中心已入库</option>
+									<option value="5">送往机场</option>
+									<option value="6">空运中</option>
+									<option value="7">海关清关</option>
+									<option value="8">目的地第三方快递</option>
+									<option value="9">收件人已接收</option>
+								</select>
+								&nbsp;&nbsp;
+								新运单航班信息：<input type="text" class="text-input" size="10" name="newFlight"/>
+								<input class="button" type="button" value="修改" name="modifyBt554" />
+							</form>
+						</div>
+						<hr/>
+						<div id="u550" style="padding-top: 5px;">
+							<span id="batch_order_info554">&nbsp;</span>
+						</div>
+						
+					</div>
+					<div style="clear: both;"></div>
+					<div style="width:400px; margin-left:550px; margin-top: -60px;">
+						<div class="notification information png_bg">
+		      				<div>
+		      				1、需要根据原运单<strong>航班信息</strong>获取数据时候，会自动获取状态为<strong>空运</strong>中的运单。<br/>
+		      				2、如果要修改运单的<strong>航班信息</strong>，那么会同时自动修改运单的状态为<strong>空运</strong>中。
+		      				</div>
+		    			</div>
+					</div>
+					<div style="clear: both;"></div>
+					
+
+					<table style="width: 100%">
+						<col width="60px"/>
+						<col width="120px" />
+						<col width="80px" />
+						<col width="100px" />
+						<col/>
+						<col width="80px" />
+						<col width="140px">
+						<col width="140px" />
+						<thead>
+							<tr>
+								<th>
+									<input type="checkbox" name="o_batch_order_check_all" id="o_batch_order_check_all" />全选
+								</th>
+								<th id="u_id">
+									运单号
+								</th>
+								<th id="u_nick_name">
+									所属用户
+								</th>
+								<th id="u_phone">
+									收件人姓名
+								</th>
+								<th id="u_email">
+									货物品名
+								</th>
+								<th id="u_qq">
+									运费
+								</th>
+								<th>
+									当前状态
+								</th>
+								<th id="u_balance">
+									航班号
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td style="text-align: left;" colspan="8"><span>&nbsp;&nbsp;请先获取要修改的数据，在提交修改信息!</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav554Data();
+	});
+</script>
+</html>

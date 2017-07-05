@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.FreezeMoneyDao">
+	<resultMap id="basic_result_map" type="com.meitao.model.FreezeMoney">
+		<id column="id" property="id" javaType="String" />
+		<result column="rmb" property="rmb" javaType="String" />
+		<result column="usa" property="usa" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="userId" property="userId" javaType="String" />
+		
+	</resultMap>
+
+	<insert id="insert" parameterType="com.meitao.model.T_tran_price" useGeneratedKeys="true" keyProperty="id">
+		insert into
+		freeze_money(rmb,usa,create_date,userId)
+		values(#{rmb},#{usa},#{createDate},#{userId})
+	</insert>
+
+
+	
+	<delete id="delete">
+		delete from freeze_money
+		where id=#{id}
+	</delete>
+	
+		
+	<delete id="deletebyuserId">
+		delete from freeze_money
+		where userId=#{userId}
+	</delete>
+	
+	
+	
+	<select id="getbyid" resultMap="basic_result_map">
+		select freeze_money.* from freeze_money 
+		where id=#{id}
+	</select>
+	
+	<select id="getbyuserId" resultMap="basic_result_map">
+		select freeze_money.* from freeze_money 
+		where userId=#{userId}
+	</select>
+</mapper>

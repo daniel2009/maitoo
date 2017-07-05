@@ -1,0 +1,260 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">认领包裹详情
+			<a href="javascript:nav_renling_Click();" id="" class="button">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">认领包裹详情</div>
+			<div class="content_text">
+		
+				<div class="tab-content" id="tab2">
+		          
+		          	<input type="text" style="display:none;" id="id" name="id" readonly>
+					<p>
+						<label class="cllabel" style="padding: 0px">认领单号：</label> <label
+							class="vallabel" style="padding: 0px;color:red;" id="t_id"></label>
+						 <label class="cllabel" style="padding: 0px">录入员工：</label>
+						<label class="vallabel" style="padding: 0px;color:red;" id="u_name">&nbsp;</label>
+						<label class="cllabel" style="padding: 0px">所属仓库：</label> <label
+							class="vallabel" style="padding: 0px;color:red;" id="u_warehouse">&nbsp;</label>
+						<br />
+					</p>
+					<p>		
+						<label class="cllabel" style="padding: 0px">当前状态：</label> <label
+							class="vallabel" style="padding: 0px;color:red;" id="u_state">审核中</label>
+						<label class="cllabel" style="padding: 0px">认领人：</label> <label
+							class="vallabel" style="padding: 0px;color:red;" id="u_user_no">&nbsp;</label>
+						<label class="cllabel" style="padding: 0px">认领转运号：</label> <label
+							class="vallabel" style="padding: 0px;color:red;" id="u_tran_no">&nbsp;</label>
+							<br />
+					</p>
+					<div id="transhipmentForward" >
+			        	<input type="checkbox" id="transhipmentCheckBox" checked>审核通过后直接跳转输入转运页面
+			        </div>
+		             
+
+			            <hr />
+			            <hr />
+				<section id="section">
+			    	<h4 style="color:red;">认领人信息：</h4>（绿色：包裹单号一致；红色：包裹单号不一致）
+					<div style="display: flex">
+						<div style="flex: 1;">
+		           			<label class="cllabel">认领人id：</label>
+		              		<label class="vallabel" style="padding: 0px;color:red;" id="reninfoUserId"></label>
+		           		</div>
+		           		<div style="flex: 1;">
+		           			<label class="cllabel">认领人姓名：</label>
+		              		<label class="vallabel" style="padding: 0px;color:red;" id="reninfoUserName"></label>
+		           		</div>
+		           		<div style="flex: 1;">
+		           			<label class="cllabel">认领人电话：</label>
+		              		<label class="vallabel" style="padding: 0px;color:red;" id="reninfoPhone"></label>
+		           		</div>
+		           		<div style="flex: 1;">
+		           			<label class="cllabel">认领时间：</label>
+		              		<label class="vallabel" style="padding: 0px;color:red;" id="reninfoCreateDate"></label>
+		           		</div>
+		            </div>
+			             <p>
+			              <label class="cllabel">认领备注：</label>
+			               <label class="vallabel" style="padding: 0px;color:red;" id="reninfoRemark"></label>
+			            </p>
+			            <br/>
+			            <div style="display:flex; flex-flow: wrap;">
+			             	<label class="cllabel">认领证据图：</label>
+			            	<img width="150px" height="150px" id="claimPersonImg1" src="">
+			            	<img width="150px" height="150px" id="claimPersonImg2" src="">
+			            	<img width="150px" height="150px" id="claimPersonImg3" src="">
+			            	<img width="150px" height="150px" id="claimPersonImg4" src="">
+			            	<img width="150px" height="150px" id="claimPersonImg5" src="">
+			            </div>
+			            <h4 style="color:red;">审核结果：</h4>
+			            <label class="cllabel"><span style="color:blue;">审核结果：</span></label>
+			            <form id="form">
+			            	<input type="text" style="display:none;" id="userId" name="userId" readonly>
+			            	<input type="text" style="display:none;" id="claimPersonId" name="claimPersonId" readonly>
+			          		<select id="stateSelect" name="state" class="text-input">
+								<option value="3" selected="selected" >审核中</option>
+				              	<option value="1">审核通过</option>
+				              	<option value="4">审核不通过</option>
+					        </select>
+					        <span class="gl_message">*</span>
+				            <input class="button" style="margin-left: 100px;" type="button" value="提交" onclick="javascript:auditSubmit();"/>
+						    <p>
+				              <label class="cllabel"><span style="color:blue;">审核备注：</span></label>
+				             <textarea rows="2" cols="10" class="text-input textarea wysiwyg" id="remark" name="remark"></textarea><span class="gl_message">*</span>
+				            </p>
+			            </form>
+			        </section>
+			        
+			      	</div>
+			            <hr />
+			            <hr />
+			           <h4 style="color:red;">包裹信息：</h4>
+			            <p>
+			              <label class="cllabel">包裹单号：</label>
+			              <input class="text-input small-input" type="text" id="baoguoId" maxlength="16" readonly/><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label class="cllabel">快递公司：</label>
+			              <input class="text-input small-input" type="text" id="company" maxlength="36" readonly/>
+			            </p>
+			           <p>
+			              <label class="cllabel">接收人姓名：</label>
+			              <input class="text-input small-input" type="text" id="revName" maxlength="36" readonly/>
+			            </p>
+			           
+			            <p>
+			              <label class="cllabel">接收人电话：</label>
+			              <input class="text-input small-input" type="text" id="baoguoPhone" maxlength="16" readonly/>
+			            </p>
+			            <p>
+			             <label class="cllabel">认领标题：</label>
+			              <input class="text-input medium-input" type="text" id="title" maxlength="46" readonly/><span class="gl_message">*</span>
+			            </p>         			            
+			            <p>
+			              <label class="cllabel">认领内容描述：</label>
+			              <textarea rows="4" cols="10" class="text-input textarea wysiwyg" id="content" readonly></textarea>
+			            </p>
+			            <div style="display:flex; flex-flow: wrap;">
+			             	<label class="cllabel">原图预览：</label>
+			            	<img style="max-width: 300px; max-height: 300px;" id="claimPackageImg1" src="">
+			            	<img style="max-width: 300px; max-height: 300px;" id="claimPackageImg2" src="">
+			            	<img style="max-width: 300px; max-height: 300px;" id="claimPackageImg3" src="">
+			            </div>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		        </div>
+			</div>
+		</div>
+		
+		<div id="tmpmsgdiv1" style="display:none;"></div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		var sessionStorage = window.sessionStorage;
+		var id = sessionStorage.getItem("claimPackageId");
+		sessionStorage.removeItem("claimPackageId");
+
+		$.ajax({
+			type: "get",
+			url: "../admin/claimPackage/initAudit",//----/admin/renling/get_one
+			data: {
+				id:id
+			},
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var data = response.data;
+					if(data != null){
+
+						document.getElementById("t_id").innerHTML = data.id;
+						document.getElementById("id").value = data.id;
+						
+						document.getElementById("u_warehouse").innerHTML = data.warehouseName;
+						document.getElementById("company").value = data.company;
+						document.getElementById("u_name").innerHTML = data.empId;
+						document.getElementById("u_user_no").innerHTML = data.userId;
+						document.getElementById("u_tran_no").innerHTML = data.tranId;
+						document.getElementById("title").value = data.title;
+						document.getElementById("content").innerHTML = data.content;
+						document.getElementById("revName").value = data.revName;
+						document.getElementById("baoguoId").value = data.baoguoId;
+						document.getElementById("baoguoPhone").value = data.baoguoPhone;
+						document.getElementById("claimPackageImg1").src = baseUrl + data.pic1;
+						document.getElementById("claimPackageImg2").src = baseUrl + data.pic2;
+						document.getElementById("claimPackageImg3").src = baseUrl + data.pic3;
+						clearWrongImg();
+					}
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("获取仓库数据失败，原因是:" + response.message);
+				}
+			}
+		});
+		//init claim person list
+		$.ajax({
+			type : "get",
+			url : "../admin/claimPackage/findAllClaimPersonByClaimPackageId",
+			data :{
+				claimPackageId : id
+			},
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var list = response.data.datas;
+					if(list == null || list.length < 0){
+						alert("没有知道对应列表数据");
+					}else{
+						var adminBaoguoId = document.getElementById("baoguoId").value;
+						var section = document.getElementById("section");
+						section.innerHTML = "";
+						section.innerHTML += "<h4 style='color:red; display: inline;'>认领人信息：</h4>（<label style='color:#3d3;'>绿色</label>：认领成功者；<label style='color:#d33;'>红色</label>：认领失败者）";
+						for(var i=0; i<list.length; i++){
+							var string = "";
+							string += "<details style='margin: 2px 0; border: 1px solid #555; box-shadow: inset 0 0 5px #67c; '>";
+							var summaryColor = "#dbb";
+							if(1==list[i].state){
+								summaryColor = "#ada";
+							}
+							string += "<summary style='background-color: " + summaryColor + ";'>";
+							string += "<span>认领人id：<span style='color:red;'>" + list[i].userId +" </span></span>";
+							string += "<span style='float: right;'>认领时间：<span style='color:red;'>" + list[i].createDate +" </span></span>";
+							string += "<span style='margin-right: 20%; float: right;'>认领人电话：<span style='color:red;'>" + list[i].phone +" </span></span>";
+							string += "<span style='margin-right: 20%; float: right;'>认领人姓名：<span style='color:red;'>" + list[i].userName +" </span></span>";
+							string += "</summary>";
+							string += "<article>";
+							string += "<div><label class='cllabel'>包裹单号：</label><label class='vallabel' style='padding: 0px;color:red;'>" + list[i].baoguoId +" </label></div><br/>";
+							string += "<div><label class='cllabel'>认领备注：</label><label class='vallabel' style='padding: 0px;color:red;'>" + list[i].baoguoRemark +" </label></div><br/>";
+							string += "<div style='display:flex; flex-flow: wrap;'><label class='cllabel'>认领证据图：</label>";
+							string += "<img style='max-width: 200px; max-height:200px;' src='"+baseUrl+list[i].pic1+"'>";
+							string += "<img style='max-width: 200px; max-height:200px;' src='"+baseUrl+list[i].pic2+"'>";
+							string += "<img style='max-width: 200px; max-height:200px;' src='"+baseUrl+list[i].pic3+"'>";
+							string += "<img style='max-width: 200px; max-height:200px;' src='"+baseUrl+list[i].pic4+"'>";
+							string += "<img style='max-width: 200px; max-height:200px;' src='"+baseUrl+list[i].pic5+"'>";
+							string += "</div>";
+							string += "<h4 style='color:red;'>审核结果：</h4><label class='cllabel'><span style='color:blue;'>审核结果：</span></label>";
+							string += "<form id='form"+list[i].id+"'>";
+							string += "<input type='text' style='display:none;' id='userId"+list[i].id+"' value='"+list[i].userId+"' readonly>";
+							string += "<input type='text' style='display:none;' name='claimPersonId' value='"+list[i].id+"' readonly>";
+							string += "<input type='text' style='display:none;' name='id' value='"+list[i].renlingId+"' readonly>";
+							var state = "";
+							if(list[i].state == 1){
+								state ="认领成功";
+							}else if(list[i].state==2){
+								state = "认领失败";
+							}
+							string += state + "<br/>";
+							string += "<p>";
+							string += "<label class='cllabel'><span style='color:blue;'>审核备注：</span></label>";
+							string += "<label>" + list[i].auditRemark + "</label>";
+							string += "</p>";
+							string +="</article>";
+							string += "</details>";
+							section.innerHTML += string;
+						}
+						clearWrongImg();
+					}
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("获取仓库数据失败，原因是:" + response.message);
+				};
+			}
+		});
+		
+	});
+</script>
+</html>

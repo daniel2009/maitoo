@@ -1,0 +1,176 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">认领包裹
+			<a href="#" id="a_back_claim_package_list_link" class="button">返回列表</a>
+			<script>
+				$("#a_back_claim_package_list_link").click(function(){
+					nav15Click();
+					return false;
+				})
+			</script>
+		</p>
+
+		<div class="box_content">
+			<div class="content_title">认领包裹</div>
+			<div class="content_text">
+				<div class="tab-content" id="tab2">
+					<article>
+						认领标题：<label id="title"></label><br/>
+						公司：<label id="company"></label><br/>
+						创建时间：<label id="createDate"></label><br/>
+						认领内容：<label id="content1"></label><br/>
+						<div style="display:flex;">
+							认领套图:
+							<figure style="flex:1;">
+								<img id="picture1Package">
+							</figure>
+							<figure style="flex:1;">
+								<img id="picture2Package">
+							</figure>
+							<figure style="flex:1;">
+								<img id="picture3Package">
+							</figure>
+						</div>
+					</article>
+					<hr/>
+					审核说明：<label style="color:#f00;" id="auditRemark"></label>
+		          <form action="" id="form" method="post" enctype="multipart/form-data">
+		            <fieldset>
+		            	<input type="text" id="id" name="id" style="display: none;" readonly>
+			            <p>
+			              <label class="cllabel">包裹号：</label>
+			              <input class="text-input small-input" type="text" id="baoguoId" name="baoguoId" /><span class="gl_message">*</span>
+			            </p>
+			           <p>
+			              <label class="cllabel">包裹描述：</label>
+			              <textarea rows="4" cols="10" class="text-input textarea wysiwyg" id="baoguoRemark" name="baoguoRemark" ></textarea>
+			            </p>
+			            <section style="display: flex; flex-flow: wrap;">
+				            <figure>
+			            		<img id="picture1" style="max-width: 300px; max-height: 300px;">
+			            		<figcaption><input type="file" name="picture1"><input type="text" style="display: none;" id="pic1" name="pic1" readonly></figcaption>
+			            	</figure>
+			            	<figure>
+			            		<img id="picture2" style="max-width: 300px; max-height: 300px;">
+			            		<figcaption><input type="file" name="picture2"><input type="text" style="display: none;" id="pic2" name="pic2" readonly></figcaption>
+			            	</figure>
+			            	<figure>
+			            		<img id="picture3" style="max-width: 300px; max-height: 300px;">
+			            		<figcaption><input type="file" name="picture3"><input type="text" style="display: none;" id="pic3" name="pic3" readonly></figcaption>
+			            	</figure>
+			            	<figure>
+			            		<img id="picture4" style="max-width: 300px; max-height: 300px;">
+			            		<figcaption><input type="file" name="picture4"><input type="text" style="display: none;" id="pic4" name="pic4" readonly></figcaption>
+			            	</figure>
+			            	<figure>
+			            		<img id="picture5" style="max-width: 300px; max-height: 300px;">
+			            		<figcaption><input type="file" name="picture5"><input type="text" style="display: none;" id="pic5" name="pic5" readonly></figcaption>
+			            	</figure>
+		            	</section>
+			            <p style="margin-left: 50px;">
+			              <input id="bt_add_renlingbaoguo" class="button" type="button" value="提交" onclick="javascript:claimPackage();" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline"/>
+			              <input id="reset" class="button" type="reset" value="重置" style="background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline">
+			            </p>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+		</div>
+		
+		<div id="tmpmsgdiv1" style="display:none;"></div>
+	</body>
+<script type="text/javascript" src="${pageContext.request.contextPath }/resources/scripts/jquery.form.js"></script> 
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		var sessionStorage = window.sessionStorage;
+		var claimPackageId = sessionStorage.getItem("claimPersonId");
+		document.getElementById("id").value = claimPackageId;
+		sessionStorage.removeItem("cleaimPackageId");
+		$.ajax({
+			type: "get",
+			url: "../user/claimPerson/getById",
+			data: {
+				id : $("#id").val(),
+			},
+			success: function(response){
+				var code = response.code;
+				var data = response.data;
+				if ("200" == code) {
+					document.getElementById("title").innerHTML = data.renlingBaoguo.title;
+					document.getElementById("company").innerHTML = data.renlingBaoguo.company;
+					document.getElementById("createDate").innerHTML = data.renlingBaoguo.createDate;
+					document.getElementById("content1").innerHTML = data.renlingBaoguo.content;
+					document.getElementById("picture1Package").src = baseUrl + data.renlingBaoguo.pic1;
+					document.getElementById("picture2Package").src = baseUrl + data.renlingBaoguo.pic2;
+					document.getElementById("picture3Package").src = baseUrl + data.renlingBaoguo.pic3;
+					document.getElementById("auditRemark").innerHTML = data.auditRemark;
+					document.getElementById("baoguoId").value = data.baoguoId;
+					document.getElementById("baoguoRemark").value = data.baoguoRemark;
+					document.getElementById("picture1").src = baseUrl + data.pic1;
+					document.getElementById("picture2").src = baseUrl + data.pic2;
+					document.getElementById("picture3").src = baseUrl + data.pic3;
+					document.getElementById("picture4").src = baseUrl + data.pic4;
+					document.getElementById("picture5").src = baseUrl + data.pic5;
+					document.getElementById("pic1").value = data.pic1;
+					document.getElementById("pic2").value = data.pic2;
+					document.getElementById("pic3").value = data.pic3;
+					document.getElementById("pic4").value = data.pic4;
+					document.getElementById("pic5").value = data.pic5;
+					var sessionStorage = window.sessionStorage;
+					if(sessionStorage.getItem("readonly") == "1"){
+						sessionStorage.removeItem("readonly");
+						document.getElementById("baoguoId").readOnly = true;
+						document.getElementById("baoguoRemark").readOnly = true;
+						document.getElementById("bt_add_renlingbaoguo").hidden = true;
+						document.getElementById("reset").hidden = true;
+						$("input[type=file]").css("display", "none");
+					}
+					clearWrongImg();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("获取元数据失败，失败原因：" + response.message);
+				}
+				return false;
+			}
+		});
+	});
+	function claimPackage(){
+		var httpRequest = new XMLHttpRequest();
+		var url = "../user/claimPackage/reclaim";
+		httpRequest.onreadystatechange = function(){
+			if(4 == httpRequest.readyState){
+				if(200 == httpRequest.status){
+					var response = eval("(" + httpRequest.responseText + ")");
+					var code = response.code;
+					if("200" == code){
+						alert("提交成功，等待审核");
+						nav15Click();
+					}else if("607" == code){
+						alert("登录过期，请重新登录");
+						window.location.href = "login.jsp";
+					}else{
+						alert("添加失败，失败原因:" + response.message);
+					};
+				};
+			}
+			return false;
+		};
+		httpRequest.open("post", url, true);
+		httpRequest.send(new FormData(document.getElementById("form")));
+		return false;
+	}
+</script>
+</html>

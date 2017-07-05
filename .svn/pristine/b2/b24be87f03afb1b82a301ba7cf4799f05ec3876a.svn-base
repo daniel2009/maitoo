@@ -1,0 +1,150 @@
+
+
+document.write("<div class='QQbox' id='divQQbox' >");
+document.write("<LINK href='js/qq/qq.css' type=text\/css rel=stylesheet>");
+
+document.write("<div class='Qlist' id='divOnline'  >");
+
+document.write("<div class='t'  onclick=\"if(document.all.divQQbox.style.display=='none'){document.all.divQQbox.style.display=''} else {document.all.divQQbox.style.display='none'}\" ><img src=\"/js/qq/top.gif\" alt=\"1\" border=\"0\" /></div>");
+
+document.write("<div class='con'>");
+document.write("<table border='0' cellspacing='0' cellpadding='0' width='100%'>");
+
+document.writeln("<tr style=border:none;><td  colspan='2' align=center style=padding-right:0px;padding-top:0px;padding-bottom:0px;border:none;><a target='_blank' href='http://wpa.qq.com/msgrd?v=3&uin=2569458125&site=qq&menu=yes'><img src=' http://wpa.qq.com/pa?p=2:2569458125:45'  border='0' alt='点击这里给我发消息' /></a></td><td style=border:none;><a target='_blank' href='http://wpa.qq.com/msgrd?v=3&uin=2569458125&site=qq&menu=yes'>洛杉矶客服</a></td></tr>");document.writeln("<tr style=border:none;><td  colspan='2' align=center style=padding-right:0px;padding-top:0px;padding-bottom:0px;border:none;><a target='_blank' href='http://wpa.qq.com/msgrd?v=3&uin=2717990880&site=qq&menu=yes'><img src=' http://wpa.qq.com/pa?p=2:2717990880:45'  border='0' alt='点击这里给我发消息' /></a></td><td style=border:none;><a target='_blank' href='http://wpa.qq.com/msgrd?v=3&uin=2717990880&site=qq&menu=yes'>上海客服</a></td></tr>");
+document.write("</table>");
+
+
+document.write("</div>");
+document.write("<div class='b'><a href='contact.asp'><img src='/js/qq/bottom.gif' alt='contact us'></a></div>");
+document.write("</div>");
+document.write("</div>");
+
+
+
+//<![CDATA[
+
+var tips; var theTop = 60/*这是默认高度,越大越往下*/; var old = theTop;
+
+function initFloatTips() {
+
+tips = document.getElementById('divQQbox');
+
+moveTips();
+
+};
+
+function moveTips() {
+
+var tt=50;
+
+if (window.innerHeight) {
+
+pos = window.pageYOffset
+
+}
+
+else if (document.documentElement && document.documentElement.scrollTop) {
+
+pos = document.documentElement.scrollTop
+
+}
+
+else if (document.body) {
+
+pos = document.body.scrollTop;
+
+}
+
+pos=pos-tips.offsetTop+theTop;
+
+pos=tips.offsetTop+pos/10;
+
+
+
+if (pos < theTop) pos = theTop;
+
+if (pos != old) {
+
+tips.style.top = pos+"px";
+
+tt=10;
+
+//alert(tips.style.top);
+
+}   
+
+
+
+old = pos;
+
+setTimeout(moveTips,tt);
+
+}
+
+//!]]>
+
+initFloatTips();
+
+
+
+
+function OnlineOver(){
+
+document.getElementById("divMenu").style.display = "none";
+
+//document.getElementById("divOnline").style.display = "block";
+
+document.getElementById("divQQbox").style.width = "118px";
+
+}
+
+
+
+function OnlineOut(){
+
+document.getElementById("divMenu").style.display = "block";
+
+//document.getElementById("divOnline").style.display = "none";
+
+
+
+}
+
+
+
+function hideMsgBox(theEvent){ //theEvent用来传入事件，Firefox的方式
+
+　 if (theEvent){
+
+　 var browser=navigator.userAgent; //取得浏览器属性
+
+　 if (browser.indexOf("Firefox")>0){ //如果是Firefox
+
+　　 if (document.getElementById('divOnline').contains(theEvent.relatedTarget)) { //如果是子元素
+
+　　 return; //结束函式
+
+} 
+
+} 
+
+if (browser.indexOf("MSIE")>0){ //如果是IE
+
+if (document.getElementById('divOnline').contains(event.toElement)) { //如果是子元素
+
+return; //结束函式
+
+}
+
+}
+
+}
+
+/*要执行的操作*/
+
+document.getElementById("divMenu").style.display = "block";
+
+//document.getElementById("divOnline").style.display = "none";
+
+}
+

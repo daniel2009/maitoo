@@ -1,0 +1,134 @@
+#u31 {
+	width: 100%px;
+	height: 60px;
+}
+
+#u310{
+	padding: 10px;
+	/*width: 800px;*/
+	float: left;
+}
+
+
+#u320 {
+	font-size: 14px;
+	float: right;
+	width: 100px;
+	margin-top: 30px;
+	margin-right: 50px;
+	padding: 10px;
+}
+
+.cllabel {
+	float: left;
+	width: 100px;
+	text-align: right;
+}
+
+.vallabel{
+	float: left;
+	min-width:200px;
+	text-align: left;
+}
+
+#u51 {
+	width: 100%px;
+	height: 60px;
+}
+
+#u510{
+	padding: 10px;
+	float: left;
+}
+
+#u52 {
+	width: 100%px;
+	height: 60px;
+}
+
+#520 {
+	padding: 10px;
+	width: 900px;
+	float: left;
+}
+
+#u55 {
+	width: 100%px;
+	height: 60px;
+}
+
+#u550{
+	/* padding: 10px; */
+	width: 100%;
+	float: left;
+}
+
+
+#u551 {
+	font-size: 14px;
+	float: right;
+	width: 300px;
+	margin-top: 5px;
+	padding: 10px;
+	padding-top: 0px;
+}
+
+/*add by chenkanghua */
+#u552 {
+	font-size: 14px;
+	float: right;
+	/* width: 300px; */
+	margin-top: 5px;
+	padding: 10px;
+	padding-top: 0px;
+}
+
+#u5401{
+	background: white;
+	padding: 0px;
+	margin: 0px;
+	border-collapse: 0px;
+	border-spacing: 0px;
+	border: 0px;
+}
+
+#u5401 tr {
+	background: white;
+	border: 0px;
+}
+
+#u5401 td,
+#u5401 th {
+	background: white;
+	border: 2px solid #999;
+}
+
+#u5401 div th {
+	background: #ef9;
+}
+
+#u5402 {
+	height: 200px;
+	margin-bottom: 10px;
+	max-height: 200px;
+    overflow: auto;
+    overflow-x: hidden;
+    border: 1px solid #999;
+}
+
+#u5402 table {
+	table-layout: fixed;
+}
+
+#msgtable tbody tr td {
+	word-wrap:break-all;
+	white-space: pre-wrap;
+}
+#msgtable tbody tr td div span{
+	word-wrap:break-all;
+	white-space: pre-wrap;
+}
+
+.displaynone{
+	display: none;
+}

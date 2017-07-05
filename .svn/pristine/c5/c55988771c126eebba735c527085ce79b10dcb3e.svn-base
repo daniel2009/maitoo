@@ -1,0 +1,116 @@
+package com.weiye.controller;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.model.ResponseObject;
+
+@Controller
+public class TestController {
+	@RequestMapping(value = "/test/array", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<List<Object>> testArray(String[] ids) {
+		ResponseObject<List<Object>> result = new ResponseObject<List<Object>>("200");
+		List<Object> list = new ArrayList<Object>();
+		list.add(ids.length);
+		list.add(ids);
+		result.setData(list);
+		return result;
+	}
+
+	@RequestMapping(value = "/test/mulit_array", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public ResponseObject<List<Object>> testMulitArray(@RequestParam(value = "ids") String[][] ids) {
+		ResponseObject<List<Object>> result = new ResponseObject<List<Object>>("200");
+		List<Object> list = new ArrayList<Object>();
+		list.add(ids.length);
+		list.add(ids);
+		result.setData(list);
+		return result;
+	}
+
+	@RequestMapping(value = "/test/user_model", method = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT })
+	@ResponseBody
+	public ResponseObject<Top> testUserDefindModel(@RequestParam(value = "top") Top top) {
+		ResponseObject<Top> result = new ResponseObject<Top>("200");
+		result.setData(top);
+		return result;
+	}
+}
+
+class Top implements Serializable {
+	private static final long serialVersionUID = 5347460750826457424L;
+	private List<Child> childs = new ArrayList<Child>();
+	private String userId = "";
+
+	public List<Child> getChilds() {
+		return childs;
+	}
+
+	public void setChilds(List<Child> childs) {
+		this.childs = childs;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+}
+
+class Child implements Serializable {
+
+	private static final long serialVersionUID = -6669031097752081925L;
+	private String name;
+	private String age;
+	private List<Sun> suns = new ArrayList<Sun>();
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getAge() {
+		return age;
+	}
+
+	public void setAge(String age) {
+		this.age = age;
+	}
+
+	public List<Sun> getSuns() {
+		return suns;
+	}
+
+	public void setSuns(List<Sun> suns) {
+		this.suns = suns;
+	}
+}
+
+class Sun implements Serializable {
+
+	private static final long serialVersionUID = 5971608517380338699L;
+	private String key;
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+}

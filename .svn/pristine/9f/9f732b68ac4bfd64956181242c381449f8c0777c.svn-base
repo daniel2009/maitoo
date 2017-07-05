@@ -1,0 +1,41 @@
+#u20 {
+	position: absolute;
+	left: -15px;
+	top: 30px;
+	width: 100%;
+	height: 30px;
+}
+
+#u20_text {
+	position:absolute;
+	left:5px;
+	top:0px;
+	font-weight: bold;
+	font-size: 20px;
+	color: #999;
+}
+
+#u21 {
+	position: absolute;
+	left: -10px;
+	top: 60px;
+	width: 800px;
+	height: 600px;
+}
+
+#u210, #u220 {
+	font-size: 14px;
+}
+
+#u22 {
+	position: absolute;
+	left: -10px;
+	top: 60px;
+	width: 400px;
+	height: 600px;
+}
+
+#e_d_pic img {
+	width: 100px;
+	height: 100px;
+}

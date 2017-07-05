@@ -1,0 +1,10 @@
+﻿<html>
+<script language="javascript" type="text/javascript"> 
+// 以下方式直接跳转
+//window.location.href='./frontpage/zongheng/index.html';
+//window.location.href='./frontpage/usitao/index.html';
+//window.location.href='./frontpage/gobox/index.html';
+window.location.href='./frontpage/US258/index.html';
+//window.location.href='./91gou/index.html';
+</script>
+</html>

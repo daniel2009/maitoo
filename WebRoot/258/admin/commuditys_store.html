@@ -1,0 +1,271 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+    <link href="../resources/artDialog/css/ui-dialog.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <style type="text/css">
+        .ui-jqgrid-view > .ui-jqgrid-titlebar {
+            display: block;
+        }
+
+        .table-condensed > tbody > tr .name {
+            background-color: #F1F1F1;
+          
+            width: 120px;
+        }
+    </style>
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">渠道商品管理</a>
+                </li>
+
+                <li>
+                    <a href="#">渠道管理</a>
+                </li>
+
+            </ul>
+        </div>
+
+
+        <div class="page-content" id="divGrid">
+
+
+            <div class="row toolrow" id="divAdvanceSearch" style="border:1px solid #ccc">
+                <div class="col-xs-12" style="padding:3px 5px 0px;">
+              <div style="float:left">
+                    门店： <select name="select_stores"></select>
+                    </div>
+                    <div style="float:left">
+                     渠道： <select name="select_channels"></select>
+                    </div>
+                 
+                    
+                    
+                    
+                    <div style="float:right">
+                    
+                    <label for="keyword" class="control-label width60px">商品ID:</label>
+
+                        <input name="id" id="empId" placeholder="关键字">
+
+                        <label for="keyword" class="control-label width60px">关键字:</label>
+
+                        <input name="keyword" id="keyword" placeholder="关键字">
+                        
+                        <label for="commudity_state" class="control-label width60px">商品启用状态:</label>
+
+                        <select name="commudity_state" ><option value="-1">请选择商品状态</option><option value="0">否</option><option value="1">是</option></select>
+                        
+                         <label for="store_state" class="control-label width60px">门店启用状态:</label>
+
+                        <select name="store_state" ><option value="-1">请选择商品状态</option><option value="0">否</option><option value="1">是</option></select>
+                        
+                        <button type="button" class="btn btn-purple btn-sm" id="btnAdvanceSearch">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            搜索
+                        </button>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+
+            <div style="clear:both">
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-xs-12">
+
+                    <!-- PAGE CONTENT BEGINS -->
+                    <table id="yundangrid-table"></table>
+                    <div id="yundangrid-pager"></div>
+
+                    <!-- PAGE CONTENT ENDS -->
+                </div>
+            </div>
+        </div>
+
+ 
+
+ 
+
+        <div class="page-content" id="divDetail" style="display:none">
+
+            <div class="row">
+                <div style="margin-top: 10px; margin-bottom: 10px;color:blue" class="well well-sm">
+                    <span>员工详细信息</span>
+                </div>
+            </div>
+            <div class="row" style=" margin-bottom:30px;">
+                <div class="col-xs-12">
+
+
+                    <form class="form">
+
+                        <table class="table table-bordered  table-striped table-condensed ">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        员工信息
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td class="name">
+                                        用户编号：
+                                    </td>
+                                    <td class="value">
+                                        <span name="id"></span>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        用户名：
+                                    </td>
+                                    <td class="value">
+                                        <span name="account"></span>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        门市：
+                                    </td>
+                                    <td class="value">
+
+                                        <span name="storeName"></span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="name">
+                                        手机号码：
+                                    </td>
+                                    <td class="value">
+
+                                        <span name="phone"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="name">
+                                        拥有权限：
+                                    </td>
+                                    <td class="value">
+
+                                        <span name="auth"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+
+                        <div class="clearfix form-buttons">
+                            <label class="control-label col-md-5"></label>
+
+                            <button type="button" class="cancel btn btn-sub btn-sm btn-warning"><i class="glyphicon glyphicon-remove"></i><strong>返回列表</strong></button>
+                        </div>
+                    </form>
+							
+                </div>
+            </div>
+            
+        </div>
+<p style="color:blue;">&nbsp;&nbsp;&nbsp;&nbsp;注意：网上置单的价格是指用户在网上置单后，拿到门店得到的计费标准，如果本身用户的会员价格低于网上置单的价格，将仍然按照会员的价格来计算。
+<br/>上门收费的价格则相反，如果会员价格高于此价格，将按会员价格收取，否则使用此价格来收取上门收货的物品！</p>
+    </div>
+
+
+
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+
+    <!--开关插件-->
+
+    <script src="../resources/artDialog/dist/dialog-min.js"></script>
+    <script src="../resources/artDialog/dist/dialog.new.life.js"></script>
+
+    <!--表单验证插件-->
+    <script src="../resources/js/jquery.validate.min.js"></script>
+    <script src="../resources/js/jquery.validate.messages_zh.min.js"></script>
+
+    <script src="../resources/scripts/common.js"></script>
+
+    <script src="../resources/scripts/commudity_store.js"></script>
+</body>
+</html>

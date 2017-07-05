@@ -1,0 +1,31 @@
+package com.weiye.dao;
+
+import java.util.List;
+
+
+
+
+
+
+
+
+
+
+
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.model.CardId;
+import com.weiye.model.Channel;
+import com.weiye.model.FlyInfo;
+import com.weiye.model.Order;
+import com.weiye.model.Seaprint;
+import com.weiye.model.Warehouse;
+
+public interface CardIdDao {
+
+	
+	public int insertcaridinfo(CardId cardid);//身份证信息插入
+	public int countbycardid(@Param("cardid") String cardid);//查找身分证id数量
+	public List<CardId> getcardidbyname(@Param("cname") String cname);//查找身分证id数量
+}

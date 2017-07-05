@@ -1,0 +1,3110 @@
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : localhost
+Source Server Version : 50530
+Source Host           : localhost:3306
+Source Database       : shining
+
+Target Server Type    : MYSQL
+Target Server Version : 50530
+File Encoding         : 65001
+
+Date: 2015-11-24 15:46:04
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for `account`
+-- ----------------------------
+DROP TABLE IF EXISTS `account`;
+CREATE TABLE `account` (
+  `user_id` int(11) NOT NULL,
+  `rmb` decimal(18,2) DEFAULT NULL,
+  `usd` decimal(18,2) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of account
+-- ----------------------------
+INSERT INTO `account` VALUES ('1187', '0.00', '0.00', '2015-11-24 15:36:32', '2015-11-24 15:36:32');
+
+-- ----------------------------
+-- Table structure for `account_detail`
+-- ----------------------------
+DROP TABLE IF EXISTS `account_detail`;
+CREATE TABLE `account_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `credit_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `type` varchar(10) DEFAULT NULL,
+  `state` varchar(10) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `amount` decimal(18,2) DEFAULT NULL,
+  `currency` varchar(10) DEFAULT NULL,
+  `emp_id` int(11) DEFAULT NULL,
+  `remark` text,
+  `emp_name` varchar(20) DEFAULT NULL,
+  `emp_store` varchar(50) DEFAULT NULL,
+  `groupid` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=332 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of account_detail
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `authority_employees`
+-- ----------------------------
+DROP TABLE IF EXISTS `authority_employees`;
+CREATE TABLE `authority_employees` (
+  `authority_id` int(10) NOT NULL,
+  `employees_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of authority_employees
+-- ----------------------------
+INSERT INTO `authority_employees` VALUES ('100', '134');
+INSERT INTO `authority_employees` VALUES ('101', '134');
+INSERT INTO `authority_employees` VALUES ('102', '134');
+INSERT INTO `authority_employees` VALUES ('103', '134');
+INSERT INTO `authority_employees` VALUES ('104', '134');
+INSERT INTO `authority_employees` VALUES ('105', '134');
+INSERT INTO `authority_employees` VALUES ('106', '134');
+INSERT INTO `authority_employees` VALUES ('107', '134');
+INSERT INTO `authority_employees` VALUES ('200', '134');
+INSERT INTO `authority_employees` VALUES ('202', '134');
+INSERT INTO `authority_employees` VALUES ('300', '134');
+INSERT INTO `authority_employees` VALUES ('301', '134');
+INSERT INTO `authority_employees` VALUES ('400', '134');
+INSERT INTO `authority_employees` VALUES ('401', '134');
+INSERT INTO `authority_employees` VALUES ('500', '134');
+INSERT INTO `authority_employees` VALUES ('501', '134');
+INSERT INTO `authority_employees` VALUES ('502', '134');
+INSERT INTO `authority_employees` VALUES ('600', '134');
+INSERT INTO `authority_employees` VALUES ('601', '134');
+INSERT INTO `authority_employees` VALUES ('700', '134');
+INSERT INTO `authority_employees` VALUES ('800', '134');
+INSERT INTO `authority_employees` VALUES ('801', '134');
+INSERT INTO `authority_employees` VALUES ('802', '134');
+INSERT INTO `authority_employees` VALUES ('803', '134');
+INSERT INTO `authority_employees` VALUES ('100', '136');
+INSERT INTO `authority_employees` VALUES ('101', '136');
+INSERT INTO `authority_employees` VALUES ('102', '136');
+INSERT INTO `authority_employees` VALUES ('103', '136');
+INSERT INTO `authority_employees` VALUES ('104', '136');
+INSERT INTO `authority_employees` VALUES ('105', '136');
+INSERT INTO `authority_employees` VALUES ('106', '136');
+INSERT INTO `authority_employees` VALUES ('107', '136');
+INSERT INTO `authority_employees` VALUES ('102', '133');
+INSERT INTO `authority_employees` VALUES ('103', '133');
+INSERT INTO `authority_employees` VALUES ('100', '131');
+INSERT INTO `authority_employees` VALUES ('101', '131');
+INSERT INTO `authority_employees` VALUES ('102', '131');
+INSERT INTO `authority_employees` VALUES ('100', '104');
+INSERT INTO `authority_employees` VALUES ('101', '104');
+INSERT INTO `authority_employees` VALUES ('102', '104');
+INSERT INTO `authority_employees` VALUES ('103', '104');
+INSERT INTO `authority_employees` VALUES ('104', '104');
+INSERT INTO `authority_employees` VALUES ('105', '104');
+INSERT INTO `authority_employees` VALUES ('106', '104');
+INSERT INTO `authority_employees` VALUES ('107', '104');
+INSERT INTO `authority_employees` VALUES ('200', '104');
+INSERT INTO `authority_employees` VALUES ('202', '104');
+INSERT INTO `authority_employees` VALUES ('300', '104');
+INSERT INTO `authority_employees` VALUES ('301', '104');
+INSERT INTO `authority_employees` VALUES ('400', '104');
+INSERT INTO `authority_employees` VALUES ('401', '104');
+INSERT INTO `authority_employees` VALUES ('500', '104');
+INSERT INTO `authority_employees` VALUES ('501', '104');
+INSERT INTO `authority_employees` VALUES ('502', '104');
+INSERT INTO `authority_employees` VALUES ('600', '104');
+INSERT INTO `authority_employees` VALUES ('601', '104');
+INSERT INTO `authority_employees` VALUES ('700', '104');
+INSERT INTO `authority_employees` VALUES ('800', '104');
+INSERT INTO `authority_employees` VALUES ('801', '104');
+INSERT INTO `authority_employees` VALUES ('802', '104');
+INSERT INTO `authority_employees` VALUES ('803', '104');
+INSERT INTO `authority_employees` VALUES ('100', '137');
+INSERT INTO `authority_employees` VALUES ('101', '137');
+INSERT INTO `authority_employees` VALUES ('102', '137');
+INSERT INTO `authority_employees` VALUES ('103', '137');
+INSERT INTO `authority_employees` VALUES ('105', '137');
+INSERT INTO `authority_employees` VALUES ('107', '137');
+INSERT INTO `authority_employees` VALUES ('100', '138');
+INSERT INTO `authority_employees` VALUES ('102', '138');
+INSERT INTO `authority_employees` VALUES ('103', '138');
+INSERT INTO `authority_employees` VALUES ('104', '138');
+INSERT INTO `authority_employees` VALUES ('105', '138');
+INSERT INTO `authority_employees` VALUES ('106', '138');
+INSERT INTO `authority_employees` VALUES ('107', '138');
+INSERT INTO `authority_employees` VALUES ('100', '140');
+INSERT INTO `authority_employees` VALUES ('101', '140');
+INSERT INTO `authority_employees` VALUES ('102', '140');
+INSERT INTO `authority_employees` VALUES ('103', '140');
+INSERT INTO `authority_employees` VALUES ('104', '140');
+INSERT INTO `authority_employees` VALUES ('105', '140');
+INSERT INTO `authority_employees` VALUES ('106', '140');
+INSERT INTO `authority_employees` VALUES ('107', '140');
+
+-- ----------------------------
+-- Table structure for `authority_url`
+-- ----------------------------
+DROP TABLE IF EXISTS `authority_url`;
+CREATE TABLE `authority_url` (
+  `authority_id` int(11) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `menu_id` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`authority_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of authority_url
+-- ----------------------------
+INSERT INTO `authority_url` VALUES ('100', '预报列表', 'nav1_yubaoliebiao');
+INSERT INTO `authority_url` VALUES ('101', '运单管理', 'nav1_yundanguanli');
+INSERT INTO `authority_url` VALUES ('102', '门市件管理', 'nav1_menshijianguanli');
+INSERT INTO `authority_url` VALUES ('103', '价格计算', 'nav1_jiagejisuan');
+INSERT INTO `authority_url` VALUES ('104', '空运单管理', 'nav1_kongyundanguanli');
+INSERT INTO `authority_url` VALUES ('105', '上门取件', 'nav1_shangmenqujian');
+INSERT INTO `authority_url` VALUES ('106', '路由管理', 'nav1_luyouguanli');
+INSERT INTO `authority_url` VALUES ('107', '包裹认领', 'nav1_baoguorenling');
+INSERT INTO `authority_url` VALUES ('200', '员工管理', 'nav2_yuangongguanli');
+INSERT INTO `authority_url` VALUES ('202', '仓库门店管理', 'nav2_cangkumendianguanli');
+INSERT INTO `authority_url` VALUES ('300', '会员管理', 'nav3_huiyuanguanli');
+INSERT INTO `authority_url` VALUES ('301', '导出会员信息', 'nav3_daochuhuiyuanxinxi');
+INSERT INTO `authority_url` VALUES ('400', '账户管理', 'nav4_zhanghuguanli');
+INSERT INTO `authority_url` VALUES ('401', '预充值管理', 'nav4_yuchongzhiguanli');
+INSERT INTO `authority_url` VALUES ('500', '留言管理', 'nav5_liuyanguanli');
+INSERT INTO `authority_url` VALUES ('501', '异常运单管理', 'nav5_yichangzhuanyunguanli');
+INSERT INTO `authority_url` VALUES ('502', '异常预订单管理', 'nav5_yichangyundanguanli');
+INSERT INTO `authority_url` VALUES ('600', '新闻管理', 'nav6_xingwenguanli');
+INSERT INTO `authority_url` VALUES ('601', '公告管理', 'nav6_gonggaoguanli');
+INSERT INTO `authority_url` VALUES ('700', '统计报表', 'nav7_tongjibaobiao');
+INSERT INTO `authority_url` VALUES ('800', '渠道管理', 'nav8_qudaoguanli');
+INSERT INTO `authority_url` VALUES ('801', '商品类型价格管理', 'nav8_shangpinleixingjiage');
+INSERT INTO `authority_url` VALUES ('802', '发送短信', 'nav8_fasongduanxin');
+INSERT INTO `authority_url` VALUES ('803', '全局参数配置', 'nav8_quanjucanshupeizhi');
+
+-- ----------------------------
+-- Table structure for `call_order`
+-- ----------------------------
+DROP TABLE IF EXISTS `call_order`;
+CREATE TABLE `call_order` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `send_name` varchar(100) DEFAULT '' COMMENT '寄件人',
+  `send_province` varchar(100) DEFAULT NULL,
+  `send_city` varchar(100) DEFAULT NULL,
+  `send_district` varchar(100) DEFAULT NULL,
+  `send_street_address` varchar(256) DEFAULT NULL,
+  `send_zip_code` varchar(20) DEFAULT NULL,
+  `send_phone` varchar(20) DEFAULT NULL,
+  `weight` decimal(18,2) DEFAULT NULL,
+  `state` int(11) DEFAULT NULL,
+  `emp_id` int(11) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of call_order
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `channels`
+-- ----------------------------
+DROP TABLE IF EXISTS `channels`;
+CREATE TABLE `channels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `alias` varchar(50) DEFAULT NULL,
+  `warehouse_id` int(11) DEFAULT NULL,
+  `state` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of channels
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `commodity`
+-- ----------------------------
+DROP TABLE IF EXISTS `commodity`;
+CREATE TABLE `commodity` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `cost` decimal(18,2) DEFAULT '0.00',
+  `price` decimal(18,2) DEFAULT '0.00' COMMENT '转运价格',
+  `ms_price` decimal(18,2) DEFAULT '0.00' COMMENT '门市价格',
+  `vip_one_price` decimal(18,2) DEFAULT '0.00',
+  `vip_two_price` decimal(18,2) DEFAULT '0.00',
+  `vip_three_price` decimal(18,2) DEFAULT '0.00',
+  `first_fee` decimal(18,2) DEFAULT NULL,
+  `store_id` int(11) DEFAULT NULL,
+  `channel_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=191 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of commodity
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `consignee_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `consignee_info`;
+CREATE TABLE `consignee_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `province` varchar(100) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `district` varchar(100) DEFAULT NULL,
+  `street_address` varchar(256) DEFAULT NULL,
+  `zip_code` varchar(30) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `telephone` varchar(30) DEFAULT NULL,
+  `card_id` varchar(30) DEFAULT NULL,
+  `card_url` varchar(128) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `last_date` varchar(50) DEFAULT NULL,
+  `cardurlother` varchar(128) DEFAULT NULL,
+  `cardurltogether` varchar(128) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of consignee_info
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `credit_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `credit_info`;
+CREATE TABLE `credit_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `address1` text,
+  `address2` text,
+  `city` varchar(100) DEFAULT NULL,
+  `province` varchar(100) DEFAULT NULL,
+  `zip_code` varchar(20) DEFAULT NULL,
+  `type` varchar(20) DEFAULT NULL,
+  `credit_no` varchar(100) DEFAULT NULL,
+  `credit_security_code` varchar(100) DEFAULT NULL,
+  `expire_year` varchar(10) DEFAULT NULL,
+  `expire_month` varchar(10) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of credit_info
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `employees`
+-- ----------------------------
+DROP TABLE IF EXISTS `employees`;
+CREATE TABLE `employees` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `account` varchar(50) DEFAULT NULL,
+  `password` varchar(100) DEFAULT NULL,
+  `store_id` varchar(20) DEFAULT NULL,
+  `store_name` varchar(100) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `pic_url` varchar(100) DEFAULT NULL,
+  `sign_date` varchar(50) DEFAULT NULL,
+  `groupid` varchar(10) DEFAULT NULL,
+  `superadmin` tinyint(4) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `account` (`account`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=141 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of employees
+-- ----------------------------
+INSERT INTO `employees` VALUES ('104', 'admin', '96e79218965eb72c92a549dd5a330112', '4', 'Los Angeles 总仓', '6267104685', null, '2014-10-10 10:12:32', '1', '1');
+
+-- ----------------------------
+-- Table structure for `ex_rate`
+-- ----------------------------
+DROP TABLE IF EXISTS `ex_rate`;
+CREATE TABLE `ex_rate` (
+  `usd2rmb` decimal(18,2) DEFAULT NULL,
+  `rmb2usd` decimal(18,2) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of ex_rate
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `e_o_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `e_o_info`;
+CREATE TABLE `e_o_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` varchar(50) DEFAULT NULL,
+  `emp_name` varchar(100) DEFAULT NULL,
+  `content` text,
+  `create_date` varchar(50) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `parent_id` int(11) DEFAULT NULL,
+  `state` int(11) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of e_o_info
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `e_t_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `e_t_info`;
+CREATE TABLE `e_t_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transh_id` varchar(50) DEFAULT NULL,
+  `emp_name` varchar(100) DEFAULT NULL,
+  `content` text,
+  `create_date` varchar(50) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `parent_id` int(11) DEFAULT NULL,
+  `state` int(11) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of e_t_info
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `flyinfo`
+-- ----------------------------
+DROP TABLE IF EXISTS `flyinfo`;
+CREATE TABLE `flyinfo` (
+  `id` int(12) NOT NULL AUTO_INCREMENT,
+  `flightno` varchar(50) NOT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL,
+  `remark` text,
+  `state` varchar(18) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `flightno` (`flightno`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of flyinfo
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `globalargs`
+-- ----------------------------
+DROP TABLE IF EXISTS `globalargs`;
+CREATE TABLE `globalargs` (
+  `id` int(32) NOT NULL AUTO_INCREMENT,
+  `argflag` varchar(256) CHARACTER SET gb2312 DEFAULT NULL,
+  `argcontent` text CHARACTER SET gb2312,
+  `argtype` varchar(28) DEFAULT NULL,
+  `modifytime` varchar(28) DEFAULT NULL,
+  `createtime` varchar(28) CHARACTER SET utf8 DEFAULT NULL,
+  `argremark` text CHARACTER SET gb2312,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
+
+-- ----------------------------
+-- Records of globalargs
+-- ----------------------------
+INSERT INTO `globalargs` VALUES ('12', 'foot', '   <div id=\"footer\" class=\"section-3 footer-dark\">       <div class=\"container\">         <div class=\"row\">           <!-- Contact us -->           <div class=\"span3\">             <h2>联系我们</h2>             <address class=\"vcard\">             <span class=\"street-address\">拉斯维加斯: 3541 s valley view blvd las vegas，nv 89103 </span>              <span class=\"street-address\">洛杉矶地区: 4969 sereno dr temple city,ca 91780 </span>             <span class=\"tel\">美国电话：626-898-7996</span>             <span class=\"tel\">中国电话：189-1885-3038</span>              <a href=\"sales@webxury.com\" class=\"email\">sales@webxury.com</a>             </address>           </div>           <!-- Useful Links -->           <div class=\"span3\">             <h2>友情链接</h2>             <ul class=\"list\">               <li><a href=\"http://www.weiye-express.com\" target=\"_blank\">飞力网</a></li>               <li><a href=\"http://www.chinapost.com.cn\" target=\"_blank\">中国邮政</a></li>               <li><a href=\"http://www.chinapost.com.cn\" target=\"_blank\">中国EMS</a></li>               <li><a href=\"https://www.usps.com\" target=\"_blank\">美国邮政总局</a></li>             </ul>           </div>           <!-- twitter feed  -->           <div class=\"span3\">              <h2>关注我们</h2>                <ul class=\"list\">               <li><a href=\"cai780722\">微信</a></li>               <li><a href=\"http://www.weibo.com/u/3324836372\" target=\"_blank\">微博</a></li>               <li><a href=\"mailto:sales@webxury.com\">商务合作</a></li>                            </ul>           </div>           <!-- Newsletter -->           <!--  <div class=\"span3\">             <h2>站内信</h2>             <form class=\"navbar-inverse form-search\">               <div class=\"navbar-search input-append\">                 <input type=\"text\" placeholder=\"请输入邮箱地址\" class=\"span2 search-query\">                 <button type=\"submit\" class=\"btn btn-warning\">提交</button>               </div>               <div class=\"clearfix\"></div>             </form>             <div class=\"clearfix p1\">               <p class=\"text-info\"><i>如有任何问题请与我们联系，我们会第一为您解决！</i></p>             </div>           </div>           -->         </div>       </div>     </div>     <!-- footer 2  twitter-->     <div id=\"copyrights\" class=\"footer-2 footer-dark\">       <div class=\"container\">         <div class=\"row\">           <div class=\"span12\">www.weiye-express.com All rights reserved<a href=\"#\">版权所有 Fleet全球速递</a></div>         </div>       </div>     </div>   ', '1', '2015-10-14 11:29:59', '2015-10-13 14:10:27', '整个页脚的内容,但不包含<footer>标志');
+INSERT INTO `globalargs` VALUES ('15', 'logo_big', '/resources/pics/global/G_GEROx_04045.jpg', '0', '2015-10-15 10:00:37', '2015-10-14 10:45:47', '用于前端显示的logo图片，建议使用大小为248px*80px的图片，或者等比例的图片，否则容易引起变形和失真！');
+INSERT INTO `globalargs` VALUES ('16', 'cur_usa_cn', '6.5', '1', '2015-10-14 11:09:10', '2015-10-14 11:09:10', '美元兑换人民币的汇率');
+INSERT INTO `globalargs` VALUES ('17', 'print_site_url', 'www.weiye-express.com', '1', '2015-10-16 20:35:14', '2015-10-16 19:19:43', '打印在订单上的连接显示内容。');
+INSERT INTO `globalargs` VALUES ('18', 'print_order_hit', 'Couner do not responsible for any damages caused during transition and delays due to custom inspection or weather.By signing above,sender agrees to take full responsibilities for all legal issues caused by this shipment,if the items are not insured,sender may be legible compensated maximum up to $100 USD for all lost items.', '1', '2015-10-16 20:35:06', '2015-10-16 19:23:06', '打印在订单上的提示内容！');
+INSERT INTO `globalargs` VALUES ('19', 'print_logo_flag', '/resources/pics/global/print_logo_flag_zwozl_92206.png', '0', '2015-10-16 20:39:20', '2015-10-16 19:25:09', '显示在打印的订单上的logo图片。图片大小为248px*80px或按此比例的图片，否则可能变形不好看');
+INSERT INTO `globalargs` VALUES ('20', 'premium_rate', '0.05', '1', '2015-11-23 21:50:59', '2015-11-23 21:50:59', '保险比例');
+
+-- ----------------------------
+-- Table structure for `gonggao`
+-- ----------------------------
+DROP TABLE IF EXISTS `gonggao`;
+CREATE TABLE `gonggao` (
+  `id` int(12) NOT NULL AUTO_INCREMENT,
+  `title` varchar(100) DEFAULT NULL,
+  `content` text,
+  `remark` text,
+  `authorid` int(11) NOT NULL,
+  `author` varchar(100) DEFAULT NULL,
+  `releasetime` varchar(28) DEFAULT NULL,
+  `viewcontent` text,
+  `tag` varchar(255) DEFAULT NULL,
+  `modifytime` varchar(50) DEFAULT NULL,
+  `img` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of gonggao
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `login_info`
+-- ----------------------------
+DROP TABLE IF EXISTS `login_info`;
+CREATE TABLE `login_info` (
+  `id` int(11) NOT NULL DEFAULT '0',
+  `login_times` int(11) DEFAULT NULL,
+  `last_date` varchar(50) DEFAULT NULL,
+  `now_date` varchar(50) DEFAULT NULL,
+  `type` varchar(5) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of login_info
+-- ----------------------------
+INSERT INTO `login_info` VALUES ('104', '1', '2015-11-24 15:31:36', '2015-11-24 15:31:36', '1');
+
+-- ----------------------------
+-- Table structure for `message`
+-- ----------------------------
+DROP TABLE IF EXISTS `message`;
+CREATE TABLE `message` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `user_name` varchar(100) DEFAULT NULL,
+  `content` text,
+  `create_date` varchar(50) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `parent_id` int(11) DEFAULT NULL,
+  `state` int(11) DEFAULT '0',
+  `groupid` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of message
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `news`
+-- ----------------------------
+DROP TABLE IF EXISTS `news`;
+CREATE TABLE `news` (
+  `id` int(12) NOT NULL AUTO_INCREMENT,
+  `title` varchar(100) DEFAULT NULL,
+  `content` text,
+  `remark` text,
+  `author` varchar(100) DEFAULT NULL,
+  `authorid` int(11) NOT NULL,
+  `releasetime` varchar(28) DEFAULT NULL,
+  `modifytime` varchar(28) DEFAULT NULL,
+  `viewcontent` text,
+  `tag` varchar(255) DEFAULT NULL,
+  `img` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of news
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `order`
+-- ----------------------------
+DROP TABLE IF EXISTS `order`;
+CREATE TABLE `order` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` varchar(50) DEFAULT NULL,
+  `warehouse_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `weight` decimal(18,2) DEFAULT NULL,
+  `tariff` decimal(18,2) DEFAULT NULL,
+  `or` decimal(18,2) DEFAULT NULL,
+  `other` decimal(18,2) DEFAULT NULL,
+  `premium` decimal(18,2) DEFAULT NULL,
+  `parce_value` varchar(50) DEFAULT NULL,
+  `consignee_id` int(11) DEFAULT NULL,
+  `consignee_name` varchar(100) DEFAULT NULL,
+  `consignee_province` varchar(100) DEFAULT NULL,
+  `consignee_city` varchar(100) DEFAULT NULL,
+  `consignee_district` varchar(100) DEFAULT NULL,
+  `consignee_street_address` varchar(256) DEFAULT NULL,
+  `consignee_zip_code` varchar(20) DEFAULT NULL,
+  `consignee_phone` varchar(20) DEFAULT NULL,
+  `remark` text,
+  `state` varchar(10) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `mail` varchar(10) DEFAULT NULL,
+  `emp_id` int(11) DEFAULT NULL,
+  `store_id` varchar(20) DEFAULT NULL,
+  `pay_date` varchar(50) DEFAULT NULL,
+  `third_pns` varchar(100) DEFAULT NULL,
+  `third_no` varchar(100) DEFAULT NULL,
+  `batch_id` int(11) DEFAULT NULL,
+  `flight` varchar(50) DEFAULT NULL,
+  `CommodityCost` decimal(18,2) DEFAULT NULL,
+  `total_money` decimal(18,2) DEFAULT '0.00',
+  `type` int(11) NOT NULL,
+  `length` decimal(18,2) DEFAULT '0.00',
+  `width` decimal(18,2) DEFAULT '0.00',
+  `height` decimal(18,2) DEFAULT '0.00',
+  `channel_id` int(11) DEFAULT NULL,
+  `cardid` varchar(50) DEFAULT NULL,
+  `cardurl` varchar(128) DEFAULT NULL,
+  `weight_kg` decimal(18,0) DEFAULT NULL,
+  `address_all` varchar(556) DEFAULT NULL,
+  `name_pinyi` varchar(100) DEFAULT NULL,
+  `express_name` varchar(100) DEFAULT NULL,
+  `senduserphone` varchar(100) DEFAULT NULL,
+  `senduserAddress` varchar(556) DEFAULT NULL,
+  `senduserName` varchar(100) DEFAULT NULL,
+  `cardurlother` varchar(128) DEFAULT NULL,
+  `cardurltogether` varchar(128) DEFAULT NULL,
+  `tran_pro` varchar(18) DEFAULT NULL,
+  `third_create_date` varchar(56) DEFAULT NULL,
+  `box_no` varchar(32) DEFAULT NULL,
+  `pay_or_not` varchar(11) DEFAULT NULL,
+  `card_or_not` varchar(11) DEFAULT NULL,
+  `commodity_third_list` text,
+  `import_remark` text,
+  `base_money` decimal(18,2) DEFAULT NULL,
+  `state_remark` text,
+  `third_brands` text,
+  `order_type` varchar(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=821 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of order
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `order_detail`
+-- ----------------------------
+DROP TABLE IF EXISTS `order_detail`;
+CREATE TABLE `order_detail` (
+  `order_id` varchar(50) NOT NULL DEFAULT '',
+  `transhipment_id` int(11) NOT NULL DEFAULT '0',
+  `commodity_id` int(11) NOT NULL DEFAULT '0',
+  `quantity` int(11) DEFAULT NULL,
+  `name` varchar(256) DEFAULT NULL,
+  `weight` decimal(18,2) DEFAULT NULL,
+  `tariff` decimal(18,2) DEFAULT NULL,
+  `or` decimal(18,2) DEFAULT NULL,
+  `other` decimal(18,2) DEFAULT NULL,
+  `remark` text,
+  `sjweight` decimal(18,2) DEFAULT NULL,
+  `jfweight` decimal(18,2) DEFAULT NULL,
+  `brands` varchar(1000) DEFAULT NULL,
+  `xiangqing` varchar(1000) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of order_detail
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `order_midfix`
+-- ----------------------------
+DROP TABLE IF EXISTS `order_midfix`;
+CREATE TABLE `order_midfix` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_midfix` varchar(20) NOT NULL,
+  `state` varchar(10) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13006 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of order_midfix
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `renling_bill`
+-- ----------------------------
+DROP TABLE IF EXISTS `renling_bill`;
+CREATE TABLE `renling_bill` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `warehouse_id` varchar(18) DEFAULT NULL,
+  `user_id` varchar(18) DEFAULT NULL,
+  `emp_id` varchar(18) DEFAULT NULL,
+  `company` varchar(50) DEFAULT NULL,
+  `state` varchar(10) DEFAULT NULL,
+  `baoguo_id` varchar(50) DEFAULT NULL,
+  `title` varchar(50) DEFAULT NULL,
+  `remark` text,
+  `content` text,
+  `tran_id` varchar(18) DEFAULT NULL,
+  `pic_1` varchar(256) DEFAULT NULL,
+  `pic_2` varchar(256) DEFAULT NULL,
+  `pic_3` varchar(256) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `rev_name` varchar(50) DEFAULT NULL,
+  `baoguo_phone` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=176 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of renling_bill
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `renling_person`
+-- ----------------------------
+DROP TABLE IF EXISTS `renling_person`;
+CREATE TABLE `renling_person` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `renling_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `user_name` varchar(28) DEFAULT NULL,
+  `user_phone` varchar(20) DEFAULT NULL,
+  `baoguo_id` varchar(50) DEFAULT NULL,
+  `baoguo_remark` text,
+  `pic1` varchar(265) DEFAULT NULL,
+  `pic2` varchar(256) DEFAULT NULL,
+  `pic3` varchar(256) DEFAULT NULL,
+  `pic4` varchar(256) DEFAULT NULL,
+  `pic5` varchar(256) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `create_person` varchar(30) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of renling_person
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `route`
+-- ----------------------------
+DROP TABLE IF EXISTS `route`;
+CREATE TABLE `route` (
+  `order_id` varchar(50) DEFAULT NULL,
+  `state` varchar(50) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `date` varchar(50) DEFAULT NULL,
+  `address` varchar(50) DEFAULT NULL,
+  `remark` text,
+  `flight` varchar(10) DEFAULT NULL,
+  `third_pns` varchar(50) DEFAULT NULL,
+  `third_no` varchar(50) DEFAULT NULL,
+  `state_remark` varchar(500) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of route
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `transhipment_bill`
+-- ----------------------------
+DROP TABLE IF EXISTS `transhipment_bill`;
+CREATE TABLE `transhipment_bill` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `warehouse_id` int(11) DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `emp_id` int(11) DEFAULT NULL,
+  `from_user` varchar(50) DEFAULT NULL,
+  `state` varchar(10) DEFAULT NULL,
+  `eta` varchar(50) DEFAULT NULL,
+  `awt` varchar(50) DEFAULT NULL,
+  `remark` text,
+  `weight` decimal(18,2) DEFAULT NULL,
+  `parce_value` varchar(50) DEFAULT NULL,
+  `tariff` decimal(18,2) DEFAULT NULL,
+  `or` decimal(18,2) DEFAULT NULL,
+  `other` decimal(18,2) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `transit_no` varchar(50) DEFAULT NULL,
+  `transit_company` varchar(50) DEFAULT NULL,
+  `length` decimal(18,2) DEFAULT '0.00',
+  `width` decimal(18,2) DEFAULT '0.00',
+  `height` decimal(18,2) DEFAULT '0.00',
+  `channel_id` int(11) DEFAULT NULL,
+  `cName` varchar(50) DEFAULT NULL,
+  `transit_type` varchar(11) DEFAULT NULL,
+  `cProvince` varchar(50) DEFAULT NULL,
+  `cCity` varchar(50) DEFAULT NULL,
+  `cDistrict` varchar(50) DEFAULT NULL,
+  `cStreetAddress` varchar(255) DEFAULT NULL,
+  `cZipCode` varchar(50) DEFAULT NULL,
+  `cPhone` varchar(50) DEFAULT NULL,
+  `cardid` varchar(50) DEFAULT NULL,
+  `cardurl` varchar(255) DEFAULT NULL,
+  `cardurlother` varchar(255) DEFAULT NULL,
+  `cardurltogether` varchar(255) DEFAULT NULL,
+  `weight_kg` decimal(18,0) DEFAULT NULL,
+  `mail` varchar(10) DEFAULT NULL,
+  `premium` decimal(18,0) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=181 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of transhipment_bill
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `transhipment_commodity`
+-- ----------------------------
+DROP TABLE IF EXISTS `transhipment_commodity`;
+CREATE TABLE `transhipment_commodity` (
+  `id` int(32) NOT NULL AUTO_INCREMENT,
+  `transhipment_id` int(11) DEFAULT NULL,
+  `commodity_id` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `sjweight` decimal(18,2) DEFAULT NULL,
+  `tariff` decimal(18,2) DEFAULT NULL,
+  `jfweight` decimal(18,2) DEFAULT NULL,
+  `xiangqing` varchar(50) DEFAULT NULL,
+  `eachjfweight` decimal(18,2) DEFAULT NULL,
+  `commodity_sku` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=268 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of transhipment_commodity
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `usercode`
+-- ----------------------------
+DROP TABLE IF EXISTS `usercode`;
+CREATE TABLE `usercode` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `usercode` varchar(10) NOT NULL,
+  `state` varchar(10) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2205 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of usercode
+-- ----------------------------
+INSERT INTO `usercode` VALUES ('1', 'AAAAAA', '1');
+INSERT INTO `usercode` VALUES ('2', 'AAAAAB', '1');
+INSERT INTO `usercode` VALUES ('3', 'AAAAAC', '1');
+INSERT INTO `usercode` VALUES ('4', 'AAAAAD', '1');
+INSERT INTO `usercode` VALUES ('5', 'AAAAAE', '1');
+INSERT INTO `usercode` VALUES ('6', 'AAAAAF', '1');
+INSERT INTO `usercode` VALUES ('7', 'AAAAAG', '1');
+INSERT INTO `usercode` VALUES ('8', 'AAAAAH', '1');
+INSERT INTO `usercode` VALUES ('9', 'AAAAAI', '1');
+INSERT INTO `usercode` VALUES ('10', 'AAAAAJ', '1');
+INSERT INTO `usercode` VALUES ('11', 'AAAAAK', '1');
+INSERT INTO `usercode` VALUES ('12', 'AAAAAL', '1');
+INSERT INTO `usercode` VALUES ('13', 'AAAAAM', '1');
+INSERT INTO `usercode` VALUES ('14', 'AAAAAN', '1');
+INSERT INTO `usercode` VALUES ('15', 'AAAAAO', '1');
+INSERT INTO `usercode` VALUES ('16', 'AAAAAP', '1');
+INSERT INTO `usercode` VALUES ('17', 'AAAAAQ', '1');
+INSERT INTO `usercode` VALUES ('18', 'AAAAAR', '1');
+INSERT INTO `usercode` VALUES ('19', 'AAAAAS', '1');
+INSERT INTO `usercode` VALUES ('20', 'AAAAAT', '1');
+INSERT INTO `usercode` VALUES ('21', 'AAAAAU', '1');
+INSERT INTO `usercode` VALUES ('22', 'AAAAAV', '1');
+INSERT INTO `usercode` VALUES ('23', 'AAAAAW', '1');
+INSERT INTO `usercode` VALUES ('24', 'AAAAAX', '1');
+INSERT INTO `usercode` VALUES ('25', 'AAAAAY', '1');
+INSERT INTO `usercode` VALUES ('26', 'AAAAAZ', '1');
+INSERT INTO `usercode` VALUES ('27', 'AAAABA', '0');
+INSERT INTO `usercode` VALUES ('28', 'AAAABB', '0');
+INSERT INTO `usercode` VALUES ('29', 'AAAABC', '0');
+INSERT INTO `usercode` VALUES ('30', 'AAAABD', '0');
+INSERT INTO `usercode` VALUES ('31', 'AAAABE', '0');
+INSERT INTO `usercode` VALUES ('32', 'AAAABF', '0');
+INSERT INTO `usercode` VALUES ('33', 'AAAABG', '0');
+INSERT INTO `usercode` VALUES ('34', 'AAAABH', '0');
+INSERT INTO `usercode` VALUES ('35', 'AAAABI', '0');
+INSERT INTO `usercode` VALUES ('36', 'AAAABJ', '0');
+INSERT INTO `usercode` VALUES ('37', 'AAAABK', '0');
+INSERT INTO `usercode` VALUES ('38', 'AAAABL', '0');
+INSERT INTO `usercode` VALUES ('39', 'AAAABM', '0');
+INSERT INTO `usercode` VALUES ('40', 'AAAABN', '0');
+INSERT INTO `usercode` VALUES ('41', 'AAAABO', '0');
+INSERT INTO `usercode` VALUES ('42', 'AAAABP', '0');
+INSERT INTO `usercode` VALUES ('43', 'AAAABQ', '0');
+INSERT INTO `usercode` VALUES ('44', 'AAAABR', '0');
+INSERT INTO `usercode` VALUES ('45', 'AAAABS', '0');
+INSERT INTO `usercode` VALUES ('46', 'AAAABT', '0');
+INSERT INTO `usercode` VALUES ('47', 'AAAABU', '0');
+INSERT INTO `usercode` VALUES ('48', 'AAAABV', '0');
+INSERT INTO `usercode` VALUES ('49', 'AAAABW', '0');
+INSERT INTO `usercode` VALUES ('50', 'AAAABX', '0');
+INSERT INTO `usercode` VALUES ('51', 'AAAABY', '0');
+INSERT INTO `usercode` VALUES ('52', 'AAAABZ', '0');
+INSERT INTO `usercode` VALUES ('53', 'AAAACA', '0');
+INSERT INTO `usercode` VALUES ('54', 'AAAACB', '0');
+INSERT INTO `usercode` VALUES ('55', 'AAAACC', '0');
+INSERT INTO `usercode` VALUES ('56', 'AAAACD', '0');
+INSERT INTO `usercode` VALUES ('57', 'AAAACE', '0');
+INSERT INTO `usercode` VALUES ('58', 'AAAACF', '0');
+INSERT INTO `usercode` VALUES ('59', 'AAAACG', '0');
+INSERT INTO `usercode` VALUES ('60', 'AAAACH', '0');
+INSERT INTO `usercode` VALUES ('61', 'AAAACI', '0');
+INSERT INTO `usercode` VALUES ('62', 'AAAACJ', '0');
+INSERT INTO `usercode` VALUES ('63', 'AAAACK', '0');
+INSERT INTO `usercode` VALUES ('64', 'AAAACL', '0');
+INSERT INTO `usercode` VALUES ('65', 'AAAACM', '0');
+INSERT INTO `usercode` VALUES ('66', 'AAAACN', '0');
+INSERT INTO `usercode` VALUES ('67', 'AAAACO', '0');
+INSERT INTO `usercode` VALUES ('68', 'AAAACP', '0');
+INSERT INTO `usercode` VALUES ('69', 'AAAACQ', '0');
+INSERT INTO `usercode` VALUES ('70', 'AAAACR', '0');
+INSERT INTO `usercode` VALUES ('71', 'AAAACS', '0');
+INSERT INTO `usercode` VALUES ('72', 'AAAACT', '0');
+INSERT INTO `usercode` VALUES ('73', 'AAAACU', '0');
+INSERT INTO `usercode` VALUES ('74', 'AAAACV', '0');
+INSERT INTO `usercode` VALUES ('75', 'AAAACW', '0');
+INSERT INTO `usercode` VALUES ('76', 'AAAACX', '0');
+INSERT INTO `usercode` VALUES ('77', 'AAAACY', '0');
+INSERT INTO `usercode` VALUES ('78', 'AAAACZ', '0');
+INSERT INTO `usercode` VALUES ('79', 'AAAADA', '0');
+INSERT INTO `usercode` VALUES ('80', 'AAAADB', '0');
+INSERT INTO `usercode` VALUES ('81', 'AAAADC', '0');
+INSERT INTO `usercode` VALUES ('82', 'AAAADD', '0');
+INSERT INTO `usercode` VALUES ('83', 'AAAADE', '0');
+INSERT INTO `usercode` VALUES ('84', 'AAAADF', '0');
+INSERT INTO `usercode` VALUES ('85', 'AAAADG', '0');
+INSERT INTO `usercode` VALUES ('86', 'AAAADH', '0');
+INSERT INTO `usercode` VALUES ('87', 'AAAADI', '0');
+INSERT INTO `usercode` VALUES ('88', 'AAAADJ', '0');
+INSERT INTO `usercode` VALUES ('89', 'AAAADK', '0');
+INSERT INTO `usercode` VALUES ('90', 'AAAADL', '0');
+INSERT INTO `usercode` VALUES ('91', 'AAAADM', '0');
+INSERT INTO `usercode` VALUES ('92', 'AAAADN', '0');
+INSERT INTO `usercode` VALUES ('93', 'AAAADO', '0');
+INSERT INTO `usercode` VALUES ('94', 'AAAADP', '0');
+INSERT INTO `usercode` VALUES ('95', 'AAAADQ', '0');
+INSERT INTO `usercode` VALUES ('96', 'AAAADR', '0');
+INSERT INTO `usercode` VALUES ('97', 'AAAADS', '0');
+INSERT INTO `usercode` VALUES ('98', 'AAAADT', '0');
+INSERT INTO `usercode` VALUES ('99', 'AAAADU', '0');
+INSERT INTO `usercode` VALUES ('100', 'AAAADV', '0');
+INSERT INTO `usercode` VALUES ('101', 'AAAADW', '0');
+INSERT INTO `usercode` VALUES ('102', 'AAAADX', '0');
+INSERT INTO `usercode` VALUES ('103', 'AAAADY', '0');
+INSERT INTO `usercode` VALUES ('104', 'AAAADZ', '0');
+INSERT INTO `usercode` VALUES ('105', 'AAAAEA', '0');
+INSERT INTO `usercode` VALUES ('106', 'AAAAEB', '0');
+INSERT INTO `usercode` VALUES ('107', 'AAAAEC', '0');
+INSERT INTO `usercode` VALUES ('108', 'AAAAED', '0');
+INSERT INTO `usercode` VALUES ('109', 'AAAAEE', '0');
+INSERT INTO `usercode` VALUES ('110', 'AAAAEF', '0');
+INSERT INTO `usercode` VALUES ('111', 'AAAAEG', '0');
+INSERT INTO `usercode` VALUES ('112', 'AAAAEH', '0');
+INSERT INTO `usercode` VALUES ('113', 'AAAAEI', '0');
+INSERT INTO `usercode` VALUES ('114', 'AAAAEJ', '0');
+INSERT INTO `usercode` VALUES ('115', 'AAAAEK', '0');
+INSERT INTO `usercode` VALUES ('116', 'AAAAEL', '0');
+INSERT INTO `usercode` VALUES ('117', 'AAAAEM', '0');
+INSERT INTO `usercode` VALUES ('118', 'AAAAEN', '0');
+INSERT INTO `usercode` VALUES ('119', 'AAAAEO', '0');
+INSERT INTO `usercode` VALUES ('120', 'AAAAEP', '0');
+INSERT INTO `usercode` VALUES ('121', 'AAAAEQ', '0');
+INSERT INTO `usercode` VALUES ('122', 'AAAAER', '0');
+INSERT INTO `usercode` VALUES ('123', 'AAAAES', '0');
+INSERT INTO `usercode` VALUES ('124', 'AAAAET', '0');
+INSERT INTO `usercode` VALUES ('125', 'AAAAEU', '0');
+INSERT INTO `usercode` VALUES ('126', 'AAAAEV', '0');
+INSERT INTO `usercode` VALUES ('127', 'AAAAEW', '0');
+INSERT INTO `usercode` VALUES ('128', 'AAAAEX', '0');
+INSERT INTO `usercode` VALUES ('129', 'AAAAEY', '0');
+INSERT INTO `usercode` VALUES ('130', 'AAAAEZ', '0');
+INSERT INTO `usercode` VALUES ('131', 'AAAAFA', '0');
+INSERT INTO `usercode` VALUES ('132', 'AAAAFB', '0');
+INSERT INTO `usercode` VALUES ('133', 'AAAAFC', '0');
+INSERT INTO `usercode` VALUES ('134', 'AAAAFD', '0');
+INSERT INTO `usercode` VALUES ('135', 'AAAAFE', '0');
+INSERT INTO `usercode` VALUES ('136', 'AAAAFF', '0');
+INSERT INTO `usercode` VALUES ('137', 'AAAAFG', '0');
+INSERT INTO `usercode` VALUES ('138', 'AAAAFH', '0');
+INSERT INTO `usercode` VALUES ('139', 'AAAAFI', '0');
+INSERT INTO `usercode` VALUES ('140', 'AAAAFJ', '0');
+INSERT INTO `usercode` VALUES ('141', 'AAAAFK', '0');
+INSERT INTO `usercode` VALUES ('142', 'AAAAFL', '0');
+INSERT INTO `usercode` VALUES ('143', 'AAAAFM', '0');
+INSERT INTO `usercode` VALUES ('144', 'AAAAFN', '0');
+INSERT INTO `usercode` VALUES ('145', 'AAAAFO', '0');
+INSERT INTO `usercode` VALUES ('146', 'AAAAFP', '0');
+INSERT INTO `usercode` VALUES ('147', 'AAAAFQ', '0');
+INSERT INTO `usercode` VALUES ('148', 'AAAAFR', '0');
+INSERT INTO `usercode` VALUES ('149', 'AAAAFS', '0');
+INSERT INTO `usercode` VALUES ('150', 'AAAAFT', '0');
+INSERT INTO `usercode` VALUES ('151', 'AAAAFU', '0');
+INSERT INTO `usercode` VALUES ('152', 'AAAAFV', '0');
+INSERT INTO `usercode` VALUES ('153', 'AAAAFW', '0');
+INSERT INTO `usercode` VALUES ('154', 'AAAAFX', '0');
+INSERT INTO `usercode` VALUES ('155', 'AAAAFY', '0');
+INSERT INTO `usercode` VALUES ('156', 'AAAAFZ', '0');
+INSERT INTO `usercode` VALUES ('157', 'AAAAGA', '0');
+INSERT INTO `usercode` VALUES ('158', 'AAAAGB', '0');
+INSERT INTO `usercode` VALUES ('159', 'AAAAGC', '0');
+INSERT INTO `usercode` VALUES ('160', 'AAAAGD', '0');
+INSERT INTO `usercode` VALUES ('161', 'AAAAGE', '0');
+INSERT INTO `usercode` VALUES ('162', 'AAAAGF', '0');
+INSERT INTO `usercode` VALUES ('163', 'AAAAGG', '0');
+INSERT INTO `usercode` VALUES ('164', 'AAAAGH', '0');
+INSERT INTO `usercode` VALUES ('165', 'AAAAGI', '0');
+INSERT INTO `usercode` VALUES ('166', 'AAAAGJ', '0');
+INSERT INTO `usercode` VALUES ('167', 'AAAAGK', '0');
+INSERT INTO `usercode` VALUES ('168', 'AAAAGL', '0');
+INSERT INTO `usercode` VALUES ('169', 'AAAAGM', '0');
+INSERT INTO `usercode` VALUES ('170', 'AAAAGN', '0');
+INSERT INTO `usercode` VALUES ('171', 'AAAAGO', '0');
+INSERT INTO `usercode` VALUES ('172', 'AAAAGP', '0');
+INSERT INTO `usercode` VALUES ('173', 'AAAAGQ', '0');
+INSERT INTO `usercode` VALUES ('174', 'AAAAGR', '0');
+INSERT INTO `usercode` VALUES ('175', 'AAAAGS', '0');
+INSERT INTO `usercode` VALUES ('176', 'AAAAGT', '0');
+INSERT INTO `usercode` VALUES ('177', 'AAAAGU', '0');
+INSERT INTO `usercode` VALUES ('178', 'AAAAGV', '0');
+INSERT INTO `usercode` VALUES ('179', 'AAAAGW', '0');
+INSERT INTO `usercode` VALUES ('180', 'AAAAGX', '0');
+INSERT INTO `usercode` VALUES ('181', 'AAAAGY', '0');
+INSERT INTO `usercode` VALUES ('182', 'AAAAGZ', '0');
+INSERT INTO `usercode` VALUES ('183', 'AAAAHA', '0');
+INSERT INTO `usercode` VALUES ('184', 'AAAAHB', '0');
+INSERT INTO `usercode` VALUES ('185', 'AAAAHC', '0');
+INSERT INTO `usercode` VALUES ('186', 'AAAAHD', '0');
+INSERT INTO `usercode` VALUES ('187', 'AAAAHE', '0');
+INSERT INTO `usercode` VALUES ('188', 'AAAAHF', '0');
+INSERT INTO `usercode` VALUES ('189', 'AAAAHG', '0');
+INSERT INTO `usercode` VALUES ('190', 'AAAAHH', '0');
+INSERT INTO `usercode` VALUES ('191', 'AAAAHI', '0');
+INSERT INTO `usercode` VALUES ('192', 'AAAAHJ', '0');
+INSERT INTO `usercode` VALUES ('193', 'AAAAHK', '0');
+INSERT INTO `usercode` VALUES ('194', 'AAAAHL', '0');
+INSERT INTO `usercode` VALUES ('195', 'AAAAHM', '0');
+INSERT INTO `usercode` VALUES ('196', 'AAAAHN', '0');
+INSERT INTO `usercode` VALUES ('197', 'AAAAHO', '0');
+INSERT INTO `usercode` VALUES ('198', 'AAAAHP', '0');
+INSERT INTO `usercode` VALUES ('199', 'AAAAHQ', '0');
+INSERT INTO `usercode` VALUES ('200', 'AAAAHR', '0');
+INSERT INTO `usercode` VALUES ('201', 'AAAAHS', '0');
+INSERT INTO `usercode` VALUES ('202', 'AAAAHT', '0');
+INSERT INTO `usercode` VALUES ('203', 'AAAAHU', '0');
+INSERT INTO `usercode` VALUES ('204', 'AAAAHV', '0');
+INSERT INTO `usercode` VALUES ('205', 'AAAAHW', '0');
+INSERT INTO `usercode` VALUES ('206', 'AAAAHX', '0');
+INSERT INTO `usercode` VALUES ('207', 'AAAAHY', '0');
+INSERT INTO `usercode` VALUES ('208', 'AAAAHZ', '0');
+INSERT INTO `usercode` VALUES ('209', 'AAAAIA', '0');
+INSERT INTO `usercode` VALUES ('210', 'AAAAIB', '0');
+INSERT INTO `usercode` VALUES ('211', 'AAAAIC', '0');
+INSERT INTO `usercode` VALUES ('212', 'AAAAID', '0');
+INSERT INTO `usercode` VALUES ('213', 'AAAAIE', '0');
+INSERT INTO `usercode` VALUES ('214', 'AAAAIF', '0');
+INSERT INTO `usercode` VALUES ('215', 'AAAAIG', '0');
+INSERT INTO `usercode` VALUES ('216', 'AAAAIH', '0');
+INSERT INTO `usercode` VALUES ('217', 'AAAAII', '0');
+INSERT INTO `usercode` VALUES ('218', 'AAAAIJ', '0');
+INSERT INTO `usercode` VALUES ('219', 'AAAAIK', '0');
+INSERT INTO `usercode` VALUES ('220', 'AAAAIL', '0');
+INSERT INTO `usercode` VALUES ('221', 'AAAAIM', '0');
+INSERT INTO `usercode` VALUES ('222', 'AAAAIN', '0');
+INSERT INTO `usercode` VALUES ('223', 'AAAAIO', '0');
+INSERT INTO `usercode` VALUES ('224', 'AAAAIP', '0');
+INSERT INTO `usercode` VALUES ('225', 'AAAAIQ', '0');
+INSERT INTO `usercode` VALUES ('226', 'AAAAIR', '0');
+INSERT INTO `usercode` VALUES ('227', 'AAAAIS', '0');
+INSERT INTO `usercode` VALUES ('228', 'AAAAIT', '0');
+INSERT INTO `usercode` VALUES ('229', 'AAAAIU', '0');
+INSERT INTO `usercode` VALUES ('230', 'AAAAIV', '0');
+INSERT INTO `usercode` VALUES ('231', 'AAAAIW', '0');
+INSERT INTO `usercode` VALUES ('232', 'AAAAIX', '0');
+INSERT INTO `usercode` VALUES ('233', 'AAAAIY', '0');
+INSERT INTO `usercode` VALUES ('234', 'AAAAIZ', '0');
+INSERT INTO `usercode` VALUES ('235', 'AAAAJA', '0');
+INSERT INTO `usercode` VALUES ('236', 'AAAAJB', '0');
+INSERT INTO `usercode` VALUES ('237', 'AAAAJC', '0');
+INSERT INTO `usercode` VALUES ('238', 'AAAAJD', '0');
+INSERT INTO `usercode` VALUES ('239', 'AAAAJE', '0');
+INSERT INTO `usercode` VALUES ('240', 'AAAAJF', '0');
+INSERT INTO `usercode` VALUES ('241', 'AAAAJG', '0');
+INSERT INTO `usercode` VALUES ('242', 'AAAAJH', '0');
+INSERT INTO `usercode` VALUES ('243', 'AAAAJI', '0');
+INSERT INTO `usercode` VALUES ('244', 'AAAAJJ', '0');
+INSERT INTO `usercode` VALUES ('245', 'AAAAJK', '0');
+INSERT INTO `usercode` VALUES ('246', 'AAAAJL', '0');
+INSERT INTO `usercode` VALUES ('247', 'AAAAJM', '0');
+INSERT INTO `usercode` VALUES ('248', 'AAAAJN', '0');
+INSERT INTO `usercode` VALUES ('249', 'AAAAJO', '0');
+INSERT INTO `usercode` VALUES ('250', 'AAAAJP', '0');
+INSERT INTO `usercode` VALUES ('251', 'AAAAJQ', '0');
+INSERT INTO `usercode` VALUES ('252', 'AAAAJR', '0');
+INSERT INTO `usercode` VALUES ('253', 'AAAAJS', '0');
+INSERT INTO `usercode` VALUES ('254', 'AAAAJT', '0');
+INSERT INTO `usercode` VALUES ('255', 'AAAAJU', '0');
+INSERT INTO `usercode` VALUES ('256', 'AAAAJV', '0');
+INSERT INTO `usercode` VALUES ('257', 'AAAAJW', '0');
+INSERT INTO `usercode` VALUES ('258', 'AAAAJX', '0');
+INSERT INTO `usercode` VALUES ('259', 'AAAAJY', '0');
+INSERT INTO `usercode` VALUES ('260', 'AAAAJZ', '0');
+INSERT INTO `usercode` VALUES ('261', 'AAAAKA', '0');
+INSERT INTO `usercode` VALUES ('262', 'AAAAKB', '0');
+INSERT INTO `usercode` VALUES ('263', 'AAAAKC', '0');
+INSERT INTO `usercode` VALUES ('264', 'AAAAKD', '0');
+INSERT INTO `usercode` VALUES ('265', 'AAAAKE', '0');
+INSERT INTO `usercode` VALUES ('266', 'AAAAKF', '0');
+INSERT INTO `usercode` VALUES ('267', 'AAAAKG', '0');
+INSERT INTO `usercode` VALUES ('268', 'AAAAKH', '0');
+INSERT INTO `usercode` VALUES ('269', 'AAAAKI', '0');
+INSERT INTO `usercode` VALUES ('270', 'AAAAKJ', '0');
+INSERT INTO `usercode` VALUES ('271', 'AAAAKK', '0');
+INSERT INTO `usercode` VALUES ('272', 'AAAAKL', '0');
+INSERT INTO `usercode` VALUES ('273', 'AAAAKM', '0');
+INSERT INTO `usercode` VALUES ('274', 'AAAAKN', '0');
+INSERT INTO `usercode` VALUES ('275', 'AAAAKO', '0');
+INSERT INTO `usercode` VALUES ('276', 'AAAAKP', '0');
+INSERT INTO `usercode` VALUES ('277', 'AAAAKQ', '0');
+INSERT INTO `usercode` VALUES ('278', 'AAAAKR', '0');
+INSERT INTO `usercode` VALUES ('279', 'AAAAKS', '0');
+INSERT INTO `usercode` VALUES ('280', 'AAAAKT', '0');
+INSERT INTO `usercode` VALUES ('281', 'AAAAKU', '0');
+INSERT INTO `usercode` VALUES ('282', 'AAAAKV', '0');
+INSERT INTO `usercode` VALUES ('283', 'AAAAKW', '0');
+INSERT INTO `usercode` VALUES ('284', 'AAAAKX', '0');
+INSERT INTO `usercode` VALUES ('285', 'AAAAKY', '0');
+INSERT INTO `usercode` VALUES ('286', 'AAAAKZ', '0');
+INSERT INTO `usercode` VALUES ('287', 'AAAALA', '0');
+INSERT INTO `usercode` VALUES ('288', 'AAAALB', '0');
+INSERT INTO `usercode` VALUES ('289', 'AAAALC', '0');
+INSERT INTO `usercode` VALUES ('290', 'AAAALD', '0');
+INSERT INTO `usercode` VALUES ('291', 'AAAALE', '0');
+INSERT INTO `usercode` VALUES ('292', 'AAAALF', '0');
+INSERT INTO `usercode` VALUES ('293', 'AAAALG', '0');
+INSERT INTO `usercode` VALUES ('294', 'AAAALH', '0');
+INSERT INTO `usercode` VALUES ('295', 'AAAALI', '0');
+INSERT INTO `usercode` VALUES ('296', 'AAAALJ', '0');
+INSERT INTO `usercode` VALUES ('297', 'AAAALK', '0');
+INSERT INTO `usercode` VALUES ('298', 'AAAALL', '0');
+INSERT INTO `usercode` VALUES ('299', 'AAAALM', '0');
+INSERT INTO `usercode` VALUES ('300', 'AAAALN', '0');
+INSERT INTO `usercode` VALUES ('301', 'AAAALO', '0');
+INSERT INTO `usercode` VALUES ('302', 'AAAALP', '0');
+INSERT INTO `usercode` VALUES ('303', 'AAAALQ', '0');
+INSERT INTO `usercode` VALUES ('304', 'AAAALR', '0');
+INSERT INTO `usercode` VALUES ('305', 'AAAALS', '0');
+INSERT INTO `usercode` VALUES ('306', 'AAAALT', '0');
+INSERT INTO `usercode` VALUES ('307', 'AAAALU', '0');
+INSERT INTO `usercode` VALUES ('308', 'AAAALV', '0');
+INSERT INTO `usercode` VALUES ('309', 'AAAALW', '0');
+INSERT INTO `usercode` VALUES ('310', 'AAAALX', '0');
+INSERT INTO `usercode` VALUES ('311', 'AAAALY', '0');
+INSERT INTO `usercode` VALUES ('312', 'AAAALZ', '0');
+INSERT INTO `usercode` VALUES ('313', 'AAAAMA', '0');
+INSERT INTO `usercode` VALUES ('314', 'AAAAMB', '0');
+INSERT INTO `usercode` VALUES ('315', 'AAAAMC', '0');
+INSERT INTO `usercode` VALUES ('316', 'AAAAMD', '0');
+INSERT INTO `usercode` VALUES ('317', 'AAAAME', '0');
+INSERT INTO `usercode` VALUES ('318', 'AAAAMF', '0');
+INSERT INTO `usercode` VALUES ('319', 'AAAAMG', '0');
+INSERT INTO `usercode` VALUES ('320', 'AAAAMH', '0');
+INSERT INTO `usercode` VALUES ('321', 'AAAAMI', '0');
+INSERT INTO `usercode` VALUES ('322', 'AAAAMJ', '0');
+INSERT INTO `usercode` VALUES ('323', 'AAAAMK', '0');
+INSERT INTO `usercode` VALUES ('324', 'AAAAML', '0');
+INSERT INTO `usercode` VALUES ('325', 'AAAAMM', '0');
+INSERT INTO `usercode` VALUES ('326', 'AAAAMN', '0');
+INSERT INTO `usercode` VALUES ('327', 'AAAAMO', '0');
+INSERT INTO `usercode` VALUES ('328', 'AAAAMP', '0');
+INSERT INTO `usercode` VALUES ('329', 'AAAAMQ', '0');
+INSERT INTO `usercode` VALUES ('330', 'AAAAMR', '0');
+INSERT INTO `usercode` VALUES ('331', 'AAAAMS', '0');
+INSERT INTO `usercode` VALUES ('332', 'AAAAMT', '0');
+INSERT INTO `usercode` VALUES ('333', 'AAAAMU', '0');
+INSERT INTO `usercode` VALUES ('334', 'AAAAMV', '0');
+INSERT INTO `usercode` VALUES ('335', 'AAAAMW', '0');
+INSERT INTO `usercode` VALUES ('336', 'AAAAMX', '0');
+INSERT INTO `usercode` VALUES ('337', 'AAAAMY', '0');
+INSERT INTO `usercode` VALUES ('338', 'AAAAMZ', '0');
+INSERT INTO `usercode` VALUES ('339', 'AAAANA', '0');
+INSERT INTO `usercode` VALUES ('340', 'AAAANB', '0');
+INSERT INTO `usercode` VALUES ('341', 'AAAANC', '0');
+INSERT INTO `usercode` VALUES ('342', 'AAAAND', '0');
+INSERT INTO `usercode` VALUES ('343', 'AAAANE', '0');
+INSERT INTO `usercode` VALUES ('344', 'AAAANF', '0');
+INSERT INTO `usercode` VALUES ('345', 'AAAANG', '0');
+INSERT INTO `usercode` VALUES ('346', 'AAAANH', '0');
+INSERT INTO `usercode` VALUES ('347', 'AAAANI', '0');
+INSERT INTO `usercode` VALUES ('348', 'AAAANJ', '0');
+INSERT INTO `usercode` VALUES ('349', 'AAAANK', '0');
+INSERT INTO `usercode` VALUES ('350', 'AAAANL', '0');
+INSERT INTO `usercode` VALUES ('351', 'AAAANM', '0');
+INSERT INTO `usercode` VALUES ('352', 'AAAANN', '0');
+INSERT INTO `usercode` VALUES ('353', 'AAAANO', '0');
+INSERT INTO `usercode` VALUES ('354', 'AAAANP', '0');
+INSERT INTO `usercode` VALUES ('355', 'AAAANQ', '0');
+INSERT INTO `usercode` VALUES ('356', 'AAAANR', '0');
+INSERT INTO `usercode` VALUES ('357', 'AAAANS', '0');
+INSERT INTO `usercode` VALUES ('358', 'AAAANT', '0');
+INSERT INTO `usercode` VALUES ('359', 'AAAANU', '0');
+INSERT INTO `usercode` VALUES ('360', 'AAAANV', '0');
+INSERT INTO `usercode` VALUES ('361', 'AAAANW', '0');
+INSERT INTO `usercode` VALUES ('362', 'AAAANX', '0');
+INSERT INTO `usercode` VALUES ('363', 'AAAANY', '0');
+INSERT INTO `usercode` VALUES ('364', 'AAAANZ', '0');
+INSERT INTO `usercode` VALUES ('365', 'AAAAOA', '0');
+INSERT INTO `usercode` VALUES ('366', 'AAAAOB', '0');
+INSERT INTO `usercode` VALUES ('367', 'AAAAOC', '0');
+INSERT INTO `usercode` VALUES ('368', 'AAAAOD', '0');
+INSERT INTO `usercode` VALUES ('369', 'AAAAOE', '0');
+INSERT INTO `usercode` VALUES ('370', 'AAAAOF', '0');
+INSERT INTO `usercode` VALUES ('371', 'AAAAOG', '0');
+INSERT INTO `usercode` VALUES ('372', 'AAAAOH', '0');
+INSERT INTO `usercode` VALUES ('373', 'AAAAOI', '0');
+INSERT INTO `usercode` VALUES ('374', 'AAAAOJ', '0');
+INSERT INTO `usercode` VALUES ('375', 'AAAAOK', '0');
+INSERT INTO `usercode` VALUES ('376', 'AAAAOL', '0');
+INSERT INTO `usercode` VALUES ('377', 'AAAAOM', '0');
+INSERT INTO `usercode` VALUES ('378', 'AAAAON', '0');
+INSERT INTO `usercode` VALUES ('379', 'AAAAOO', '0');
+INSERT INTO `usercode` VALUES ('380', 'AAAAOP', '0');
+INSERT INTO `usercode` VALUES ('381', 'AAAAOQ', '0');
+INSERT INTO `usercode` VALUES ('382', 'AAAAOR', '0');
+INSERT INTO `usercode` VALUES ('383', 'AAAAOS', '0');
+INSERT INTO `usercode` VALUES ('384', 'AAAAOT', '0');
+INSERT INTO `usercode` VALUES ('385', 'AAAAOU', '0');
+INSERT INTO `usercode` VALUES ('386', 'AAAAOV', '0');
+INSERT INTO `usercode` VALUES ('387', 'AAAAOW', '0');
+INSERT INTO `usercode` VALUES ('388', 'AAAAOX', '0');
+INSERT INTO `usercode` VALUES ('389', 'AAAAOY', '0');
+INSERT INTO `usercode` VALUES ('390', 'AAAAOZ', '0');
+INSERT INTO `usercode` VALUES ('391', 'AAAAPA', '0');
+INSERT INTO `usercode` VALUES ('392', 'AAAAPB', '0');
+INSERT INTO `usercode` VALUES ('393', 'AAAAPC', '0');
+INSERT INTO `usercode` VALUES ('394', 'AAAAPD', '0');
+INSERT INTO `usercode` VALUES ('395', 'AAAAPE', '0');
+INSERT INTO `usercode` VALUES ('396', 'AAAAPF', '0');
+INSERT INTO `usercode` VALUES ('397', 'AAAAPG', '0');
+INSERT INTO `usercode` VALUES ('398', 'AAAAPH', '0');
+INSERT INTO `usercode` VALUES ('399', 'AAAAPI', '0');
+INSERT INTO `usercode` VALUES ('400', 'AAAAPJ', '0');
+INSERT INTO `usercode` VALUES ('401', 'AAAAPK', '0');
+INSERT INTO `usercode` VALUES ('402', 'AAAAPL', '0');
+INSERT INTO `usercode` VALUES ('403', 'AAAAPM', '0');
+INSERT INTO `usercode` VALUES ('404', 'AAAAPN', '0');
+INSERT INTO `usercode` VALUES ('405', 'AAAAPO', '0');
+INSERT INTO `usercode` VALUES ('406', 'AAAAPP', '0');
+INSERT INTO `usercode` VALUES ('407', 'AAAAPQ', '0');
+INSERT INTO `usercode` VALUES ('408', 'AAAAPR', '0');
+INSERT INTO `usercode` VALUES ('409', 'AAAAPS', '0');
+INSERT INTO `usercode` VALUES ('410', 'AAAAPT', '0');
+INSERT INTO `usercode` VALUES ('411', 'AAAAPU', '0');
+INSERT INTO `usercode` VALUES ('412', 'AAAAPV', '0');
+INSERT INTO `usercode` VALUES ('413', 'AAAAPW', '0');
+INSERT INTO `usercode` VALUES ('414', 'AAAAPX', '0');
+INSERT INTO `usercode` VALUES ('415', 'AAAAPY', '0');
+INSERT INTO `usercode` VALUES ('416', 'AAAAPZ', '0');
+INSERT INTO `usercode` VALUES ('417', 'AAAAQA', '0');
+INSERT INTO `usercode` VALUES ('418', 'AAAAQB', '0');
+INSERT INTO `usercode` VALUES ('419', 'AAAAQC', '0');
+INSERT INTO `usercode` VALUES ('420', 'AAAAQD', '0');
+INSERT INTO `usercode` VALUES ('421', 'AAAAQE', '0');
+INSERT INTO `usercode` VALUES ('422', 'AAAAQF', '0');
+INSERT INTO `usercode` VALUES ('423', 'AAAAQG', '0');
+INSERT INTO `usercode` VALUES ('424', 'AAAAQH', '0');
+INSERT INTO `usercode` VALUES ('425', 'AAAAQI', '0');
+INSERT INTO `usercode` VALUES ('426', 'AAAAQJ', '0');
+INSERT INTO `usercode` VALUES ('427', 'AAAAQK', '0');
+INSERT INTO `usercode` VALUES ('428', 'AAAAQL', '0');
+INSERT INTO `usercode` VALUES ('429', 'AAAAQM', '0');
+INSERT INTO `usercode` VALUES ('430', 'AAAAQN', '0');
+INSERT INTO `usercode` VALUES ('431', 'AAAAQO', '0');
+INSERT INTO `usercode` VALUES ('432', 'AAAAQP', '0');
+INSERT INTO `usercode` VALUES ('433', 'AAAAQQ', '0');
+INSERT INTO `usercode` VALUES ('434', 'AAAAQR', '0');
+INSERT INTO `usercode` VALUES ('435', 'AAAAQS', '0');
+INSERT INTO `usercode` VALUES ('436', 'AAAAQT', '0');
+INSERT INTO `usercode` VALUES ('437', 'AAAAQU', '0');
+INSERT INTO `usercode` VALUES ('438', 'AAAAQV', '0');
+INSERT INTO `usercode` VALUES ('439', 'AAAAQW', '0');
+INSERT INTO `usercode` VALUES ('440', 'AAAAQX', '0');
+INSERT INTO `usercode` VALUES ('441', 'AAAAQY', '0');
+INSERT INTO `usercode` VALUES ('442', 'AAAAQZ', '0');
+INSERT INTO `usercode` VALUES ('443', 'AAAARA', '0');
+INSERT INTO `usercode` VALUES ('444', 'AAAARB', '0');
+INSERT INTO `usercode` VALUES ('445', 'AAAARC', '0');
+INSERT INTO `usercode` VALUES ('446', 'AAAARD', '0');
+INSERT INTO `usercode` VALUES ('447', 'AAAARE', '0');
+INSERT INTO `usercode` VALUES ('448', 'AAAARF', '0');
+INSERT INTO `usercode` VALUES ('449', 'AAAARG', '0');
+INSERT INTO `usercode` VALUES ('450', 'AAAARH', '0');
+INSERT INTO `usercode` VALUES ('451', 'AAAARI', '0');
+INSERT INTO `usercode` VALUES ('452', 'AAAARJ', '0');
+INSERT INTO `usercode` VALUES ('453', 'AAAARK', '0');
+INSERT INTO `usercode` VALUES ('454', 'AAAARL', '0');
+INSERT INTO `usercode` VALUES ('455', 'AAAARM', '0');
+INSERT INTO `usercode` VALUES ('456', 'AAAARN', '0');
+INSERT INTO `usercode` VALUES ('457', 'AAAARO', '0');
+INSERT INTO `usercode` VALUES ('458', 'AAAARP', '0');
+INSERT INTO `usercode` VALUES ('459', 'AAAARQ', '0');
+INSERT INTO `usercode` VALUES ('460', 'AAAARR', '0');
+INSERT INTO `usercode` VALUES ('461', 'AAAARS', '0');
+INSERT INTO `usercode` VALUES ('462', 'AAAART', '0');
+INSERT INTO `usercode` VALUES ('463', 'AAAARU', '0');
+INSERT INTO `usercode` VALUES ('464', 'AAAARV', '0');
+INSERT INTO `usercode` VALUES ('465', 'AAAARW', '0');
+INSERT INTO `usercode` VALUES ('466', 'AAAARX', '0');
+INSERT INTO `usercode` VALUES ('467', 'AAAARY', '0');
+INSERT INTO `usercode` VALUES ('468', 'AAAARZ', '0');
+INSERT INTO `usercode` VALUES ('469', 'AAAASA', '0');
+INSERT INTO `usercode` VALUES ('470', 'AAAASB', '0');
+INSERT INTO `usercode` VALUES ('471', 'AAAASC', '0');
+INSERT INTO `usercode` VALUES ('472', 'AAAASD', '0');
+INSERT INTO `usercode` VALUES ('473', 'AAAASE', '0');
+INSERT INTO `usercode` VALUES ('474', 'AAAASF', '0');
+INSERT INTO `usercode` VALUES ('475', 'AAAASG', '0');
+INSERT INTO `usercode` VALUES ('476', 'AAAASH', '0');
+INSERT INTO `usercode` VALUES ('477', 'AAAASI', '0');
+INSERT INTO `usercode` VALUES ('478', 'AAAASJ', '0');
+INSERT INTO `usercode` VALUES ('479', 'AAAASK', '0');
+INSERT INTO `usercode` VALUES ('480', 'AAAASL', '0');
+INSERT INTO `usercode` VALUES ('481', 'AAAASM', '0');
+INSERT INTO `usercode` VALUES ('482', 'AAAASN', '0');
+INSERT INTO `usercode` VALUES ('483', 'AAAASO', '0');
+INSERT INTO `usercode` VALUES ('484', 'AAAASP', '0');
+INSERT INTO `usercode` VALUES ('485', 'AAAASQ', '0');
+INSERT INTO `usercode` VALUES ('486', 'AAAASR', '0');
+INSERT INTO `usercode` VALUES ('487', 'AAAASS', '0');
+INSERT INTO `usercode` VALUES ('488', 'AAAAST', '0');
+INSERT INTO `usercode` VALUES ('489', 'AAAASU', '0');
+INSERT INTO `usercode` VALUES ('490', 'AAAASV', '0');
+INSERT INTO `usercode` VALUES ('491', 'AAAASW', '0');
+INSERT INTO `usercode` VALUES ('492', 'AAAASX', '0');
+INSERT INTO `usercode` VALUES ('493', 'AAAASY', '0');
+INSERT INTO `usercode` VALUES ('494', 'AAAASZ', '0');
+INSERT INTO `usercode` VALUES ('495', 'AAAATA', '0');
+INSERT INTO `usercode` VALUES ('496', 'AAAATB', '0');
+INSERT INTO `usercode` VALUES ('497', 'AAAATC', '0');
+INSERT INTO `usercode` VALUES ('498', 'AAAATD', '0');
+INSERT INTO `usercode` VALUES ('499', 'AAAATE', '0');
+INSERT INTO `usercode` VALUES ('500', 'AAAATF', '0');
+INSERT INTO `usercode` VALUES ('501', 'AAAATG', '0');
+INSERT INTO `usercode` VALUES ('502', 'AAAATH', '0');
+INSERT INTO `usercode` VALUES ('503', 'AAAATI', '0');
+INSERT INTO `usercode` VALUES ('504', 'AAAATJ', '0');
+INSERT INTO `usercode` VALUES ('505', 'AAAATK', '0');
+INSERT INTO `usercode` VALUES ('506', 'AAAATL', '0');
+INSERT INTO `usercode` VALUES ('507', 'AAAATM', '0');
+INSERT INTO `usercode` VALUES ('508', 'AAAATN', '0');
+INSERT INTO `usercode` VALUES ('509', 'AAAATO', '0');
+INSERT INTO `usercode` VALUES ('510', 'AAAATP', '0');
+INSERT INTO `usercode` VALUES ('511', 'AAAATQ', '0');
+INSERT INTO `usercode` VALUES ('512', 'AAAATR', '0');
+INSERT INTO `usercode` VALUES ('513', 'AAAATS', '0');
+INSERT INTO `usercode` VALUES ('514', 'AAAATT', '0');
+INSERT INTO `usercode` VALUES ('515', 'AAAATU', '0');
+INSERT INTO `usercode` VALUES ('516', 'AAAATV', '0');
+INSERT INTO `usercode` VALUES ('517', 'AAAATW', '0');
+INSERT INTO `usercode` VALUES ('518', 'AAAATX', '0');
+INSERT INTO `usercode` VALUES ('519', 'AAAATY', '0');
+INSERT INTO `usercode` VALUES ('520', 'AAAATZ', '0');
+INSERT INTO `usercode` VALUES ('521', 'AAAAUA', '0');
+INSERT INTO `usercode` VALUES ('522', 'AAAAUB', '0');
+INSERT INTO `usercode` VALUES ('523', 'AAAAUC', '0');
+INSERT INTO `usercode` VALUES ('524', 'AAAAUD', '0');
+INSERT INTO `usercode` VALUES ('525', 'AAAAUE', '0');
+INSERT INTO `usercode` VALUES ('526', 'AAAAUF', '0');
+INSERT INTO `usercode` VALUES ('527', 'AAAAUG', '0');
+INSERT INTO `usercode` VALUES ('528', 'AAAAUH', '0');
+INSERT INTO `usercode` VALUES ('529', 'AAAAUI', '0');
+INSERT INTO `usercode` VALUES ('530', 'AAAAUJ', '0');
+INSERT INTO `usercode` VALUES ('531', 'AAAAUK', '0');
+INSERT INTO `usercode` VALUES ('532', 'AAAAUL', '0');
+INSERT INTO `usercode` VALUES ('533', 'AAAAUM', '0');
+INSERT INTO `usercode` VALUES ('534', 'AAAAUN', '0');
+INSERT INTO `usercode` VALUES ('535', 'AAAAUO', '0');
+INSERT INTO `usercode` VALUES ('536', 'AAAAUP', '0');
+INSERT INTO `usercode` VALUES ('537', 'AAAAUQ', '0');
+INSERT INTO `usercode` VALUES ('538', 'AAAAUR', '0');
+INSERT INTO `usercode` VALUES ('539', 'AAAAUS', '0');
+INSERT INTO `usercode` VALUES ('540', 'AAAAUT', '0');
+INSERT INTO `usercode` VALUES ('541', 'AAAAUU', '0');
+INSERT INTO `usercode` VALUES ('542', 'AAAAUV', '0');
+INSERT INTO `usercode` VALUES ('543', 'AAAAUW', '0');
+INSERT INTO `usercode` VALUES ('544', 'AAAAUX', '0');
+INSERT INTO `usercode` VALUES ('545', 'AAAAUY', '0');
+INSERT INTO `usercode` VALUES ('546', 'AAAAUZ', '0');
+INSERT INTO `usercode` VALUES ('547', 'AAAAVA', '0');
+INSERT INTO `usercode` VALUES ('548', 'AAAAVB', '0');
+INSERT INTO `usercode` VALUES ('549', 'AAAAVC', '0');
+INSERT INTO `usercode` VALUES ('550', 'AAAAVD', '0');
+INSERT INTO `usercode` VALUES ('551', 'AAAAVE', '0');
+INSERT INTO `usercode` VALUES ('552', 'AAAAVF', '0');
+INSERT INTO `usercode` VALUES ('553', 'AAAAVG', '0');
+INSERT INTO `usercode` VALUES ('554', 'AAAAVH', '0');
+INSERT INTO `usercode` VALUES ('555', 'AAAAVI', '0');
+INSERT INTO `usercode` VALUES ('556', 'AAAAVJ', '0');
+INSERT INTO `usercode` VALUES ('557', 'AAAAVK', '0');
+INSERT INTO `usercode` VALUES ('558', 'AAAAVL', '0');
+INSERT INTO `usercode` VALUES ('559', 'AAAAVM', '0');
+INSERT INTO `usercode` VALUES ('560', 'AAAAVN', '0');
+INSERT INTO `usercode` VALUES ('561', 'AAAAVO', '0');
+INSERT INTO `usercode` VALUES ('562', 'AAAAVP', '0');
+INSERT INTO `usercode` VALUES ('563', 'AAAAVQ', '0');
+INSERT INTO `usercode` VALUES ('564', 'AAAAVR', '0');
+INSERT INTO `usercode` VALUES ('565', 'AAAAVS', '0');
+INSERT INTO `usercode` VALUES ('566', 'AAAAVT', '0');
+INSERT INTO `usercode` VALUES ('567', 'AAAAVU', '0');
+INSERT INTO `usercode` VALUES ('568', 'AAAAVV', '0');
+INSERT INTO `usercode` VALUES ('569', 'AAAAVW', '0');
+INSERT INTO `usercode` VALUES ('570', 'AAAAVX', '0');
+INSERT INTO `usercode` VALUES ('571', 'AAAAVY', '0');
+INSERT INTO `usercode` VALUES ('572', 'AAAAVZ', '0');
+INSERT INTO `usercode` VALUES ('573', 'AAAAWA', '0');
+INSERT INTO `usercode` VALUES ('574', 'AAAAWB', '0');
+INSERT INTO `usercode` VALUES ('575', 'AAAAWC', '0');
+INSERT INTO `usercode` VALUES ('576', 'AAAAWD', '0');
+INSERT INTO `usercode` VALUES ('577', 'AAAAWE', '0');
+INSERT INTO `usercode` VALUES ('578', 'AAAAWF', '0');
+INSERT INTO `usercode` VALUES ('579', 'AAAAWG', '0');
+INSERT INTO `usercode` VALUES ('580', 'AAAAWH', '0');
+INSERT INTO `usercode` VALUES ('581', 'AAAAWI', '0');
+INSERT INTO `usercode` VALUES ('582', 'AAAAWJ', '0');
+INSERT INTO `usercode` VALUES ('583', 'AAAAWK', '0');
+INSERT INTO `usercode` VALUES ('584', 'AAAAWL', '0');
+INSERT INTO `usercode` VALUES ('585', 'AAAAWM', '0');
+INSERT INTO `usercode` VALUES ('586', 'AAAAWN', '0');
+INSERT INTO `usercode` VALUES ('587', 'AAAAWO', '0');
+INSERT INTO `usercode` VALUES ('588', 'AAAAWP', '0');
+INSERT INTO `usercode` VALUES ('589', 'AAAAWQ', '0');
+INSERT INTO `usercode` VALUES ('590', 'AAAAWR', '0');
+INSERT INTO `usercode` VALUES ('591', 'AAAAWS', '0');
+INSERT INTO `usercode` VALUES ('592', 'AAAAWT', '0');
+INSERT INTO `usercode` VALUES ('593', 'AAAAWU', '0');
+INSERT INTO `usercode` VALUES ('594', 'AAAAWV', '0');
+INSERT INTO `usercode` VALUES ('595', 'AAAAWW', '0');
+INSERT INTO `usercode` VALUES ('596', 'AAAAWX', '0');
+INSERT INTO `usercode` VALUES ('597', 'AAAAWY', '0');
+INSERT INTO `usercode` VALUES ('598', 'AAAAWZ', '0');
+INSERT INTO `usercode` VALUES ('599', 'AAAAXA', '0');
+INSERT INTO `usercode` VALUES ('600', 'AAAAXB', '0');
+INSERT INTO `usercode` VALUES ('601', 'AAAAXC', '0');
+INSERT INTO `usercode` VALUES ('602', 'AAAAXD', '0');
+INSERT INTO `usercode` VALUES ('603', 'AAAAXE', '0');
+INSERT INTO `usercode` VALUES ('604', 'AAAAXF', '0');
+INSERT INTO `usercode` VALUES ('605', 'AAAAXG', '0');
+INSERT INTO `usercode` VALUES ('606', 'AAAAXH', '0');
+INSERT INTO `usercode` VALUES ('607', 'AAAAXI', '0');
+INSERT INTO `usercode` VALUES ('608', 'AAAAXJ', '0');
+INSERT INTO `usercode` VALUES ('609', 'AAAAXK', '0');
+INSERT INTO `usercode` VALUES ('610', 'AAAAXL', '0');
+INSERT INTO `usercode` VALUES ('611', 'AAAAXM', '0');
+INSERT INTO `usercode` VALUES ('612', 'AAAAXN', '0');
+INSERT INTO `usercode` VALUES ('613', 'AAAAXO', '0');
+INSERT INTO `usercode` VALUES ('614', 'AAAAXP', '0');
+INSERT INTO `usercode` VALUES ('615', 'AAAAXQ', '0');
+INSERT INTO `usercode` VALUES ('616', 'AAAAXR', '0');
+INSERT INTO `usercode` VALUES ('617', 'AAAAXS', '0');
+INSERT INTO `usercode` VALUES ('618', 'AAAAXT', '0');
+INSERT INTO `usercode` VALUES ('619', 'AAAAXU', '0');
+INSERT INTO `usercode` VALUES ('620', 'AAAAXV', '0');
+INSERT INTO `usercode` VALUES ('621', 'AAAAXW', '0');
+INSERT INTO `usercode` VALUES ('622', 'AAAAXX', '0');
+INSERT INTO `usercode` VALUES ('623', 'AAAAXY', '0');
+INSERT INTO `usercode` VALUES ('624', 'AAAAXZ', '0');
+INSERT INTO `usercode` VALUES ('625', 'AAAAYA', '0');
+INSERT INTO `usercode` VALUES ('626', 'AAAAYB', '0');
+INSERT INTO `usercode` VALUES ('627', 'AAAAYC', '0');
+INSERT INTO `usercode` VALUES ('628', 'AAAAYD', '0');
+INSERT INTO `usercode` VALUES ('629', 'AAAAYE', '0');
+INSERT INTO `usercode` VALUES ('630', 'AAAAYF', '0');
+INSERT INTO `usercode` VALUES ('631', 'AAAAYG', '0');
+INSERT INTO `usercode` VALUES ('632', 'AAAAYH', '0');
+INSERT INTO `usercode` VALUES ('633', 'AAAAYI', '0');
+INSERT INTO `usercode` VALUES ('634', 'AAAAYJ', '0');
+INSERT INTO `usercode` VALUES ('635', 'AAAAYK', '0');
+INSERT INTO `usercode` VALUES ('636', 'AAAAYL', '0');
+INSERT INTO `usercode` VALUES ('637', 'AAAAYM', '0');
+INSERT INTO `usercode` VALUES ('638', 'AAAAYN', '0');
+INSERT INTO `usercode` VALUES ('639', 'AAAAYO', '0');
+INSERT INTO `usercode` VALUES ('640', 'AAAAYP', '0');
+INSERT INTO `usercode` VALUES ('641', 'AAAAYQ', '0');
+INSERT INTO `usercode` VALUES ('642', 'AAAAYR', '0');
+INSERT INTO `usercode` VALUES ('643', 'AAAAYS', '0');
+INSERT INTO `usercode` VALUES ('644', 'AAAAYT', '0');
+INSERT INTO `usercode` VALUES ('645', 'AAAAYU', '0');
+INSERT INTO `usercode` VALUES ('646', 'AAAAYV', '0');
+INSERT INTO `usercode` VALUES ('647', 'AAAAYW', '0');
+INSERT INTO `usercode` VALUES ('648', 'AAAAYX', '0');
+INSERT INTO `usercode` VALUES ('649', 'AAAAYY', '0');
+INSERT INTO `usercode` VALUES ('650', 'AAAAYZ', '0');
+INSERT INTO `usercode` VALUES ('651', 'AAAAZA', '0');
+INSERT INTO `usercode` VALUES ('652', 'AAAAZB', '0');
+INSERT INTO `usercode` VALUES ('653', 'AAAAZC', '0');
+INSERT INTO `usercode` VALUES ('654', 'AAAAZD', '0');
+INSERT INTO `usercode` VALUES ('655', 'AAAAZE', '0');
+INSERT INTO `usercode` VALUES ('656', 'AAAAZF', '0');
+INSERT INTO `usercode` VALUES ('657', 'AAAAZG', '0');
+INSERT INTO `usercode` VALUES ('658', 'AAAAZH', '0');
+INSERT INTO `usercode` VALUES ('659', 'AAAAZI', '0');
+INSERT INTO `usercode` VALUES ('660', 'AAAAZJ', '0');
+INSERT INTO `usercode` VALUES ('661', 'AAAAZK', '0');
+INSERT INTO `usercode` VALUES ('662', 'AAAAZL', '0');
+INSERT INTO `usercode` VALUES ('663', 'AAAAZM', '0');
+INSERT INTO `usercode` VALUES ('664', 'AAAAZN', '0');
+INSERT INTO `usercode` VALUES ('665', 'AAAAZO', '0');
+INSERT INTO `usercode` VALUES ('666', 'AAAAZP', '0');
+INSERT INTO `usercode` VALUES ('667', 'AAAAZQ', '0');
+INSERT INTO `usercode` VALUES ('668', 'AAAAZR', '0');
+INSERT INTO `usercode` VALUES ('669', 'AAAAZS', '0');
+INSERT INTO `usercode` VALUES ('670', 'AAAAZT', '0');
+INSERT INTO `usercode` VALUES ('671', 'AAAAZU', '0');
+INSERT INTO `usercode` VALUES ('672', 'AAAAZV', '0');
+INSERT INTO `usercode` VALUES ('673', 'AAAAZW', '0');
+INSERT INTO `usercode` VALUES ('674', 'AAAAZX', '0');
+INSERT INTO `usercode` VALUES ('675', 'AAAAZY', '0');
+INSERT INTO `usercode` VALUES ('676', 'AAAAZZ', '0');
+INSERT INTO `usercode` VALUES ('677', 'AAABAA', '0');
+INSERT INTO `usercode` VALUES ('678', 'AAABAB', '0');
+INSERT INTO `usercode` VALUES ('679', 'AAABAC', '0');
+INSERT INTO `usercode` VALUES ('680', 'AAABAD', '0');
+INSERT INTO `usercode` VALUES ('681', 'AAABAE', '0');
+INSERT INTO `usercode` VALUES ('682', 'AAABAF', '0');
+INSERT INTO `usercode` VALUES ('683', 'AAABAG', '0');
+INSERT INTO `usercode` VALUES ('684', 'AAABAH', '0');
+INSERT INTO `usercode` VALUES ('685', 'AAABAI', '0');
+INSERT INTO `usercode` VALUES ('686', 'AAABAJ', '0');
+INSERT INTO `usercode` VALUES ('687', 'AAABAK', '0');
+INSERT INTO `usercode` VALUES ('688', 'AAABAL', '0');
+INSERT INTO `usercode` VALUES ('689', 'AAABAM', '0');
+INSERT INTO `usercode` VALUES ('690', 'AAABAN', '0');
+INSERT INTO `usercode` VALUES ('691', 'AAABAO', '0');
+INSERT INTO `usercode` VALUES ('692', 'AAABAP', '0');
+INSERT INTO `usercode` VALUES ('693', 'AAABAQ', '0');
+INSERT INTO `usercode` VALUES ('694', 'AAABAR', '0');
+INSERT INTO `usercode` VALUES ('695', 'AAABAS', '0');
+INSERT INTO `usercode` VALUES ('696', 'AAABAT', '0');
+INSERT INTO `usercode` VALUES ('697', 'AAABAU', '0');
+INSERT INTO `usercode` VALUES ('698', 'AAABAV', '0');
+INSERT INTO `usercode` VALUES ('699', 'AAABAW', '0');
+INSERT INTO `usercode` VALUES ('700', 'AAABAX', '0');
+INSERT INTO `usercode` VALUES ('701', 'AAABAY', '0');
+INSERT INTO `usercode` VALUES ('702', 'AAABAZ', '0');
+INSERT INTO `usercode` VALUES ('703', 'AAABBA', '0');
+INSERT INTO `usercode` VALUES ('704', 'AAABBB', '0');
+INSERT INTO `usercode` VALUES ('705', 'AAABBC', '0');
+INSERT INTO `usercode` VALUES ('706', 'AAABBD', '0');
+INSERT INTO `usercode` VALUES ('707', 'AAABBE', '0');
+INSERT INTO `usercode` VALUES ('708', 'AAABBF', '0');
+INSERT INTO `usercode` VALUES ('709', 'AAABBG', '0');
+INSERT INTO `usercode` VALUES ('710', 'AAABBH', '0');
+INSERT INTO `usercode` VALUES ('711', 'AAABBI', '0');
+INSERT INTO `usercode` VALUES ('712', 'AAABBJ', '0');
+INSERT INTO `usercode` VALUES ('713', 'AAABBK', '0');
+INSERT INTO `usercode` VALUES ('714', 'AAABBL', '0');
+INSERT INTO `usercode` VALUES ('715', 'AAABBM', '0');
+INSERT INTO `usercode` VALUES ('716', 'AAABBN', '0');
+INSERT INTO `usercode` VALUES ('717', 'AAABBO', '0');
+INSERT INTO `usercode` VALUES ('718', 'AAABBP', '0');
+INSERT INTO `usercode` VALUES ('719', 'AAABBQ', '0');
+INSERT INTO `usercode` VALUES ('720', 'AAABBR', '0');
+INSERT INTO `usercode` VALUES ('721', 'AAABBS', '0');
+INSERT INTO `usercode` VALUES ('722', 'AAABBT', '0');
+INSERT INTO `usercode` VALUES ('723', 'AAABBU', '0');
+INSERT INTO `usercode` VALUES ('724', 'AAABBV', '0');
+INSERT INTO `usercode` VALUES ('725', 'AAABBW', '0');
+INSERT INTO `usercode` VALUES ('726', 'AAABBX', '0');
+INSERT INTO `usercode` VALUES ('727', 'AAABBY', '0');
+INSERT INTO `usercode` VALUES ('728', 'AAABBZ', '0');
+INSERT INTO `usercode` VALUES ('729', 'AAABCA', '0');
+INSERT INTO `usercode` VALUES ('730', 'AAABCB', '0');
+INSERT INTO `usercode` VALUES ('731', 'AAABCC', '0');
+INSERT INTO `usercode` VALUES ('732', 'AAABCD', '0');
+INSERT INTO `usercode` VALUES ('733', 'AAABCE', '0');
+INSERT INTO `usercode` VALUES ('734', 'AAABCF', '0');
+INSERT INTO `usercode` VALUES ('735', 'AAABCG', '0');
+INSERT INTO `usercode` VALUES ('736', 'AAABCH', '0');
+INSERT INTO `usercode` VALUES ('737', 'AAABCI', '0');
+INSERT INTO `usercode` VALUES ('738', 'AAABCJ', '0');
+INSERT INTO `usercode` VALUES ('739', 'AAABCK', '0');
+INSERT INTO `usercode` VALUES ('740', 'AAABCL', '0');
+INSERT INTO `usercode` VALUES ('741', 'AAABCM', '0');
+INSERT INTO `usercode` VALUES ('742', 'AAABCN', '0');
+INSERT INTO `usercode` VALUES ('743', 'AAABCO', '0');
+INSERT INTO `usercode` VALUES ('744', 'AAABCP', '0');
+INSERT INTO `usercode` VALUES ('745', 'AAABCQ', '0');
+INSERT INTO `usercode` VALUES ('746', 'AAABCR', '0');
+INSERT INTO `usercode` VALUES ('747', 'AAABCS', '0');
+INSERT INTO `usercode` VALUES ('748', 'AAABCT', '0');
+INSERT INTO `usercode` VALUES ('749', 'AAABCU', '0');
+INSERT INTO `usercode` VALUES ('750', 'AAABCV', '0');
+INSERT INTO `usercode` VALUES ('751', 'AAABCW', '0');
+INSERT INTO `usercode` VALUES ('752', 'AAABCX', '0');
+INSERT INTO `usercode` VALUES ('753', 'AAABCY', '0');
+INSERT INTO `usercode` VALUES ('754', 'AAABCZ', '0');
+INSERT INTO `usercode` VALUES ('755', 'AAABDA', '0');
+INSERT INTO `usercode` VALUES ('756', 'AAABDB', '0');
+INSERT INTO `usercode` VALUES ('757', 'AAABDC', '0');
+INSERT INTO `usercode` VALUES ('758', 'AAABDD', '0');
+INSERT INTO `usercode` VALUES ('759', 'AAABDE', '0');
+INSERT INTO `usercode` VALUES ('760', 'AAABDF', '0');
+INSERT INTO `usercode` VALUES ('761', 'AAABDG', '0');
+INSERT INTO `usercode` VALUES ('762', 'AAABDH', '0');
+INSERT INTO `usercode` VALUES ('763', 'AAABDI', '0');
+INSERT INTO `usercode` VALUES ('764', 'AAABDJ', '0');
+INSERT INTO `usercode` VALUES ('765', 'AAABDK', '0');
+INSERT INTO `usercode` VALUES ('766', 'AAABDL', '0');
+INSERT INTO `usercode` VALUES ('767', 'AAABDM', '0');
+INSERT INTO `usercode` VALUES ('768', 'AAABDN', '0');
+INSERT INTO `usercode` VALUES ('769', 'AAABDO', '0');
+INSERT INTO `usercode` VALUES ('770', 'AAABDP', '0');
+INSERT INTO `usercode` VALUES ('771', 'AAABDQ', '0');
+INSERT INTO `usercode` VALUES ('772', 'AAABDR', '0');
+INSERT INTO `usercode` VALUES ('773', 'AAABDS', '0');
+INSERT INTO `usercode` VALUES ('774', 'AAABDT', '0');
+INSERT INTO `usercode` VALUES ('775', 'AAABDU', '0');
+INSERT INTO `usercode` VALUES ('776', 'AAABDV', '0');
+INSERT INTO `usercode` VALUES ('777', 'AAABDW', '0');
+INSERT INTO `usercode` VALUES ('778', 'AAABDX', '0');
+INSERT INTO `usercode` VALUES ('779', 'AAABDY', '0');
+INSERT INTO `usercode` VALUES ('780', 'AAABDZ', '0');
+INSERT INTO `usercode` VALUES ('781', 'AAABEA', '0');
+INSERT INTO `usercode` VALUES ('782', 'AAABEB', '0');
+INSERT INTO `usercode` VALUES ('783', 'AAABEC', '0');
+INSERT INTO `usercode` VALUES ('784', 'AAABED', '0');
+INSERT INTO `usercode` VALUES ('785', 'AAABEE', '0');
+INSERT INTO `usercode` VALUES ('786', 'AAABEF', '0');
+INSERT INTO `usercode` VALUES ('787', 'AAABEG', '0');
+INSERT INTO `usercode` VALUES ('788', 'AAABEH', '0');
+INSERT INTO `usercode` VALUES ('789', 'AAABEI', '0');
+INSERT INTO `usercode` VALUES ('790', 'AAABEJ', '0');
+INSERT INTO `usercode` VALUES ('791', 'AAABEK', '0');
+INSERT INTO `usercode` VALUES ('792', 'AAABEL', '0');
+INSERT INTO `usercode` VALUES ('793', 'AAABEM', '0');
+INSERT INTO `usercode` VALUES ('794', 'AAABEN', '0');
+INSERT INTO `usercode` VALUES ('795', 'AAABEO', '0');
+INSERT INTO `usercode` VALUES ('796', 'AAABEP', '0');
+INSERT INTO `usercode` VALUES ('797', 'AAABEQ', '0');
+INSERT INTO `usercode` VALUES ('798', 'AAABER', '0');
+INSERT INTO `usercode` VALUES ('799', 'AAABES', '0');
+INSERT INTO `usercode` VALUES ('800', 'AAABET', '0');
+INSERT INTO `usercode` VALUES ('801', 'AAABEU', '0');
+INSERT INTO `usercode` VALUES ('802', 'AAABEV', '0');
+INSERT INTO `usercode` VALUES ('803', 'AAABEW', '0');
+INSERT INTO `usercode` VALUES ('804', 'AAABEX', '0');
+INSERT INTO `usercode` VALUES ('805', 'AAABEY', '0');
+INSERT INTO `usercode` VALUES ('806', 'AAABEZ', '0');
+INSERT INTO `usercode` VALUES ('807', 'AAABFA', '0');
+INSERT INTO `usercode` VALUES ('808', 'AAABFB', '0');
+INSERT INTO `usercode` VALUES ('809', 'AAABFC', '0');
+INSERT INTO `usercode` VALUES ('810', 'AAABFD', '0');
+INSERT INTO `usercode` VALUES ('811', 'AAABFE', '0');
+INSERT INTO `usercode` VALUES ('812', 'AAABFF', '0');
+INSERT INTO `usercode` VALUES ('813', 'AAABFG', '0');
+INSERT INTO `usercode` VALUES ('814', 'AAABFH', '0');
+INSERT INTO `usercode` VALUES ('815', 'AAABFI', '0');
+INSERT INTO `usercode` VALUES ('816', 'AAABFJ', '0');
+INSERT INTO `usercode` VALUES ('817', 'AAABFK', '0');
+INSERT INTO `usercode` VALUES ('818', 'AAABFL', '0');
+INSERT INTO `usercode` VALUES ('819', 'AAABFM', '0');
+INSERT INTO `usercode` VALUES ('820', 'AAABFN', '0');
+INSERT INTO `usercode` VALUES ('821', 'AAABFO', '0');
+INSERT INTO `usercode` VALUES ('822', 'AAABFP', '0');
+INSERT INTO `usercode` VALUES ('823', 'AAABFQ', '0');
+INSERT INTO `usercode` VALUES ('824', 'AAABFR', '0');
+INSERT INTO `usercode` VALUES ('825', 'AAABFS', '0');
+INSERT INTO `usercode` VALUES ('826', 'AAABFT', '0');
+INSERT INTO `usercode` VALUES ('827', 'AAABFU', '0');
+INSERT INTO `usercode` VALUES ('828', 'AAABFV', '0');
+INSERT INTO `usercode` VALUES ('829', 'AAABFW', '0');
+INSERT INTO `usercode` VALUES ('830', 'AAABFX', '0');
+INSERT INTO `usercode` VALUES ('831', 'AAABFY', '0');
+INSERT INTO `usercode` VALUES ('832', 'AAABFZ', '0');
+INSERT INTO `usercode` VALUES ('833', 'AAABGA', '0');
+INSERT INTO `usercode` VALUES ('834', 'AAABGB', '0');
+INSERT INTO `usercode` VALUES ('835', 'AAABGC', '0');
+INSERT INTO `usercode` VALUES ('836', 'AAABGD', '0');
+INSERT INTO `usercode` VALUES ('837', 'AAABGE', '0');
+INSERT INTO `usercode` VALUES ('838', 'AAABGF', '0');
+INSERT INTO `usercode` VALUES ('839', 'AAABGG', '0');
+INSERT INTO `usercode` VALUES ('840', 'AAABGH', '0');
+INSERT INTO `usercode` VALUES ('841', 'AAABGI', '0');
+INSERT INTO `usercode` VALUES ('842', 'AAABGJ', '0');
+INSERT INTO `usercode` VALUES ('843', 'AAABGK', '0');
+INSERT INTO `usercode` VALUES ('844', 'AAABGL', '0');
+INSERT INTO `usercode` VALUES ('845', 'AAABGM', '0');
+INSERT INTO `usercode` VALUES ('846', 'AAABGN', '0');
+INSERT INTO `usercode` VALUES ('847', 'AAABGO', '0');
+INSERT INTO `usercode` VALUES ('848', 'AAABGP', '0');
+INSERT INTO `usercode` VALUES ('849', 'AAABGQ', '0');
+INSERT INTO `usercode` VALUES ('850', 'AAABGR', '0');
+INSERT INTO `usercode` VALUES ('851', 'AAABGS', '0');
+INSERT INTO `usercode` VALUES ('852', 'AAABGT', '0');
+INSERT INTO `usercode` VALUES ('853', 'AAABGU', '0');
+INSERT INTO `usercode` VALUES ('854', 'AAABGV', '0');
+INSERT INTO `usercode` VALUES ('855', 'AAABGW', '0');
+INSERT INTO `usercode` VALUES ('856', 'AAABGX', '0');
+INSERT INTO `usercode` VALUES ('857', 'AAABGY', '0');
+INSERT INTO `usercode` VALUES ('858', 'AAABGZ', '0');
+INSERT INTO `usercode` VALUES ('859', 'AAABHA', '0');
+INSERT INTO `usercode` VALUES ('860', 'AAABHB', '0');
+INSERT INTO `usercode` VALUES ('861', 'AAABHC', '0');
+INSERT INTO `usercode` VALUES ('862', 'AAABHD', '0');
+INSERT INTO `usercode` VALUES ('863', 'AAABHE', '0');
+INSERT INTO `usercode` VALUES ('864', 'AAABHF', '0');
+INSERT INTO `usercode` VALUES ('865', 'AAABHG', '0');
+INSERT INTO `usercode` VALUES ('866', 'AAABHH', '0');
+INSERT INTO `usercode` VALUES ('867', 'AAABHI', '0');
+INSERT INTO `usercode` VALUES ('868', 'AAABHJ', '0');
+INSERT INTO `usercode` VALUES ('869', 'AAABHK', '0');
+INSERT INTO `usercode` VALUES ('870', 'AAABHL', '0');
+INSERT INTO `usercode` VALUES ('871', 'AAABHM', '0');
+INSERT INTO `usercode` VALUES ('872', 'AAABHN', '0');
+INSERT INTO `usercode` VALUES ('873', 'AAABHO', '0');
+INSERT INTO `usercode` VALUES ('874', 'AAABHP', '0');
+INSERT INTO `usercode` VALUES ('875', 'AAABHQ', '0');
+INSERT INTO `usercode` VALUES ('876', 'AAABHR', '0');
+INSERT INTO `usercode` VALUES ('877', 'AAABHS', '0');
+INSERT INTO `usercode` VALUES ('878', 'AAABHT', '0');
+INSERT INTO `usercode` VALUES ('879', 'AAABHU', '0');
+INSERT INTO `usercode` VALUES ('880', 'AAABHV', '0');
+INSERT INTO `usercode` VALUES ('881', 'AAABHW', '0');
+INSERT INTO `usercode` VALUES ('882', 'AAABHX', '0');
+INSERT INTO `usercode` VALUES ('883', 'AAABHY', '0');
+INSERT INTO `usercode` VALUES ('884', 'AAABHZ', '0');
+INSERT INTO `usercode` VALUES ('885', 'AAABIA', '0');
+INSERT INTO `usercode` VALUES ('886', 'AAABIB', '0');
+INSERT INTO `usercode` VALUES ('887', 'AAABIC', '0');
+INSERT INTO `usercode` VALUES ('888', 'AAABID', '0');
+INSERT INTO `usercode` VALUES ('889', 'AAABIE', '0');
+INSERT INTO `usercode` VALUES ('890', 'AAABIF', '0');
+INSERT INTO `usercode` VALUES ('891', 'AAABIG', '0');
+INSERT INTO `usercode` VALUES ('892', 'AAABIH', '0');
+INSERT INTO `usercode` VALUES ('893', 'AAABII', '0');
+INSERT INTO `usercode` VALUES ('894', 'AAABIJ', '0');
+INSERT INTO `usercode` VALUES ('895', 'AAABIK', '0');
+INSERT INTO `usercode` VALUES ('896', 'AAABIL', '0');
+INSERT INTO `usercode` VALUES ('897', 'AAABIM', '0');
+INSERT INTO `usercode` VALUES ('898', 'AAABIN', '0');
+INSERT INTO `usercode` VALUES ('899', 'AAABIO', '0');
+INSERT INTO `usercode` VALUES ('900', 'AAABIP', '0');
+INSERT INTO `usercode` VALUES ('901', 'AAABIQ', '0');
+INSERT INTO `usercode` VALUES ('902', 'AAABIR', '0');
+INSERT INTO `usercode` VALUES ('903', 'AAABIS', '0');
+INSERT INTO `usercode` VALUES ('904', 'AAABIT', '0');
+INSERT INTO `usercode` VALUES ('905', 'AAABIU', '0');
+INSERT INTO `usercode` VALUES ('906', 'AAABIV', '0');
+INSERT INTO `usercode` VALUES ('907', 'AAABIW', '0');
+INSERT INTO `usercode` VALUES ('908', 'AAABIX', '0');
+INSERT INTO `usercode` VALUES ('909', 'AAABIY', '0');
+INSERT INTO `usercode` VALUES ('910', 'AAABIZ', '0');
+INSERT INTO `usercode` VALUES ('911', 'AAABJA', '0');
+INSERT INTO `usercode` VALUES ('912', 'AAABJB', '0');
+INSERT INTO `usercode` VALUES ('913', 'AAABJC', '0');
+INSERT INTO `usercode` VALUES ('914', 'AAABJD', '0');
+INSERT INTO `usercode` VALUES ('915', 'AAABJE', '0');
+INSERT INTO `usercode` VALUES ('916', 'AAABJF', '0');
+INSERT INTO `usercode` VALUES ('917', 'AAABJG', '0');
+INSERT INTO `usercode` VALUES ('918', 'AAABJH', '0');
+INSERT INTO `usercode` VALUES ('919', 'AAABJI', '0');
+INSERT INTO `usercode` VALUES ('920', 'AAABJJ', '0');
+INSERT INTO `usercode` VALUES ('921', 'AAABJK', '0');
+INSERT INTO `usercode` VALUES ('922', 'AAABJL', '0');
+INSERT INTO `usercode` VALUES ('923', 'AAABJM', '0');
+INSERT INTO `usercode` VALUES ('924', 'AAABJN', '0');
+INSERT INTO `usercode` VALUES ('925', 'AAABJO', '0');
+INSERT INTO `usercode` VALUES ('926', 'AAABJP', '0');
+INSERT INTO `usercode` VALUES ('927', 'AAABJQ', '0');
+INSERT INTO `usercode` VALUES ('928', 'AAABJR', '0');
+INSERT INTO `usercode` VALUES ('929', 'AAABJS', '0');
+INSERT INTO `usercode` VALUES ('930', 'AAABJT', '0');
+INSERT INTO `usercode` VALUES ('931', 'AAABJU', '0');
+INSERT INTO `usercode` VALUES ('932', 'AAABJV', '0');
+INSERT INTO `usercode` VALUES ('933', 'AAABJW', '0');
+INSERT INTO `usercode` VALUES ('934', 'AAABJX', '0');
+INSERT INTO `usercode` VALUES ('935', 'AAABJY', '0');
+INSERT INTO `usercode` VALUES ('936', 'AAABJZ', '0');
+INSERT INTO `usercode` VALUES ('937', 'AAABKA', '0');
+INSERT INTO `usercode` VALUES ('938', 'AAABKB', '0');
+INSERT INTO `usercode` VALUES ('939', 'AAABKC', '0');
+INSERT INTO `usercode` VALUES ('940', 'AAABKD', '0');
+INSERT INTO `usercode` VALUES ('941', 'AAABKE', '0');
+INSERT INTO `usercode` VALUES ('942', 'AAABKF', '0');
+INSERT INTO `usercode` VALUES ('943', 'AAABKG', '0');
+INSERT INTO `usercode` VALUES ('944', 'AAABKH', '0');
+INSERT INTO `usercode` VALUES ('945', 'AAABKI', '0');
+INSERT INTO `usercode` VALUES ('946', 'AAABKJ', '0');
+INSERT INTO `usercode` VALUES ('947', 'AAABKK', '0');
+INSERT INTO `usercode` VALUES ('948', 'AAABKL', '0');
+INSERT INTO `usercode` VALUES ('949', 'AAABKM', '0');
+INSERT INTO `usercode` VALUES ('950', 'AAABKN', '0');
+INSERT INTO `usercode` VALUES ('951', 'AAABKO', '0');
+INSERT INTO `usercode` VALUES ('952', 'AAABKP', '0');
+INSERT INTO `usercode` VALUES ('953', 'AAABKQ', '0');
+INSERT INTO `usercode` VALUES ('954', 'AAABKR', '0');
+INSERT INTO `usercode` VALUES ('955', 'AAABKS', '0');
+INSERT INTO `usercode` VALUES ('956', 'AAABKT', '0');
+INSERT INTO `usercode` VALUES ('957', 'AAABKU', '0');
+INSERT INTO `usercode` VALUES ('958', 'AAABKV', '0');
+INSERT INTO `usercode` VALUES ('959', 'AAABKW', '0');
+INSERT INTO `usercode` VALUES ('960', 'AAABKX', '0');
+INSERT INTO `usercode` VALUES ('961', 'AAABKY', '0');
+INSERT INTO `usercode` VALUES ('962', 'AAABKZ', '0');
+INSERT INTO `usercode` VALUES ('963', 'AAABLA', '0');
+INSERT INTO `usercode` VALUES ('964', 'AAABLB', '0');
+INSERT INTO `usercode` VALUES ('965', 'AAABLC', '0');
+INSERT INTO `usercode` VALUES ('966', 'AAABLD', '0');
+INSERT INTO `usercode` VALUES ('967', 'AAABLE', '0');
+INSERT INTO `usercode` VALUES ('968', 'AAABLF', '0');
+INSERT INTO `usercode` VALUES ('969', 'AAABLG', '0');
+INSERT INTO `usercode` VALUES ('970', 'AAABLH', '0');
+INSERT INTO `usercode` VALUES ('971', 'AAABLI', '0');
+INSERT INTO `usercode` VALUES ('972', 'AAABLJ', '0');
+INSERT INTO `usercode` VALUES ('973', 'AAABLK', '0');
+INSERT INTO `usercode` VALUES ('974', 'AAABLL', '0');
+INSERT INTO `usercode` VALUES ('975', 'AAABLM', '0');
+INSERT INTO `usercode` VALUES ('976', 'AAABLN', '0');
+INSERT INTO `usercode` VALUES ('977', 'AAABLO', '0');
+INSERT INTO `usercode` VALUES ('978', 'AAABLP', '0');
+INSERT INTO `usercode` VALUES ('979', 'AAABLQ', '0');
+INSERT INTO `usercode` VALUES ('980', 'AAABLR', '0');
+INSERT INTO `usercode` VALUES ('981', 'AAABLS', '0');
+INSERT INTO `usercode` VALUES ('982', 'AAABLT', '0');
+INSERT INTO `usercode` VALUES ('983', 'AAABLU', '0');
+INSERT INTO `usercode` VALUES ('984', 'AAABLV', '0');
+INSERT INTO `usercode` VALUES ('985', 'AAABLW', '0');
+INSERT INTO `usercode` VALUES ('986', 'AAABLX', '0');
+INSERT INTO `usercode` VALUES ('987', 'AAABLY', '0');
+INSERT INTO `usercode` VALUES ('988', 'AAABLZ', '0');
+INSERT INTO `usercode` VALUES ('989', 'AAABMA', '0');
+INSERT INTO `usercode` VALUES ('990', 'AAABMB', '0');
+INSERT INTO `usercode` VALUES ('991', 'AAABMC', '0');
+INSERT INTO `usercode` VALUES ('992', 'AAABMD', '0');
+INSERT INTO `usercode` VALUES ('993', 'AAABME', '0');
+INSERT INTO `usercode` VALUES ('994', 'AAABMF', '0');
+INSERT INTO `usercode` VALUES ('995', 'AAABMG', '0');
+INSERT INTO `usercode` VALUES ('996', 'AAABMH', '0');
+INSERT INTO `usercode` VALUES ('997', 'AAABMI', '0');
+INSERT INTO `usercode` VALUES ('998', 'AAABMJ', '0');
+INSERT INTO `usercode` VALUES ('999', 'AAABMK', '0');
+INSERT INTO `usercode` VALUES ('1000', 'AAABML', '0');
+INSERT INTO `usercode` VALUES ('1001', 'AAABMN', '0');
+INSERT INTO `usercode` VALUES ('1002', 'AAABMO', '0');
+INSERT INTO `usercode` VALUES ('1003', 'AAABMP', '0');
+INSERT INTO `usercode` VALUES ('1004', 'AAABMQ', '0');
+INSERT INTO `usercode` VALUES ('1005', 'AAABMR', '0');
+INSERT INTO `usercode` VALUES ('1006', 'AAABMS', '0');
+INSERT INTO `usercode` VALUES ('1007', 'AAABMT', '0');
+INSERT INTO `usercode` VALUES ('1008', 'AAABMU', '0');
+INSERT INTO `usercode` VALUES ('1009', 'AAABMV', '0');
+INSERT INTO `usercode` VALUES ('1010', 'AAABMW', '0');
+INSERT INTO `usercode` VALUES ('1011', 'AAABMX', '0');
+INSERT INTO `usercode` VALUES ('1012', 'AAABMY', '0');
+INSERT INTO `usercode` VALUES ('1013', 'AAABMZ', '0');
+INSERT INTO `usercode` VALUES ('1014', 'AAABNA', '0');
+INSERT INTO `usercode` VALUES ('1015', 'AAABNB', '0');
+INSERT INTO `usercode` VALUES ('1016', 'AAABNC', '0');
+INSERT INTO `usercode` VALUES ('1017', 'AAABND', '0');
+INSERT INTO `usercode` VALUES ('1018', 'AAABNE', '0');
+INSERT INTO `usercode` VALUES ('1019', 'AAABNF', '0');
+INSERT INTO `usercode` VALUES ('1020', 'AAABNG', '0');
+INSERT INTO `usercode` VALUES ('1021', 'AAABNH', '0');
+INSERT INTO `usercode` VALUES ('1022', 'AAABNI', '0');
+INSERT INTO `usercode` VALUES ('1023', 'AAABNJ', '0');
+INSERT INTO `usercode` VALUES ('1024', 'AAABNK', '0');
+INSERT INTO `usercode` VALUES ('1025', 'AAABNL', '0');
+INSERT INTO `usercode` VALUES ('1026', 'AAABNM', '0');
+INSERT INTO `usercode` VALUES ('1027', 'AAABNN', '0');
+INSERT INTO `usercode` VALUES ('1028', 'AAABNO', '0');
+INSERT INTO `usercode` VALUES ('1029', 'AAABNP', '0');
+INSERT INTO `usercode` VALUES ('1030', 'AAABNQ', '0');
+INSERT INTO `usercode` VALUES ('1031', 'AAABNR', '0');
+INSERT INTO `usercode` VALUES ('1032', 'AAABNS', '0');
+INSERT INTO `usercode` VALUES ('1033', 'AAABNT', '0');
+INSERT INTO `usercode` VALUES ('1034', 'AAABNU', '0');
+INSERT INTO `usercode` VALUES ('1035', 'AAABNV', '0');
+INSERT INTO `usercode` VALUES ('1036', 'AAABNW', '0');
+INSERT INTO `usercode` VALUES ('1037', 'AAABNX', '0');
+INSERT INTO `usercode` VALUES ('1038', 'AAABNY', '0');
+INSERT INTO `usercode` VALUES ('1039', 'AAABNZ', '0');
+INSERT INTO `usercode` VALUES ('1040', 'AAABOA', '0');
+INSERT INTO `usercode` VALUES ('1041', 'AAABOB', '0');
+INSERT INTO `usercode` VALUES ('1042', 'AAABOC', '0');
+INSERT INTO `usercode` VALUES ('1043', 'AAABOD', '0');
+INSERT INTO `usercode` VALUES ('1044', 'AAABOE', '0');
+INSERT INTO `usercode` VALUES ('1045', 'AAABOF', '0');
+INSERT INTO `usercode` VALUES ('1046', 'AAABOG', '0');
+INSERT INTO `usercode` VALUES ('1047', 'AAABOH', '0');
+INSERT INTO `usercode` VALUES ('1048', 'AAABOI', '0');
+INSERT INTO `usercode` VALUES ('1049', 'AAABOJ', '0');
+INSERT INTO `usercode` VALUES ('1050', 'AAABOK', '0');
+INSERT INTO `usercode` VALUES ('1051', 'AAABOL', '0');
+INSERT INTO `usercode` VALUES ('1052', 'AAABOM', '0');
+INSERT INTO `usercode` VALUES ('1053', 'AAABON', '0');
+INSERT INTO `usercode` VALUES ('1054', 'AAABOO', '0');
+INSERT INTO `usercode` VALUES ('1055', 'AAABOP', '0');
+INSERT INTO `usercode` VALUES ('1056', 'AAABOQ', '0');
+INSERT INTO `usercode` VALUES ('1057', 'AAABOR', '0');
+INSERT INTO `usercode` VALUES ('1058', 'AAABOS', '0');
+INSERT INTO `usercode` VALUES ('1059', 'AAABOT', '0');
+INSERT INTO `usercode` VALUES ('1060', 'AAABOU', '0');
+INSERT INTO `usercode` VALUES ('1061', 'AAABOV', '0');
+INSERT INTO `usercode` VALUES ('1062', 'AAABOW', '0');
+INSERT INTO `usercode` VALUES ('1063', 'AAABOX', '0');
+INSERT INTO `usercode` VALUES ('1064', 'AAABOY', '0');
+INSERT INTO `usercode` VALUES ('1065', 'AAABOZ', '0');
+INSERT INTO `usercode` VALUES ('1066', 'AAABPA', '0');
+INSERT INTO `usercode` VALUES ('1067', 'AAABPB', '0');
+INSERT INTO `usercode` VALUES ('1068', 'AAABPC', '0');
+INSERT INTO `usercode` VALUES ('1069', 'AAABPD', '0');
+INSERT INTO `usercode` VALUES ('1070', 'AAABPE', '0');
+INSERT INTO `usercode` VALUES ('1071', 'AAABPF', '0');
+INSERT INTO `usercode` VALUES ('1072', 'AAABPG', '0');
+INSERT INTO `usercode` VALUES ('1073', 'AAABPH', '0');
+INSERT INTO `usercode` VALUES ('1074', 'AAABPI', '0');
+INSERT INTO `usercode` VALUES ('1075', 'AAABPJ', '0');
+INSERT INTO `usercode` VALUES ('1076', 'AAABPK', '0');
+INSERT INTO `usercode` VALUES ('1077', 'AAABPL', '0');
+INSERT INTO `usercode` VALUES ('1078', 'AAABPM', '0');
+INSERT INTO `usercode` VALUES ('1079', 'AAABPN', '0');
+INSERT INTO `usercode` VALUES ('1080', 'AAABPO', '0');
+INSERT INTO `usercode` VALUES ('1081', 'AAABPP', '0');
+INSERT INTO `usercode` VALUES ('1082', 'AAABPQ', '0');
+INSERT INTO `usercode` VALUES ('1083', 'AAABPR', '0');
+INSERT INTO `usercode` VALUES ('1084', 'AAABPS', '0');
+INSERT INTO `usercode` VALUES ('1085', 'AAABPT', '0');
+INSERT INTO `usercode` VALUES ('1086', 'AAABPU', '0');
+INSERT INTO `usercode` VALUES ('1087', 'AAABPV', '0');
+INSERT INTO `usercode` VALUES ('1088', 'AAABPW', '0');
+INSERT INTO `usercode` VALUES ('1089', 'AAABPX', '0');
+INSERT INTO `usercode` VALUES ('1090', 'AAABPY', '0');
+INSERT INTO `usercode` VALUES ('1091', 'AAABPZ', '0');
+INSERT INTO `usercode` VALUES ('1092', 'AAABQA', '0');
+INSERT INTO `usercode` VALUES ('1093', 'AAABQB', '0');
+INSERT INTO `usercode` VALUES ('1094', 'AAABQC', '0');
+INSERT INTO `usercode` VALUES ('1095', 'AAABQD', '0');
+INSERT INTO `usercode` VALUES ('1096', 'AAABQE', '0');
+INSERT INTO `usercode` VALUES ('1097', 'AAABQF', '0');
+INSERT INTO `usercode` VALUES ('1098', 'AAABQG', '0');
+INSERT INTO `usercode` VALUES ('1099', 'AAABQH', '0');
+INSERT INTO `usercode` VALUES ('1100', 'AAABQI', '0');
+INSERT INTO `usercode` VALUES ('1101', 'AAABQJ', '0');
+INSERT INTO `usercode` VALUES ('1102', 'AAABQK', '0');
+INSERT INTO `usercode` VALUES ('1103', 'AAABQL', '0');
+INSERT INTO `usercode` VALUES ('1104', 'AAABQM', '0');
+INSERT INTO `usercode` VALUES ('1105', 'AAABQN', '0');
+INSERT INTO `usercode` VALUES ('1106', 'AAABQO', '0');
+INSERT INTO `usercode` VALUES ('1107', 'AAABQP', '0');
+INSERT INTO `usercode` VALUES ('1108', 'AAABQQ', '0');
+INSERT INTO `usercode` VALUES ('1109', 'AAABQR', '0');
+INSERT INTO `usercode` VALUES ('1110', 'AAABQS', '0');
+INSERT INTO `usercode` VALUES ('1111', 'AAABQT', '0');
+INSERT INTO `usercode` VALUES ('1112', 'AAABQU', '0');
+INSERT INTO `usercode` VALUES ('1113', 'AAABQV', '0');
+INSERT INTO `usercode` VALUES ('1114', 'AAABQW', '0');
+INSERT INTO `usercode` VALUES ('1115', 'AAABQX', '0');
+INSERT INTO `usercode` VALUES ('1116', 'AAABQY', '0');
+INSERT INTO `usercode` VALUES ('1117', 'AAABQZ', '0');
+INSERT INTO `usercode` VALUES ('1118', 'AAABRA', '0');
+INSERT INTO `usercode` VALUES ('1119', 'AAABRB', '0');
+INSERT INTO `usercode` VALUES ('1120', 'AAABRC', '0');
+INSERT INTO `usercode` VALUES ('1121', 'AAABRD', '0');
+INSERT INTO `usercode` VALUES ('1122', 'AAABRE', '0');
+INSERT INTO `usercode` VALUES ('1123', 'AAABRF', '0');
+INSERT INTO `usercode` VALUES ('1124', 'AAABRG', '0');
+INSERT INTO `usercode` VALUES ('1125', 'AAABRH', '0');
+INSERT INTO `usercode` VALUES ('1126', 'AAABRI', '0');
+INSERT INTO `usercode` VALUES ('1127', 'AAABRJ', '0');
+INSERT INTO `usercode` VALUES ('1128', 'AAABRK', '0');
+INSERT INTO `usercode` VALUES ('1129', 'AAABRL', '0');
+INSERT INTO `usercode` VALUES ('1130', 'AAABRM', '0');
+INSERT INTO `usercode` VALUES ('1131', 'AAABRN', '0');
+INSERT INTO `usercode` VALUES ('1132', 'AAABRO', '0');
+INSERT INTO `usercode` VALUES ('1133', 'AAABRP', '0');
+INSERT INTO `usercode` VALUES ('1134', 'AAABRQ', '0');
+INSERT INTO `usercode` VALUES ('1135', 'AAABRR', '0');
+INSERT INTO `usercode` VALUES ('1136', 'AAABRS', '0');
+INSERT INTO `usercode` VALUES ('1137', 'AAABRT', '0');
+INSERT INTO `usercode` VALUES ('1138', 'AAABRU', '0');
+INSERT INTO `usercode` VALUES ('1139', 'AAABRV', '0');
+INSERT INTO `usercode` VALUES ('1140', 'AAABRW', '0');
+INSERT INTO `usercode` VALUES ('1141', 'AAABRX', '0');
+INSERT INTO `usercode` VALUES ('1142', 'AAABRY', '0');
+INSERT INTO `usercode` VALUES ('1143', 'AAABRZ', '0');
+INSERT INTO `usercode` VALUES ('1144', 'AAABSA', '0');
+INSERT INTO `usercode` VALUES ('1145', 'AAABSB', '0');
+INSERT INTO `usercode` VALUES ('1146', 'AAABSC', '0');
+INSERT INTO `usercode` VALUES ('1147', 'AAABSD', '0');
+INSERT INTO `usercode` VALUES ('1148', 'AAABSE', '0');
+INSERT INTO `usercode` VALUES ('1149', 'AAABSF', '0');
+INSERT INTO `usercode` VALUES ('1150', 'AAABSG', '0');
+INSERT INTO `usercode` VALUES ('1151', 'AAABSH', '0');
+INSERT INTO `usercode` VALUES ('1152', 'AAABSI', '0');
+INSERT INTO `usercode` VALUES ('1153', 'AAABSJ', '0');
+INSERT INTO `usercode` VALUES ('1154', 'AAABSK', '0');
+INSERT INTO `usercode` VALUES ('1155', 'AAABSL', '0');
+INSERT INTO `usercode` VALUES ('1156', 'AAABSM', '0');
+INSERT INTO `usercode` VALUES ('1157', 'AAABSN', '0');
+INSERT INTO `usercode` VALUES ('1158', 'AAABSO', '0');
+INSERT INTO `usercode` VALUES ('1159', 'AAABSP', '0');
+INSERT INTO `usercode` VALUES ('1160', 'AAABSQ', '0');
+INSERT INTO `usercode` VALUES ('1161', 'AAABSR', '0');
+INSERT INTO `usercode` VALUES ('1162', 'AAABSS', '0');
+INSERT INTO `usercode` VALUES ('1163', 'AAABST', '0');
+INSERT INTO `usercode` VALUES ('1164', 'AAABSU', '0');
+INSERT INTO `usercode` VALUES ('1165', 'AAABSV', '0');
+INSERT INTO `usercode` VALUES ('1166', 'AAABSW', '0');
+INSERT INTO `usercode` VALUES ('1167', 'AAABSX', '0');
+INSERT INTO `usercode` VALUES ('1168', 'AAABSY', '0');
+INSERT INTO `usercode` VALUES ('1169', 'AAABSZ', '0');
+INSERT INTO `usercode` VALUES ('1170', 'AAABTA', '0');
+INSERT INTO `usercode` VALUES ('1171', 'AAABTB', '0');
+INSERT INTO `usercode` VALUES ('1172', 'AAABTC', '0');
+INSERT INTO `usercode` VALUES ('1173', 'AAABTD', '0');
+INSERT INTO `usercode` VALUES ('1174', 'AAABTE', '0');
+INSERT INTO `usercode` VALUES ('1175', 'AAABTF', '0');
+INSERT INTO `usercode` VALUES ('1176', 'AAABTG', '0');
+INSERT INTO `usercode` VALUES ('1177', 'AAABTH', '0');
+INSERT INTO `usercode` VALUES ('1178', 'AAABTI', '0');
+INSERT INTO `usercode` VALUES ('1179', 'AAABTJ', '0');
+INSERT INTO `usercode` VALUES ('1180', 'AAABTK', '0');
+INSERT INTO `usercode` VALUES ('1181', 'AAABTL', '0');
+INSERT INTO `usercode` VALUES ('1182', 'AAABTM', '0');
+INSERT INTO `usercode` VALUES ('1183', 'AAABTN', '0');
+INSERT INTO `usercode` VALUES ('1184', 'AAABTO', '0');
+INSERT INTO `usercode` VALUES ('1185', 'AAABTP', '0');
+INSERT INTO `usercode` VALUES ('1186', 'AAABTQ', '0');
+INSERT INTO `usercode` VALUES ('1187', 'AAABTR', '0');
+INSERT INTO `usercode` VALUES ('1188', 'AAABTS', '0');
+INSERT INTO `usercode` VALUES ('1189', 'AAABTT', '0');
+INSERT INTO `usercode` VALUES ('1190', 'AAABTU', '0');
+INSERT INTO `usercode` VALUES ('1191', 'AAABTV', '0');
+INSERT INTO `usercode` VALUES ('1192', 'AAABTW', '0');
+INSERT INTO `usercode` VALUES ('1193', 'AAABTX', '0');
+INSERT INTO `usercode` VALUES ('1194', 'AAABTY', '0');
+INSERT INTO `usercode` VALUES ('1195', 'AAABTZ', '0');
+INSERT INTO `usercode` VALUES ('1196', 'AAABUA', '0');
+INSERT INTO `usercode` VALUES ('1197', 'AAABUB', '0');
+INSERT INTO `usercode` VALUES ('1198', 'AAABUC', '0');
+INSERT INTO `usercode` VALUES ('1199', 'AAABUD', '0');
+INSERT INTO `usercode` VALUES ('1200', 'AAABUE', '0');
+INSERT INTO `usercode` VALUES ('1201', 'AAABUF', '0');
+INSERT INTO `usercode` VALUES ('1202', 'AAABUG', '0');
+INSERT INTO `usercode` VALUES ('1203', 'AAABUH', '0');
+INSERT INTO `usercode` VALUES ('1204', 'AAABUI', '0');
+INSERT INTO `usercode` VALUES ('1205', 'AAABUJ', '0');
+INSERT INTO `usercode` VALUES ('1206', 'AAABUK', '0');
+INSERT INTO `usercode` VALUES ('1207', 'AAABUL', '0');
+INSERT INTO `usercode` VALUES ('1208', 'AAABUM', '0');
+INSERT INTO `usercode` VALUES ('1209', 'AAABUN', '0');
+INSERT INTO `usercode` VALUES ('1210', 'AAABUO', '0');
+INSERT INTO `usercode` VALUES ('1211', 'AAABUP', '0');
+INSERT INTO `usercode` VALUES ('1212', 'AAABUQ', '0');
+INSERT INTO `usercode` VALUES ('1213', 'AAABUR', '0');
+INSERT INTO `usercode` VALUES ('1214', 'AAABUS', '0');
+INSERT INTO `usercode` VALUES ('1215', 'AAABUT', '0');
+INSERT INTO `usercode` VALUES ('1216', 'AAABUU', '0');
+INSERT INTO `usercode` VALUES ('1217', 'AAABUV', '0');
+INSERT INTO `usercode` VALUES ('1218', 'AAABUW', '0');
+INSERT INTO `usercode` VALUES ('1219', 'AAABUX', '0');
+INSERT INTO `usercode` VALUES ('1220', 'AAABUY', '0');
+INSERT INTO `usercode` VALUES ('1221', 'AAABUZ', '0');
+INSERT INTO `usercode` VALUES ('1222', 'AAABVA', '0');
+INSERT INTO `usercode` VALUES ('1223', 'AAABVB', '0');
+INSERT INTO `usercode` VALUES ('1224', 'AAABVC', '0');
+INSERT INTO `usercode` VALUES ('1225', 'AAABVD', '0');
+INSERT INTO `usercode` VALUES ('1226', 'AAABVE', '0');
+INSERT INTO `usercode` VALUES ('1227', 'AAABVF', '0');
+INSERT INTO `usercode` VALUES ('1228', 'AAABVG', '0');
+INSERT INTO `usercode` VALUES ('1229', 'AAABVH', '0');
+INSERT INTO `usercode` VALUES ('1230', 'AAABVI', '0');
+INSERT INTO `usercode` VALUES ('1231', 'AAABVJ', '0');
+INSERT INTO `usercode` VALUES ('1232', 'AAABVK', '0');
+INSERT INTO `usercode` VALUES ('1233', 'AAABVL', '0');
+INSERT INTO `usercode` VALUES ('1234', 'AAABVM', '0');
+INSERT INTO `usercode` VALUES ('1235', 'AAABVN', '0');
+INSERT INTO `usercode` VALUES ('1236', 'AAABVO', '0');
+INSERT INTO `usercode` VALUES ('1237', 'AAABVP', '0');
+INSERT INTO `usercode` VALUES ('1238', 'AAABVQ', '0');
+INSERT INTO `usercode` VALUES ('1239', 'AAABVR', '0');
+INSERT INTO `usercode` VALUES ('1240', 'AAABVS', '0');
+INSERT INTO `usercode` VALUES ('1241', 'AAABVT', '0');
+INSERT INTO `usercode` VALUES ('1242', 'AAABVU', '0');
+INSERT INTO `usercode` VALUES ('1243', 'AAABVV', '0');
+INSERT INTO `usercode` VALUES ('1244', 'AAABVW', '0');
+INSERT INTO `usercode` VALUES ('1245', 'AAABVX', '0');
+INSERT INTO `usercode` VALUES ('1246', 'AAABVY', '0');
+INSERT INTO `usercode` VALUES ('1247', 'AAABVZ', '0');
+INSERT INTO `usercode` VALUES ('1248', 'AAABWA', '0');
+INSERT INTO `usercode` VALUES ('1249', 'AAABWB', '0');
+INSERT INTO `usercode` VALUES ('1250', 'AAABWC', '0');
+INSERT INTO `usercode` VALUES ('1251', 'AAABWD', '0');
+INSERT INTO `usercode` VALUES ('1252', 'AAABWE', '0');
+INSERT INTO `usercode` VALUES ('1253', 'AAABWF', '0');
+INSERT INTO `usercode` VALUES ('1254', 'AAABWG', '0');
+INSERT INTO `usercode` VALUES ('1255', 'AAABWH', '0');
+INSERT INTO `usercode` VALUES ('1256', 'AAABWI', '0');
+INSERT INTO `usercode` VALUES ('1257', 'AAABWJ', '0');
+INSERT INTO `usercode` VALUES ('1258', 'AAABWK', '0');
+INSERT INTO `usercode` VALUES ('1259', 'AAABWL', '0');
+INSERT INTO `usercode` VALUES ('1260', 'AAABWM', '0');
+INSERT INTO `usercode` VALUES ('1261', 'AAABWN', '0');
+INSERT INTO `usercode` VALUES ('1262', 'AAABWO', '0');
+INSERT INTO `usercode` VALUES ('1263', 'AAABWP', '0');
+INSERT INTO `usercode` VALUES ('1264', 'AAABWQ', '0');
+INSERT INTO `usercode` VALUES ('1265', 'AAABWR', '0');
+INSERT INTO `usercode` VALUES ('1266', 'AAABWS', '0');
+INSERT INTO `usercode` VALUES ('1267', 'AAABWT', '0');
+INSERT INTO `usercode` VALUES ('1268', 'AAABWU', '0');
+INSERT INTO `usercode` VALUES ('1269', 'AAABWV', '0');
+INSERT INTO `usercode` VALUES ('1270', 'AAABWW', '0');
+INSERT INTO `usercode` VALUES ('1271', 'AAABWX', '0');
+INSERT INTO `usercode` VALUES ('1272', 'AAABWY', '0');
+INSERT INTO `usercode` VALUES ('1273', 'AAABWZ', '0');
+INSERT INTO `usercode` VALUES ('1274', 'AAABXA', '0');
+INSERT INTO `usercode` VALUES ('1275', 'AAABXB', '0');
+INSERT INTO `usercode` VALUES ('1276', 'AAABXC', '0');
+INSERT INTO `usercode` VALUES ('1277', 'AAABXD', '0');
+INSERT INTO `usercode` VALUES ('1278', 'AAABXE', '0');
+INSERT INTO `usercode` VALUES ('1279', 'AAABXF', '0');
+INSERT INTO `usercode` VALUES ('1280', 'AAABXG', '0');
+INSERT INTO `usercode` VALUES ('1281', 'AAABXH', '0');
+INSERT INTO `usercode` VALUES ('1282', 'AAABXI', '0');
+INSERT INTO `usercode` VALUES ('1283', 'AAABXJ', '0');
+INSERT INTO `usercode` VALUES ('1284', 'AAABXK', '0');
+INSERT INTO `usercode` VALUES ('1285', 'AAABXL', '0');
+INSERT INTO `usercode` VALUES ('1286', 'AAABXM', '0');
+INSERT INTO `usercode` VALUES ('1287', 'AAABXN', '0');
+INSERT INTO `usercode` VALUES ('1288', 'AAABXO', '0');
+INSERT INTO `usercode` VALUES ('1289', 'AAABXP', '0');
+INSERT INTO `usercode` VALUES ('1290', 'AAABXQ', '0');
+INSERT INTO `usercode` VALUES ('1291', 'AAABXR', '0');
+INSERT INTO `usercode` VALUES ('1292', 'AAABXS', '0');
+INSERT INTO `usercode` VALUES ('1293', 'AAABXT', '0');
+INSERT INTO `usercode` VALUES ('1294', 'AAABXU', '0');
+INSERT INTO `usercode` VALUES ('1295', 'AAABXV', '0');
+INSERT INTO `usercode` VALUES ('1296', 'AAABXW', '0');
+INSERT INTO `usercode` VALUES ('1297', 'AAABXX', '0');
+INSERT INTO `usercode` VALUES ('1298', 'AAABXY', '0');
+INSERT INTO `usercode` VALUES ('1299', 'AAABXZ', '0');
+INSERT INTO `usercode` VALUES ('1300', 'AAABYA', '0');
+INSERT INTO `usercode` VALUES ('1301', 'AAABYB', '0');
+INSERT INTO `usercode` VALUES ('1302', 'AAABYC', '0');
+INSERT INTO `usercode` VALUES ('1303', 'AAABYD', '0');
+INSERT INTO `usercode` VALUES ('1304', 'AAABYE', '0');
+INSERT INTO `usercode` VALUES ('1305', 'AAABYF', '0');
+INSERT INTO `usercode` VALUES ('1306', 'AAABYG', '0');
+INSERT INTO `usercode` VALUES ('1307', 'AAABYH', '0');
+INSERT INTO `usercode` VALUES ('1308', 'AAABYI', '0');
+INSERT INTO `usercode` VALUES ('1309', 'AAABYJ', '0');
+INSERT INTO `usercode` VALUES ('1310', 'AAABYK', '0');
+INSERT INTO `usercode` VALUES ('1311', 'AAABYL', '0');
+INSERT INTO `usercode` VALUES ('1312', 'AAABYM', '0');
+INSERT INTO `usercode` VALUES ('1313', 'AAABYN', '0');
+INSERT INTO `usercode` VALUES ('1314', 'AAABYO', '0');
+INSERT INTO `usercode` VALUES ('1315', 'AAABYP', '0');
+INSERT INTO `usercode` VALUES ('1316', 'AAABYQ', '0');
+INSERT INTO `usercode` VALUES ('1317', 'AAABYR', '0');
+INSERT INTO `usercode` VALUES ('1318', 'AAABYS', '0');
+INSERT INTO `usercode` VALUES ('1319', 'AAABYT', '0');
+INSERT INTO `usercode` VALUES ('1320', 'AAABYU', '0');
+INSERT INTO `usercode` VALUES ('1321', 'AAABYV', '0');
+INSERT INTO `usercode` VALUES ('1322', 'AAABYW', '0');
+INSERT INTO `usercode` VALUES ('1323', 'AAABYX', '0');
+INSERT INTO `usercode` VALUES ('1324', 'AAABYY', '0');
+INSERT INTO `usercode` VALUES ('1325', 'AAABYZ', '0');
+INSERT INTO `usercode` VALUES ('1326', 'AAABZA', '0');
+INSERT INTO `usercode` VALUES ('1327', 'AAABZB', '0');
+INSERT INTO `usercode` VALUES ('1328', 'AAABZC', '0');
+INSERT INTO `usercode` VALUES ('1329', 'AAABZD', '0');
+INSERT INTO `usercode` VALUES ('1330', 'AAABZE', '0');
+INSERT INTO `usercode` VALUES ('1331', 'AAABZF', '0');
+INSERT INTO `usercode` VALUES ('1332', 'AAABZG', '0');
+INSERT INTO `usercode` VALUES ('1333', 'AAABZH', '0');
+INSERT INTO `usercode` VALUES ('1334', 'AAABZI', '0');
+INSERT INTO `usercode` VALUES ('1335', 'AAABZJ', '0');
+INSERT INTO `usercode` VALUES ('1336', 'AAABZK', '0');
+INSERT INTO `usercode` VALUES ('1337', 'AAABZL', '0');
+INSERT INTO `usercode` VALUES ('1338', 'AAABZM', '0');
+INSERT INTO `usercode` VALUES ('1339', 'AAABZN', '0');
+INSERT INTO `usercode` VALUES ('1340', 'AAABZO', '0');
+INSERT INTO `usercode` VALUES ('1341', 'AAABZP', '0');
+INSERT INTO `usercode` VALUES ('1342', 'AAABZQ', '0');
+INSERT INTO `usercode` VALUES ('1343', 'AAABZR', '0');
+INSERT INTO `usercode` VALUES ('1344', 'AAABZS', '0');
+INSERT INTO `usercode` VALUES ('1345', 'AAABZT', '0');
+INSERT INTO `usercode` VALUES ('1346', 'AAABZU', '0');
+INSERT INTO `usercode` VALUES ('1347', 'AAABZV', '0');
+INSERT INTO `usercode` VALUES ('1348', 'AAABZW', '0');
+INSERT INTO `usercode` VALUES ('1349', 'AAABZX', '0');
+INSERT INTO `usercode` VALUES ('1350', 'AAABZY', '0');
+INSERT INTO `usercode` VALUES ('1351', 'AAABZZ', '0');
+INSERT INTO `usercode` VALUES ('1352', 'AAACAA', '0');
+INSERT INTO `usercode` VALUES ('1353', 'AAACAB', '0');
+INSERT INTO `usercode` VALUES ('1354', 'AAACAC', '0');
+INSERT INTO `usercode` VALUES ('1355', 'AAACAD', '0');
+INSERT INTO `usercode` VALUES ('1356', 'AAACAE', '0');
+INSERT INTO `usercode` VALUES ('1357', 'AAACAF', '0');
+INSERT INTO `usercode` VALUES ('1358', 'AAACAG', '0');
+INSERT INTO `usercode` VALUES ('1359', 'AAACAH', '0');
+INSERT INTO `usercode` VALUES ('1360', 'AAACAI', '0');
+INSERT INTO `usercode` VALUES ('1361', 'AAACAJ', '0');
+INSERT INTO `usercode` VALUES ('1362', 'AAACAK', '0');
+INSERT INTO `usercode` VALUES ('1363', 'AAACAL', '0');
+INSERT INTO `usercode` VALUES ('1364', 'AAACAM', '0');
+INSERT INTO `usercode` VALUES ('1365', 'AAACAN', '0');
+INSERT INTO `usercode` VALUES ('1366', 'AAACAO', '0');
+INSERT INTO `usercode` VALUES ('1367', 'AAACAP', '0');
+INSERT INTO `usercode` VALUES ('1368', 'AAACAQ', '0');
+INSERT INTO `usercode` VALUES ('1369', 'AAACAR', '0');
+INSERT INTO `usercode` VALUES ('1370', 'AAACAS', '0');
+INSERT INTO `usercode` VALUES ('1371', 'AAACAT', '0');
+INSERT INTO `usercode` VALUES ('1372', 'AAACAU', '0');
+INSERT INTO `usercode` VALUES ('1373', 'AAACAV', '0');
+INSERT INTO `usercode` VALUES ('1374', 'AAACAW', '0');
+INSERT INTO `usercode` VALUES ('1375', 'AAACAX', '0');
+INSERT INTO `usercode` VALUES ('1376', 'AAACAY', '0');
+INSERT INTO `usercode` VALUES ('1377', 'AAACAZ', '0');
+INSERT INTO `usercode` VALUES ('1378', 'AAACBA', '0');
+INSERT INTO `usercode` VALUES ('1379', 'AAACBB', '0');
+INSERT INTO `usercode` VALUES ('1380', 'AAACBC', '0');
+INSERT INTO `usercode` VALUES ('1381', 'AAACBD', '0');
+INSERT INTO `usercode` VALUES ('1382', 'AAACBE', '0');
+INSERT INTO `usercode` VALUES ('1383', 'AAACBF', '0');
+INSERT INTO `usercode` VALUES ('1384', 'AAACBG', '0');
+INSERT INTO `usercode` VALUES ('1385', 'AAACBH', '0');
+INSERT INTO `usercode` VALUES ('1386', 'AAACBI', '0');
+INSERT INTO `usercode` VALUES ('1387', 'AAACBJ', '0');
+INSERT INTO `usercode` VALUES ('1388', 'AAACBK', '0');
+INSERT INTO `usercode` VALUES ('1389', 'AAACBL', '0');
+INSERT INTO `usercode` VALUES ('1390', 'AAACBM', '0');
+INSERT INTO `usercode` VALUES ('1391', 'AAACBN', '0');
+INSERT INTO `usercode` VALUES ('1392', 'AAACBO', '0');
+INSERT INTO `usercode` VALUES ('1393', 'AAACBP', '0');
+INSERT INTO `usercode` VALUES ('1394', 'AAACBQ', '0');
+INSERT INTO `usercode` VALUES ('1395', 'AAACBR', '0');
+INSERT INTO `usercode` VALUES ('1396', 'AAACBS', '0');
+INSERT INTO `usercode` VALUES ('1397', 'AAACBT', '0');
+INSERT INTO `usercode` VALUES ('1398', 'AAACBU', '0');
+INSERT INTO `usercode` VALUES ('1399', 'AAACBV', '0');
+INSERT INTO `usercode` VALUES ('1400', 'AAACBW', '0');
+INSERT INTO `usercode` VALUES ('1401', 'AAACBX', '0');
+INSERT INTO `usercode` VALUES ('1402', 'AAACBY', '0');
+INSERT INTO `usercode` VALUES ('1403', 'AAACBZ', '0');
+INSERT INTO `usercode` VALUES ('1404', 'AAACCA', '0');
+INSERT INTO `usercode` VALUES ('1405', 'AAACCB', '0');
+INSERT INTO `usercode` VALUES ('1406', 'AAACCC', '0');
+INSERT INTO `usercode` VALUES ('1407', 'AAACCD', '0');
+INSERT INTO `usercode` VALUES ('1408', 'AAACCE', '0');
+INSERT INTO `usercode` VALUES ('1409', 'AAACCF', '0');
+INSERT INTO `usercode` VALUES ('1410', 'AAACCG', '0');
+INSERT INTO `usercode` VALUES ('1411', 'AAACCH', '0');
+INSERT INTO `usercode` VALUES ('1412', 'AAACCI', '0');
+INSERT INTO `usercode` VALUES ('1413', 'AAACCJ', '0');
+INSERT INTO `usercode` VALUES ('1414', 'AAACCK', '0');
+INSERT INTO `usercode` VALUES ('1415', 'AAACCL', '0');
+INSERT INTO `usercode` VALUES ('1416', 'AAACCM', '0');
+INSERT INTO `usercode` VALUES ('1417', 'AAACCN', '0');
+INSERT INTO `usercode` VALUES ('1418', 'AAACCO', '0');
+INSERT INTO `usercode` VALUES ('1419', 'AAACCP', '0');
+INSERT INTO `usercode` VALUES ('1420', 'AAACCQ', '0');
+INSERT INTO `usercode` VALUES ('1421', 'AAACCR', '0');
+INSERT INTO `usercode` VALUES ('1422', 'AAACCS', '0');
+INSERT INTO `usercode` VALUES ('1423', 'AAACCT', '0');
+INSERT INTO `usercode` VALUES ('1424', 'AAACCU', '0');
+INSERT INTO `usercode` VALUES ('1425', 'AAACCV', '0');
+INSERT INTO `usercode` VALUES ('1426', 'AAACCW', '0');
+INSERT INTO `usercode` VALUES ('1427', 'AAACCX', '0');
+INSERT INTO `usercode` VALUES ('1428', 'AAACCY', '0');
+INSERT INTO `usercode` VALUES ('1429', 'AAACCZ', '0');
+INSERT INTO `usercode` VALUES ('1430', 'AAACDA', '0');
+INSERT INTO `usercode` VALUES ('1431', 'AAACDB', '0');
+INSERT INTO `usercode` VALUES ('1432', 'AAACDC', '0');
+INSERT INTO `usercode` VALUES ('1433', 'AAACDD', '0');
+INSERT INTO `usercode` VALUES ('1434', 'AAACDE', '0');
+INSERT INTO `usercode` VALUES ('1435', 'AAACDF', '0');
+INSERT INTO `usercode` VALUES ('1436', 'AAACDG', '0');
+INSERT INTO `usercode` VALUES ('1437', 'AAACDH', '0');
+INSERT INTO `usercode` VALUES ('1438', 'AAACDI', '0');
+INSERT INTO `usercode` VALUES ('1439', 'AAACDJ', '0');
+INSERT INTO `usercode` VALUES ('1440', 'AAACDK', '0');
+INSERT INTO `usercode` VALUES ('1441', 'AAACDL', '0');
+INSERT INTO `usercode` VALUES ('1442', 'AAACDM', '0');
+INSERT INTO `usercode` VALUES ('1443', 'AAACDN', '0');
+INSERT INTO `usercode` VALUES ('1444', 'AAACDO', '0');
+INSERT INTO `usercode` VALUES ('1445', 'AAACDP', '0');
+INSERT INTO `usercode` VALUES ('1446', 'AAACDQ', '0');
+INSERT INTO `usercode` VALUES ('1447', 'AAACDR', '0');
+INSERT INTO `usercode` VALUES ('1448', 'AAACDS', '0');
+INSERT INTO `usercode` VALUES ('1449', 'AAACDT', '0');
+INSERT INTO `usercode` VALUES ('1450', 'AAACDU', '0');
+INSERT INTO `usercode` VALUES ('1451', 'AAACDV', '0');
+INSERT INTO `usercode` VALUES ('1452', 'AAACDW', '0');
+INSERT INTO `usercode` VALUES ('1453', 'AAACDX', '0');
+INSERT INTO `usercode` VALUES ('1454', 'AAACDY', '0');
+INSERT INTO `usercode` VALUES ('1455', 'AAACDZ', '0');
+INSERT INTO `usercode` VALUES ('1456', 'AAACEA', '0');
+INSERT INTO `usercode` VALUES ('1457', 'AAACEB', '0');
+INSERT INTO `usercode` VALUES ('1458', 'AAACEC', '0');
+INSERT INTO `usercode` VALUES ('1459', 'AAACED', '0');
+INSERT INTO `usercode` VALUES ('1460', 'AAACEE', '0');
+INSERT INTO `usercode` VALUES ('1461', 'AAACEF', '0');
+INSERT INTO `usercode` VALUES ('1462', 'AAACEG', '0');
+INSERT INTO `usercode` VALUES ('1463', 'AAACEH', '0');
+INSERT INTO `usercode` VALUES ('1464', 'AAACEI', '0');
+INSERT INTO `usercode` VALUES ('1465', 'AAACEJ', '0');
+INSERT INTO `usercode` VALUES ('1466', 'AAACEK', '0');
+INSERT INTO `usercode` VALUES ('1467', 'AAACEL', '0');
+INSERT INTO `usercode` VALUES ('1468', 'AAACEM', '0');
+INSERT INTO `usercode` VALUES ('1469', 'AAACEN', '0');
+INSERT INTO `usercode` VALUES ('1470', 'AAACEO', '0');
+INSERT INTO `usercode` VALUES ('1471', 'AAACEP', '0');
+INSERT INTO `usercode` VALUES ('1472', 'AAACEQ', '0');
+INSERT INTO `usercode` VALUES ('1473', 'AAACER', '0');
+INSERT INTO `usercode` VALUES ('1474', 'AAACES', '0');
+INSERT INTO `usercode` VALUES ('1475', 'AAACET', '0');
+INSERT INTO `usercode` VALUES ('1476', 'AAACEU', '0');
+INSERT INTO `usercode` VALUES ('1477', 'AAACEV', '0');
+INSERT INTO `usercode` VALUES ('1478', 'AAACEW', '0');
+INSERT INTO `usercode` VALUES ('1479', 'AAACEX', '0');
+INSERT INTO `usercode` VALUES ('1480', 'AAACEY', '0');
+INSERT INTO `usercode` VALUES ('1481', 'AAACEZ', '0');
+INSERT INTO `usercode` VALUES ('1482', 'AAACFA', '0');
+INSERT INTO `usercode` VALUES ('1483', 'AAACFB', '0');
+INSERT INTO `usercode` VALUES ('1484', 'AAACFC', '0');
+INSERT INTO `usercode` VALUES ('1485', 'AAACFD', '0');
+INSERT INTO `usercode` VALUES ('1486', 'AAACFE', '0');
+INSERT INTO `usercode` VALUES ('1487', 'AAACFF', '0');
+INSERT INTO `usercode` VALUES ('1488', 'AAACFG', '0');
+INSERT INTO `usercode` VALUES ('1489', 'AAACFH', '0');
+INSERT INTO `usercode` VALUES ('1490', 'AAACFI', '0');
+INSERT INTO `usercode` VALUES ('1491', 'AAACFJ', '0');
+INSERT INTO `usercode` VALUES ('1492', 'AAACFK', '0');
+INSERT INTO `usercode` VALUES ('1493', 'AAACFL', '0');
+INSERT INTO `usercode` VALUES ('1494', 'AAACFM', '0');
+INSERT INTO `usercode` VALUES ('1495', 'AAACFN', '0');
+INSERT INTO `usercode` VALUES ('1496', 'AAACFO', '0');
+INSERT INTO `usercode` VALUES ('1497', 'AAACFP', '0');
+INSERT INTO `usercode` VALUES ('1498', 'AAACFQ', '0');
+INSERT INTO `usercode` VALUES ('1499', 'AAACFR', '0');
+INSERT INTO `usercode` VALUES ('1500', 'AAACFS', '0');
+INSERT INTO `usercode` VALUES ('1501', 'AAACFT', '0');
+INSERT INTO `usercode` VALUES ('1502', 'AAACFU', '0');
+INSERT INTO `usercode` VALUES ('1503', 'AAACFV', '0');
+INSERT INTO `usercode` VALUES ('1504', 'AAACFW', '0');
+INSERT INTO `usercode` VALUES ('1505', 'AAACFX', '0');
+INSERT INTO `usercode` VALUES ('1506', 'AAACFY', '0');
+INSERT INTO `usercode` VALUES ('1507', 'AAACFZ', '0');
+INSERT INTO `usercode` VALUES ('1508', 'AAACGA', '0');
+INSERT INTO `usercode` VALUES ('1509', 'AAACGB', '0');
+INSERT INTO `usercode` VALUES ('1510', 'AAACGC', '0');
+INSERT INTO `usercode` VALUES ('1511', 'AAACGD', '0');
+INSERT INTO `usercode` VALUES ('1512', 'AAACGE', '0');
+INSERT INTO `usercode` VALUES ('1513', 'AAACGF', '0');
+INSERT INTO `usercode` VALUES ('1514', 'AAACGG', '0');
+INSERT INTO `usercode` VALUES ('1515', 'AAACGH', '0');
+INSERT INTO `usercode` VALUES ('1516', 'AAACGI', '0');
+INSERT INTO `usercode` VALUES ('1517', 'AAACGJ', '0');
+INSERT INTO `usercode` VALUES ('1518', 'AAACGK', '0');
+INSERT INTO `usercode` VALUES ('1519', 'AAACGL', '0');
+INSERT INTO `usercode` VALUES ('1520', 'AAACGM', '0');
+INSERT INTO `usercode` VALUES ('1521', 'AAACGN', '0');
+INSERT INTO `usercode` VALUES ('1522', 'AAACGO', '0');
+INSERT INTO `usercode` VALUES ('1523', 'AAACGP', '0');
+INSERT INTO `usercode` VALUES ('1524', 'AAACGQ', '0');
+INSERT INTO `usercode` VALUES ('1525', 'AAACGR', '0');
+INSERT INTO `usercode` VALUES ('1526', 'AAACGS', '0');
+INSERT INTO `usercode` VALUES ('1527', 'AAACGT', '0');
+INSERT INTO `usercode` VALUES ('1528', 'AAACGU', '0');
+INSERT INTO `usercode` VALUES ('1529', 'AAACGV', '0');
+INSERT INTO `usercode` VALUES ('1530', 'AAACGW', '0');
+INSERT INTO `usercode` VALUES ('1531', 'AAACGX', '0');
+INSERT INTO `usercode` VALUES ('1532', 'AAACGY', '0');
+INSERT INTO `usercode` VALUES ('1533', 'AAACGZ', '0');
+INSERT INTO `usercode` VALUES ('1534', 'AAACHA', '0');
+INSERT INTO `usercode` VALUES ('1535', 'AAACHB', '0');
+INSERT INTO `usercode` VALUES ('1536', 'AAACHC', '0');
+INSERT INTO `usercode` VALUES ('1537', 'AAACHD', '0');
+INSERT INTO `usercode` VALUES ('1538', 'AAACHE', '0');
+INSERT INTO `usercode` VALUES ('1539', 'AAACHF', '0');
+INSERT INTO `usercode` VALUES ('1540', 'AAACHG', '0');
+INSERT INTO `usercode` VALUES ('1541', 'AAACHH', '0');
+INSERT INTO `usercode` VALUES ('1542', 'AAACHI', '0');
+INSERT INTO `usercode` VALUES ('1543', 'AAACHJ', '0');
+INSERT INTO `usercode` VALUES ('1544', 'AAACHK', '0');
+INSERT INTO `usercode` VALUES ('1545', 'AAACHL', '0');
+INSERT INTO `usercode` VALUES ('1546', 'AAACHM', '0');
+INSERT INTO `usercode` VALUES ('1547', 'AAACHN', '0');
+INSERT INTO `usercode` VALUES ('1548', 'AAACHO', '0');
+INSERT INTO `usercode` VALUES ('1549', 'AAACHP', '0');
+INSERT INTO `usercode` VALUES ('1550', 'AAACHQ', '0');
+INSERT INTO `usercode` VALUES ('1551', 'AAACHR', '0');
+INSERT INTO `usercode` VALUES ('1552', 'AAACHS', '0');
+INSERT INTO `usercode` VALUES ('1553', 'AAACHT', '0');
+INSERT INTO `usercode` VALUES ('1554', 'AAACHU', '0');
+INSERT INTO `usercode` VALUES ('1555', 'AAACHV', '0');
+INSERT INTO `usercode` VALUES ('1556', 'AAACHW', '0');
+INSERT INTO `usercode` VALUES ('1557', 'AAACHX', '0');
+INSERT INTO `usercode` VALUES ('1558', 'AAACHY', '0');
+INSERT INTO `usercode` VALUES ('1559', 'AAACHZ', '0');
+INSERT INTO `usercode` VALUES ('1560', 'AAACIA', '0');
+INSERT INTO `usercode` VALUES ('1561', 'AAACIB', '0');
+INSERT INTO `usercode` VALUES ('1562', 'AAACIC', '0');
+INSERT INTO `usercode` VALUES ('1563', 'AAACID', '0');
+INSERT INTO `usercode` VALUES ('1564', 'AAACIE', '0');
+INSERT INTO `usercode` VALUES ('1565', 'AAACIF', '0');
+INSERT INTO `usercode` VALUES ('1566', 'AAACIG', '0');
+INSERT INTO `usercode` VALUES ('1567', 'AAACIH', '0');
+INSERT INTO `usercode` VALUES ('1568', 'AAACII', '0');
+INSERT INTO `usercode` VALUES ('1569', 'AAACIJ', '0');
+INSERT INTO `usercode` VALUES ('1570', 'AAACIK', '0');
+INSERT INTO `usercode` VALUES ('1571', 'AAACIL', '0');
+INSERT INTO `usercode` VALUES ('1572', 'AAACIM', '0');
+INSERT INTO `usercode` VALUES ('1573', 'AAACIN', '0');
+INSERT INTO `usercode` VALUES ('1574', 'AAACIO', '0');
+INSERT INTO `usercode` VALUES ('1575', 'AAACIP', '0');
+INSERT INTO `usercode` VALUES ('1576', 'AAACIQ', '0');
+INSERT INTO `usercode` VALUES ('1577', 'AAACIR', '0');
+INSERT INTO `usercode` VALUES ('1578', 'AAACIS', '0');
+INSERT INTO `usercode` VALUES ('1579', 'AAACIT', '0');
+INSERT INTO `usercode` VALUES ('1580', 'AAACIU', '0');
+INSERT INTO `usercode` VALUES ('1581', 'AAACIV', '0');
+INSERT INTO `usercode` VALUES ('1582', 'AAACIW', '0');
+INSERT INTO `usercode` VALUES ('1583', 'AAACIX', '0');
+INSERT INTO `usercode` VALUES ('1584', 'AAACIY', '0');
+INSERT INTO `usercode` VALUES ('1585', 'AAACIZ', '0');
+INSERT INTO `usercode` VALUES ('1586', 'AAACJA', '0');
+INSERT INTO `usercode` VALUES ('1587', 'AAACJB', '0');
+INSERT INTO `usercode` VALUES ('1588', 'AAACJC', '0');
+INSERT INTO `usercode` VALUES ('1589', 'AAACJD', '0');
+INSERT INTO `usercode` VALUES ('1590', 'AAACJE', '0');
+INSERT INTO `usercode` VALUES ('1591', 'AAACJF', '0');
+INSERT INTO `usercode` VALUES ('1592', 'AAACJG', '0');
+INSERT INTO `usercode` VALUES ('1593', 'AAACJH', '0');
+INSERT INTO `usercode` VALUES ('1594', 'AAACJI', '0');
+INSERT INTO `usercode` VALUES ('1595', 'AAACJJ', '0');
+INSERT INTO `usercode` VALUES ('1596', 'AAACJK', '0');
+INSERT INTO `usercode` VALUES ('1597', 'AAACJL', '0');
+INSERT INTO `usercode` VALUES ('1598', 'AAACJM', '0');
+INSERT INTO `usercode` VALUES ('1599', 'AAACJN', '0');
+INSERT INTO `usercode` VALUES ('1600', 'AAACJO', '0');
+INSERT INTO `usercode` VALUES ('1601', 'AAACJP', '0');
+INSERT INTO `usercode` VALUES ('1602', 'AAACJQ', '0');
+INSERT INTO `usercode` VALUES ('1603', 'AAACJR', '0');
+INSERT INTO `usercode` VALUES ('1604', 'AAACJS', '0');
+INSERT INTO `usercode` VALUES ('1605', 'AAACJT', '0');
+INSERT INTO `usercode` VALUES ('1606', 'AAACJU', '0');
+INSERT INTO `usercode` VALUES ('1607', 'AAACJV', '0');
+INSERT INTO `usercode` VALUES ('1608', 'AAACJW', '0');
+INSERT INTO `usercode` VALUES ('1609', 'AAACJX', '0');
+INSERT INTO `usercode` VALUES ('1610', 'AAACJY', '0');
+INSERT INTO `usercode` VALUES ('1611', 'AAACJZ', '0');
+INSERT INTO `usercode` VALUES ('1612', 'AAACKA', '0');
+INSERT INTO `usercode` VALUES ('1613', 'AAACKB', '0');
+INSERT INTO `usercode` VALUES ('1614', 'AAACKC', '0');
+INSERT INTO `usercode` VALUES ('1615', 'AAACKD', '0');
+INSERT INTO `usercode` VALUES ('1616', 'AAACKE', '0');
+INSERT INTO `usercode` VALUES ('1617', 'AAACKF', '0');
+INSERT INTO `usercode` VALUES ('1618', 'AAACKG', '0');
+INSERT INTO `usercode` VALUES ('1619', 'AAACKH', '0');
+INSERT INTO `usercode` VALUES ('1620', 'AAACKI', '0');
+INSERT INTO `usercode` VALUES ('1621', 'AAACKJ', '0');
+INSERT INTO `usercode` VALUES ('1622', 'AAACKK', '0');
+INSERT INTO `usercode` VALUES ('1623', 'AAACKL', '0');
+INSERT INTO `usercode` VALUES ('1624', 'AAACKM', '0');
+INSERT INTO `usercode` VALUES ('1625', 'AAACKN', '0');
+INSERT INTO `usercode` VALUES ('1626', 'AAACKO', '0');
+INSERT INTO `usercode` VALUES ('1627', 'AAACKP', '0');
+INSERT INTO `usercode` VALUES ('1628', 'AAACKQ', '0');
+INSERT INTO `usercode` VALUES ('1629', 'AAACKR', '0');
+INSERT INTO `usercode` VALUES ('1630', 'AAACKS', '0');
+INSERT INTO `usercode` VALUES ('1631', 'AAACKT', '0');
+INSERT INTO `usercode` VALUES ('1632', 'AAACKU', '0');
+INSERT INTO `usercode` VALUES ('1633', 'AAACKV', '0');
+INSERT INTO `usercode` VALUES ('1634', 'AAACKW', '0');
+INSERT INTO `usercode` VALUES ('1635', 'AAACKX', '0');
+INSERT INTO `usercode` VALUES ('1636', 'AAACKY', '0');
+INSERT INTO `usercode` VALUES ('1637', 'AAACKZ', '0');
+INSERT INTO `usercode` VALUES ('1638', 'AAACLA', '0');
+INSERT INTO `usercode` VALUES ('1639', 'AAACLB', '0');
+INSERT INTO `usercode` VALUES ('1640', 'AAACLC', '0');
+INSERT INTO `usercode` VALUES ('1641', 'AAACLD', '0');
+INSERT INTO `usercode` VALUES ('1642', 'AAACLE', '0');
+INSERT INTO `usercode` VALUES ('1643', 'AAACLF', '0');
+INSERT INTO `usercode` VALUES ('1644', 'AAACLG', '0');
+INSERT INTO `usercode` VALUES ('1645', 'AAACLH', '0');
+INSERT INTO `usercode` VALUES ('1646', 'AAACLI', '0');
+INSERT INTO `usercode` VALUES ('1647', 'AAACLJ', '0');
+INSERT INTO `usercode` VALUES ('1648', 'AAACLK', '0');
+INSERT INTO `usercode` VALUES ('1649', 'AAACLL', '0');
+INSERT INTO `usercode` VALUES ('1650', 'AAACLM', '0');
+INSERT INTO `usercode` VALUES ('1651', 'AAACLN', '0');
+INSERT INTO `usercode` VALUES ('1652', 'AAACLO', '0');
+INSERT INTO `usercode` VALUES ('1653', 'AAACLP', '0');
+INSERT INTO `usercode` VALUES ('1654', 'AAACLQ', '0');
+INSERT INTO `usercode` VALUES ('1655', 'AAACLR', '0');
+INSERT INTO `usercode` VALUES ('1656', 'AAACLS', '0');
+INSERT INTO `usercode` VALUES ('1657', 'AAACLT', '0');
+INSERT INTO `usercode` VALUES ('1658', 'AAACLU', '0');
+INSERT INTO `usercode` VALUES ('1659', 'AAACLV', '0');
+INSERT INTO `usercode` VALUES ('1660', 'AAACLW', '0');
+INSERT INTO `usercode` VALUES ('1661', 'AAACLX', '0');
+INSERT INTO `usercode` VALUES ('1662', 'AAACLY', '0');
+INSERT INTO `usercode` VALUES ('1663', 'AAACLZ', '0');
+INSERT INTO `usercode` VALUES ('1664', 'AAACMA', '0');
+INSERT INTO `usercode` VALUES ('1665', 'AAACMB', '0');
+INSERT INTO `usercode` VALUES ('1666', 'AAACMC', '0');
+INSERT INTO `usercode` VALUES ('1667', 'AAACMD', '0');
+INSERT INTO `usercode` VALUES ('1668', 'AAACME', '0');
+INSERT INTO `usercode` VALUES ('1669', 'AAACMF', '0');
+INSERT INTO `usercode` VALUES ('1670', 'AAACMG', '0');
+INSERT INTO `usercode` VALUES ('1671', 'AAACMH', '0');
+INSERT INTO `usercode` VALUES ('1672', 'AAACMI', '0');
+INSERT INTO `usercode` VALUES ('1673', 'AAACMJ', '0');
+INSERT INTO `usercode` VALUES ('1674', 'AAACMK', '0');
+INSERT INTO `usercode` VALUES ('1675', 'AAACML', '0');
+INSERT INTO `usercode` VALUES ('1676', 'AAACMM', '0');
+INSERT INTO `usercode` VALUES ('1677', 'AAACMN', '0');
+INSERT INTO `usercode` VALUES ('1678', 'AAACMO', '0');
+INSERT INTO `usercode` VALUES ('1679', 'AAACMP', '0');
+INSERT INTO `usercode` VALUES ('1680', 'AAACMQ', '0');
+INSERT INTO `usercode` VALUES ('1681', 'AAACMR', '0');
+INSERT INTO `usercode` VALUES ('1682', 'AAACMS', '0');
+INSERT INTO `usercode` VALUES ('1683', 'AAACMT', '0');
+INSERT INTO `usercode` VALUES ('1684', 'AAACMU', '0');
+INSERT INTO `usercode` VALUES ('1685', 'AAACMV', '0');
+INSERT INTO `usercode` VALUES ('1686', 'AAACMW', '0');
+INSERT INTO `usercode` VALUES ('1687', 'AAACMX', '0');
+INSERT INTO `usercode` VALUES ('1688', 'AAACMY', '0');
+INSERT INTO `usercode` VALUES ('1689', 'AAACMZ', '0');
+INSERT INTO `usercode` VALUES ('1690', 'AAACNA', '0');
+INSERT INTO `usercode` VALUES ('1691', 'AAACNB', '0');
+INSERT INTO `usercode` VALUES ('1692', 'AAACNC', '0');
+INSERT INTO `usercode` VALUES ('1693', 'AAACND', '0');
+INSERT INTO `usercode` VALUES ('1694', 'AAACNE', '0');
+INSERT INTO `usercode` VALUES ('1695', 'AAACNF', '0');
+INSERT INTO `usercode` VALUES ('1696', 'AAACNG', '0');
+INSERT INTO `usercode` VALUES ('1697', 'AAACNH', '0');
+INSERT INTO `usercode` VALUES ('1698', 'AAACNI', '0');
+INSERT INTO `usercode` VALUES ('1699', 'AAACNJ', '0');
+INSERT INTO `usercode` VALUES ('1700', 'AAACNK', '0');
+INSERT INTO `usercode` VALUES ('1701', 'AAACNL', '0');
+INSERT INTO `usercode` VALUES ('1702', 'AAACNM', '0');
+INSERT INTO `usercode` VALUES ('1703', 'AAACNN', '0');
+INSERT INTO `usercode` VALUES ('1704', 'AAACNO', '0');
+INSERT INTO `usercode` VALUES ('1705', 'AAACNP', '0');
+INSERT INTO `usercode` VALUES ('1706', 'AAACNQ', '0');
+INSERT INTO `usercode` VALUES ('1707', 'AAACNR', '0');
+INSERT INTO `usercode` VALUES ('1708', 'AAACNS', '0');
+INSERT INTO `usercode` VALUES ('1709', 'AAACNT', '0');
+INSERT INTO `usercode` VALUES ('1710', 'AAACNU', '0');
+INSERT INTO `usercode` VALUES ('1711', 'AAACNV', '0');
+INSERT INTO `usercode` VALUES ('1712', 'AAACNW', '0');
+INSERT INTO `usercode` VALUES ('1713', 'AAACNX', '0');
+INSERT INTO `usercode` VALUES ('1714', 'AAACNY', '0');
+INSERT INTO `usercode` VALUES ('1715', 'AAACNZ', '0');
+INSERT INTO `usercode` VALUES ('1716', 'AAACOA', '0');
+INSERT INTO `usercode` VALUES ('1717', 'AAACOB', '0');
+INSERT INTO `usercode` VALUES ('1718', 'AAACOC', '0');
+INSERT INTO `usercode` VALUES ('1719', 'AAACOD', '0');
+INSERT INTO `usercode` VALUES ('1720', 'AAACOE', '0');
+INSERT INTO `usercode` VALUES ('1721', 'AAACOF', '0');
+INSERT INTO `usercode` VALUES ('1722', 'AAACOG', '0');
+INSERT INTO `usercode` VALUES ('1723', 'AAACOH', '0');
+INSERT INTO `usercode` VALUES ('1724', 'AAACOI', '0');
+INSERT INTO `usercode` VALUES ('1725', 'AAACOJ', '0');
+INSERT INTO `usercode` VALUES ('1726', 'AAACOK', '0');
+INSERT INTO `usercode` VALUES ('1727', 'AAACOL', '0');
+INSERT INTO `usercode` VALUES ('1728', 'AAACOM', '0');
+INSERT INTO `usercode` VALUES ('1729', 'AAACON', '0');
+INSERT INTO `usercode` VALUES ('1730', 'AAACOO', '0');
+INSERT INTO `usercode` VALUES ('1731', 'AAACOP', '0');
+INSERT INTO `usercode` VALUES ('1732', 'AAACOQ', '0');
+INSERT INTO `usercode` VALUES ('1733', 'AAACOR', '0');
+INSERT INTO `usercode` VALUES ('1734', 'AAACOS', '0');
+INSERT INTO `usercode` VALUES ('1735', 'AAACOT', '0');
+INSERT INTO `usercode` VALUES ('1736', 'AAACOU', '0');
+INSERT INTO `usercode` VALUES ('1737', 'AAACOV', '0');
+INSERT INTO `usercode` VALUES ('1738', 'AAACOW', '0');
+INSERT INTO `usercode` VALUES ('1739', 'AAACOX', '0');
+INSERT INTO `usercode` VALUES ('1740', 'AAACOY', '0');
+INSERT INTO `usercode` VALUES ('1741', 'AAACOZ', '0');
+INSERT INTO `usercode` VALUES ('1742', 'AAACPA', '0');
+INSERT INTO `usercode` VALUES ('1743', 'AAACPB', '0');
+INSERT INTO `usercode` VALUES ('1744', 'AAACPC', '0');
+INSERT INTO `usercode` VALUES ('1745', 'AAACPD', '0');
+INSERT INTO `usercode` VALUES ('1746', 'AAACPE', '0');
+INSERT INTO `usercode` VALUES ('1747', 'AAACPF', '0');
+INSERT INTO `usercode` VALUES ('1748', 'AAACPG', '0');
+INSERT INTO `usercode` VALUES ('1749', 'AAACPH', '0');
+INSERT INTO `usercode` VALUES ('1750', 'AAACPI', '0');
+INSERT INTO `usercode` VALUES ('1751', 'AAACPJ', '0');
+INSERT INTO `usercode` VALUES ('1752', 'AAACPK', '0');
+INSERT INTO `usercode` VALUES ('1753', 'AAACPL', '0');
+INSERT INTO `usercode` VALUES ('1754', 'AAACPM', '0');
+INSERT INTO `usercode` VALUES ('1755', 'AAACPN', '0');
+INSERT INTO `usercode` VALUES ('1756', 'AAACPO', '0');
+INSERT INTO `usercode` VALUES ('1757', 'AAACPP', '0');
+INSERT INTO `usercode` VALUES ('1758', 'AAACPQ', '0');
+INSERT INTO `usercode` VALUES ('1759', 'AAACPR', '0');
+INSERT INTO `usercode` VALUES ('1760', 'AAACPS', '0');
+INSERT INTO `usercode` VALUES ('1761', 'AAACPT', '0');
+INSERT INTO `usercode` VALUES ('1762', 'AAACPU', '0');
+INSERT INTO `usercode` VALUES ('1763', 'AAACPV', '0');
+INSERT INTO `usercode` VALUES ('1764', 'AAACPW', '0');
+INSERT INTO `usercode` VALUES ('1765', 'AAACPX', '0');
+INSERT INTO `usercode` VALUES ('1766', 'AAACPY', '0');
+INSERT INTO `usercode` VALUES ('1767', 'AAACPZ', '0');
+INSERT INTO `usercode` VALUES ('1768', 'AAACQA', '0');
+INSERT INTO `usercode` VALUES ('1769', 'AAACQB', '0');
+INSERT INTO `usercode` VALUES ('1770', 'AAACQC', '0');
+INSERT INTO `usercode` VALUES ('1771', 'AAACQD', '0');
+INSERT INTO `usercode` VALUES ('1772', 'AAACQE', '0');
+INSERT INTO `usercode` VALUES ('1773', 'AAACQF', '0');
+INSERT INTO `usercode` VALUES ('1774', 'AAACQG', '0');
+INSERT INTO `usercode` VALUES ('1775', 'AAACQH', '0');
+INSERT INTO `usercode` VALUES ('1776', 'AAACQI', '0');
+INSERT INTO `usercode` VALUES ('1777', 'AAACQJ', '0');
+INSERT INTO `usercode` VALUES ('1778', 'AAACQK', '0');
+INSERT INTO `usercode` VALUES ('1779', 'AAACQL', '0');
+INSERT INTO `usercode` VALUES ('1780', 'AAACQM', '0');
+INSERT INTO `usercode` VALUES ('1781', 'AAACQN', '0');
+INSERT INTO `usercode` VALUES ('1782', 'AAACQO', '0');
+INSERT INTO `usercode` VALUES ('1783', 'AAACQP', '0');
+INSERT INTO `usercode` VALUES ('1784', 'AAACQQ', '0');
+INSERT INTO `usercode` VALUES ('1785', 'AAACQR', '0');
+INSERT INTO `usercode` VALUES ('1786', 'AAACQS', '0');
+INSERT INTO `usercode` VALUES ('1787', 'AAACQT', '0');
+INSERT INTO `usercode` VALUES ('1788', 'AAACQU', '0');
+INSERT INTO `usercode` VALUES ('1789', 'AAACQV', '0');
+INSERT INTO `usercode` VALUES ('1790', 'AAACQW', '0');
+INSERT INTO `usercode` VALUES ('1791', 'AAACQX', '0');
+INSERT INTO `usercode` VALUES ('1792', 'AAACQY', '0');
+INSERT INTO `usercode` VALUES ('1793', 'AAACQZ', '0');
+INSERT INTO `usercode` VALUES ('1794', 'AAACRA', '0');
+INSERT INTO `usercode` VALUES ('1795', 'AAACRB', '0');
+INSERT INTO `usercode` VALUES ('1796', 'AAACRC', '0');
+INSERT INTO `usercode` VALUES ('1797', 'AAACRD', '0');
+INSERT INTO `usercode` VALUES ('1798', 'AAACRE', '0');
+INSERT INTO `usercode` VALUES ('1799', 'AAACRF', '0');
+INSERT INTO `usercode` VALUES ('1800', 'AAACRG', '0');
+INSERT INTO `usercode` VALUES ('1801', 'AAACRH', '0');
+INSERT INTO `usercode` VALUES ('1802', 'AAACRI', '0');
+INSERT INTO `usercode` VALUES ('1803', 'AAACRJ', '0');
+INSERT INTO `usercode` VALUES ('1804', 'AAACRK', '0');
+INSERT INTO `usercode` VALUES ('1805', 'AAACRL', '0');
+INSERT INTO `usercode` VALUES ('1806', 'AAACRM', '0');
+INSERT INTO `usercode` VALUES ('1807', 'AAACRN', '0');
+INSERT INTO `usercode` VALUES ('1808', 'AAACRO', '0');
+INSERT INTO `usercode` VALUES ('1809', 'AAACRP', '0');
+INSERT INTO `usercode` VALUES ('1810', 'AAACRQ', '0');
+INSERT INTO `usercode` VALUES ('1811', 'AAACRR', '0');
+INSERT INTO `usercode` VALUES ('1812', 'AAACRS', '0');
+INSERT INTO `usercode` VALUES ('1813', 'AAACRT', '0');
+INSERT INTO `usercode` VALUES ('1814', 'AAACRU', '0');
+INSERT INTO `usercode` VALUES ('1815', 'AAACRV', '0');
+INSERT INTO `usercode` VALUES ('1816', 'AAACRW', '0');
+INSERT INTO `usercode` VALUES ('1817', 'AAACRX', '0');
+INSERT INTO `usercode` VALUES ('1818', 'AAACRY', '0');
+INSERT INTO `usercode` VALUES ('1819', 'AAACRZ', '0');
+INSERT INTO `usercode` VALUES ('1820', 'AAACSA', '0');
+INSERT INTO `usercode` VALUES ('1821', 'AAACSB', '0');
+INSERT INTO `usercode` VALUES ('1822', 'AAACSC', '0');
+INSERT INTO `usercode` VALUES ('1823', 'AAACSD', '0');
+INSERT INTO `usercode` VALUES ('1824', 'AAACSE', '0');
+INSERT INTO `usercode` VALUES ('1825', 'AAACSF', '0');
+INSERT INTO `usercode` VALUES ('1826', 'AAACSG', '0');
+INSERT INTO `usercode` VALUES ('1827', 'AAACSH', '0');
+INSERT INTO `usercode` VALUES ('1828', 'AAACSI', '0');
+INSERT INTO `usercode` VALUES ('1829', 'AAACSJ', '0');
+INSERT INTO `usercode` VALUES ('1830', 'AAACSK', '0');
+INSERT INTO `usercode` VALUES ('1831', 'AAACSL', '0');
+INSERT INTO `usercode` VALUES ('1832', 'AAACSM', '0');
+INSERT INTO `usercode` VALUES ('1833', 'AAACSN', '0');
+INSERT INTO `usercode` VALUES ('1834', 'AAACSO', '0');
+INSERT INTO `usercode` VALUES ('1835', 'AAACSP', '0');
+INSERT INTO `usercode` VALUES ('1836', 'AAACSQ', '0');
+INSERT INTO `usercode` VALUES ('1837', 'AAACSR', '0');
+INSERT INTO `usercode` VALUES ('1838', 'AAACSS', '0');
+INSERT INTO `usercode` VALUES ('1839', 'AAACST', '0');
+INSERT INTO `usercode` VALUES ('1840', 'AAACSU', '0');
+INSERT INTO `usercode` VALUES ('1841', 'AAACSV', '0');
+INSERT INTO `usercode` VALUES ('1842', 'AAACSW', '0');
+INSERT INTO `usercode` VALUES ('1843', 'AAACSX', '0');
+INSERT INTO `usercode` VALUES ('1844', 'AAACSY', '0');
+INSERT INTO `usercode` VALUES ('1845', 'AAACSZ', '0');
+INSERT INTO `usercode` VALUES ('1846', 'AAACTA', '0');
+INSERT INTO `usercode` VALUES ('1847', 'AAACTB', '0');
+INSERT INTO `usercode` VALUES ('1848', 'AAACTC', '0');
+INSERT INTO `usercode` VALUES ('1849', 'AAACTD', '0');
+INSERT INTO `usercode` VALUES ('1850', 'AAACTE', '0');
+INSERT INTO `usercode` VALUES ('1851', 'AAACTF', '0');
+INSERT INTO `usercode` VALUES ('1852', 'AAACTG', '0');
+INSERT INTO `usercode` VALUES ('1853', 'AAACTH', '0');
+INSERT INTO `usercode` VALUES ('1854', 'AAACTI', '0');
+INSERT INTO `usercode` VALUES ('1855', 'AAACTJ', '0');
+INSERT INTO `usercode` VALUES ('1856', 'AAACTK', '0');
+INSERT INTO `usercode` VALUES ('1857', 'AAACTL', '0');
+INSERT INTO `usercode` VALUES ('1858', 'AAACTM', '0');
+INSERT INTO `usercode` VALUES ('1859', 'AAACTN', '0');
+INSERT INTO `usercode` VALUES ('1860', 'AAACTO', '0');
+INSERT INTO `usercode` VALUES ('1861', 'AAACTP', '0');
+INSERT INTO `usercode` VALUES ('1862', 'AAACTQ', '0');
+INSERT INTO `usercode` VALUES ('1863', 'AAACTR', '0');
+INSERT INTO `usercode` VALUES ('1864', 'AAACTS', '0');
+INSERT INTO `usercode` VALUES ('1865', 'AAACTT', '0');
+INSERT INTO `usercode` VALUES ('1866', 'AAACTU', '0');
+INSERT INTO `usercode` VALUES ('1867', 'AAACTV', '0');
+INSERT INTO `usercode` VALUES ('1868', 'AAACTW', '0');
+INSERT INTO `usercode` VALUES ('1869', 'AAACTX', '0');
+INSERT INTO `usercode` VALUES ('1870', 'AAACTY', '0');
+INSERT INTO `usercode` VALUES ('1871', 'AAACTZ', '0');
+INSERT INTO `usercode` VALUES ('1872', 'AAACUA', '0');
+INSERT INTO `usercode` VALUES ('1873', 'AAACUB', '0');
+INSERT INTO `usercode` VALUES ('1874', 'AAACUC', '0');
+INSERT INTO `usercode` VALUES ('1875', 'AAACUD', '0');
+INSERT INTO `usercode` VALUES ('1876', 'AAACUE', '0');
+INSERT INTO `usercode` VALUES ('1877', 'AAACUF', '0');
+INSERT INTO `usercode` VALUES ('1878', 'AAACUG', '0');
+INSERT INTO `usercode` VALUES ('1879', 'AAACUH', '0');
+INSERT INTO `usercode` VALUES ('1880', 'AAACUI', '0');
+INSERT INTO `usercode` VALUES ('1881', 'AAACUJ', '0');
+INSERT INTO `usercode` VALUES ('1882', 'AAACUK', '0');
+INSERT INTO `usercode` VALUES ('1883', 'AAACUL', '0');
+INSERT INTO `usercode` VALUES ('1884', 'AAACUM', '0');
+INSERT INTO `usercode` VALUES ('1885', 'AAACUN', '0');
+INSERT INTO `usercode` VALUES ('1886', 'AAACUO', '0');
+INSERT INTO `usercode` VALUES ('1887', 'AAACUP', '0');
+INSERT INTO `usercode` VALUES ('1888', 'AAACUQ', '0');
+INSERT INTO `usercode` VALUES ('1889', 'AAACUR', '0');
+INSERT INTO `usercode` VALUES ('1890', 'AAACUS', '0');
+INSERT INTO `usercode` VALUES ('1891', 'AAACUT', '0');
+INSERT INTO `usercode` VALUES ('1892', 'AAACUU', '0');
+INSERT INTO `usercode` VALUES ('1893', 'AAACUV', '0');
+INSERT INTO `usercode` VALUES ('1894', 'AAACUW', '0');
+INSERT INTO `usercode` VALUES ('1895', 'AAACUX', '0');
+INSERT INTO `usercode` VALUES ('1896', 'AAACUY', '0');
+INSERT INTO `usercode` VALUES ('1897', 'AAACUZ', '0');
+INSERT INTO `usercode` VALUES ('1898', 'AAACVA', '0');
+INSERT INTO `usercode` VALUES ('1899', 'AAACVB', '0');
+INSERT INTO `usercode` VALUES ('1900', 'AAACVC', '0');
+INSERT INTO `usercode` VALUES ('1901', 'AAACVD', '0');
+INSERT INTO `usercode` VALUES ('1902', 'AAACVE', '0');
+INSERT INTO `usercode` VALUES ('1903', 'AAACVF', '0');
+INSERT INTO `usercode` VALUES ('1904', 'AAACVG', '0');
+INSERT INTO `usercode` VALUES ('1905', 'AAACVH', '0');
+INSERT INTO `usercode` VALUES ('1906', 'AAACVI', '0');
+INSERT INTO `usercode` VALUES ('1907', 'AAACVJ', '0');
+INSERT INTO `usercode` VALUES ('1908', 'AAACVK', '0');
+INSERT INTO `usercode` VALUES ('1909', 'AAACVL', '0');
+INSERT INTO `usercode` VALUES ('1910', 'AAACVM', '0');
+INSERT INTO `usercode` VALUES ('1911', 'AAACVN', '0');
+INSERT INTO `usercode` VALUES ('1912', 'AAACVO', '0');
+INSERT INTO `usercode` VALUES ('1913', 'AAACVP', '0');
+INSERT INTO `usercode` VALUES ('1914', 'AAACVQ', '0');
+INSERT INTO `usercode` VALUES ('1915', 'AAACVR', '0');
+INSERT INTO `usercode` VALUES ('1916', 'AAACVS', '0');
+INSERT INTO `usercode` VALUES ('1917', 'AAACVT', '0');
+INSERT INTO `usercode` VALUES ('1918', 'AAACVU', '0');
+INSERT INTO `usercode` VALUES ('1919', 'AAACVV', '0');
+INSERT INTO `usercode` VALUES ('1920', 'AAACVW', '0');
+INSERT INTO `usercode` VALUES ('1921', 'AAACVX', '0');
+INSERT INTO `usercode` VALUES ('1922', 'AAACVY', '0');
+INSERT INTO `usercode` VALUES ('1923', 'AAACVZ', '0');
+INSERT INTO `usercode` VALUES ('1924', 'AAACWA', '0');
+INSERT INTO `usercode` VALUES ('1925', 'AAACWB', '0');
+INSERT INTO `usercode` VALUES ('1926', 'AAACWC', '0');
+INSERT INTO `usercode` VALUES ('1927', 'AAACWD', '0');
+INSERT INTO `usercode` VALUES ('1928', 'AAACWE', '0');
+INSERT INTO `usercode` VALUES ('1929', 'AAACWF', '0');
+INSERT INTO `usercode` VALUES ('1930', 'AAACWG', '0');
+INSERT INTO `usercode` VALUES ('1931', 'AAACWH', '0');
+INSERT INTO `usercode` VALUES ('1932', 'AAACWI', '0');
+INSERT INTO `usercode` VALUES ('1933', 'AAACWJ', '0');
+INSERT INTO `usercode` VALUES ('1934', 'AAACWK', '0');
+INSERT INTO `usercode` VALUES ('1935', 'AAACWL', '0');
+INSERT INTO `usercode` VALUES ('1936', 'AAACWM', '0');
+INSERT INTO `usercode` VALUES ('1937', 'AAACWN', '0');
+INSERT INTO `usercode` VALUES ('1938', 'AAACWO', '0');
+INSERT INTO `usercode` VALUES ('1939', 'AAACWP', '0');
+INSERT INTO `usercode` VALUES ('1940', 'AAACWQ', '0');
+INSERT INTO `usercode` VALUES ('1941', 'AAACWR', '0');
+INSERT INTO `usercode` VALUES ('1942', 'AAACWS', '0');
+INSERT INTO `usercode` VALUES ('1943', 'AAACWT', '0');
+INSERT INTO `usercode` VALUES ('1944', 'AAACWU', '0');
+INSERT INTO `usercode` VALUES ('1945', 'AAACWV', '0');
+INSERT INTO `usercode` VALUES ('1946', 'AAACWW', '0');
+INSERT INTO `usercode` VALUES ('1947', 'AAACWX', '0');
+INSERT INTO `usercode` VALUES ('1948', 'AAACWY', '0');
+INSERT INTO `usercode` VALUES ('1949', 'AAACWZ', '0');
+INSERT INTO `usercode` VALUES ('1950', 'AAACXA', '0');
+INSERT INTO `usercode` VALUES ('1951', 'AAACXB', '0');
+INSERT INTO `usercode` VALUES ('1952', 'AAACXC', '0');
+INSERT INTO `usercode` VALUES ('1953', 'AAACXD', '0');
+INSERT INTO `usercode` VALUES ('1954', 'AAACXE', '0');
+INSERT INTO `usercode` VALUES ('1955', 'AAACXF', '0');
+INSERT INTO `usercode` VALUES ('1956', 'AAACXG', '0');
+INSERT INTO `usercode` VALUES ('1957', 'AAACXH', '0');
+INSERT INTO `usercode` VALUES ('1958', 'AAACXI', '0');
+INSERT INTO `usercode` VALUES ('1959', 'AAACXJ', '0');
+INSERT INTO `usercode` VALUES ('1960', 'AAACXK', '0');
+INSERT INTO `usercode` VALUES ('1961', 'AAACXL', '0');
+INSERT INTO `usercode` VALUES ('1962', 'AAACXM', '0');
+INSERT INTO `usercode` VALUES ('1963', 'AAACXN', '0');
+INSERT INTO `usercode` VALUES ('1964', 'AAACXO', '0');
+INSERT INTO `usercode` VALUES ('1965', 'AAACXP', '0');
+INSERT INTO `usercode` VALUES ('1966', 'AAACXQ', '0');
+INSERT INTO `usercode` VALUES ('1967', 'AAACXR', '0');
+INSERT INTO `usercode` VALUES ('1968', 'AAACXS', '0');
+INSERT INTO `usercode` VALUES ('1969', 'AAACXT', '0');
+INSERT INTO `usercode` VALUES ('1970', 'AAACXU', '0');
+INSERT INTO `usercode` VALUES ('1971', 'AAACXV', '0');
+INSERT INTO `usercode` VALUES ('1972', 'AAACXW', '0');
+INSERT INTO `usercode` VALUES ('1973', 'AAACXX', '0');
+INSERT INTO `usercode` VALUES ('1974', 'AAACXY', '0');
+INSERT INTO `usercode` VALUES ('1975', 'AAACXZ', '0');
+INSERT INTO `usercode` VALUES ('1976', 'AAACYA', '0');
+INSERT INTO `usercode` VALUES ('1977', 'AAACYB', '0');
+INSERT INTO `usercode` VALUES ('1978', 'AAACYC', '0');
+INSERT INTO `usercode` VALUES ('1979', 'AAACYD', '0');
+INSERT INTO `usercode` VALUES ('1980', 'AAACYE', '0');
+INSERT INTO `usercode` VALUES ('1981', 'AAACYF', '0');
+INSERT INTO `usercode` VALUES ('1982', 'AAACYG', '0');
+INSERT INTO `usercode` VALUES ('1983', 'AAACYH', '0');
+INSERT INTO `usercode` VALUES ('1984', 'AAACYI', '0');
+INSERT INTO `usercode` VALUES ('1985', 'AAACYJ', '0');
+INSERT INTO `usercode` VALUES ('1986', 'AAACYK', '0');
+INSERT INTO `usercode` VALUES ('1987', 'AAACYL', '0');
+INSERT INTO `usercode` VALUES ('1988', 'AAACYM', '0');
+INSERT INTO `usercode` VALUES ('1989', 'AAACYN', '0');
+INSERT INTO `usercode` VALUES ('1990', 'AAACYO', '0');
+INSERT INTO `usercode` VALUES ('1991', 'AAACYP', '0');
+INSERT INTO `usercode` VALUES ('1992', 'AAACYQ', '0');
+INSERT INTO `usercode` VALUES ('1993', 'AAACYR', '0');
+INSERT INTO `usercode` VALUES ('1994', 'AAACYS', '0');
+INSERT INTO `usercode` VALUES ('1995', 'AAACYT', '0');
+INSERT INTO `usercode` VALUES ('1996', 'AAACYU', '0');
+INSERT INTO `usercode` VALUES ('1997', 'AAACYV', '0');
+INSERT INTO `usercode` VALUES ('1998', 'AAACYW', '0');
+INSERT INTO `usercode` VALUES ('1999', 'AAACYX', '0');
+INSERT INTO `usercode` VALUES ('2000', 'AAAAAA', '0');
+INSERT INTO `usercode` VALUES ('2001', 'AAAAAB', '0');
+INSERT INTO `usercode` VALUES ('2002', 'AAAAAC', '0');
+INSERT INTO `usercode` VALUES ('2003', 'AAAAAD', '0');
+INSERT INTO `usercode` VALUES ('2004', 'AAAAAE', '0');
+INSERT INTO `usercode` VALUES ('2005', 'AAAAAF', '0');
+INSERT INTO `usercode` VALUES ('2006', 'AAAAAG', '0');
+INSERT INTO `usercode` VALUES ('2007', 'AAAAAH', '0');
+INSERT INTO `usercode` VALUES ('2008', 'AAAAAI', '0');
+INSERT INTO `usercode` VALUES ('2009', 'AAAAAJ', '0');
+INSERT INTO `usercode` VALUES ('2010', 'AAAAAA', '0');
+INSERT INTO `usercode` VALUES ('2011', 'AAAAAB', '0');
+INSERT INTO `usercode` VALUES ('2012', 'AAAAAC', '0');
+INSERT INTO `usercode` VALUES ('2013', 'AAAAAD', '0');
+INSERT INTO `usercode` VALUES ('2014', 'AAAAAE', '0');
+INSERT INTO `usercode` VALUES ('2015', 'AAAAAF', '0');
+INSERT INTO `usercode` VALUES ('2016', 'AAAAAG', '0');
+INSERT INTO `usercode` VALUES ('2017', 'AAAAAH', '0');
+INSERT INTO `usercode` VALUES ('2018', 'AAAAAI', '0');
+INSERT INTO `usercode` VALUES ('2019', 'AAAAAJ', '0');
+INSERT INTO `usercode` VALUES ('2020', 'AAAAAK', '0');
+INSERT INTO `usercode` VALUES ('2021', 'AAAAAL', '0');
+INSERT INTO `usercode` VALUES ('2022', 'AAAAAM', '0');
+INSERT INTO `usercode` VALUES ('2023', 'AAAAAN', '0');
+INSERT INTO `usercode` VALUES ('2024', 'AAAAAO', '0');
+INSERT INTO `usercode` VALUES ('2025', 'AAAAAP', '0');
+INSERT INTO `usercode` VALUES ('2026', 'AAAAAQ', '0');
+INSERT INTO `usercode` VALUES ('2027', 'AAAAAR', '0');
+INSERT INTO `usercode` VALUES ('2028', 'AAAAAS', '0');
+INSERT INTO `usercode` VALUES ('2029', 'AAAAAT', '0');
+INSERT INTO `usercode` VALUES ('2030', 'AAAAAU', '0');
+INSERT INTO `usercode` VALUES ('2031', 'AAAAAV', '0');
+INSERT INTO `usercode` VALUES ('2032', 'AAAAAW', '0');
+INSERT INTO `usercode` VALUES ('2033', 'AAAAAX', '0');
+INSERT INTO `usercode` VALUES ('2034', 'AAAAAY', '0');
+INSERT INTO `usercode` VALUES ('2035', 'AAAAAZ', '0');
+INSERT INTO `usercode` VALUES ('2036', 'AAAABA', '0');
+INSERT INTO `usercode` VALUES ('2037', 'AAAABB', '0');
+INSERT INTO `usercode` VALUES ('2038', 'AAAABC', '0');
+INSERT INTO `usercode` VALUES ('2039', 'AAAABD', '0');
+INSERT INTO `usercode` VALUES ('2040', 'AAAABE', '0');
+INSERT INTO `usercode` VALUES ('2041', 'AAAABF', '0');
+INSERT INTO `usercode` VALUES ('2042', 'AAAABG', '0');
+INSERT INTO `usercode` VALUES ('2043', 'AAAABH', '0');
+INSERT INTO `usercode` VALUES ('2044', 'AAAABI', '0');
+INSERT INTO `usercode` VALUES ('2045', 'AAAABJ', '0');
+INSERT INTO `usercode` VALUES ('2046', 'AAAABK', '0');
+INSERT INTO `usercode` VALUES ('2047', 'AAAABL', '0');
+INSERT INTO `usercode` VALUES ('2048', 'AAAABM', '0');
+INSERT INTO `usercode` VALUES ('2049', 'AAAABN', '0');
+INSERT INTO `usercode` VALUES ('2050', 'AAAABO', '0');
+INSERT INTO `usercode` VALUES ('2051', 'AAAABP', '0');
+INSERT INTO `usercode` VALUES ('2052', 'AAAABQ', '0');
+INSERT INTO `usercode` VALUES ('2053', 'AAAABR', '0');
+INSERT INTO `usercode` VALUES ('2054', 'AAAABS', '0');
+INSERT INTO `usercode` VALUES ('2055', 'AAAABT', '0');
+INSERT INTO `usercode` VALUES ('2056', 'AAAABU', '0');
+INSERT INTO `usercode` VALUES ('2057', 'AAAABV', '0');
+INSERT INTO `usercode` VALUES ('2058', 'AAAABW', '0');
+INSERT INTO `usercode` VALUES ('2059', 'AAAABX', '0');
+INSERT INTO `usercode` VALUES ('2060', 'AAAABY', '0');
+INSERT INTO `usercode` VALUES ('2061', 'AAAABZ', '0');
+INSERT INTO `usercode` VALUES ('2062', 'AAAACA', '0');
+INSERT INTO `usercode` VALUES ('2063', 'AAAAAA', '0');
+INSERT INTO `usercode` VALUES ('2064', 'AAAAAB', '0');
+INSERT INTO `usercode` VALUES ('2065', 'AAAAAC', '0');
+INSERT INTO `usercode` VALUES ('2066', 'AAAAAD', '0');
+INSERT INTO `usercode` VALUES ('2067', 'AAAAAE', '0');
+INSERT INTO `usercode` VALUES ('2068', 'AAAAAF', '0');
+INSERT INTO `usercode` VALUES ('2069', 'AAAAAG', '0');
+INSERT INTO `usercode` VALUES ('2070', 'AAAAAH', '0');
+INSERT INTO `usercode` VALUES ('2071', 'AAAAAI', '0');
+INSERT INTO `usercode` VALUES ('2072', 'AAAAAJ', '0');
+INSERT INTO `usercode` VALUES ('2073', 'AAAAAK', '0');
+INSERT INTO `usercode` VALUES ('2074', 'AAAAAL', '0');
+INSERT INTO `usercode` VALUES ('2075', 'AAAAAM', '0');
+INSERT INTO `usercode` VALUES ('2076', 'AAAAAN', '0');
+INSERT INTO `usercode` VALUES ('2077', 'AAAAAO', '0');
+INSERT INTO `usercode` VALUES ('2078', 'AAAAAP', '0');
+INSERT INTO `usercode` VALUES ('2079', 'AAAAAQ', '0');
+INSERT INTO `usercode` VALUES ('2080', 'AAAAAR', '0');
+INSERT INTO `usercode` VALUES ('2081', 'AAAAAS', '0');
+INSERT INTO `usercode` VALUES ('2082', 'AAAAAT', '0');
+INSERT INTO `usercode` VALUES ('2083', 'AAAAAU', '0');
+INSERT INTO `usercode` VALUES ('2084', 'AAAAAV', '0');
+INSERT INTO `usercode` VALUES ('2085', 'AAAAAW', '0');
+INSERT INTO `usercode` VALUES ('2086', 'AAAAAX', '0');
+INSERT INTO `usercode` VALUES ('2087', 'AAAAAY', '0');
+INSERT INTO `usercode` VALUES ('2088', 'AAAAAZ', '0');
+INSERT INTO `usercode` VALUES ('2089', 'AAAABA', '0');
+INSERT INTO `usercode` VALUES ('2090', 'AAAABB', '0');
+INSERT INTO `usercode` VALUES ('2091', 'AAAABC', '0');
+INSERT INTO `usercode` VALUES ('2092', 'AAAABD', '0');
+INSERT INTO `usercode` VALUES ('2093', 'AAAABE', '0');
+INSERT INTO `usercode` VALUES ('2094', 'AAAABF', '0');
+INSERT INTO `usercode` VALUES ('2095', 'AAAABG', '0');
+INSERT INTO `usercode` VALUES ('2096', 'AAAABH', '0');
+INSERT INTO `usercode` VALUES ('2097', 'AAAABI', '0');
+INSERT INTO `usercode` VALUES ('2098', 'AAAABJ', '0');
+INSERT INTO `usercode` VALUES ('2099', 'AAAABK', '0');
+INSERT INTO `usercode` VALUES ('2100', 'AAAABL', '0');
+INSERT INTO `usercode` VALUES ('2101', 'AAAABM', '0');
+INSERT INTO `usercode` VALUES ('2102', 'AAAABN', '0');
+INSERT INTO `usercode` VALUES ('2103', 'AAAABO', '0');
+INSERT INTO `usercode` VALUES ('2104', 'AAAABP', '0');
+INSERT INTO `usercode` VALUES ('2105', 'AAAABQ', '0');
+INSERT INTO `usercode` VALUES ('2106', 'AAAABR', '0');
+INSERT INTO `usercode` VALUES ('2107', 'AAAABS', '0');
+INSERT INTO `usercode` VALUES ('2108', 'AAAABT', '0');
+INSERT INTO `usercode` VALUES ('2109', 'AAAABU', '0');
+INSERT INTO `usercode` VALUES ('2110', 'AAAABV', '0');
+INSERT INTO `usercode` VALUES ('2111', 'AAAABW', '0');
+INSERT INTO `usercode` VALUES ('2112', 'AAAABX', '0');
+INSERT INTO `usercode` VALUES ('2113', 'AAAABY', '0');
+INSERT INTO `usercode` VALUES ('2114', 'AAAABZ', '0');
+INSERT INTO `usercode` VALUES ('2115', 'AAAAAA', '0');
+INSERT INTO `usercode` VALUES ('2116', 'AAAAAB', '0');
+INSERT INTO `usercode` VALUES ('2117', 'AAAAAC', '0');
+INSERT INTO `usercode` VALUES ('2118', 'AAAAAD', '0');
+INSERT INTO `usercode` VALUES ('2119', 'AAAAAE', '0');
+INSERT INTO `usercode` VALUES ('2120', 'AAAAAF', '0');
+INSERT INTO `usercode` VALUES ('2121', 'AAAAAG', '0');
+INSERT INTO `usercode` VALUES ('2122', 'AAAAAH', '0');
+INSERT INTO `usercode` VALUES ('2123', 'AAAAAI', '0');
+INSERT INTO `usercode` VALUES ('2124', 'AAAAAJ', '0');
+INSERT INTO `usercode` VALUES ('2125', 'AAAAAK', '0');
+INSERT INTO `usercode` VALUES ('2126', 'AAAAAL', '0');
+INSERT INTO `usercode` VALUES ('2127', 'AAAAAM', '0');
+INSERT INTO `usercode` VALUES ('2128', 'AAAAAN', '0');
+INSERT INTO `usercode` VALUES ('2129', 'AAAAAO', '0');
+INSERT INTO `usercode` VALUES ('2130', 'AAAAAP', '0');
+INSERT INTO `usercode` VALUES ('2131', 'AAAAAQ', '0');
+INSERT INTO `usercode` VALUES ('2132', 'AAAAAR', '0');
+INSERT INTO `usercode` VALUES ('2133', 'AAAAAS', '0');
+INSERT INTO `usercode` VALUES ('2134', 'AAAAAT', '0');
+INSERT INTO `usercode` VALUES ('2135', 'AAAAAU', '0');
+INSERT INTO `usercode` VALUES ('2136', 'AAAAAV', '0');
+INSERT INTO `usercode` VALUES ('2137', 'AAAAAW', '0');
+INSERT INTO `usercode` VALUES ('2138', 'AAAAAX', '0');
+INSERT INTO `usercode` VALUES ('2139', 'AAAAAY', '0');
+INSERT INTO `usercode` VALUES ('2140', 'AAAAAZ', '0');
+INSERT INTO `usercode` VALUES ('2141', 'AAAABA', '0');
+INSERT INTO `usercode` VALUES ('2142', 'AAAABB', '0');
+INSERT INTO `usercode` VALUES ('2143', 'AAAABC', '0');
+INSERT INTO `usercode` VALUES ('2144', 'AAAABD', '0');
+INSERT INTO `usercode` VALUES ('2145', 'AAAABE', '0');
+INSERT INTO `usercode` VALUES ('2146', 'AAAABF', '0');
+INSERT INTO `usercode` VALUES ('2147', 'AAAABG', '0');
+INSERT INTO `usercode` VALUES ('2148', 'AAAABH', '0');
+INSERT INTO `usercode` VALUES ('2149', 'AAAAAA', '0');
+INSERT INTO `usercode` VALUES ('2150', 'AAAAAB', '0');
+INSERT INTO `usercode` VALUES ('2151', 'AAAAAC', '0');
+INSERT INTO `usercode` VALUES ('2152', 'AAAAAD', '0');
+INSERT INTO `usercode` VALUES ('2153', 'AAAAAE', '0');
+INSERT INTO `usercode` VALUES ('2154', 'AAAAAF', '0');
+INSERT INTO `usercode` VALUES ('2155', 'AAAAAG', '0');
+INSERT INTO `usercode` VALUES ('2156', 'AAAAAH', '0');
+INSERT INTO `usercode` VALUES ('2157', 'AAAAAI', '0');
+INSERT INTO `usercode` VALUES ('2158', 'AAAAAJ', '0');
+INSERT INTO `usercode` VALUES ('2159', 'AAAAAK', '0');
+INSERT INTO `usercode` VALUES ('2160', 'AAAAAL', '0');
+INSERT INTO `usercode` VALUES ('2161', 'AAAAAM', '0');
+INSERT INTO `usercode` VALUES ('2162', 'AAAAAN', '0');
+INSERT INTO `usercode` VALUES ('2163', 'AAAAAO', '0');
+INSERT INTO `usercode` VALUES ('2164', 'AAAAAP', '0');
+INSERT INTO `usercode` VALUES ('2165', 'AAAAAQ', '0');
+INSERT INTO `usercode` VALUES ('2166', 'AAAAAR', '0');
+INSERT INTO `usercode` VALUES ('2167', 'AAAAAS', '0');
+INSERT INTO `usercode` VALUES ('2168', 'AAAAAT', '0');
+INSERT INTO `usercode` VALUES ('2169', 'AAAAAU', '0');
+INSERT INTO `usercode` VALUES ('2170', 'AAAAAV', '0');
+INSERT INTO `usercode` VALUES ('2171', 'AAAAAW', '0');
+INSERT INTO `usercode` VALUES ('2172', 'AAAAAX', '0');
+INSERT INTO `usercode` VALUES ('2173', 'AAAAAY', '0');
+INSERT INTO `usercode` VALUES ('2174', 'AAAAAZ', '0');
+INSERT INTO `usercode` VALUES ('2175', 'AAAABA', '0');
+INSERT INTO `usercode` VALUES ('2176', 'AAAABB', '0');
+INSERT INTO `usercode` VALUES ('2177', 'AAAABC', '0');
+INSERT INTO `usercode` VALUES ('2178', 'AAAABD', '0');
+INSERT INTO `usercode` VALUES ('2179', 'AAAABE', '0');
+INSERT INTO `usercode` VALUES ('2180', 'AAAABF', '0');
+INSERT INTO `usercode` VALUES ('2181', 'AAAAAA', '0');
+INSERT INTO `usercode` VALUES ('2182', 'AAAAAB', '0');
+INSERT INTO `usercode` VALUES ('2183', 'AAAAAC', '0');
+INSERT INTO `usercode` VALUES ('2184', 'AAAAAD', '0');
+INSERT INTO `usercode` VALUES ('2185', 'AAAAAE', '0');
+INSERT INTO `usercode` VALUES ('2186', 'AAAAAF', '0');
+INSERT INTO `usercode` VALUES ('2187', 'AAAAAG', '0');
+INSERT INTO `usercode` VALUES ('2188', 'AAAAAH', '0');
+INSERT INTO `usercode` VALUES ('2189', 'AAAAAI', '0');
+INSERT INTO `usercode` VALUES ('2190', 'AAAAAJ', '0');
+INSERT INTO `usercode` VALUES ('2191', 'AAAAAK', '0');
+INSERT INTO `usercode` VALUES ('2192', 'AAAAAL', '0');
+INSERT INTO `usercode` VALUES ('2193', 'AAAAAM', '0');
+INSERT INTO `usercode` VALUES ('2194', 'AAAAAN', '0');
+INSERT INTO `usercode` VALUES ('2195', 'AAAAAO', '0');
+INSERT INTO `usercode` VALUES ('2196', 'AAAAAP', '0');
+INSERT INTO `usercode` VALUES ('2197', 'AAAAAQ', '0');
+INSERT INTO `usercode` VALUES ('2198', 'AAAAAR', '0');
+INSERT INTO `usercode` VALUES ('2199', 'AAAAAS', '0');
+INSERT INTO `usercode` VALUES ('2200', 'AAAAAT', '0');
+INSERT INTO `usercode` VALUES ('2201', 'AAAAAU', '0');
+INSERT INTO `usercode` VALUES ('2202', 'AAAAAV', '0');
+INSERT INTO `usercode` VALUES ('2203', 'AAAAAW', '0');
+INSERT INTO `usercode` VALUES ('2204', 'AAAAAX', '0');
+
+-- ----------------------------
+-- Table structure for `users`
+-- ----------------------------
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(100) DEFAULT NULL,
+  `password` varchar(100) NOT NULL,
+  `nick_name` varchar(100) DEFAULT NULL,
+  `real_name` varchar(100) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `qq` varchar(30) DEFAULT NULL,
+  `recommender` int(11) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
+  `address` varchar(256) DEFAULT NULL,
+  `sign_date` varchar(50) DEFAULT NULL,
+  `type` varchar(10) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `emp_account` varchar(50) DEFAULT NULL,
+  `useralias` varchar(10) DEFAULT NULL,
+  `usercode` varchar(10) DEFAULT NULL,
+  `groupid` varchar(10) DEFAULT NULL,
+  `phone_state` varchar(10) DEFAULT NULL,
+  `email_state` varchar(10) DEFAULT NULL,
+  `reg_type` varchar(10) DEFAULT NULL,
+  `modify_date` varchar(50) DEFAULT NULL,
+  `create_date` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `phone` (`phone`) USING BTREE,
+  UNIQUE KEY `email` (`email`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1188 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of users
+-- ----------------------------
+INSERT INTO `users` VALUES ('1187', null, '96e79218965eb72c92a549dd5a330112', '', '', '6267104685', '', '-1', '', '', '2015-11-24 15:36:32', '0', '0', null, 'BNMIWX', '345955', null, '0', '0', '0', '2015-11-24 15:36:31', '2015-11-24 15:36:31');
+
+-- ----------------------------
+-- Table structure for `user_token`
+-- ----------------------------
+DROP TABLE IF EXISTS `user_token`;
+CREATE TABLE `user_token` (
+  `email` varchar(100) DEFAULT NULL,
+  `token` varchar(100) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `date` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of user_token
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `warehouse`
+-- ----------------------------
+DROP TABLE IF EXISTS `warehouse`;
+CREATE TABLE `warehouse` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `company` varchar(50) DEFAULT NULL,
+  `country` varchar(20) DEFAULT NULL,
+  `address` varchar(100) DEFAULT NULL,
+  `city` varchar(20) DEFAULT NULL,
+  `province` varchar(20) DEFAULT NULL,
+  `zip_code` varchar(10) DEFAULT NULL,
+  `telephone` varchar(30) DEFAULT NULL,
+  `contact_name` varchar(50) DEFAULT NULL,
+  `serial_no` int(11) DEFAULT '0',
+  `remark` text,
+  `create_date` varchar(50) DEFAULT NULL,
+  `groupid` varchar(10) DEFAULT NULL,
+  `print_phone_cn` varchar(30) DEFAULT NULL,
+  `print_phone_usa` varchar(30) DEFAULT NULL,
+  `print_logo` varchar(128) DEFAULT NULL,
+  `print_2_code` varchar(128) DEFAULT NULL,
+  `type` varchar(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of warehouse
+-- ----------------------------
+
+-- ----------------------------
+-- Procedure structure for `pro_order_insert`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `pro_order_insert`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `pro_order_insert`(IN  min int,in max int)
+BEGIN
+
+  DECLARE cout INT;
+
+  SET cout=max;
+
+    WHILE cout>=min DO
+
+INSERT INTO order_midfix(order_midfix,state) VALUES(cout,0 );
+
+SET cout=cout-1;
+
+    END WHILE;
+
+END
+;;
+DELIMITER ;

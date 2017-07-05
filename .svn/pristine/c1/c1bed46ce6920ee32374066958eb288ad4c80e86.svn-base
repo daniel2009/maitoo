@@ -1,0 +1,665 @@
+﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+
+<body>
+
+	<div class="block" id="location_comm">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">特殊商品管理</p>
+
+		<div class="box_content">
+			<div class="content_title">特殊商品类型管理</div>
+			<div class="content_text">
+			<div class="tab-content default-tab" id="tab1">
+				<div id="u310">
+					选择门市<select name="wid">
+						<option >
+							请选择门市
+						</option>
+					</select>
+					&nbsp;&nbsp;&nbsp;&nbsp;选择渠道<select  name="cid">
+						<option >
+							请选择渠道
+						</option>
+									
+					</select>
+					
+					<!-- 以下国家的值使用国家代码 -->
+					&nbsp;&nbsp;&nbsp;&nbsp;选择国家<select  name="cid_countrylist">
+						<option value="-1">
+							请选择国家
+						</option>
+					
+									
+					</select>
+				</div>
+				<div  style="margin-left: 85%;margin-top: 20px;">
+							<span>
+								<a href="javascript:addSpencialCommodityDlg()">添加特殊商品类型</a>
+							</span>
+						</div>
+						<div style="clear: both;">
+				</div>
+					
+
+				<table style="width: 100%">
+					<col width="10%" />
+					<col width="12%" />
+					<col width="12%" />
+					
+					<col width="12%" />
+					<col width="12%" />
+					<col width="12%" />
+					<col width="12%" />
+					<col width="9%" />
+					<col width="9%" />
+					<thead>
+						<tr>
+							<th id="type">商品类型</th>
+							<th id="cost">成本价格</th>
+							<th id="firstfee">首磅价格</th>
+							<th id="price">普通会员（转运）价格</th>
+							<th id="msPrice">门市会员价格</th>
+							<th id="vipOnePrice">vip会员价格</th>
+							<th id="vipTwoPrice">vip2会员价格</th>
+							<th id="vipThreePrice">vip3会员价格</th>
+							<th id="operator">
+								<!-- colspan="2"--> 操作
+							</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		
+		$.ajax({
+			type : "get",
+			url : "../countrys/all",
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					if (response.data == null || response.data.length == 0) {
+						// 没有数据
+					} else {
+						$.each(response.data, function() {
+							var str = '<option value="' + this.id + '">'
+									+ this.chinaname + '</option>';
+							$("select[name='cid_countrylist']").append(str);
+							
+							$("select[name='cid_countrylist']").change(
+									loadSpencialCommodityList);
+						});
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					// alert("获取仓库数据失败，原因是:" + response.message);
+				}
+			}
+		});
+		//loadNav91Data();
+		//$("html,body").animate({scrollTop: $("#body-wrapper").offset().top}, 1000);
+		// 获取仓库列表
+		$.ajax({
+			type : "get",
+			url : admin_warehosue_all,
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					if (response.data == null || response.data.length == 0) {
+						// 没有数据
+					} else {
+						$.each(response.data, function() {
+							var str = '<option value="' + this.id + '">'
+									+ this.name + '</option>';
+							$("select[name='wid']").append(str);
+							$("select[name='wid']").change(
+									loadSpencialChannelListInCommodity);
+						});
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					// alert("获取仓库数据失败，原因是:" + response.message);
+				}
+			}
+		});
+		
+
+		
+		
+		
+	});
+	
+	
+	
+	function loadSpencialChannelListInCommodity() {
+		
+		$("select[name='cid_countrylist']").val("-1");
+		var wid = $("select[name='wid']").val();
+		$("select[name='cid']").html("<option >请选择渠道</option>");
+		$("#tab1 table tbody").html("<tr><td colspan='8'>请先选择渠道</td></tr>");
+		if (wid == null || wid == "请选择门市") {
+			$("#tab1 table tbody").html("<tr><td colspan='8'>请先选择门市</td></tr>");
+			return;
+		}
+
+		$.ajax({
+			post : "get",
+			url : admin_special_channel_list_url,
+			data : {
+				"wid" : wid
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if (response.data == null) {
+						$("#tab1 table tbody").html(
+								"<tr><td colspan='8'>暂无渠道信息</td></tr>");
+					} else {
+						// showChannelListInCommodity(response.data);
+						var str = "<option>请选择渠道</option>";
+						$.each(response.data, function() {
+							str += '<option value="' + this.id + '">' + this.name
+									+ '</option>';
+						});
+						$("select[name='cid']").html(str);
+						//$("select[name='cid']").change(loadSpencialCommodityListCountry);
+					}
+
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+			}
+		});
+	}
+	
+	
+	function loadSpencialCommodityListCountry() {
+		var wid = $("select[name='wid']").val();
+		var cid = $("select[name='cid']").val();
+		if (wid == null || wid == "请选择门市" || cid == null || cid == "请选择渠道") {
+			$("#tab1 table tbody").html("<tr><td colspan='8'>请先选择门市与渠道</td></tr>");
+			return;
+		}
+
+		$.ajax({
+			post : "get",
+			url : admin_special_commodity_countrylist_url,
+			data : {
+				"wid" : wid,
+				"cid" : cid
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if (response.data == null) {
+						$("#tab1 table tbody").html("");
+					} else {
+						var str = "<option>请选择国家</option>";
+						$.each(response.data, function() {
+							str += '<option value="' + this.id + '">' + this.name
+									+ '</option>';
+						});
+						$("select[name='cid_countrylist']").html(str);
+						$("select[name='cid_countrylist']").change(loadSpencialCommodityList);
+					}
+
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+				
+			}
+		});
+	}
+	
+	
+	function loadSpencialCommodityList() {
+		var wid = $("select[name='wid']").val();
+		var cid = $("select[name='cid']").val();
+		var country = $("select[name='cid_countrylist']").val();
+		if (wid == null || wid == "请选择门市" || cid == null || cid == "请选择渠道"||(country=="-1")||(country=="请选择国家")) {
+			$("#tab1 table tbody").html("<tr><td colspan='8'>请先选择门市、渠道、国家</td></tr>");
+			return;
+		}
+
+		$.ajax({
+			post : "get",
+			url : admin_special_commodity_list_url,
+			data : {
+				"wid" : wid,
+				"cid" : cid,
+				"countryid":country
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if (response.data == null) {
+						$("#tab1 table tbody").html("");
+					} else {
+						showSpencialCommodityList(response.data);
+					}
+
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+				
+			}
+		});
+	}
+	
+	
+	function showSpencialCommodityList(list) {
+		var str = "";
+
+		$.each(list, function() {
+			str += "<tr id='" + this.id + "'><td><input tpey='text' id='name_"
+					+ this.id + "' value='" + this.name + "' /></td>";
+			str += "<td><input tpey='text' id='cost_" + this.id + "' value='"
+					+ this.cost + "' /></td>";
+			str += "<td><input tpey='text' id='firstfee_" + this.id + "' value='"
+					+ this.firstFee + "' /></td>";		
+			str += "<td><input tpey='text' id='price_" + this.id + "' value='"
+					+ this.price + "' /></td>";
+			str += "<td><input tpey='text' id='msPrice_" + this.id + "' value='"
+					+ this.msPrice + "' /></td>";
+			str += "<td><input tpey='text' id='vipOnePrice_" + this.id
+					+ "' value='" + this.vipOnePrice + "' /></td>";
+			str += "<td><input tpey='text' id='vipTwoPrice_" + this.id
+					+ "' value='" + this.vipTwoPrice + "' /></td>";
+			str += "<td><input tpey='text' id='vipThreePrice_" + this.id
+					+ "' value='" + this.vipThreePrice + "' /></td>";
+			str += "<td><a href='#' name='a_spencial_commodity_modify_link'>修改</a></td>";
+			str += "<td style='display:none;' id='storeId_" + this.id + "'>"
+					+ this.storeId + "</td>";
+			str += "<td style='display:none;' id='channelId_" + this.id + "'>"
+					+ this.channelId + "</td>";
+			str += "</tr>";
+		});
+		$("#tab1 table tbody").html(str);
+
+		$("a[name='a_spencial_commodity_modify_link']").click(
+				function() {
+
+					var id = $(this).parent().parent().attr("id");
+					var name = $("#name_" + id).val();
+					var cost = $("#cost_" + id).val();
+					var firstfee = $("#firstfee_" + id).val();
+					var price = $("#price_" + id).val();
+					var msPrice = $("#msPrice_" + id).val();
+					var vipOnePrice = $("#vipOnePrice_" + id).val();
+					var vipTwoPrice = $("#vipTwoPrice_" + id).val();
+					var vipThreePrice = $("#vipThreePrice_" + id).val();
+					var storeId = $("#storeId_" + id).html();
+					var channelId = $("#channelId_" + id).html();
+					var str = '"id":"' + id + '",' + '"name":"' + name + '",'
+							+ '"cost":"' + cost + '",' + '"price":"' + price + '",' + '"firstFee":"' + firstfee + '",'
+							+ '"vipOnePrice":"' + vipOnePrice + '",'
+							+ '"vipTwoPrice":"' + vipTwoPrice + '",'
+							+ '"vipThreePrice":"' + vipThreePrice + '",'
+							+ '"storeId":"' + storeId + '",' + '"channelId":"'
+							+ channelId + '",' + '"msPrice":"' + msPrice + '"';
+
+					var obj = $.parseJSON("{" + str + "}");
+
+					$.ajax({
+
+						type : "post",
+						url : admin_special_commodity_modify_url,
+						data : $.param(obj, true),
+						success : function(response) {
+							var code = response.code;
+							if ("200" == code) {
+								alert("修改成功");
+							} else if ("607" == code) {
+								alert("您尚未登录或登录已失效！");
+								logout();
+							} else {
+								alert("修改商品类型失败，原因是:" + response.message);
+							}
+							return false;
+						}
+					});
+					return false;
+				});
+	}
+	
+	/*
+	kai 20151026 
+	添加仓库和渠道参数
+	*/
+	function addSpencialCommodityDlg(){
+		var wid = $("select[name='wid']").val();
+		var cid = $("select[name='cid']").val();
+		var country = $("select[name='country']").val();
+		
+		$.ajax({
+			type:"get",
+			url:admin_warehosue_all,
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					if (response.data == null || response.data.length == 0) {
+						// 没有数据
+					} else {
+						var addWidOptionStr="";
+						$.each(response.data,function(){
+							addWidOptionStr += '<option value="' + this.id + '">' + this.name + '</option>';
+							
+						});
+						showSpencialCommodityDlg(addWidOptionStr);
+						$("select[name='AddWid']").val(wid);
+						loadSpencialChannelListInAddCommodity();
+						
+				
+						
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("获取仓库数据失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	function loadSpencialChannelListInAddCommodity() {
+		var wid = $("select[name='AddWid']").val();
+		var cid= $("select[name='cid']").val();
+		$("select[name='AddCid']").html("<option >请选择渠道</option>");
+		if(wid==null||wid=="请选择门市"){
+			return;
+		}
+	
+		$.ajax( {
+			post : "get",
+			url : admin_special_channel_list_url,
+			data:{
+				"wid":wid
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					if(response.data==null){
+						alert("该门市暂无渠道，请先到渠道管理中添加");
+					}else{
+						//showChannelListInCommodity(response.data);
+						 str = "<option>请选择渠道</option>";
+						$.each(response.data,function(){
+							str += '<option value="' + this.id + '">' + this.name + '</option>';
+						});
+						$("select[name='AddCid']").html(str);
+						$("select[name='AddCid']").val(cid);
+						
+					}
+				
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}
+			}
+		});
+	}
+	function showSpencialCommodityDlg(addWidOptionStr) {
+		var msgw, msgh, msgbg, bordercolor, titlecolor, titlebg, con;
+		var contrylist=createCountryList();
+	    con ="";
+	    con +='<div id="add_user">';  
+	    con +='<form action="" onsubmit="return false;" style="width: 300px;margin-left: 130px;">';
+	    con +='<p><label style="display: inline;">请选择门市</label><select class="text-input" name="AddWid" onchange="loadSpencialChannelListInAddCommodity()"> <option value="-1"> 请选择门市 </option>'+addWidOptionStr+' </select> <span class="gl_message">*</span> </p>';
+        con +='<p><label style="display: inline;">请选择渠道</label><select class="text-input" name="AddCid"> <option value="-1"> 请选择渠道 </option></select> <span class="gl_message">*</span> </p>';
+        con +='<p><label style="display: inline;">请选择国家</label><select class="text-input" name="AddCountry">'+contrylist+'</select> <span class="gl_message">*</span> </p>';
+        con +='<p><label style="display: inline;">商品类型：</label> <input class="text-input" type="text" name="addName" maxlength="20"/> <span class="gl_message">*</span> </p>';
+        con +='<p><label style="display: inline;">成本价格：</label><input class="text-input" type="text" name="addCost" maxlength="7" value="0.00"/><span class="gl_message">*</span></p>';
+        con +='<p><label style="display: inline;">首磅价格：</label><input class="text-input" type="text" name="addfirstCost" maxlength="7" value="0.00"/><span class="gl_message">*</span></p>';
+        con +='<p><label style="display: inline;">普通会员价格：</label><input class="text-input" type="text" name="addPrice" maxlength="7" value="0.00"/><span class="gl_message">*</span></p>';
+        con +='<p><label style="display: inline;">门市会员价格：</label><input class="text-input" type="text" name="addMsPrice" maxlength="7" value="0.00"/><span class="gl_message">*</span></p>';
+        con +='<p><label style="display: inline;">vip会员价格：</label><input class="text-input" type="text" name="addVipOnePrice" maxlength="7" value="0.00"/><span class="gl_message">*</span></p>';
+        con +='<p><label style="display: inline;">vip2会员价格：</label><input class="text-input" type="text" name="addVipTwoPrice" maxlength="7" value="0.00"/><span class="gl_message">*</span></p>';
+        con +='<p><label style="display: inline;">vip3会员价格：</label><input class="text-input" type="text" name="addVipThreePrice" maxlength="7" value="0.00"/><span class="gl_message">*</span></p>';
+        
+        con +='<p style="margin-left: 50px;"><input class="button" type="submit" name="bt_add_special_commodity" id="bt_add_special_commodity" value="提交" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="button" type="reset" value="重置"></p>';
+        con +='</form></div>';
+
+	    //弹出窗口设置
+	    msgw = 510;   //窗口宽度
+	    msgh = 620;   //窗口高度
+	    msgbg = "#FFF";    //内容背景
+	    bordercolor = "#000"; //边框颜色
+	    titlecolor = "#FFF"; //标题颜色
+	    titlebg = "#369";   //标题背景
+	    //遮罩背景设置
+	    var sWidth, sHeight;
+	    sWidth = screen.availWidth;
+	    sHeight = document.body.scrollHeight;
+	    //创建遮罩背景
+	    var maskObj = document.createElement("div");
+	    maskObj.setAttribute('id', 'maskdiv');
+	    maskObj.style.position = "absolute";
+	    maskObj.style.top = "0";
+	    maskObj.style.left = "0";
+	    maskObj.style.background = "#777";
+	    maskObj.style.filter = "Alpha(opacity=30);";
+	    maskObj.style.opacity = "0.3";
+	    maskObj.style.width = sWidth + "px";
+	    maskObj.style.height = sHeight + "px";
+	    maskObj.style.zIndex = "10000";
+	    document.body.appendChild(maskObj);
+	    //创建弹出窗口
+	    var msgObj = document.createElement("div");
+	    msgObj.setAttribute("id", "msgdiv");
+	    msgObj.style.position = "absolute";
+	    msgObj.style.top = (screen.availHeight - msgh) / 4 + "px";
+	    msgObj.style.left = (screen.availWidth - msgw) / 2 + "px";
+	    //msgObj.style.top = (screen.availHeight - msgh) / 4 + "px";
+	    //msgObj.style.left = (screen.availWidth - msgw) / 2 + "px";
+	    msgObj.style.width = msgw + "px";
+	    msgObj.style.height = msgh + "px";
+	    msgObj.style.fontSize = "12px";
+	    msgObj.style.background = msgbg;
+	    msgObj.style.border = "1px solid " + bordercolor;
+	    msgObj.style.zIndex = "10001";
+	    //创建标题
+	    var thObj = document.createElement("div");
+	    thObj.setAttribute("id", "msgth");
+	    thObj.className = "DragAble";
+	    thObj.style.cursor = "move";
+	    thObj.style.padding = "10px 6px";
+		
+	    thObj.style.color = titlecolor;
+	    thObj.style.background = titlebg;
+	    var titleStr = "<a title='Close' style='cursor:pointer;float:right;cursor:default;color: #FFF000' onclick='CloseMsg()'>取消</a>" + "<span>商品类型添加</span>";
+	    thObj.innerHTML = titleStr;
+	    //创建内容
+	    var bodyObj = document.createElement("div");
+	    bodyObj.setAttribute("id", "msgbody");
+	    bodyObj.style.padding = "10px";
+	    bodyObj.style.lineHeight = "1.5em";
+	    bodyObj.innerHTML = con;
+	    //var txt = document.createTextNode(content)
+	    //bodyObj.appendChild(txt);
+	    //生成窗口
+	    document.body.appendChild(msgObj);
+	    document.getElementById("msgdiv").appendChild(thObj);
+	    document.getElementById("msgdiv").appendChild(bodyObj);
+	    
+	    $("#bt_add_special_commodity").click(function(){
+	    	var name = $(":text[name='addName']").val();
+	    	var cost = $(":text[name='addCost']").val();
+			var price = $(":text[name='addPrice']").val();
+			var msPrice = $(":text[name='addMsPrice']").val();
+			var vipOnePrice = $(":text[name='addVipOnePrice']").val();
+			var vipTwoPrice = $(":text[name='addVipTwoPrice']").val();
+			var vipThreePrice = $(":text[name='addVipThreePrice']").val();
+			var storeId = $("select[name='AddWid']").val();
+			var channelId = $("select[name='AddCid']").val();
+			
+			submitAddSpecialCommodity(name, cost,price, msPrice,vipOnePrice,vipTwoPrice,vipThreePrice,storeId,channelId);
+		});
+		
+		
+	}
+	
+	function submitAddSpecialCommodity(name, cost,price, msPrice,vipOnePrice,vipTwoPrice,vipThreePrice,storeId,channelId) {
+		if (!checkCommodityPrice(price)) {
+			alert("普通会员价格格式 不对或者超出范围！");
+			return false;
+		} else if (!checkCommodityPrice(cost)) {
+			alert("成本价格格式 不对或者超出范围！");
+			return false;
+		} else if (!checkCommodityPrice(msPrice)) {
+			alert("门市会员价格格式 不对或者超出范围！");
+			return false;
+		} else if (!checkCommodityPrice(vipOnePrice)) {
+			alert("vip会员价格格式 不对或者超出范围！");
+			return false;
+		} else if (!checkCommodityPrice(vipTwoPrice)) {
+			alert("vip2会员价格格式 不对或者超出范围！");
+			return false;
+		} else if (!checkCommodityPrice(vipOnePrice)) {
+			alert("vip3会员价格格式 不对或者超出范围！");
+			return false;
+		} else if (!checkCommodityName(name)) {
+			alert("商品类型格式不正确，最长长度为20个字符，请重新输入！");
+			return false;
+		}else if (storeId==null||storeId==""||storeId=="-1"||storeId=="请选择门市") {
+			alert("请选择门市！");
+			return false;
+		}else if (channelId==null||channelId==""||channelId=="-1"||channelId=="请选择渠道") {
+			alert("请选择渠道！");
+			return false;
+		} else {
+			
+			
+			var countryId = $("select[name='AddCountry']").val();
+			if((countryId=="")||(countryId=="-1"))
+			{
+				alert("必须选择国家!");
+				return false;
+			}
+			
+			var firstprist=$(":text[name='addfirstCost']").val();
+			if (!checkCommodityPrice(firstprist))
+			{
+				alert("首磅价格格式 不对或者超出范围！");
+				return false;
+			}
+			
+			
+			
+			$("#bt_add_special_commodity").attr("disabled", true);
+			$.ajax( {
+				type : "post",
+				url : admin_special_add_commodity_url,
+				data : {
+					"name" : name,
+					"cost" : cost,
+					"price" : price,
+					"msPrice" : msPrice,
+					"vipOnePrice" : vipOnePrice,
+					"vipTwoPrice" : vipTwoPrice,
+					"vipThreePrice" : vipThreePrice,
+					"storeId" : storeId,
+					"channelId":channelId,
+					"countryId":countryId,
+					"firstFee":firstprist
+				},
+				success : function(response) {
+					$("#bt_add_special_commodity").attr("disabled", false);
+					var code = response.code;
+					if ("200" == code) {
+						alert("添加成功");
+						CloseMsg();
+						//nav91Click();
+						nav91_1Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("添加商品类型失败，失败原因:" + response.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	}
+	
+	function CloseMsg() {
+	    //移除对象
+	    document.body.removeChild(document.getElementById("maskdiv"));
+	    document.getElementById("msgdiv").removeChild(document.getElementById("msgth"));
+	    document.getElementById("msgdiv").removeChild(document.getElementById("msgbody"));
+	    document.body.removeChild(document.getElementById("msgdiv"));
+	}
+	//拖动窗口
+	var ie = document.all;
+	var nn6 = document.getElementById && !document.all;
+	var isdrag = false;
+	var y, x;
+	var oDragObj;
+
+	function moveMouse(e) {
+	    if (isdrag) {
+	        oDragObj.style.top = (nn6 ? nTY + e.clientY - y : nTY + event.clientY - y) + "px";
+	        oDragObj.style.left = (nn6 ? nTX + e.clientX - x : nTX + event.clientX - x) + "px";
+	        return false;
+	    }
+	}
+
+	function initDrag(e) {
+	    var oDragHandle = nn6 ? e.target : event.srcElement;
+	    var topElement = "HTML";
+	    while (oDragHandle.tagName != topElement && oDragHandle.className != "DragAble") {
+	        oDragHandle = nn6 ? oDragHandle.parentNode : oDragHandle.parentElement;
+	    }
+	    if (oDragHandle.className == "DragAble") {
+	        isdrag = true;
+	        oDragObj = oDragHandle.parentNode;
+	        nTY = parseInt(oDragObj.style.top);
+	        y = nn6 ? e.clientY : event.clientY;
+	        nTX = parseInt(oDragObj.style.left);
+	        x = nn6 ? e.clientX : event.clientX;
+	        document.onmousemove = moveMouse;
+	        return false;
+	    }
+	}
+	document.onmousedown = initDrag;
+	document.onmouseup = new Function("isdrag=false");
+	
+	
+</script>
+
+<script type="text/javascript">
+
+//返回构造的国家列表,注意，value为国家家代码简称，name为国家英文名称，id为国家代码e
+function createCountryList()
+{
+	var str="";
+	str=$("select[name='cid_countrylist']").html();
+	return str;
+}
+
+</script>
+</html>

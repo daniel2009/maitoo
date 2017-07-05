@@ -1,0 +1,270 @@
+﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">渠道管理</p>
+
+		<div class="box_content">
+			<div class="content_title">渠道管理</div>
+			<div class="content_text">
+			<div class="tab-content default-tab" id="tab1">
+				<div id="u310">
+					选择门市<select class="text-input" name="wid">
+						<option >
+							请选择门市
+						</option>
+									
+					</select>
+				</div>
+				<div  style="margin-left: 80%;margin-top: 20px;">
+							<span>
+								<a href="javascript:addChannelDlg()">添加渠道</a>
+							</span>
+						</div>
+						<div style="clear: both;">
+				</div>
+					
+
+				<table style="width: 100%">
+					<thead>
+						<tr>
+							<th>渠道名</th>
+							<th>渠道别名</th>
+							<th>状态</th>
+							<th>包裹附加费</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					
+					<tbody>
+						<tr><td colspan='5'>请先选择门店</td></tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav93Data();
+	});
+	
+	
+	function addChannelDlg(){
+		
+		$.ajax({
+			type:"get",
+			url:admin_warehosue_all,
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					if (response.data == null || response.data.length == 0) {
+						// 没有数据
+					} else {
+						var addWidOptionStr="";
+						$.each(response.data,function(){
+							addWidOptionStr += '<option value="' + this.id + '">' + this.name + '</option>';
+							
+						});
+						showChannelDlg(addWidOptionStr);
+					}
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("获取仓库数据失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	
+	function showChannelDlg(addWidOptionStr) {
+		var msgw, msgh, msgbg, bordercolor, titlecolor, titlebg, con;
+	    con ="";
+	    con +='<div id="add_user">';  
+	    con +='<form action="" onsubmit="return false;" style="width: 300px;margin-left: 130px;">';
+	    con +='<p><label style="display: inline;padding-left: 13px;">请选择门市</label><select class="text-input" name="AddWid"> <option value="-1"> 所有门市 </option>'+addWidOptionStr+' </select> <span class="gl_message">*</span> </p>';
+        con +='<p><label style="display: inline;padding-left: 23px;">渠道名：</label> <input class="text-input" type="text" name="addName" maxlength="48"/> <span class="gl_message">*</span> </p>';
+        con +='<p><label style="display: inline;padding-left: 13px;">渠道别名：</label><input class="text-input" type="text" name="addAlias" maxlength="48" /><span class="gl_message">*</span></p>';
+        con +='<p><label style="display: inline;">包裹附加费：</label><input class="text-input" type="text" name="additivePrice" maxlength="20" value="0" /><span class="gl_message">*</span></p>';
+       
+        con +='<p><label style="display: inline;padding-left: 39px;">状态：</label><select class="text-input" name="AddState"> <option value="1"> 启用</option> <option value="2"> 停用</option></select><span class="gl_message">*</span></p>';
+      
+        con +='<p style="margin-left: 50px;"><input class="button" type="submit" name="bt_add_channel" id="bt_add_channel" value="提交" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="button" type="reset" value="重置"></p>';
+        con +='</form></div>';
+
+	    //弹出窗口设置
+	    msgw = 510;   //窗口宽度
+	    msgh = 400;   //窗口高度
+	    msgbg = "#FFF";    //内容背景
+	    bordercolor = "#000"; //边框颜色
+	    titlecolor = "#FFF"; //标题颜色
+	    titlebg = "#369";   //标题背景
+	    //遮罩背景设置
+	    var sWidth, sHeight;
+	    sWidth = screen.availWidth;
+	    sHeight = document.body.scrollHeight;
+	    //创建遮罩背景
+	    var maskObj = document.createElement("div");
+	    maskObj.setAttribute('id', 'maskdiv');
+	    maskObj.style.position = "absolute";
+	    maskObj.style.top = "0";
+	    maskObj.style.left = "0";
+	    maskObj.style.background = "#777";
+	    maskObj.style.filter = "Alpha(opacity=30);";
+	    maskObj.style.opacity = "0.3";
+	    maskObj.style.width = sWidth + "px";
+	    maskObj.style.height = sHeight + "px";
+	    maskObj.style.zIndex = "10000";
+	    document.body.appendChild(maskObj);
+	    //创建弹出窗口
+	    var msgObj = document.createElement("div");
+	    msgObj.setAttribute("id", "msgdiv");
+	    msgObj.style.position = "absolute";
+	    msgObj.style.top = (screen.availHeight - msgh) / 4 + "px";
+	    msgObj.style.left = (screen.availWidth - msgw) / 2 + "px";
+	    //msgObj.style.top = (screen.availHeight - msgh) / 4 + "px";
+	    //msgObj.style.left = (screen.availWidth - msgw) / 2 + "px";
+	    msgObj.style.width = msgw + "px";
+	    msgObj.style.height = msgh + "px";
+	    msgObj.style.fontSize = "12px";
+	    msgObj.style.background = msgbg;
+	    msgObj.style.border = "1px solid " + bordercolor;
+	    msgObj.style.zIndex = "10001";
+	    //创建标题
+	    var thObj = document.createElement("div");
+	    thObj.setAttribute("id", "msgth");
+	    thObj.className = "DragAble";
+	    thObj.style.cursor = "move";
+	    thObj.style.padding = "10px 6px";
+		
+	    thObj.style.color = titlecolor;
+	    thObj.style.background = titlebg;
+	    var titleStr = "<a title='Close' style='cursor:pointer;float:right;cursor:default;color: #FFF000' onclick='CloseMsg()'>取消</a>" + "<span>渠道添加</span>";
+	    thObj.innerHTML = titleStr;
+	    //创建内容
+	    var bodyObj = document.createElement("div");
+	    bodyObj.setAttribute("id", "msgbody");
+	    bodyObj.style.padding = "10px";
+	    bodyObj.style.lineHeight = "1.5em";
+	    bodyObj.innerHTML = con;
+	    //var txt = document.createTextNode(content)
+	    //bodyObj.appendChild(txt);
+	    //生成窗口
+	    document.body.appendChild(msgObj);
+	    document.getElementById("msgdiv").appendChild(thObj);
+	    document.getElementById("msgdiv").appendChild(bodyObj);
+	    
+	    $("#bt_add_channel").click(function(){
+	    	var name = $(":text[name='addName']").val();
+	    	var alias = $(":text[name='addAlias']").val();
+			var state = $("select[name='AddState']").val();
+			var wid = $("select[name='AddWid']").val();
+			var additivePrice = $(":text[name='additivePrice']").val();
+			submitAddChannel(wid, name,alias, state,additivePrice);
+			
+		});
+		
+		
+	}
+	
+	function submitAddChannel(wid, name,alias, state,additivePrice) {
+		if (name==null||name=="") {
+			alert("渠道名为空,请输入渠道名！");
+		} else if (alias==null||alias=="") {
+			alert("渠道别名为空,请输入渠道别名！");
+		} else if (state!="1"&&state!="2") {
+			alert("状态错误，请选择状态！");
+		} else if (wid==null||wid=="") {
+			alert("门市为空，请选择门市！");
+		} else if (additivePrice==null||additivePrice=="") {
+			alert("附加价格不能为空！");	
+		} else {
+			$("#bt_add_channel").attr("disabled", true);
+			var str = '"name":"' + name + '",' +
+				'"alias":"' + alias + '",' +
+				'"warehouseId":"' + wid + '",' +
+				'"additivePrice":"' + additivePrice + '",' +
+				'"state":"' + state + '"' ;
+			var obj = $.parseJSON("{" + str + "}");
+			
+			$.ajax( {
+				type : "post",
+				url : admin_add_channel_url,
+				data : $.param(
+					obj
+				,true),
+				success : function(response) {
+					$("#bt_add_channel").attr("disabled", false);
+					var code = response.code;
+					if ("200" == code) {
+						alert("添加成功");
+						CloseMsg();
+						nav93Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("添加渠道失败，失败原因:" + response.message);
+					}
+					return false;
+				}
+			});
+		}
+		return false;
+	}
+	
+	function CloseMsg() {
+	    //移除对象
+	    document.body.removeChild(document.getElementById("maskdiv"));
+	    document.getElementById("msgdiv").removeChild(document.getElementById("msgth"));
+	    document.getElementById("msgdiv").removeChild(document.getElementById("msgbody"));
+	    document.body.removeChild(document.getElementById("msgdiv"));
+	}
+	//拖动窗口
+	var ie = document.all;
+	var nn6 = document.getElementById && !document.all;
+	var isdrag = false;
+	var y, x;
+	var oDragObj;
+
+	function moveMouse(e) {
+	    if (isdrag) {
+	        oDragObj.style.top = (nn6 ? nTY + e.clientY - y : nTY + event.clientY - y) + "px";
+	        oDragObj.style.left = (nn6 ? nTX + e.clientX - x : nTX + event.clientX - x) + "px";
+	        return false;
+	    }
+	}
+
+	function initDrag(e) {
+	    var oDragHandle = nn6 ? e.target : event.srcElement;
+	    var topElement = "HTML";
+	    while (oDragHandle.tagName != topElement && oDragHandle.className != "DragAble") {
+	        oDragHandle = nn6 ? oDragHandle.parentNode : oDragHandle.parentElement;
+	    }
+	    if (oDragHandle.className == "DragAble") {
+	        isdrag = true;
+	        oDragObj = oDragHandle.parentNode;
+	        nTY = parseInt(oDragObj.style.top);
+	        y = nn6 ? e.clientY : event.clientY;
+	        nTX = parseInt(oDragObj.style.left);
+	        x = nn6 ? e.clientX : event.clientX;
+	        document.onmousemove = moveMouse;
+	        return false;
+	    }
+	}
+	document.onmousedown = initDrag;
+	document.onmouseup = new Function("isdrag=false");
+	
+	
+</script>
+</html>

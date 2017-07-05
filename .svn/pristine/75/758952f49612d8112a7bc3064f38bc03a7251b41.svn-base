@@ -1,0 +1,96 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="oid" value="${param.oid }"/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">运单信息详情
+			<a href="#" id="a_back_tran_route_list_link" class="button">返回列表</a>
+			
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">运单信息详情</div>
+			<div class="content_text">
+			
+				<div class="tab-content" id="tab2">
+		          <form action="#" method="post">
+		            <fieldset>
+		            	<p>
+			              <label style="display: inline;">运单号：</label>
+			              <label style="display: inline;" id="u_d_id">${param.oid }</label><br/>
+			              
+			              <label style="display: inline;">运单类型：</label>
+			              <label style="display: inline;" id="u_ordertype">&nbsp;</label><br/>
+			              <label style="display: inline;">包裹号：</label>
+			              <label style="display: inline;" id="u_transitNo">&nbsp;</label><br/>
+			              <label style="display: inline;">运单号：</label>
+			              <label style="display: inline;" id="u_orderId">&nbsp;</label><br/>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">发件人信息：</label>
+			              <label style="display: inline;" id="from_user_info">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">收件人信息：</label>
+			              <label style="display: inline;" id="to_user_info">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">包裹商品信息：</label>
+			              <label style="display: inline;" id="commodify_info">&nbsp;</label><br/>
+			              <label style="display: inline;">品牌：</label>
+			              <label style="display: inline;" id="commodify_brands">&nbsp;</label>
+			            </p>
+			           
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">费用信息：</label>
+			              <label style="display: inline;" id="money_info">&nbsp;</label>
+			            </p>
+			            
+			             <hr/>
+		            	
+		            	<p >
+			              <label style="display: inline;">其它信息：</label>
+			              <label style="display: inline;" id="otherall_info">&nbsp;</label>
+			            </p>
+			            
+			             <hr/>
+		            	
+		            	<p >
+			              <label style="display: inline;">备注信息：</label>
+			              <label style="display: inline;" id="remark_info">&nbsp;</label>
+			            </p>
+			            
+			            <hr/>
+		            	<p>
+			              <label style="display: inline;">路由信息：</label>
+			              <label style="display: inline;" id="route_info">&nbsp;</label>
+			            </p>
+			            <hr/>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+	</div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		nav516_Data();
+	});
+	
+	
+	
+</script>
+</html>

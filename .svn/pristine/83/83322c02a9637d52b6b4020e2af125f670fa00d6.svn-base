@@ -1,0 +1,6348 @@
+﻿
+var usa_to_rmb_rate_bgyb=0;
+var jw_commodity_rate=0;
+var lowest_weight_value=0;
+var price_carry_flag=0;
+var tran_price_table;
+var mux_tran_box_rate=0;
+var tran_price_carry_flag=0;//默认转运计算方法
+var premium_max_value=0;//保险的最大赔偿的额度
+
+//获取转运价格表
+function get_tranpricetable() {
+	$.ajax({
+		type : "post",
+		url : "../tranprice/get_all",
+		success : function(response) {
+			var code = response.code;
+
+			if ("200" == code) {
+
+				if (response.data != null) {
+					tran_price_table=response.data;
+				} else {
+
+				}
+			} else {
+
+			}
+			
+		}
+	});
+}
+
+function getglobalargs_commrate() {
+	var flags = "jw_commodity_rate,lowest_weight_value_flag,price_carry_flag,mux_tran_box_rate,tran_price_carry_flag,premium_max_value";//获取商品进位值
+	$.ajax({
+		type : "post",
+		url : user_globalargs_getcontents_url,
+		data : {
+			"flags" : flags
+		},
+		success : function(response) {
+			var code = response.code;
+
+			if ("200" == code) {
+
+				if (response.data != null) {
+					jw_commodity_rate=response.data[0];	//商品的进位价格
+					lowest_weight_value=response.data[1];//商品的最小重量
+					price_carry_flag=response.data[2];//商品的进位类型
+					mux_tran_box_rate=response.data[3];//转运包裹的分合箱手续费用
+					tran_price_carry_flag=response.data[4];//转运的计算价格方法
+					premium_max_value=response.data[5];//保险的最大额度
+					//alert(jw_commodity_rate);
+				} else {
+
+				}
+			} else {
+
+			}
+			
+		}
+	});
+}
+function getglobalargs_cur_usa_cn() {
+	var flags = "cur_usa_cn";//获取当前人民币汇率
+	$.ajax({
+		type : "post",
+		url : "../user/globalargs/getcontents",
+		data : {
+			"flags" : flags
+		},
+		success : function(response) {
+			var code = response.code;
+
+			if ("200" == code) {
+
+				if (response.data != null) {
+					usa_to_rmb_rate_bgyb=response.data[0];	
+					
+					//alert(jw_commodity_rate);
+				} else {
+
+				}
+			} else {
+
+			}
+			
+		}
+	});
+}
+
+//kai 20150106 转运的新算法
+function userModifyCalcFreight_dhyb() {
+	// var type = $(":hidden[name='type']").val();
+	// var maxPrice=0.00;
+	var userType = $(":hidden[name='userType']").val();
+	//alert(userType);
+	var moneyType = "price";
+	if (userType == "0") {
+		moneyType = "price";
+		//kai 20151123 普通会员按门市价钱来算
+		//moneyType = "price";
+		moneyType = "msPrice";
+	} else if (userType == "1") {
+		//moneyType = "msPrice";
+		moneyType = "price";//门市会员也按普通会员计算
+	} else if (userType == "2") {
+		moneyType = "vipOnePrice";
+	} else if (userType == "3") {
+		moneyType = "vipTwoPrice";
+	} else if (userType == "4") {
+		moneyType = "vipThreePrice";
+	} else {
+		moneyType = "price";
+	}
+	var commodityPrice = 0.00;
+	var commodityweighttotal = 0.00;
+	var commodityjwweighttotal=0.00;
+	var additiveweight=0.00;//附加重量
+	var lowestprice=0.00;
+	var highestprice=0.00;
+	var or=0.00;
+	var or_self=0.00;
+	var or_CommodityCost=0.00;
+	
+	var checkbox = document.getElementsByName("commdity_nums"); // id表示你的checkbox的name属性
+	
+	
+
+	for (var i = 0; i < checkbox.length; i++) {
+		if (checkbox[i].checked == true) {
+			var commoditylist=$(":hidden[name='s_commoditylist']").val();
+			var commodityid=$(checkbox[i]).parent().parent().find("td[name='commodityid']").html();//获取商品id
+			var comprice="0";
+			
+			
+			comprice=$(checkbox[i]).parent().parent().find("td[name='commodityNamePrice']").attr(moneyType);//获取商品id
+			
+			var eachjweight=$(checkbox[i]).parent().parent().find("td[name='eachweight']").html();//获取商品每个重量
+			
+			
+			var jweight=parseFloat(eachjweight);//每个只有一个商品
+			if(jweight=="NaN")
+			{
+				alert("单件数量或重量格式不对，请检查!");
+				return false;
+			}
+			
+			if(lowestprice!=0.00)
+			{
+				if(lowestprice>parseFloat(comprice))
+				{
+					lowestprice=parseFloat(comprice);
+				}
+			}
+			else
+			{
+				lowestprice=parseFloat(comprice);
+			}
+			
+			if(highestprice!=0.00)
+			{
+				if(highestprice<parseFloat(comprice))
+				{
+					highestprice=parseFloat(comprice);
+				}
+			}
+			else
+			{
+				highestprice=parseFloat(comprice);
+			}
+			
+			var sjweight = jweight;//转运只按总量进位，不按单商品进位
+			commodityPrice = commodityPrice
+					+ parseFloat(comprice) * sjweight;
+			// kai 20150912
+			commodityweighttotal = commodityweighttotal
+					+ parseFloat(sjweight);
+			
+			commodityjwweighttotal = commodityjwweighttotal
+			+ parseFloat(jweight);
+			
+			
+//计算转运价格
+			
+			
+			//alert($(":hidden[name='count_emp_store_id']").val());
+			//alert($(":hidden[name='count_tranwarehouseId_id']").val());
+			var s_warehouseid=$(":hidden[name='s_warehouseid']").val();//仓库id
+			var tranWarehouseId=$(checkbox[i]).parent().parent().find("td[name='tranWarehouseId']").html();//获取转运仓库id
+			if((removenull(s_warehouseid)=="")||(removenull(tranWarehouseId)==""))
+			{}
+			else
+			{
+				if(s_warehouseid!=tranWarehouseId)//同一个仓库不计算转运费
+				{
+					
+					$.each(
+							tran_price_table,
+							function() {
+								
+								if(this.warehouseId==s_warehouseid)//会员所属仓库id
+								{
+									if(this.tranwarehouseId==tranWarehouseId)//转运州过来的id
+									{
+										or+=parseFloat(jweight)*parseFloat(this.price);	
+										or_CommodityCost+=parseFloat(jweight)*parseFloat(this.cost);
+									}
+								}
+							});
+				}
+			}
+		}
+	}
+	
+//alert(commodityweighttotal);
+//alert(commodityPrice);
+	$(":hidden[name='t_CommodityCost']").val(or_CommodityCost);
+
+	if((tran_price_carry_flag!="5")||(tran_price_carry_flag!="6")||(tran_price_carry_flag!="7")||(tran_price_carry_flag!="8"))
+	{
+		tran_price_carry_flag=5;
+	}
+	
+	if(commodityweighttotal<parseFloat(lowest_weight_value))
+	{
+		if((tran_price_carry_flag!="0"))
+		{
+			additiveweight=parseFloat(lowest_weight_value)-commodityweighttotal;
+			commodityweighttotal=parseFloat(lowest_weight_value);
+		}
+	}
+	else
+	{
+		//表示商品总重量按照jw_commodity_rate进位，进位重量按价格最高的商品计算。
+		//表示商品总重量按照jw_commodity_rate进位，进位重量按照商品价格最低的来进行计算。
+		if((tran_price_carry_flag=="5")||(tran_price_carry_flag=="6")||(tran_price_carry_flag=="7")||(tran_price_carry_flag=="8"))
+		{
+			var j=parseInt(commodityweighttotal);
+			if((parseFloat(jw_commodity_rate)!="NaN")&&(parseFloat(jw_commodity_rate)>0)&&(parseFloat(jw_commodity_rate)<1))
+			{
+				//alert("1");
+				if((commodityweighttotal-j)>jw_commodity_rate)
+				{
+					additiveweight=j+1-commodityweighttotal;
+					commodityweighttotal=j+1;
+					
+				}
+				else
+				{
+					if((tran_price_carry_flag=="5")||(tran_price_carry_flag=="6"))//退位计算
+					{
+						additiveweight=j-commodityweighttotal;//退位计算
+						commodityweighttotal=j;
+					}
+					else if((tran_price_carry_flag=="7")||(tran_price_carry_flag=="8"))//按实际计算
+					{
+						
+					}
+					else
+					{
+						
+					}
+				}
+			}
+			else
+			{
+				commodityweighttotal=commodityjwweighttotal;
+			}
+			
+		}
+	}
+	
+	//$(":text[name='sum_weight']").val(commodityjwweighttotal.toString());
+	//$(":text[name='weight']").val(commodityweighttotal.toString());
+	
+	var weight = commodityweighttotal.toString();
+	var tariff = 0;
+	var other = 0;
+	//var premium = parseFloat($(":hidden[name='premium']").val());
+	var premium = parseFloat($(":text[name='premium']").val());
+	if (premium == "NaN") {
+		premium = parseFloat($(":hidden[name='premium']").val());
+	}
+	
+	
+	var length = 0;
+	var width = 0;
+	var height = 0;
+	
+	
+	
+	var addtivePrice = parseFloat($(":text[name='additivePrice']").val());
+	if(additiveweight<=-1)
+	{
+		additiveweight=0;
+	}
+	if((tran_price_carry_flag=="1")||(tran_price_carry_flag=="3"))
+	{
+		addtivePrice=addtivePrice+highestprice*additiveweight;
+	}//2：表示单个商品进位计算，即如果超过jw_commodity_rate设置的值，进位到整数，如果小于将退位到整数。如果低于lowest_weight_value_flag，多的按最低价计算。
+	else if((tran_price_carry_flag=="2")||(tran_price_carry_flag=="4"))
+	{
+		addtivePrice=addtivePrice+lowestprice*additiveweight;
+	}
+	else if((tran_price_carry_flag=="5")||(tran_price_carry_flag=="7"))
+	{
+		addtivePrice=addtivePrice+highestprice*additiveweight;
+	}
+	else if((tran_price_carry_flag=="6")||(tran_price_carry_flag=="8"))
+	{
+		addtivePrice=addtivePrice+lowestprice*additiveweight;
+	}
+	
+	
+	//var checkbox =document.getElementsByName("divideboxmoney");	
+	var muxtranboxrate=0.00;
+	/*if(checkbox[0].checked==true)
+	{
+		if(removenull(mux_tran_box_rate)!="")
+		{
+			muxtranboxrate=parseFloat(mux_tran_box_rate);
+			$(":hidden[name='t_divide_money']").val(muxtranboxrate);
+			if(isNaN(muxtranboxrate))
+			{
+				alert("自提手续费设置出错，请检查全局变量mux_tran_box_rate!");
+			}
+		}
+	}
+	else
+	{
+		$(":hidden[name='t_divide_money']").val("0");
+	}
+	*/
+		
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	$(":text[name='moneyor']").val(or);
+	
+	
+	
+	var totalMoney = commodityPrice + tariff +muxtranboxrate+ other+addtivePrice+or+ premium + length * width
+			* height / 166;
+	// kai 20150912
+	
+	var f_x = parseFloat(totalMoney);
+	if (isNaN(commodityPrice)) {
+		alert('商品类型中的重量填写错误！');
+		return false;
+	}
+	if (isNaN(weight)) {
+		alert('重量输入错误！');
+		return false;
+	}
+
+	if (isNaN(length * width * height / 166)) {
+		alert('长宽高输入错误！');
+		return false;
+	}
+	if (isNaN(f_x)) {
+		alert('计算总价钱错误，可能是参数填写错误！');
+		return false;
+	}
+	var f_x = Math.round(totalMoney * 100) / 100;
+
+	var s_x = f_x.toString();
+	var pos_decimal = s_x.indexOf('.');
+	if (pos_decimal < 0) {
+		pos_decimal = s_x.length;
+		s_x += '.';
+	}
+	while (s_x.length <= pos_decimal + 2) {
+		s_x += '0';
+	}
+	$(":text[name='totalmoney']").val(s_x);
+}
+
+function choosesenduser()
+{
+    if($("#senduserlist").val()!="-1")
+    {
+    	var name=$("#senduserlist").find("option:selected").attr("name");
+    	var phone=$("#senduserlist").find("option:selected").attr("phone");
+    	if(removenull(name)!="")
+    	{
+    		$(":text[name='sendname']").val(name);	
+    	}
+    	if(removenull(phone)!="")
+    	{
+    		$(":text[name='sendphone']").val(phone);	
+    	}
+    }
+}
+function showonlinesenduser()
+{
+	
+	$.ajax({
+		type:"post",
+		url:"../user/get_sendusers",
+		success:function(response) {
+			var code = response.code;
+			
+			if (code == "200") {
+				var data = response.data;
+				if(data!=null)
+				{
+					var str="<option value='1'>选择历史发件人</option>";
+					$.each(
+							data,
+							function() {
+								str+="<option value='"+this.id+"' name='"+this.name+"' phone='"+this.phone+"'>"+this.name+"-"+this.phone+"</option>";
+							});
+					$("#senduserlist").html(str);
+				}
+				
+			
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+	
+}
+function loadNav12Data() {	// loadCaddress1();
+	//alert("55454");
+	
+	
+	// 获取用户数据,判断用户是否能够在线车置单
+	
+	
+	
+	$.ajax({
+		type:"get",
+		url:user_get_self_url,
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				var data = response.data;
+				
+				if((data.realName=="")||(data.realName=="null")||(data.realName==null)||(data.realName=="undefined"))
+				{
+					alert("请先填写完整的个人资料，才能够进行在线置单!(至少包含联系电话和姓名)");
+					nav73Click();
+					return false;
+				}
+				if((data.phone=="")||(data.phone=="null")||(data.phone==null)||(data.phone=="undefined"))
+				{
+					alert("请先填写完整的个人资料，才能够进行在线置单!(至少包含联系电话和姓名)");
+					nav73Click();
+					return false;
+				}
+				
+				
+				$(":text[name='sendname']").val(data.realName);
+				$(":text[name='sendphone']").val(data.phone);
+			
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+	
+	
+	showonlinesenduser();
+	//loadshouhuodizhiinfo_wsjd("1");
+	loadshouhuodizhiinfo_wsjd_key("",1);
+	// 点击跳转事件，用于置单地址工体东路8号康堡花园A2-402	
+	$("#cdatatable tfoot a").click(function() {
+		// 跳页
+		var pn = $(this).attr("href");
+		//loadshouhuodizhiinfo_wsjd(pn);
+		loaddhybinfo_onlineorder_wsjd(-10, pn);
+		return false;
+	});
+
+	$("#cdatatable tfoot input").keydown(function(event) {
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				//loadshouhuodizhiinfo_wsjd(pn);
+				loaddhybinfo_onlineorder_wsjd(-10, pn);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});
+
+	// 设置点击跳转链接的事件，用于历史置单
+	$("#wsjl_history tfoot a[name='to_page']").click(function() {
+		// 跳页
+		// alert("333333");
+		var pn = $(this).attr("href");
+
+		//loaddhybinfo_onlineorder_wsjd(-1, pn);
+		loaddhybinfo_onlineorder_wsjd(-10, pn);
+		return false;
+	});
+	$("#wsjl_history tfoot input").keydown(function(event) {
+
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				//loaddhybinfo_onlineorder_wsjd(-1, pn);
+				loaddhybinfo_onlineorder_wsjd(-10, pn);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});
+
+	
+	//说罢当前状态为修改状态
+	
+	$("a[name='mulitsub']").attr("style","background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline");//设置提交状态为灰色
+	$("a[name='mulitsub']").attr("state","yes");//设置状态为no
+	$("a[name='modifyenable']").attr("style","display:none;");//不显示设置的单号
+	
+	$("a[name='mulitsubmodify']").attr("style","background: #6C7175;color: #FFFFFF;padding: 5px 15px;display:inline");//设置提交状态为亮色
+	$("a[name='mulitsubmodify']").attr("state","no");//设置状态为no
+	$("a[name='mulitsubcancel']").attr("style","background: #6C7175;color: #FFFFFF;padding: 5px 15px;display:inline");//设置提交状态为亮色
+	$("a[name='mulitsubcancel']").attr("state","no");//设置状态为no
+	
+	loadconinfo_wsjd();
+	// alert("222226");
+	//loadCommoditySelectOption1();// 原来的函数可能冲突了，我在这里改了一个名就可以 了
+//kai 20150911 modify
+	loaddhybinfo_onlineorder_wsjd(-10, 1);// 装载网上置单历史记录
+	// alert("7777");
+	$("a[name='a_delete_commodify_info']").click(function() {
+		if ($("a[name='a_delete_commodify_info']").length > 1)
+			$(this).parent().parent().remove();
+		return false;
+	});
+	//alert("545");
+	
+	
+	//获取汇率等全局变量
+	var flags="cur_usa_cn,premium_rate,premium_max_value";//汇率,保险率
+	 $.ajax({
+			type : "post",
+			url : user_globalargs_getcontents_url,
+			data : {
+				"flags" : flags
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+
+					if (response.data != null) {
+						
+						//alert(response.data);
+							if((response.data[0]=="")||(response.data[0]=="null")||(response.data[0]=="undefined")||(response.data[0]==null))
+							{							
+								//alert("汇率获取失败");
+								
+							}
+							else
+							{
+								
+								$("#usa_rmb_rate").html(response.data[0]);
+								$(":hidden[name='s_usa_rmb_rate']").val(response.data[0]);
+							}
+							
+							if((response.data[1]=="")||(response.data[1]=="null")||(response.data[1]=="undefined")||(response.data[1]==null))
+							{							
+								//alert("汇率获取失败");
+								$(":hidden[name='premiumratevalue']").val("0");
+							}
+							else
+							{
+								
+								$(":hidden[name='premiumratevalue']").val(response.data[1]);
+							}
+							
+							premium_max_value=response.data[2];//保险的最大额度
+						
+					} else {
+
+					}
+				}  else {
+
+				}
+				
+			}
+		});
+	
+	
+	$(":text[name='premium']").change(countpremiummoney_user);
+	$("a[name='addCommodity']")
+			.click(
+					function() {
+
+						var commodity = $("select[name='commodityName']")
+								.html();
+						var str = '<tr><td>商品类别：<select name="commodityName" style="width:100px">';
+						str += commodity;
+						str += '</select>';
+						
+						
+						
+						str += '&nbsp;品牌：<input type="text" name="commodifybrands" placeholder="填写英文品牌"style="width:120px" />';
+						str += '&nbsp;包裹详情：<input type="text" name="commodifyxiangqing" placeholder="填写中文描述"style="width:120px" />';
+						str += '&nbsp;商品数量：<input type="text" name="commodifyQuantity" style="width:100px" maxlength="5"/>';
+						str += '<a href="#" name="a_delete_commodify_info">删除</a>';
+						str += '</td></tr>';
+
+						$("#ttable tbody").append(str);
+
+						$("a[name='a_delete_commodify_info']")
+								.click(
+										function() {
+											if ($("a[name='a_delete_commodify_info']").length > 1)
+												$(this).parent().parent()
+														.remove();
+											return false;
+										});
+						return false;
+					});
+	}
+
+
+
+//用于网上置单的地址添加 
+function loadshouhuodizhiinfo_wsjd(pn) {
+	// alert("4444444");
+	$.ajax({
+		type : "get",
+		url : consignee_search_url,
+		data : {
+			"pageIndex" : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			// alert(response);
+			if (code == "200") {
+				if (response.data != null) {
+					showsjrdzlist_wsjd(response.data.datas);
+					showpagesplit_wsjd(response.data);
+				} else {
+					showsjrdzlist_wsjd(null);
+					showpagesplit_wsjd(null);
+				}
+				 aftershow_wsjd();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+	
+	
+	
+	
+	function aftershow_wsjd() {
+		
+		
+		//alert("45000");
+		// 设置点击跳转的事件
+		$("#cdatatable tfoot a").click(function() {
+			// 跳页
+			var pn = $(this).attr("href");
+			loadshouhuodizhiinfo_wsjd(pn);
+			return false;
+		});
+
+		$("#cdatatable tfoot input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					loadshouhuodizhiinfo_wsjd(pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+		
+		
+	
+	}
+}
+//搜索用户地址薄信息
+function searchrevaddress()
+{
+	//alert("233232");
+	var key=$(":text[name='search_rev_person']").val();
+	
+	//alert(key);
+	loadshouhuodizhiinfo_wsjd_key(key,1);
+}
+//用于网上置单的地址添加 
+function loadshouhuodizhiinfo_wsjd_key(key,pn) {
+	// alert("4444444");
+	key=removenull(key);
+	key = encodeURI(key);
+	$(":hidden[name='key']").val(key);
+	$.ajax({
+		type : "get",
+		url : "../consignee/searchbyinfo",
+		data : {
+			"key":key,
+			"pageIndex" : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			// alert(response);
+			
+			if (code == "200") {
+				if (response.data != null) {
+					showsjrdzlist_wsjd(response.data.datas);
+					showpagesplit_wsjd(response.data);
+				} else {
+					showsjrdzlist_wsjd(null);
+					showpagesplit_wsjd(null);
+				}
+				aftershow_wsjd_key();
+				
+				
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+	
+	
+	
+	
+	function aftershow_wsjd_key() {
+		
+		
+		//alert("45000");
+		// 设置点击跳转的事件
+		$("#cdatatable tfoot a").click(function() {
+			// 跳页
+			var pn = $(this).attr("href");
+			var key=$(":hidden[name='key']").val();
+			loadshouhuodizhiinfo_wsjd_key(key,pn);
+			return false;
+		});
+
+		$("#cdatatable tfoot input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				var key=$(":hidden[name='key']").val();
+				if (/^\d*$/.test(pn)) {
+					//loadshouhuodizhiinfo_wsjd(pn);
+					loadshouhuodizhiinfo_wsjd_key(key,pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+		
+		
+	
+	}
+}
+
+//kai 20150921 modify
+function showsjrdzlist_wsjd(list) {
+	// $("#sjdztable tbody").html("");
+
+	$("#cdatatable tbody").html("");
+	var str22 = '<tr style="display:none"><td><input type="radio" name="cid" value="-1"/></td></tr>';
+	$("#cdatatable tbody :radio").first().attr("checked", true);
+	$("#cdatatable tbody").append(str22);
+	var flag = 0;
+
+	if (list != null && list.length > 0) {
+		/*
+		 * $.each(list,function() { var str = "<tr>"; str += "<td>" +
+		 * this.id + "</td>"; str += "<td><a href='" + this.id + "'
+		 * name='a_detail_link'>"+ this.name + "</a></td>"; str += "<td>" +
+		 * this.phone + "</td>"; str += "<td>" + this.province + "/" +
+		 * this.city+ "/" + this.district + "</td>"; str += "<td>" +
+		 * this.streetAddress + "</td>"; str += "<td>" + this.cardId + "</td>";
+		 * if (this.cardUrl == null || this.cardUrl == '') { str += "<td>无</td>"; }
+		 * else { var url = this.cardUrl; url = baseUrl+url; str += "<td><a
+		 * href='" + url + "' target='_blank'><img width='30px' height='30px'
+		 * src='" + url + "'/></a></td>"; } str += "<td><a href='" +
+		 * this.id + "' name='a_modify_sjdz_link'>修改</a>|<a href='" + this.id + "'
+		 * name='a_del_sjdz_link'>删除</a></td></tr>"; $("#cdatatable
+		 * tbody").append(str); });
+		 */
+
+		// $.each(response.data, function(){
+		$
+				.each(
+						list,
+						function() {
+							var str = "<tr>";
+							str += '<td align="center"><input type="radio" name="cid" value="'
+									+ this.id + '"/></td>';
+							str += '<td name="conName">' + this.name + '</td>';
+							str += '<td name="conPhone">' + this.phone
+									+ '</td>';
+
+							str += '<td  colspan="4">' + this.province
+									+ '&nbsp;' + this.city + '&nbsp;'
+									+ this.district + '&nbsp;'
+									+ this.streetAddress + '</td>';
+							str += '<td name="conProvince" style="display:none">'
+									+ this.province + '</td>';
+							str += '<td name="conCity" style="display:none">'
+									+ this.city + '</td>';
+							str += '<td name="conDistrict" style="display:none">'
+									+ this.district + '</td>';
+							str += '<td name="conStreetAddress" style="display:none">'
+									+ this.streetAddress + '</td>';
+							str += '<td name="conZipCode" style="display:none">'
+									+ this.zipCode + '</td>';
+							str += '<td name="conCardUrl" style="display:none">'
+									+ this.cardUrl + '</td>';
+							str += '<td name="conCardUrlother" style="display:none">'
+								+ this.cardurlother + '</td>';
+							str += '<td name="conCardUrltogether" style="display:none">'
+								+ this.cardurltogether + '</td>';
+							str += '<td name="conCardId">' + this.cardId
+									+ '</td>';
+							if (this.cardUrl == null || this.cardUrl == '') {
+								str += "<td align='center'>无</td>";
+							} else {
+								var url = this.cardUrl;
+								url = baseUrl + url;
+								str += "<td align='center'><a href='"
+										+ url
+										+ "'  target='_blank'><img width='30px' height='30px' src='"
+										+ url + "'/></a></td>";
+							}
+
+							
+							if (this.cardurlother == null || this.cardurlother == '') {
+								str += "<td align='center'>无</td>";
+							} else {
+								var url = this.cardurlother;
+								url = baseUrl + url;
+								str += "<td align='center'><a href='"
+										+ url
+										+ "'  target='_blank'><img width='30px' height='30px' src='"
+										+ url + "'/></a></td>";
+							}
+							
+							if (this.cardurltogether == null || this.cardurltogether == '') {
+								str += "<td align='center'>无</td>";
+							} else {
+								var url = this.cardurltogether;
+								url = baseUrl + url;
+								str += "<td align='center'><a href='"
+										+ url
+										+ "'  target='_blank'><img width='30px' height='30px' src='"
+										+ url + "'/></a></td>";
+							}
+							
+							str += '</tr>';
+							$("#cdatatable tbody").append(str);
+							if (flag == 0)// 列出第一个
+							{
+								/*
+								 * $(":text[name='cName']").val(this.name);
+								 * $(":text[name='cPhone']").val(this.phone);
+								 * $(":text[name='cCardID']").val(this.cardId);
+								 * $(":text[name='cProvince']").val(this.province);
+								 * $(":text[name='cCity']").val(this.city);
+								 * $(":text[name='cDistrict']").val(this.district);
+								 * $(":text[name='cStreetAddress']").val(this.streetAddress);
+								 * $(":text[name='cZipCode']").val(this.zipCode);
+								 * $(":text[name='idurlcard']").val(this.cardUrl);
+								 */
+							}
+
+							flag = flag + 1;
+						});
+		$(":radio[name='cid']").click(
+				function() {
+					// alert($(this).parent().parent().find("a[name='conName']").html());
+					$(":text[name='cName']").val(
+							$(this).parent().parent()
+									.find("td[name='conName']").html());
+					$(":text[name='cProvince']").val(
+							$(this).parent().parent().find(
+									"td[name='conProvince']").html());
+					$(":text[name='cCity']").val(
+							$(this).parent().parent()
+									.find("td[name='conCity']").html());
+					$(":text[name='cDistrict']").val(
+							$(this).parent().parent().find(
+									"td[name='conDistrict']").html());
+					$(":text[name='cStreetAddress']").val(
+							$(this).parent().parent().find(
+									"td[name='conStreetAddress']").html());
+					$(":text[name='cZipCode']").val(
+							$(this).parent().parent().find(
+									"td[name='conZipCode']").html());
+					$(":text[name='cPhone']").val(
+							$(this).parent().parent().find(
+									"td[name='conPhone']").html());
+					$(":text[name='cardidname']").val(
+							$(this).parent().parent().find(
+									"td[name='conCardId']").html());
+
+					$(":text[name='idurlcard']").val(
+							$(this).parent().parent().find(
+									"td[name='conCardUrl']").html());
+					var cardurl1 = $(this).parent().parent().find(
+							"td[name='conCardUrl']").html();
+					// $(":file[name='file']").val(
+					// $(this).parent().parent()
+					// .find("td[name='conCardUrl']").html());
+					if ((cardurl1 != "") && (cardurl1 != "null") && (cardurl1 != "无"))// 地址中包含有身份证图片，显示出来
+					{
+						// alert(cardurl1);
+						$("#showcardpicid").attr("style", "display:block;");
+						$(":text[name='idurlcard']").val(cardurl1);
+						cardurl1 = getRootPath() + cardurl1;
+						$("#imacardurlid").attr("href", cardurl1);
+						$("#imacardurlid img").attr("src", cardurl1);
+						
+
+					} else {
+						$("#showcardpicid").attr("style", "display:none");
+
+						$(":text[name='idurlcard']").val("");// 已经重新上传，清空原有的图片
+					}
+
+					$(":file[name='file']").val("");// 清空原来选择过上传的图片
+					
+					
+					 cardurl1 = $(this).parent().parent().find(
+						"td[name='conCardUrlother']").html();
+					if ((cardurl1 != "") && (cardurl1 != "null") && (cardurl1 != "无"))// 地址中包含有身份证图片，显示出来
+					{
+						// alert(cardurl1);
+						$("#showcardpicidother").attr("style", "display:block;");
+						$(":text[name='idurlcardother']").val(cardurl1);
+						cardurl1 = getRootPath() + cardurl1;
+						$("#imacardurlidother").attr("href", cardurl1);
+						$("#imacardurlidother img").attr("src", cardurl1);
+						
+
+					} else {
+						$("#showcardpicidother").attr("style", "display:none");
+
+						$(":text[name='idurlcardother']").val("");// 已经重新上传，清空原有的图片
+					}
+
+					$(":file[name='fileother']").val("");// 清空原来选择过上传的图片
+					
+					
+					//提取合成图
+					cardurl1 = $(this).parent().parent().find(
+					"td[name='conCardUrltogether']").html();
+					if ((cardurl1 != "") && (cardurl1 != "null") && (cardurl1 != "无"))// 地址中包含有身份证图片，显示出来
+					{
+	
+						$(":text[name='idurlcardtogether']").val(cardurl1);
+
+					} else {
+
+						$(":text[name='idurlcardtogether']").val("");// 已经重新上传，清空原有的图片
+					}
+
+				});
+		// 当上传图片时，用于实时隐藏原地址薄中的图片
+		$("#cardpicid").on("change", function() {
+			//alert("555");
+			var picValue = $(":file[name='file']").val();
+			//alert(picValue);
+			if ((picValue != null) && ("" != picValue)) {// 包含图片,要单独处理
+				$("#showcardpicid").attr("style", "display:none");
+
+				//$(":text[name='idurlcard']").val("");// 已经重新上传，清空原有的图片
+
+			}
+			else
+			{
+				var url2=$(":text[name='idurlcard']").val();
+				
+				//alert(url2);
+				if((url2!=null)&&(url2!="")&&(url2!="null"))
+				{
+					$("#showcardpicid").attr("style", "display:block;");
+					var cardurl1 = getRootPath() + url2;
+					
+					$("#imacardurlid").attr("href", cardurl1);
+					$("#imacardurlid img").attr("src", cardurl1);
+					
+				}
+			}
+			// $("#imacardurlid").attr("href",$("#cardpicid").val());
+			// $("#imacardurlid img").attr("src",$("#cardpicid").val());
+		});
+		
+		// 当上传图片时，用于实时隐藏原地址薄中的图片
+		$("#cardpicidother").on("change", function() {
+			//alert(666);
+			var picValue = $(":file[name='fileother']").val();
+			if ((picValue != null) && ("" != picValue)) {// 包含图片,要单独处理
+				$("#showcardpicidother").attr("style", "display:none");
+
+			//	$(":text[name='idurlcardother']").val("");// 已经重新上传，清空原有的图片
+
+			}
+			else
+			{
+				var url2=$(":text[name='idurlcardother']").val();
+				if((url2!=null)&&(url2!="")&&(url2!="null"))
+				{
+					$("#showcardpicidother").attr("style", "display:block;");
+					var cardurl1 = getRootPath() + url2;
+					$("#imacardurlidother").attr("href", cardurl1);
+					$("#imacardurlidother img").attr("src", cardurl1);
+					
+				}
+			}
+			// $("#imacardurlid").attr("href",$("#cardpicid").val());
+			// $("#imacardurlid img").attr("src",$("#cardpicid").val());
+		});
+
+	}
+}
+
+function showpagesplit_wsjd(pageSplit) {
+	var rowCount = 0;
+	var pageSize = 0;
+	var pageNow = 0;
+	var pageCount = 0;
+	if (pageSplit != null) {
+		rowCount = pageSplit.rowCount;
+		pageSize = pageSplit.pageSize;
+		pageNow = pageSplit.pageNow;
+		pageCount = pageSplit.pageCount;
+	}
+	$("#trsize").html(rowCount);
+	$("#tpsize").html(pageCount);
+	$("#first_page").attr("href", "1");
+	$("#pre_page").attr("href", pageNow - 1);
+	$("#next_page").attr("href", pageNow + 1);
+	$("#last_page").attr("href", pageCount);
+}
+// 用于显示网上置单历史记录的分页
+function showpagesplit_wsjd1(pageSplit) {
+	var rowCount = 0;
+	var pageSize = 0;
+	var pageNow = 0;
+	var pageCount = 0;
+	if (pageSplit != null) {
+		rowCount = pageSplit.rowCount;
+		pageSize = pageSplit.pageSize;
+		pageNow = pageSplit.pageNow;
+		pageCount = pageSplit.pageCount;
+	}
+	$("#trsize1").html(rowCount);
+	$("#tpsize1").html(pageCount);
+	$("#first_page1").attr("href", "1");
+	$("#pre_page1").attr("href", pageNow - 1);
+	$("#next_page1").attr("href", pageNow + 1);
+	$("#last_page1").attr("href", pageCount);
+}
+// 查询在线置单的历史记录
+function loaddhybinfo_onlineorder_wsjd(state, pn) {
+	// $(":hidden[name='oid']").val(oid);
+	$.ajax({
+		type : "get",
+		url : "../order/searchstate",
+		data : {
+			"state" : state,
+			"pageIndex" : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+
+				if (response.data != null) {
+					showdhyblist_wsjd(response.data.datas);
+					showpagesplit_wsjd1(response.data);
+				} else {
+					showdhyblist_wsjd(null);
+					showpagesplit_wsjd1(null);
+				}
+				afterShow();
+			} else if ("607" == code) {
+				window.location.href = "login.jsp";
+			} else {
+				// 失败
+				alert("获取运单记录信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+function showdhyblist_wsjd(list) {
+
+	$("#wsjl_history tbody").html("");
+	if (list != null && list.length > 0) {
+		$
+				.each(
+						list,
+						function() {
+							var str = "<tr id='" + this.orderId + "'>";
+
+							str += "<td name='conorderId'><a href='#' name='a_order_datail_link'>"
+									+ this.orderId + "</a></td>";
+
+							str += "<td name='sendname1' style='display:none'>" + this.senduserName + "</td>";
+							str += "<td name='sendphone1' style='display:none'>" + this.senduserphone + "</td>";
+							str += "<td name='conName'>" + this.cName + "</td>";
+							str += "<td name='tariff' style='display:none'>" + this.tariff + "</td>";
+							str += "<td name='weight' style='display:none'>" + this.weight + "</td>";
+							str += "<td name='premium' style='display:none'>" + this.premium + "</td>";
+							str += "<td name='conPhone'>" + this.cPhone
+									+ "</td>";
+
+							var pm = "";
+							var pm1 = "";
+							$.each(this.details, function() {
+								pm += this.ctype + ":" + this.quantity + ";";
+								pm1 += this.commodityId + ":::" + this.quantity
+										+ ":::" + this.xiangqing 
+										+ ":::" + this.brands + ";;;";
+								// 设置保存商品信息
+								/*
+								 * str += '<td name="conCommctype" style="display:none">' +
+								 * this.ctype+ '</td>'; str += '<td name="conCommQuantity" style="display:none">' +
+								 * this.quantity+ '</td>'; str += '<td name="conCommxiangqing" style="display:none">' +
+								 * this.xiangqing+ '</td>';
+								 */
+							});
+							str += "<td colspan='2'>" + pm + "</td>";
+							str += "<td name='conCommoditys' colspan='2' style='display:none'>"
+									+ pm1 + "</td>";
+
+							str += '<td  colspan="4">' + this.cProvince
+									+ '&nbsp;' + this.cCity + '&nbsp;'
+									+ this.cDistrict + '&nbsp;'
+									+ this.cStreetAddress + '</td>';
+
+							str += '<td name="conProvince" style="display:none">'
+									+ this.cProvince + '</td>';
+							str += '<td name="conCity" style="display:none">'
+									+ this.cCity + '</td>';
+							str += '<td name="conDistrict" style="display:none">'
+									+ this.cDistrict + '</td>';
+							str += '<td name="conStreetAddress" style="display:none">'
+									+ this.cStreetAddress + '</td>';
+							str += '<td name="conZipCode" style="display:none">'
+									+ this.cZipCode + '</td>';
+							str += '<td name="conCardId" style="display:none">'
+									+ this.cardid + '</td>';
+							str += '<td name="conCardUrl" style="display:none">'
+									+ this.cardurl + '</td>';
+
+							str += '<td name="conCardUrlother" style="display:none">'
+								+ this.cardurlother + '</td>';
+							str += '<td name="conCardUrltogether" style="display:none">'
+								+ this.cardurltogether + '</td>';
+							
+							str += '<td name="conmail" style="display:none">'
+								+ this.mail + '</td>';
+							
+							str += '<td name="conparceValue" style="display:none">'
+								+ this.parceValue + '</td>';
+	
+							str += '<td name="conwid" style="display:none">'
+								+ this.warehouseId + '</td>';
+							str += '<td name="concid" style="display:none">'
+								+ this.channelId + '</td>';
+							
+							str += '<td name="conremark" style="display:none">'
+								+ this.remark + '</td>';
+							
+							
+							str += "<td>" + this.createDate + "</td>";
+
+							str += "<td><a href='#' name='a_modify_link_wsjd'>修改</a>/<a href='#' name='a_del_link_wsjd'>删除</a>/<a href="+this.orderId+" name='a_pring_link_wsjd'>打印</a></td></tr>";
+
+							/*
+							 * if(this.totalMoney==null){ str += "<td>" +
+							 * "&nbsp";+ "</td>"; }else{ str += "<td>" +
+							 * this.totalMoney + "</td>"; } str += "<td>" +
+							 * this.stateStr + "</td>";
+							 * 
+							 * if (this.state == "1") { str += "<td><input
+							 * type='checkbox' name='cb_submit' value='" +
+							 * this.orderId + "' /></td></tr>"; }else
+							 * if(this.state=="-1"){ str += "<td><a href='#'
+							 * name='a_del_link'>删除</a></td></tr>"; }else {
+							 * str += "<td><input type='checkbox'
+							 * name='xiangqing_submit' value='" + this.orderId + "' /></td></tr>"; }
+							 */
+							$("#wsjl_history tbody").append(str);
+						});
+
+	}
+	//alert("asdfdsaf");
+	//kai 20151104 添加置单打印
+	$("a[name='a_pring_link_wsjd']").click(function() {
+//alert("asdfsdff");
+		var id = $(this).parent().parent().attr("id");
+		var orderId = id;
+		
+
+		var url = user_print_page_url  + "?id=" + id + "&orderId=" + orderId;
+		//alert(getRootPath() + url);
+		//Window.open (getRootPath()+url);
+		$("#my_print_div").load(url);
+		return false;
+		
+		/*	var oid = $(this).parent().parent().attr("id");
+		// alert(oid);		
+			$.ajax({
+				type : "post",
+				url : "../order/userprint",
+				data : $.param({
+					"oid" : oid,
+				}, true),
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("打印成功成功");
+
+						// window.location.href = "lishiyundan.jsp";
+						loadNav12Data();
+					} else if ("607" == code) {
+						window.location.href = "login.jsp";
+					} else {
+						// 失败
+						alert("打印信息失败，原因是:" + response.message);
+					}
+				}
+			});*/
+		
+		//return false;
+	});
+	
+	
+	// 添加修改和删除连接的操作
+	$("a[name='a_del_link_wsjd']").click(function() {
+
+		var oid = $(this).parent().parent().attr("id");
+		// alert(oid);
+		if (confirm("您是否确认要删除此运单记录?")) {
+			$.ajax({
+				type : "post",
+				url : "../order/delete",
+				data : $.param({
+					"oid" : oid,
+				}, true),
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("删除成功");
+
+						// window.location.href = "lishiyundan.jsp";
+						loadNav12Data();
+					} else if ("607" == code) {
+						window.location.href = "login.jsp";
+					} else {
+						// 失败
+						alert("删除信息失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	});
+	// 在线置单时，点击修改历史记录进行的操作0903
+	$("a[name='a_modify_link_wsjd']")
+			.click(
+					function() {
+
+						var oid = $(this).parent().parent().attr("id");
+						// alert(oid);
+						// alert($(this).parent().parent().find("a[name='conName']").html());
+						$(":text[name='sendname']").val(
+								$(this).parent().parent().find(
+										"td[name='sendname1']").html());
+						$(":text[name='sendphone']").val(
+								$(this).parent().parent().find(
+										"td[name='sendphone1']").html());
+						
+						$(":text[name='weight']").val(
+								$(this).parent().parent().find(
+										"td[name='weight']").html());
+						$(":text[name='tariff']").val(
+								$(this).parent().parent().find(
+										"td[name='tariff']").html());
+						$(":text[name='premium']").val(
+								$(this).parent().parent().find(
+										"td[name='premium']").html());
+						countpremiummoney_user();
+						
+						$(":text[name='cName']").val(
+								$(this).parent().parent().find(
+										"td[name='conName']").html());
+						$(":text[name='cProvince']").val(
+								$(this).parent().parent().find(
+										"td[name='conProvince']").html());
+						$(":text[name='cCity']").val(
+								$(this).parent().parent().find(
+										"td[name='conCity']").html());
+						$(":text[name='cDistrict']").val(
+								$(this).parent().parent().find(
+										"td[name='conDistrict']").html());
+						$(":text[name='cStreetAddress']").val(
+								$(this).parent().parent().find(
+										"td[name='conStreetAddress']").html());
+						$(":text[name='cZipCode']").val(
+								$(this).parent().parent().find(
+										"td[name='conZipCode']").html());
+						$(":text[name='cPhone']").val(
+								$(this).parent().parent().find(
+										"td[name='conPhone']").html());
+						$(":text[name='cardidname']").val(
+								$(this).parent().parent().find(
+										"td[name='conCardId']").html());
+
+						$(":text[name='idurlcard']").val(
+								$(this).parent().parent().find(
+										"td[name='conCardUrl']").html());
+						$(":text[name='idurlcardother']").val(
+								$(this).parent().parent().find(
+										"td[name='conCardUrlother']").html());
+						$(":text[name='idurlcardtogether']").val(
+								$(this).parent().parent().find(
+										"td[name='conCardUrltogether']").html());
+						
+						var cardurl1 = $(this).parent().parent().find(
+								"td[name='conCardUrl']").html();
+						
+						
+						$("select[name='mail']").val($(this).parent().parent().find(
+						"td[name='conmail']").html());
+
+						
+						//$(":textarea[name='remark']").text($(this).parent().parent().find(
+						//"td[name='conremark']").html());
+						$("[name='remark']").text($(this).parent().parent().find(
+						"td[name='conremark']").html());
+
+						$(":text[name='parceValue']").val($(this).parent().parent().find(
+						"td[name='conparceValue']").html());
+						
+						$("a[name='modifyenable']").attr("style","text-decoration:none");//显示单号
+						//modifyorderid
+						$(":text[name='modifyorderid']").val($(this).parent().parent().find(
+						"td[name='conorderId'] a").html());
+						$(":text[name='modifyorderidname']").val($(this).parent().parent().find(
+						"td[name='conorderId'] a").html());
+						
+						
+						// $(":file[name='file']").val(
+						// $(this).parent().parent()
+						// .find("td[name='conCardUrl']").html());
+						
+						
+						
+						
+						
+						
+						
+						if ((cardurl1 != "") && (cardurl1 != "null"))// 地址中包含有身份证图片，显示出来
+						{
+							// alert(cardurl1);
+							$("#showcardpicid").attr("style", "display:block;");
+							$(":text[name='idurlcard']").val(cardurl1);
+							cardurl1 = getRootPath() + cardurl1;
+							$("#imacardurlid").attr("href", cardurl1);
+							$("#imacardurlid img").attr("src", cardurl1);
+							
+
+						} else {
+							$("#showcardpicid").attr("style", "display:none");
+
+							//$(":text[name='idurlcard']").val("");// 已经重新上传，清空原有的图片
+						}
+
+						$(":file[name='file']").val("");// 清空原来选择过上传的图片
+						
+						cardurl1 = $(this).parent().parent().find(
+						"td[name='conCardUrlother']").html();
+						if ((cardurl1 != "") && (cardurl1 != "null"))// 地址中包含有身份证图片，显示出来
+						{
+							// alert(cardurl1);
+							$("#showcardpicidother").attr("style", "display:block;");
+							$(":text[name='idurlcardother']").val(cardurl1);
+							cardurl1 = getRootPath() + cardurl1;
+							$("#imacardurlidother").attr("href", cardurl1);
+							$("#imacardurlidother img").attr("src", cardurl1);
+							
+
+						} else {
+							$("#showcardpicidother").attr("style", "display:none");
+
+							//$(":text[name='idurlcard']").val("");// 已经重新上传，清空原有的图片
+						}
+
+						$(":file[name='fileother']").val("");// 清空原来选择过上传的图片
+						//
+						//loadconinfo_wsjd();//重新装载信息
+						
+						var wid=$(this).parent().parent().find("td[name='conwid']").html();
+						var cid=$(this).parent().parent().find("td[name='concid']").html();
+						//alert("wid:"+wid+"cid:"+cid);
+						
+						//alert("asdfasf");
+						/*if (("a[name='a_delete_commodify_info']").length > 1) {
+
+							var str_first = $(
+									"a[name='a_delete_commodify_info']")
+									.parent().parent().html();// 保存一个样例
+
+							$("a[name='a_delete_commodify_info']").parent()
+									.parent().remove();// 删除所有已经存在的商品列表
+
+							var str = "<tr>" + str_first + "</tr>";
+							$("#ttable tbody").append(str);
+
+						} else {
+
+						}*/
+
+						// 对端口影射处理
+						var commoditystr = $(this).parent().parent().find(
+								"td[name='conCommoditys']").html();
+						
+						var strcomm = commoditystr.split(";;;");
+						loadconinfo_m_wsjd(wid,cid,commoditystr,strcomm);//重新载入相应的仓库及通道的对应商品参数
+						// $("#select_id option[value='5']").attr("selected",
+						// true);
+
+
+					//#6C7175
+						//说罢当前状态为修改状态
+						
+						$("a[name='mulitsub']").attr("style","background: #6C7175;color: #FFFFFF;padding: 5px 15px;display:inline");//设置提交状态为灰色
+						$("a[name='mulitsub']").attr("state","no");//设置状态为no
+						$("a[name='mulitsubmodify']").attr("style","background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline");//设置提交状态为亮色
+						$("a[name='mulitsubmodify']").attr("state","yes");//设置状态为yes
+						$("a[name='mulitsubcancel']").attr("style","background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline");//设置提交状态为亮色
+						$("a[name='mulitsubcancel']").attr("state","yes");//设置状态为yes
+					
+					});
+
+}
+
+//修改置单时，显示已经有的商品信息
+function changehistorycomm_wsjd(commoditystr,strcomm)
+{
+	
+	if (strcomm.length > 1) {
+		
+		var i;
+		for (i = 0; i < strcomm.length; i++) {
+			// alert(strcomm[i]);
+			var str2 = strcomm[i].split(":::");
+			if (str2.length > 0) {
+				if (str2[0] == "") {
+					continue;
+				}
+                
+				if (i == 0) {
+					
+					$("select[name='commodityName']").val(
+							str2[0]);
+					$(":text[name='commodifyQuantity']")
+							.val(str2[1]);
+					$(":text[name='commodifyxiangqing']")
+							.val(str2[2]);
+					$(":text[name='commodifybrands']")
+					.val(str2[3]);
+					
+				} else {
+					var commodity = $(
+							"select[name='commodityName']")
+							.html();
+					var str = '<tr><td>商品类别：<select name="commodityName" id="selectcommtempname" style="width:100px">';
+					str += commodity;
+					str += '</select>';
+					str += '&nbsp;品牌：<input type="text" name="commodifybrands" id="commodifybrandstempid" placeholder="填写英文品牌"style="width:120px" />';
+					str += '&nbsp;包裹详情：<input type="text" name="commodifyxiangqing" id="commodifyxiangqingtempid" placeholder="填写中文描述"style="width:120px" />';
+					str += '&nbsp;商品数量：<input type="text" name="commodifyQuantity" id="commodifyQuantitytempid" style="width:100px" maxlength="5"/>';
+					str += '<a href="#" name="a_delete_commodify_info">删除</a>';
+					str += '</td></tr>';
+
+					$("#ttable tbody").append(str);
+                    
+					$("#selectcommtempname").val(str2[0]);
+					$("#commodifyQuantitytempid").val(
+							str2[1]);
+					$("#commodifyxiangqingtempid").val(
+							str2[2]);
+					
+					$("#commodifybrandstempid").val(
+							str2[3]);
+
+					var obj = document
+							.getElementById("selectcommtempname");
+					obj.setAttribute("id", "");// 清空原有id
+					obj = document
+							.getElementById("commodifyQuantitytempid");
+					obj.setAttribute("id", "");// 清空原有id
+					obj = document
+							.getElementById("commodifyxiangqingtempid");
+					obj.setAttribute("id", "");// 清空原有id
+					
+					obj = document
+					.getElementById("commodifybrandstempid");
+					obj.setAttribute("id", "");// 清空原有id
+
+					$("a[name='a_delete_commodify_info']")
+							.click(
+									function() {
+										if ($("a[name='a_delete_commodify_info']").length > 1)
+											$(this)
+													.parent()
+													.parent()
+													.remove();
+
+									});
+
+				}
+
+			}
+		}
+
+	}
+}
+
+function loadCommoditySelectOption() {
+	$.ajax({
+		post : "get",
+		url : "../commodity/user_all",
+		data : {
+		"wid" : "4"
+	},success : function(response) {
+		var code = response.code;
+		if ("200" == code) {
+			//showCommodityList(response.data);;
+			var str = "";
+			$.each(response.data,function() {
+				str += "<option value='" + this.id+"'  price='" + this.price+"' msPrice='" + this.msPrice+"' >"
+				+ this.name+ "</option>";
+			});
+		$("select[name='commodityName']").html(str);
+		} else if ("607" == code) {
+			alert("您尚未登录或登录已失效！");
+			logout();
+		}
+	}
+	});
+}
+
+
+function showChannelTable_wsjd(){
+	
+
+	var wid = $("select[name='warehouse']").val();
+	if((removenull(wid)=="")||(wid=="-1"))
+	{
+		var str1 = "<option value='-1'>请选择渠道</option>";
+		$("select[name='channelidname']").html(str1);
+		return false;
+	}
+	//alert(wid);
+	//$("select[name='cid']").html("<option >请选择渠道</option>");
+	$.ajax( {
+		post : "get",
+		url : "../channel/all",
+		data:{
+			"wid":wid
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if(response.data==null){
+					var str1 = "<option value='-1'>请选择渠道</option>";
+					$("select[name='channelidname']").html(str1);
+					alert("门店中没有该运单的渠道，请联系系统管理员！");
+				}else{
+					//var str = "<option>请选择渠道</option>";
+					var str = "<option value='-1'>请选择渠道</option>";
+					$.each(response.data,function(){
+						str += '<option value="' + this.id + '">' + this.name + '</option>';
+					});
+					$("select[name='channelidname']").html(str);
+					//showCommodityTableInTM();
+					//alert("77777");
+					loadCommoditySelectOption1();
+					$("select[name='channelidname']").change(loadCommoditySelectOption1);
+					
+				}
+				
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+
+function showChannelTable_m_wsjd(cid,commoditystr,strcomm){
+	
+	
+	var wid = $("select[name='warehouse']").val();
+	$("select[name='cid']").children().remove();
+	//alert("re cid");
+	//alert(wid);
+	//$("select[name='cid']").html("<option >请选择渠道</option>");
+	$.ajax( {
+		post : "get",
+		url : "../channel/all",
+		data:{
+			"wid":wid
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if(response.data==null){
+					alert("门店中没有该运单的渠道，请联系系统管理员！");
+				}else{
+					//var str = "<option>请选择渠道</option>";
+					var str = "";
+					$.each(response.data,function(){
+						str += '<option value="' + this.id + '">' + this.name + '</option>';
+					});
+					$("select[name='channelidname']").html(str);
+					$("select[name='channelidname']").val(cid);
+
+					loadCommoditySelectOption2(commoditystr,strcomm);
+					
+					//alert("88888888");
+
+				//	$("select[name='cid']").change(loadCommoditySelectOption1);
+					
+				}
+				
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+
+
+function loadCommoditySelectOption1() {
+	
+	var wid = $("select[name='warehouse']").val();
+	var cid=$("select[name='channelidname']").val();
+	//alert(cid);
+	
+	$("a[name='a_delete_commodify_info']").parent().parent().remove();// 删除所有已经存在的商品列表
+	//alert("7888");
+	//添加商品头
+	var str_temp="";
+	str_temp+='<tr>';
+	
+	str_temp+='<td>商品类别： <select name="commodityName"';
+	str_temp+='style="width:100px"></select> ';
+		str_temp+='&nbsp;品牌：<input type="text"';
+	str_temp+='name="commodifybrands" placeholder="填写英文品牌"';
+	str_temp+='style="width:120px" />';
+	str_temp+='&nbsp;商品详情：<input type="text"';
+	str_temp+='name="commodifyxiangqing" placeholder="填写中文描述"';
+	str_temp+='style="width:120px" />';
+	
+	str_temp+='&nbsp;商品数量：<input type="text"';
+	str_temp+='name="commodifyQuantity" style="width:100px" maxlength="5" />';
+	str_temp+='<a href="#" name="a_delete_commodify_info">删除</a></td>';
+	str_temp+='</tr>';
+	$("#ttable tbody").html(str_temp);
+	//alert("9999");
+	
+	// alert("8888");
+	$.ajax({
+		post : "get",
+		 url : "../commodity/user_all",
+		//url : "../commodity/all",
+		data : {
+			"wid" : wid,
+			"cid" : cid //设置渠道
+		},
+		success : function(response) {
+			
+			var code = response.code;
+			if ("200" == code) {
+				// showCommodityList(response.data);;
+				
+				var str = "";
+				//alert("5555");
+				$.each(response.data, function() {
+					str += "<option value='" + this.id + "'  price='"
+							+ this.price + "' msPrice='" + this.msPrice + "' >"
+							+ this.name + "</option>";
+				});
+				//alert(str);
+				$("select[name='commodityName']").html(str);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+
+
+function loadCommoditySelectOption2(commoditystr,strcomm) {
+	
+	var wid = $("select[name='warehouse']").val();
+	var cid=$("select[name='channelidname']").val();
+	//alert(cid);
+	
+	$("a[name='a_delete_commodify_info']").parent().parent().remove();// 删除所有已经存在的商品列表
+	//alert("7888");
+	//添加商品头
+	var str_temp="";
+	str_temp+='<tr>';
+	
+	str_temp+='<td>商品类别： <select name="commodityName"';
+	str_temp+='style="width:100px"></select> ';
+	str_temp+='&nbsp;品牌：<input type="text" ';
+	str_temp+='	name="commodifybrands" placeholder="填写英文品牌"';
+	str_temp+='	style="width:120px" />';
+	
+	str_temp+='	&nbsp;包裹详情：<input type="text"';
+	str_temp+='name="commodifyxiangqing" placeholder="填写具体物品信息"';
+	str_temp+='style="width:120px" /> &nbsp;商品数量：<input type="text"';
+	str_temp+='name="commodifyQuantity" style="width:100px" maxlength="5" />';
+	str_temp+='<a href="#" name="a_delete_commodify_info">删除</a></td>';
+	str_temp+='</tr>';
+	$("#ttable tbody").html(str_temp);
+	//alert("9999");
+	
+	// alert("8888");
+	$.ajax({
+		post : "get",
+		 //url : commodity_all_user_url,
+		url : "../commodity/user_all",
+		data : {
+			"wid" : wid,
+			"cid" : cid //设置渠道
+		},
+		success : function(response) {
+			
+			var code = response.code;
+			if ("200" == code) {
+				// showCommodityList(response.data);;
+				
+				var str = "";
+				//alert("5555");
+				$.each(response.data, function() {
+					str += "<option value='" + this.id + "'  price='"
+							+ this.price + "' msPrice='" + this.msPrice + "' >"
+							+ this.name + "</option>";
+				});
+				//alert(str);
+				$("select[name='commodityName']").html(str);
+				
+				changehistorycomm_wsjd(commoditystr,strcomm);
+				
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+//装载仓库及相关联的数据
+function loadconinfo_wsjd()
+{
+	$.ajax({
+		type:"get",
+		async:false,
+		url:"../user/warehouse/all",
+		success:function(response){
+			var code = response.code;
+			if (code == '200') {
+				if(response.data != null) {
+					var str = "<option value='-1'>请选择门店</option>";
+					$.each(response.data,function(){
+						str += "<option value='" + this.id + "'>" + this.name + "</option>";
+					});
+					$("select[name='warehouse']").html(str);
+					showChannelTable_wsjd();
+					
+					//showChannelTableInTM();
+					
+					$("select[name='warehouse']").change(showChannelTable_wsjd);
+					//loadCommoditySelectOption1();
+				}
+			}
+		}
+	});	
+}
+
+
+//装载仓库及相关联的数据,用于修改时重新调用
+function loadconinfo_m_wsjd(wid,cid,commoditystr,strcomm)
+{
+	//清空原有列表
+	$("select[name='warehouse']").children().remove();
+	//alert("remove");
+	$.ajax({
+		type:"get",
+		async:false,
+		url:"../user/warehouse/all",
+		success:function(response){
+			var code = response.code;
+			if (code == '200') {
+				if(response.data != null) {
+					var str = "";
+					$.each(response.data,function(){
+						str += "<option value='" + this.id + "'>" + this.name + "</option>";
+					});
+					
+					$("select[name='warehouse']").html(str);
+					$("select[name='warehouse']").val(wid);//选中指定的仓库
+					
+					
+					
+					//showChannelTableInTM();
+					
+					//$("select[name='warehouse']").change(showChannelTable_wsjd);
+					showChannelTable_m_wsjd(cid,commoditystr,strcomm);
+					//loadCommoditySelectOption1();
+				}
+			}
+		}
+	});	
+}
+
+function loadCaddressInWszj() {
+	$.ajax({
+		type : "get",
+		url : consignee_all_url,
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+			$("#cdatatable tbody").html("");
+			$.each(response.data,function() {
+				var str = "<tr id='"+this.id+"'>";
+				str += '<td><input type="radio" name="cid" value="' + this.id + '"/></td>';
+				str += '<td name="conName">'+ this.name + '</td>';
+				str += '<td name="conPhone">'+ this.phone + '</td>';
+				str += '<td>' + this.cardId+ '</td>';
+				str += '<td>' + this.province+ '&nbsp;' + this.city+ '&nbsp;'
+					+ this.district+ '&nbsp;'+ this.streetAddress+ '</td>';
+				str += "<td style='display:none' name='conProvince'>"+ this.province+ "</td>";
+				str += "<td style='display:none' name='conCity'>"+ this.city + "</td>";
+				str += "<td style='display:none' name='conDistrict'>"+ this.district+ "</td>";
+				str += "<td style='display:none' name='conStreetAddress'>"+ this.streetAddress+ "</td>";
+				str += "<td style='display:none' name='conZipCode'>"+ this.zipCode+ "</td>";
+				str += '</tr>';
+				$("#cdatatable tbody").append(str);
+				});
+				$(":radio[name='cid']").click(
+					function() {
+						$(":text[name='cName']").val($(this).parent().parent().find("td[name='conName']").html());
+						$(":text[name='cProvince']").val($(this).parent().parent().find("td[name='conProvince']").html());
+						$(":text[name='cCity']").val($(this).parent().parent().find("td[name='conCity']").html());
+						$(":text[name='cDistrict']").val($(this).parent().parent().find("td[name='conDistrict']").html());
+						$(":text[name='cStreetAddress']").val($(this).parent().parent().find("td[name='conStreetAddress']").html());
+						$(":text[name='cZipCode']").val($(this).parent().parent().find("td[name='conZipCode']").html());
+						$(":text[name='cPhone']").val($(this).parent().parent().find("td[name='conPhone']").html());
+
+						if ($(":text[name='cName']").val() != null) {
+							$(":text[name='cName']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cProvince']").val() != null) {
+							$(":text[name='cProvince']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cCity']").val() != null) {
+							$(":text[name='cCity']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cDistrict']").val() != null) {
+							$(":text[name='cDistrict']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cZipCode']").val() != null) {
+							$(":text[name='cZipCode']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cStreetAddress']").val() != null) {
+							$(":text[name='cStreetAddress']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cPhone']").val() != null) {$(":text[name='cPhone']").css({"border-color" : ""});
+						}
+					});
+						//$("#cdatatable tbody :radio").first().attr("checked",true);
+
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("获取地址信息失败，原因是:" + response.message);
+				}
+			}
+		});
+}
+
+
+/*
+function loadNav12Data() {
+	loadCaddressInWszj();
+}
+
+function loadCommoditySelectOption() {
+	$.ajax({
+		post : "get",
+		url : commodity_all_url,
+		data : {
+		"wid" : "4"
+	},success : function(response) {
+		var code = response.code;
+		if ("200" == code) {
+			//showCommodityList(response.data);;
+			var str = "";
+			$.each(response.data,function() {
+				str += "<option value='" + this.id+"'  price='" + this.price+"' msPrice='" + this.msPrice+"' >"
+				+ this.name+ "</option>";
+			});
+		$("select[name='commodityName']").html(str);
+		} else if ("607" == code) {
+			alert("您尚未登录或登录已失效！");
+			logout();
+		}
+	}
+	});
+}
+
+function loadCaddressInWszj() {
+	$.ajax({
+		type : "get",
+		url : consignee_all_url,
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+			$("#cdatatable tbody").html("");
+			$.each(response.data,function() {
+				var str = "<tr id='"+this.id+"'>";
+				str += '<td><input type="radio" name="cid" value="' + this.id + '"/></td>';
+				str += '<td name="conName">'+ this.name + '</td>';
+				str += '<td name="conPhone">'+ this.phone + '</td>';
+				str += '<td>' + this.cardId+ '</td>';
+				str += '<td>' + this.province+ '&nbsp;' + this.city+ '&nbsp;'
+					+ this.district+ '&nbsp;'+ this.streetAddress+ '</td>';
+				str += "<td style='display:none' name='conProvince'>"+ this.province+ "</td>";
+				str += "<td style='display:none' name='conCity'>"+ this.city + "</td>";
+				str += "<td style='display:none' name='conDistrict'>"+ this.district+ "</td>";
+				str += "<td style='display:none' name='conStreetAddress'>"+ this.streetAddress+ "</td>";
+				str += "<td style='display:none' name='conZipCode'>"+ this.zipCode+ "</td>";
+				str += "<td style='display:none' name='conCardId'>"+ this.cardId+ "</td>";
+				str += "<td style='display:none' name='conCardUrl'>"+ this.cardUrl+ "</td>";
+				str += '</tr>';
+				$("#cdatatable tbody").append(str);
+				});
+				$(":radio[name='cid']").click(
+					function() {
+						$(":text[name='cName']").val($(this).parent().parent().find("td[name='conName']").html());
+						$(":text[name='cProvince']").val($(this).parent().parent().find("td[name='conProvince']").html());
+						$(":text[name='cCity']").val($(this).parent().parent().find("td[name='conCity']").html());
+						$(":text[name='cDistrict']").val($(this).parent().parent().find("td[name='conDistrict']").html());
+						$(":text[name='cStreetAddress']").val($(this).parent().parent().find("td[name='conStreetAddress']").html());
+						$(":text[name='cZipCode']").val($(this).parent().parent().find("td[name='conZipCode']").html());
+						$(":text[name='cPhone']").val($(this).parent().parent().find("td[name='conPhone']").html());
+						$(":text[name='cCardId']").val($(this).parent().parent().find("td[name='conCardId']").html());
+						//$(":text[name='cCardUrl']").val($(this).parent().parent().find("td[name='conCardUrl']").html());
+						var cardUrl = $(this).parent().parent().find("td[name='conCardUrl']").html();
+						if(cardUrl!=null&&cardUrl!=""&&cardUrl!="null"){
+							$("#a_card_url").attr("href", baseUrl+cardUrl);
+							$("#a_card_url img").attr("src", baseUrl+cardUrl);
+							$("#a_card_url").attr("style", "display:block;");
+							
+							$(":hidden[name='cccardUrl']").val(cardUrl);
+						}else {
+							$("#a_card_url").attr("href", "");
+							$("#a_card_url img").attr("src", "");
+							$("#a_card_url").attr("style", "display:none;");
+							$(":hidden[name='cccardUrl']").val("");
+						}
+						if ($(":text[name='cName']").val() != null) {
+							$(":text[name='cName']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cProvince']").val() != null) {
+							$(":text[name='cProvince']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cCity']").val() != null) {
+							$(":text[name='cCity']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cDistrict']").val() != null) {
+							$(":text[name='cDistrict']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cZipCode']").val() != null) {
+							$(":text[name='cZipCode']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cStreetAddress']").val() != null) {
+							$(":text[name='cStreetAddress']").css({"border-color" : ""});
+						}
+						if ($(":text[name='cPhone']").val() != null) {$(":text[name='cPhone']").css({"border-color" : ""});
+						}
+					});
+						//$("#cdatatable tbody :radio").first().attr("checked",true);
+
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("获取地址信息失败，原因是:" + response.message);
+				}
+			}
+		});
+}
+
+
+function mulitSubmitWszjOrder() {
+
+	var cName = $(":text[name='cName']").val();
+	var cProvince = $(":text[name='cProvince']").val();
+	var cCity = $(":text[name='cCity']").val();
+	var cDistrict = $(":text[name='cDistrict']").val();
+	var cStreetAddress = $(":text[name='cStreetAddress']").val();
+	var cZipCode = $(":text[name='cZipCode']").val();
+	var cPhone = $(":text[name='cPhone']").val();
+	var cCardId = $(":text[name='cCardId']").val();
+	var cCardUrl = $(":hidden[name='cccardUrl']").val();
+	
+	if(cCardUrl==null){
+		cCardUrl = "";
+	}else{
+		cCardUrl =cCardUrl.replace(/\\/g,"/");
+	}
+
+	var mail = $("select[name='mail']").val();
+	//var parceValue = $(":text[name='parceValue']").val();
+	var remark = $("textarea[name='remark']").val();
+	//var premium = $(":text[name='premium']").val();
+	
+
+	var validate = true;
+	if (cName == "" || cName == null) {
+		$(":text[name='cName']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cName']").change(function() {
+			if ($(":text[name='cName']").val() != null)
+				$(":text[name='cName']").css({ 
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cProvince == "" || cProvince == null) {
+		$(":text[name='cProvince']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cProvince']").change(function() {
+			if ($(":text[name='cProvince']").val() != null)
+				$(":text[name='cProvince']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cCity == "" || cCity == null) {
+		$(":text[name='cCity']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cCity']").change(function() {
+			if ($(":text[name='cCity']").val() != null)
+				$(":text[name='cCity']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cDistrict == "" || cDistrict == null) {
+		$(":text[name='cDistrict']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cDistrict']").change(function() {
+			if ($(":text[name='cDistrict']").val() != null)
+				$(":text[name='cDistrict']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cStreetAddress == "" || cStreetAddress == null) {
+		$(":text[name='cStreetAddress']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cStreetAddress']").change(function() {
+			if ($(":text[name='cStreetAddress']").val() != null)
+				$(":text[name='cStreetAddress']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cZipCode == "" || cZipCode == null) {
+		$(":text[name='cZipCode']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cZipCode']").change(function() {
+			if ($(":text[name='cZipCode']").val() != null)
+				$(":text[name='cZipCode']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cPhone == "" || cPhone == null) {
+		$(":text[name='cPhone']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cPhone']").change(function() {
+			if ($(":text[name='cPhone']").val() != null)
+				$(":text[name='cPhone']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	
+	if (!validate) {
+		alert("红色框中的信息必须正确填写，才可以提交！");
+		return false;
+	}
+
+	var picValue = $(":file[name='file']").val();
+	
+	if (picValue == null || "" == picValue) {
+		var str = '"cName":"' + cName + '",' + '"cProvince":"' + cProvince
+		+ '",' + '"cCity":"' + cCity + '",' + '"cDistrict":"'
+		+ cDistrict + '",' + '"cZipCode":"' + cZipCode + '",'
+		+ '"cPhone":"' + cPhone + '",'+ '"cardId":"' + cCardId+ '",' +'"cardUrl":"' + cCardUrl + '",' + '"mail":"' + mail + '",'
+		//+ '"parceValue":"' + parceValue + '",'
+		+ '"remark":"' + remark+ '",'
+		+ '"premium":"0",' + '"cStreetAddress":"' + cStreetAddress + '"';
+		var obj = $.parseJSON("{" + str + "}");
+		$.ajax({
+			type : "post",
+			url : order_online_submit_url,
+			data : obj,
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					alert("提交成功,请记下您的当前运单编号：" + response.data.orderId
+							+ "把包裹拿到任何一家门店即可");
+					nav12Click();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("提交网上置件信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	} else {
+		//submit form
+		$("#add_wszj_form").ajaxSubmit( {
+			type : "post",
+			url : order_online_submit_has_cardurl_url,
+			success : function(data) {
+				$("#tmpmsgdiv").html(data);
+				var str = $("#tmpmsgdiv pre").html();
+				var obj = $.parseJSON(str);
+				var code = obj.code;
+				if (code == "200") {
+					alert("提交成功,请记下您的当前运单编号：" + obj.data.orderId
+							+ "把包裹拿到任何一家门店即可");
+				} else if (code == "607") {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("提交运单失败，原因是:" + obj.message);
+				}
+				return false;
+			},
+			error : function(XmlHttpRequest, textStatus, errorThrown) {
+				alert("操作失败");
+				return false;
+			}
+		});
+	}
+} */
+
+
+//js获取项目根路径，如： http://localhost:8083/uimcardprj
+base_url_set_has_sub = false;
+function getRootPath() {
+	// 获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+	var curWwwPath = window.document.location.href;
+	// 获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+	var pathName = window.document.location.pathname;
+	var pos = curWwwPath.indexOf(pathName);
+	// 获取主机地址，如： http://localhost:8083
+	var localhostPaht = curWwwPath.substring(0, pos);
+	// 获取带"/"的项目名，如：/uimcardprj
+	var projectName = pathName
+			.substring(0, pathName.substr(1).indexOf('/') + 1);
+	if(base_url_set_has_sub==true)
+	{
+		return (localhostPaht + projectName);
+	}
+	else
+	{
+		return localhostPaht;
+	}
+}
+
+function loadCaddress1() {
+	$
+			.ajax({
+				type : "get",
+				url : consignee_all_url,
+				success : function(response) {
+					var code = response.code;
+					var flag = 0;
+					if (code == "200") {
+						$("#cdatatable tbody").html("");
+						var str22 = '<tr style="display:none"><td><input type="radio" name="cid" value="-1"/></td></tr>';
+						$("#cdatatable tbody :radio").first().attr("checked",
+								true);
+						$("#cdatatable tbody").append(str22);
+						$
+								.each(
+										response.data,
+										function() {
+											var str = "<tr>";
+											str += '<td><input type="radio" name="cid" value="'
+													+ this.id + '"/></td>';
+											str += '<td name="conName">'
+													+ this.name + '</td>';
+											str += '<td name="conPhone">'
+													+ this.phone + '</td>';
+											str += '<td name="conCardId">'
+													+ this.cardId + '</td>';
+											str += '<td>' + this.province
+													+ '&nbsp;' + this.city
+													+ '&nbsp;' + this.district
+													+ '&nbsp;'
+													+ this.streetAddress
+													+ '</td>';
+											str += '<td name="conProvince" style="display:none">'
+													+ this.province + '</td>';
+											str += '<td name="conCity" style="display:none">'
+													+ this.city + '</td>';
+											str += '<td name="conDistrict" style="display:none">'
+													+ this.district + '</td>';
+											str += '<td name="conStreetAddress" style="display:none">'
+													+ this.streetAddress
+													+ '</td>';
+											str += '<td name="conZipCode" style="display:none">'
+													+ this.zipCode + '</td>';
+											str += '<td name="conCardUrl" style="display:none">'
+													+ this.cardUrl + '</td>';
+											str += '</tr>';
+											$("#cdatatable tbody").append(str);
+											if (flag == 0)// 列出第一个
+											{
+												/*
+												 * $(":text[name='cName']").val(this.name);
+												 * $(":text[name='cPhone']").val(this.phone);
+												 * $(":text[name='cCardID']").val(this.cardId);
+												 * $(":text[name='cProvince']").val(this.province);
+												 * $(":text[name='cCity']").val(this.city);
+												 * $(":text[name='cDistrict']").val(this.district);
+												 * $(":text[name='cStreetAddress']").val(this.streetAddress);
+												 * $(":text[name='cZipCode']").val(this.zipCode);
+												 * $(":text[name='idurlcard']").val(this.cardUrl);
+												 */
+											}
+
+											flag = flag + 1;
+										});
+
+						$(":radio[name='cid']")
+								.click(
+										function() {
+											// alert($(this).parent().parent().find("a[name='conName']").html());
+											$(":text[name='cName']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conName']")
+																	.html());
+											$(":text[name='cProvince']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conProvince']")
+																	.html());
+											$(":text[name='cCity']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conCity']")
+																	.html());
+											$(":text[name='cDistrict']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conDistrict']")
+																	.html());
+											$(":text[name='cStreetAddress']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conStreetAddress']")
+																	.html());
+											$(":text[name='cZipCode']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conZipCode']")
+																	.html());
+											$(":text[name='cPhone']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conPhone']")
+																	.html());
+											$(":text[name='cardidname']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conCardId']")
+																	.html());
+
+											$(":text[name='idurlcard']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conCardUrl']")
+																	.html());
+											var cardurl1 = $(this)
+													.parent()
+													.parent()
+													.find(
+															"td[name='conCardUrl']")
+													.html();
+											// $(":file[name='file']").val(
+											// $(this).parent().parent()
+											// .find("td[name='conCardUrl']").html());
+											if ((cardurl1 != "")
+													&& (cardurl1 != null))// 地址中包含有身份证图片，显示出来
+											{
+
+												$("#showcardpicid").attr(
+														"style",
+														"display:block");
+												cardurl1 = getRootPath()
+														+ cardurl1;
+												$("#imacardurlid").attr("href",
+														cardurl1);
+												$("#imacardurlid img").attr(
+														"src", cardurl1);
+
+											}
+											//alert("888");
+
+											$(":file[name='file']").val("");// 清空原来选择过上传的图片
+										});
+						// 当上传图片时，用于实时隐藏原地址薄中的图片
+						$("#cardpicid")						
+								.on(
+										"change",
+										function() {
+											//alert("444");
+											var picValue = $(
+													":file[name='file']").val();
+											if ((picValue != null)
+													&& ("" != picValue)) {// 包含图片,要单独处理
+												$("#showcardpicid")
+														.attr("style",
+																"display:none");
+
+												//$(":text[name='idurlcard']")
+												//		.val("");// 已经重新上传，清空原有的图片
+
+											}
+											else
+											{
+												var url2=$(":text[name='idurlcard']").val();
+												//alert(url2);
+												if((url2!=null)&&(url2!="")&&(url2!="null"))
+												{
+													$("#showcardpicid").attr("style", "display:block;");
+													var cardurl1 = getRootPath() + url2;
+													$("#imacardurlid").attr("href", cardurl1);
+													$("#imacardurlid img").attr("src", cardurl1);
+													
+												}
+											}
+											// $("#imacardurlid").attr("href",$("#cardpicid").val());
+											// $("#imacardurlid
+											// img").attr("src",$("#cardpicid").val());
+										});
+
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						// 失败
+						alert("获取地址信息失败，原因是:" + response.message);
+					}
+				}
+			});
+}
+
+function mulitSubmitOrder() {
+
+	var cName = $(":text[name='cName']").val();
+	var cProvince = $(":text[name='cProvince']").val();
+	var cCity = $(":text[name='cCity']").val();
+	var cDistrict = $(":text[name='cDistrict']").val();
+	var cStreetAddress = $(":text[name='cStreetAddress']").val();
+	var cZipCode = $(":text[name='cZipCode']").val();
+	var cPhone = $(":text[name='cPhone']").val();
+
+	var mail = $("select[name='mail']").val();
+	var parceValue = $(":text[name='parceValue']").val();
+	var remark = $("textarea[name='remark']").val();
+
+	var validate = true;
+	if (cName == "" || cName == null) {
+		$(":text[name='cName']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cName']").change(function() {
+			if ($(":text[name='cName']").val() != null)
+				$(":text[name='cName']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cProvince == "" || cProvince == null) {
+		$(":text[name='cProvince']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cProvince']").change(function() {
+			if ($(":text[name='cProvince']").val() != null)
+				$(":text[name='cProvince']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cCity == "" || cCity == null) {
+		$(":text[name='cCity']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cCity']").change(function() {
+			if ($(":text[name='cCity']").val() != null)
+				$(":text[name='cCity']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cDistrict == "" || cDistrict == null) {
+		$(":text[name='cDistrict']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cDistrict']").change(function() {
+			if ($(":text[name='cDistrict']").val() != null)
+				$(":text[name='cDistrict']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cStreetAddress == "" || cStreetAddress == null) {
+		$(":text[name='cStreetAddress']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cStreetAddress']").change(function() {
+			if ($(":text[name='cStreetAddress']").val() != null)
+				$(":text[name='cStreetAddress']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cZipCode == "" || cZipCode == null) {
+		$(":text[name='cZipCode']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cZipCode']").change(function() {
+			if ($(":text[name='cZipCode']").val() != null)
+				$(":text[name='cZipCode']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cPhone == "" || cPhone == null) {
+		$(":text[name='cPhone']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cPhone']").change(function() {
+			if ($(":text[name='cPhone']").val() != null)
+				$(":text[name='cPhone']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	var str = '"cName":"' + cName + '",' + '"cProvince":"' + cProvince + '",'
+			+ '"cCity":"' + cCity + '",' + '"cDistrict":"' + cDistrict + '",'
+			+ '"cZipCode":"' + cZipCode + '",' + '"cPhone":"' + cPhone + '",'
+			+ '"mail":"' + mail + '",' + '"parceValue":"' + parceValue + '",'
+			+ '"remark":"' + remark + '",' + '"cStreetAddress":"'
+			+ cStreetAddress + '"';
+	var i = 0;
+	$("select[name='commodityName']").each(
+			function() {
+				var cname = $(this).val();
+
+				var cxiangqingObj = $(this).parent().find(
+						":input[name='commodifyxiangqing']");
+				var cquantityObj = $(this).parent().find(
+						":input[name='commodifyQuantity']");
+				var cxiangqing = cxiangqingObj.val();
+				var cquantity = cquantityObj.val();
+
+				if (cquantity == "" || cquantity == null
+						|| isNaN(cquantityObj.val())) {
+					cquantityObj.css({
+						"border-color" : "red"
+					});
+					cquantityObj.change(function() {
+						if (cquantityObj.val() != null
+								&& !isNaN(cquantityObj.val()))
+							cquantityObj.css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+				if (cxiangqing == "" || cxiangqing == null) {
+					cxiangqingObj.css({
+						"border-color" : "red"
+					});
+					cxiangqingObj.change(function() {
+						if (cxiangqingObj.val() != null)
+							cxiangqingObj.css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+
+				str += ',"details[' + i + '].commodityId":"' + cname + '"';
+				str += ',"details[' + i + '].quantity":"' + cquantity + '"';
+				str += ',"details[' + i + '].xiangqing":"' + cxiangqing + '"';
+				i = i + 1;
+			});
+
+	if (i == 0) {
+		alert("运单商品不能为空，请按添加商品按钮，填写商品信息!");
+		return false;
+	}
+	if (!validate) {
+		alert("红色框中的信息必须正确填写，才可以提交！");
+		return false;
+	}
+	var obj = $.parseJSON("{" + str + "}");
+	$.ajax({
+		type : "post",
+		url : order_online_submit_url,
+		data : obj,
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+				alert("提交成功,请记下您的当前运单编号：" + response.data.orderId
+						+ "把包裹拿到任何一家美淘门店即可");
+				nav12Click();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("1提交网上置件信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+function addonlineorderhavepic() {
+	// alert("开始提交有图片订单,只要是指在线下单部分的订单");
+	$("#add_online_order").ajaxSubmit(
+			{
+				type : "post",
+				// url : "../consignee/add",//admin/consignee/add
+				// url : "consignee/add",
+				// url : "../admin/msjorder_pic/submit",
+				url : "../order/online_pic_submit",
+				success : function(data) {
+					//alert(data);
+					$("#tmpmsgdiv2").html(data);
+					var str = $("#tmpmsgdiv2 pre").html();
+
+					var obj = $.parseJSON(str);
+
+					var code = obj.code;
+
+					if (code == "200") {
+						// alert("提交成功");
+						// window.close();
+						alert("提交成功,请记下您的当前运单编号：" + obj.data.orderId
+								+ "把包裹拿到任何一家门店即可");
+						nav12Click();
+
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("2提交网上置件信息失败，原因是:" + response.message);
+					}
+					return false;
+				},
+				error : function(XmlHttpRequest, textStatus, errorThrown) {
+					alert("操作失败");
+					return false;
+				}
+			});
+}
+//提交网上置单处理
+function mulitSubmitOrder1() {
+	
+	
+	if($("a[name='mulitsub']").attr("state")=="no")//当前状态为修改状态
+	{
+		return false;
+	}
+
+	var cName = $(":text[name='cName']").val();
+	var cProvince = $(":text[name='cProvince']").val();
+	var cCity = $(":text[name='cCity']").val();
+	var cDistrict = $(":text[name='cDistrict']").val();
+	var cStreetAddress = $(":text[name='cStreetAddress']").val();
+	var cZipCode = $(":text[name='cZipCode']").val();
+	var cPhone = $(":text[name='cPhone']").val();
+
+	var mail = $("select[name='mail']").val();
+	var parceValue = $(":text[name='parceValue']").val();
+	var remark = $("textarea[name='remark']").val();
+
+	var cardid = $(":text[name='cardidname']").val();// 身份证号
+	var cardurl = $(":text[name='idurlcard']").val();// 原有地址中包含的身份证图片链接
+	// alert(cardurl);
+	cardurl = encodeURI(cardurl);
+	var cardurlother = $(":text[name='idurlcardother']").val();// 原有地址中包含的身份证图片链接
+	 //alert(cardurlother);
+	 cardurlother = encodeURI(cardurlother);
+	var cardurltogether = $(":text[name='idurlcardtogether']").val();// 原有地址中包含的身份证图片链接
+	// alert(cardurltogether);
+	 cardurltogether = encodeURI(cardurltogether);
+	// alert(cardurl);
+	
+	var wid = $("select[name='warehouse']").val();
+	var cid=$("select[name='channelidname']").val();
+	
+	var weight=$(":text[name='weight']").val();
+	var tariff=$(":text[name='tariff']").val();
+	var premium=$(":text[name='premium']").val();
+	
+	
+	var sendname=$(":text[name='sendname']").val();
+	var sendphone=$(":text[name='sendphone']").val();
+	
+	
+	
+var checkbox =document.getElementsByName("saveaddress");	
+	
+	if(checkbox[0].checked==true)
+	{
+		
+		$(":hidden[name='addaddressflag']").val("1");
+	}
+	else
+	{
+		$(":hidden[name='addaddressflag']").val("0");
+	}
+	
+	if((removenull(sendname)==""))
+	{
+		alert("必须填写发件人姓名!");
+		return false;
+	}
+	if((removenull(sendphone)==""))
+	{
+		alert("必须填写发件人电话!");
+		return false;
+	}
+	//kai 20160224
+	if((removenull(parceValue)==""))
+	{
+		alert("必须填写商品价值!");
+		return false;
+	}
+	else
+	{
+		if (isNaN(parceValue))
+		{
+			alert("商品价格填写不正确!");
+			return false;
+		}
+	}
+	
+
+	
+	
+	
+	
+	if((removenull(wid)=="")||(wid=="-1"))
+	{
+		alert("必须选择门店!");
+		return false;
+	}
+	if((removenull(cid)=="")||(cid=="-1"))
+	{
+		alert("必须选择渠道!");
+		return false;
+	}
+	
+	var validate = true;
+	if (cName == "" || cName == null) {
+		$(":text[name='cName']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cName']").change(function() {
+			if ($(":text[name='cName']").val() != null)
+				$(":text[name='cName']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cProvince == "" || cProvince == null) {
+		$(":text[name='cProvince']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cProvince']").change(function() {
+			if ($(":text[name='cProvince']").val() != null)
+				$(":text[name='cProvince']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cCity == "" || cCity == null) {
+		$(":text[name='cCity']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cCity']").change(function() {
+			if ($(":text[name='cCity']").val() != null)
+				$(":text[name='cCity']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cDistrict == "" || cDistrict == null) {
+		$(":text[name='cDistrict']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cDistrict']").change(function() {
+			if ($(":text[name='cDistrict']").val() != null)
+				$(":text[name='cDistrict']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cStreetAddress == "" || cStreetAddress == null) {
+		$(":text[name='cStreetAddress']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cStreetAddress']").change(function() {
+			if ($(":text[name='cStreetAddress']").val() != null)
+				$(":text[name='cStreetAddress']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	/*if (cZipCode == "" || cZipCode == null) {
+		$(":text[name='cZipCode']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cZipCode']").change(function() {
+			if ($(":text[name='cZipCode']").val() != null)
+				$(":text[name='cZipCode']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}*/
+	if (cPhone == "" || cPhone == null) {
+		$(":text[name='cPhone']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cPhone']").change(function() {
+			if ($(":text[name='cPhone']").val() != null)
+				$(":text[name='cPhone']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	
+	if(removenull(cStreetAddress)!="")
+	{
+		cStreetAddress=cStreetAddress.trim();
+	}
+
+
+	
+	
+	var str = '"cName":"' + cName + '",' + '"cProvince":"' + cProvince + '",'
+			+ '"cCity":"' + cCity + '",' + '"cDistrict":"' + cDistrict + '",'
+			+ '"cZipCode":"' + cZipCode + '",' + '"cPhone":"' + cPhone + '",'
+			+ '"weight":"' + weight + '",' + '"tariff":"' + tariff + '",'
+			+ '"premium":"' + premium + '",' + '"senduserName":"' + sendname + '",' + '"senduserphone":"' + sendphone + '",' 
+			+ '"mail":"' + mail + '",' + '"cardid":"' + cardid + '",'+ '"cardurlother":"' + cardurlother + '",'+ '"cardurltogether":"' + cardurltogether + '",'
+			+ '"cardurl":"' + cardurl + '",' + '"parceValue":"' + parceValue+ '",' + '"warehouseId":"' + wid+ '",' + '"channelId":"' + cid
+			+ '",' + '"remark":"' + remark + '",' + '"cStreetAddress":"'
+			+ cStreetAddress + '"';
+	var i = 0;
+	$("select[name='commodityName']").each(
+			function() {
+				var cname = $(this).val();
+				
+				var commodifybrandsObj = $(this).parent().find(
+				":input[name='commodifybrands']");
+				
+				var cxiangqingObj = $(this).parent().find(
+						":input[name='commodifyxiangqing']");
+				var cquantityObj = $(this).parent().find(
+						":input[name='commodifyQuantity']");
+				var cxiangqing = cxiangqingObj.val();
+				var cquantity = cquantityObj.val();
+				var commodifybrands=commodifybrandsObj.val();
+
+				if (cquantity == "" || cquantity == null
+						|| isNaN(cquantityObj.val())) {
+					cquantityObj.css({
+						"border-color" : "red"
+					});
+					cquantityObj.change(function() {
+						if (cquantityObj.val() != null
+								&& !isNaN(cquantityObj.val()))
+							cquantityObj.css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+				if (cxiangqing == "" || cxiangqing == null) {
+					cxiangqingObj.css({
+						"border-color" : "red"
+					});
+					cxiangqingObj.change(function() {
+						if (cxiangqingObj.val() != null)
+							cxiangqingObj.css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+
+				if (commodifybrands == "" || commodifybrands == null) {
+					commodifybrandsObj.css({
+						"border-color" : "red"
+					});
+					commodifybrandsObj.change(function() {
+						if (commodifybrandsObj.val() != null)
+							commodifybrandsObj.css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+
+				
+				str += ',"details[' + i + '].commodityId":"' + cname + '"';
+				str += ',"details[' + i + '].quantity":"' + cquantity + '"';
+				str += ',"details[' + i + '].xiangqing":"' + cxiangqing + '"';
+				str += ',"details[' + i + '].brands":"' + commodifybrands + '"';
+				i = i + 1;
+			});
+
+	if (i == 0) {
+		alert("运单商品不能为空，请按添加商品按钮，填写商品信息!");
+		return false;
+	}
+	if (!validate) {
+		alert("红色框中的信息必须正确填写，才可以提交！");
+		return false;
+	}
+
+	
+
+	
+	
+	
+	
+	
+	
+	
+	var picValue = $(":file[name='file']").val();
+	var picValueother = $(":file[name='fileother']").val();
+	
+
+	
+	
+	if (((picValue != null) && ("" != picValue))||((picValueother != null) && ("" != picValueother))) {// 包含图片,要单独处理
+		
+		
+		
+		
+		
+		addonlineorderhavepic();
+
+		return false;
+	}
+	
+	
+	
+	
+	
+	//kai 10160224 保存地址信息
+	var checkbox =document.getElementsByName("saveaddress");	
+	
+	if(checkbox[0].checked==true)
+	{
+		$.ajax({
+			type : "post",
+			url : consignee_add_no_pic_url,
+			data : {
+				"name" : cName,
+				"province" : cProvince,
+				"city" : cCity,
+				"dist" : cDistrict,
+				"sadd" : cStreetAddress,
+				"phone" : cPhone,
+				"zcode" : cZipCode,
+				"cid" : cardid
+				/*"cardUrl" : cardurl,
+				"cardurlother" : cardurlother,
+				"cardurltogether" : cardurltogether*/
+			},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					//alert("添加成功");
+					//nav74Click();
+					// window.location.href = "zhengjiadizi.jsp";
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("添加收件人地址失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	else
+	{
+		//alert("false");
+	}
+
+	var obj = $.parseJSON("{" + str + "}");
+	$.ajax({
+		type : "post",
+		url : order_online_submit_url,
+		data : obj,
+		success : function(response) {
+
+			var code = response.code;
+			if (code == "200") {
+				alert("提交成功,请记下您的当前运单编号：" + response.data.orderId
+						+ "把包裹拿到任何一家门店即可");
+				nav12Click();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("3提交网上置件信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+
+function modifyonlineorderhavepic() {
+	// alert("开始提交有图片订单,只要是指在线下单部分的订单");
+	$("#add_online_order").ajaxSubmit(
+			{
+				type : "post",
+				// url : "../consignee/add",//admin/consignee/add
+				// url : "consignee/add",
+				// url : "../admin/msjorder_pic/submit",
+				url : "../order/online_pic_moddifyorder",
+				success : function(data) {
+					//alert(data);
+					$("#tmpmsgdiv2").html(data);
+					var str = $("#tmpmsgdiv2 pre").html();
+
+					var obj = $.parseJSON(str);
+
+					var code = obj.code;
+
+					if (code == "200") {
+						// alert("提交成功");
+						// window.close();
+						alert("修改成功！");
+						nav12Click();
+
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("4提交网上置件信息失败，原因是:" + response.message);
+					}
+					return false;
+				},
+				error : function(XmlHttpRequest, textStatus, errorThrown) {
+					alert("操作失败");
+					return false;
+				}
+			});
+}
+//提交网上修改订单,orderid表示要修改的订单号
+function mulitonlinemodifyOrder1(orderid) {
+
+	var cName = $(":text[name='cName']").val();
+	var cProvince = $(":text[name='cProvince']").val();
+	var cCity = $(":text[name='cCity']").val();
+	var cDistrict = $(":text[name='cDistrict']").val();
+	var cStreetAddress = $(":text[name='cStreetAddress']").val();
+	var cZipCode = $(":text[name='cZipCode']").val();
+	var cPhone = $(":text[name='cPhone']").val();
+
+	var mail = $("select[name='mail']").val();
+	var parceValue = $(":text[name='parceValue']").val();
+	var remark = $("textarea[name='remark']").val();
+
+	var cardid = $(":text[name='cardidname']").val();// 身份证号
+	var cardurl = $(":text[name='idurlcard']").val();// 原有地址中包含的身份证图片链接
+	// alert(cardurl);
+	cardurl = encodeURI(cardurl);
+	
+	
+	var cardurlother = $(":text[name='idurlcardother']").val();// 原有地址中包含的身份证图片链接
+	// alert(cardurl);
+	cardurlother = encodeURI(cardurlother);
+	var cardurltogether = $(":text[name='idurlcardtogether']").val();// 原有地址中包含的身份证图片链接
+	// alert(cardurl);
+	cardurltogether = encodeURI(cardurltogether);
+	
+	var wid = $("select[name='warehouse']").val();
+	var cid=$("select[name='channelidname']").val();
+	
+	var weight = $(":text[name='weight']").val();
+	var tariff = $(":text[name='tariff']").val();
+	var premium = $(":text[name='premium']").val();
+	
+	
+	//kai 20160224
+	var sendname=$(":text[name='sendname']").val();
+	var sendphone=$(":text[name='sendphone']").val();
+	
+var checkbox =document.getElementsByName("saveaddress");	
+	
+	if(checkbox[0].checked==true)
+	{
+		
+		$(":hidden[name='addaddressflag']").val("1");
+	}
+	else
+	{
+		$(":hidden[name='addaddressflag']").val("0");
+	}
+	if((removenull(sendname)==""))
+	{
+		alert("必须填写发件人姓名!");
+		return false;
+	}
+	if((removenull(sendphone)==""))
+	{
+		alert("必须填写发件人电话!");
+		return false;
+	}
+	//kai 20160224
+	if((removenull(parceValue)==""))
+	{
+		alert("必须填写商品价值!");
+		return false;
+	}
+	else
+	{
+		if (isNaN(parceValue))
+		{
+			alert("商品价格填写不正确!");
+			return false;
+		}
+	}
+	
+	if((removenull(wid)=="")||(wid=="-1"))
+	{
+		alert("必须选择门店!");
+		return false;
+	}
+	if((removenull(cid)=="")||(cid=="-1"))
+	{
+		alert("必须选择渠道!");
+		return false;
+	}
+	
+	// alert(cardurl);
+	var validate = true;
+	if (cName == "" || cName == null) {
+		$(":text[name='cName']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cName']").change(function() {
+			if ($(":text[name='cName']").val() != null)
+				$(":text[name='cName']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cProvince == "" || cProvince == null) {
+		$(":text[name='cProvince']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cProvince']").change(function() {
+			if ($(":text[name='cProvince']").val() != null)
+				$(":text[name='cProvince']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cCity == "" || cCity == null) {
+		$(":text[name='cCity']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cCity']").change(function() {
+			if ($(":text[name='cCity']").val() != null)
+				$(":text[name='cCity']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cDistrict == "" || cDistrict == null) {
+		$(":text[name='cDistrict']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cDistrict']").change(function() {
+			if ($(":text[name='cDistrict']").val() != null)
+				$(":text[name='cDistrict']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cStreetAddress == "" || cStreetAddress == null) {
+		$(":text[name='cStreetAddress']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cStreetAddress']").change(function() {
+			if ($(":text[name='cStreetAddress']").val() != null)
+				$(":text[name='cStreetAddress']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	/*if (cZipCode == "" || cZipCode == null) {
+		$(":text[name='cZipCode']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cZipCode']").change(function() {
+			if ($(":text[name='cZipCode']").val() != null)
+				$(":text[name='cZipCode']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}*/
+	if (cPhone == "" || cPhone == null) {
+		$(":text[name='cPhone']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cPhone']").change(function() {
+			if ($(":text[name='cPhone']").val() != null)
+				$(":text[name='cPhone']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+
+	//kai 20160224
+	
+	var str = '"cName":"' + cName + '",' + '"cProvince":"' + cProvince + '",'
+			+ '"cCity":"' + cCity + '",' + '"tariff":"' + tariff + '",'
+			+ '"weight":"' + weight + '",' + '"cDistrict":"' + cDistrict + '",'
+			+ '"premium":"' + premium + '",'  + '"senduserName":"' + sendname + '",' + '"senduserphone":"' + sendphone + '",' 
+			+ '"cZipCode":"' + cZipCode + '",' + '"cPhone":"' + cPhone + '",'+ '"orderId":"' + orderid + '",'
+			+ '"mail":"' + mail + '",' + '"cardid":"' + cardid + '",'+ '"cardurlother":"' + cardurlother + '",'+ '"cardurltogether":"' + cardurltogether + '",'
+			+ '"cardurl":"' + cardurl + '",' + '"parceValue":"' + parceValue+ '",' + '"warehouseId":"' + wid+ '",' + '"channelId":"' + cid
+			+ '",' + '"remark":"' + remark + '",' + '"cStreetAddress":"'
+			+ cStreetAddress + '"';
+	var i = 0;
+	$("select[name='commodityName']").each(
+			function() {
+				var cname = $(this).val();
+
+				var commodifybrandsObj = $(this).parent().find(
+				":input[name='commodifybrands']");
+				var cxiangqingObj = $(this).parent().find(
+						":input[name='commodifyxiangqing']");
+				var cquantityObj = $(this).parent().find(
+						":input[name='commodifyQuantity']");
+				var cxiangqing = cxiangqingObj.val();
+				var cquantity = cquantityObj.val();
+				
+				var commodifybrands=commodifybrandsObj.val();
+
+				if (cquantity == "" || cquantity == null
+						|| isNaN(cquantityObj.val())) {
+					cquantityObj.css({
+						"border-color" : "red"
+					});
+					cquantityObj.change(function() {
+						if (cquantityObj.val() != null
+								&& !isNaN(cquantityObj.val()))
+							cquantityObj.css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+				if (cxiangqing == "" || cxiangqing == null) {
+					cxiangqingObj.css({
+						"border-color" : "red"
+					});
+					cxiangqingObj.change(function() {
+						if (cxiangqingObj.val() != null)
+							cxiangqingObj.css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+				
+				if (commodifybrands == "" || commodifybrands == null) {
+					commodifybrandsObj.css({
+						"border-color" : "red"
+					});
+					commodifybrandsObj.change(function() {
+						if (commodifybrandsObj.val() != null)
+							commodifybrandsObj.css({
+								"border-color" : ""
+							});
+					});
+					validate = false;
+				}
+
+				str += ',"details[' + i + '].commodityId":"' + cname + '"';
+				str += ',"details[' + i + '].quantity":"' + cquantity + '"';
+				str += ',"details[' + i + '].xiangqing":"' + cxiangqing + '"';
+				str += ',"details[' + i + '].brands":"' + commodifybrands + '"';
+				i = i + 1;
+			});
+
+	if (i == 0) {
+		alert("运单商品不能为空，请按添加商品按钮，填写商品信息!");
+		return false;
+	}
+	if (!validate) {
+		alert("红色框中的信息必须正确填写，才可以提交！");
+		return false;
+	}
+
+	
+
+	
+	
+	
+	var picValue = $(":file[name='file']").val();
+	var picValueother = $(":file[name='fileother']").val();
+	if (((picValue != null) && ("" != picValue))||((picValueother != null) && ("" != picValueother))) {// 包含图片,要单独处理
+		
+		var orderid1=$(":text[name='modifyorderid']").val();
+		var orderid2=$(":text[name='modifyorderidname']").val();
+		if(orderid1!="")
+		{
+			if(orderid1!=orderid2)
+			{
+				$(":text[name='modifyorderidname']").val(orderid1);
+			}
+		}
+		
+		modifyonlineorderhavepic();
+		return false;
+	}
+
+	
+	//kai 10160224 保存地址信息
+	var checkbox =document.getElementsByName("saveaddress");	
+	
+	if(checkbox[0].checked==true)
+	{
+		$.ajax({
+			type : "post",
+			url : consignee_add_no_pic_url,
+			data : {
+				"name" : cName,
+				"province" : cProvince,
+				"city" : cCity,
+				"dist" : cDistrict,
+				"sadd" : cStreetAddress,
+				"phone" : cPhone,
+				"zcode" : cZipCode,
+				"cid" : cardid
+				/*"cardUrl" : cardurl,
+				"cardurlother" : cardurlother,
+				"cardurltogether" : cardurltogether*/
+			},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					//alert("添加成功");
+					//nav74Click();
+					// window.location.href = "zhengjiadizi.jsp";
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("添加收件人地址失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	else
+	{
+		//alert("false");
+	}
+	
+	var obj = $.parseJSON("{" + str + "}");
+	$.ajax({
+		type : "post",
+		url : "../order/online_modify",
+		data : obj,
+		success : function(response) {
+           
+			var code = response.code;
+			if (code == "200") {
+				alert("修改成功！");
+				
+				nav12Click();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("5提交网上置件信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+
+//网上置单时，提交修改的订单
+function mulitModifyOrder1()
+{
+	if($("a[name='mulitsubmodify']").attr("state")=="yes")//当前状态为修改状态
+	{
+		var orderid=$(":text[name='modifyorderid']").val();
+		//alert(orderid);
+		if(orderid!="")
+		{
+			mulitonlinemodifyOrder1(orderid);//调用网上置单提交订单函数，再通过state来判断是修改还是提交新订单
+		}
+		else
+		{
+			alert("提交修改失败");
+		}
+	}
+}
+
+//网上修改时，取消修改状态为提交状态
+function mulitcancelModifyOrder1()
+{
+	$("a[name='mulitsub']").attr("style","background: #007FFF;color: #FFFFFF;padding: 5px 15px;display:inline");//设置提交状态为灰色
+	$("a[name='mulitsub']").attr("state","yes");//设置提交为可以提交
+	$("a[name='modifyenable']").attr("style","display:none;");//设置提交为可以提交,隐藏显示要修改的单号
+	$("a[name='mulitsubmodify']").attr("style","background: #6C7175;color: #FFFFFF;padding: 5px 15px;display:inline");//设置灰色
+	$("a[name='mulitsubmodify']").attr("state","no");//设置灰色
+	$("a[name='mulitsubcancel']").attr("style","background: #6C7175;color: #FFFFFF;padding: 5px 15px;display:inline");
+	$("a[name='mulitsubcancel']").attr("state","no");//设置灰色
+}
+
+
+function mulitSubmitWszjOrder() {
+
+	var cName = $(":text[name='cName']").val();
+	var cProvince = $(":text[name='cProvince']").val();
+	var cCity = $(":text[name='cCity']").val();
+	var cDistrict = $(":text[name='cDistrict']").val();
+	var cStreetAddress = $(":text[name='cStreetAddress']").val();
+	var cZipCode = $(":text[name='cZipCode']").val();
+	var cPhone = $(":text[name='cPhone']").val();
+
+	var mail = $("select[name='mail']").val();
+	var parceValue = $(":text[name='parceValue']").val();
+	var remark = $("textarea[name='remark']").val();
+	var premium = $(":text[name='premium']").val();
+
+	var validate = true;
+	if (cName == "" || cName == null) {
+		$(":text[name='cName']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cName']").change(function() {
+			if ($(":text[name='cName']").val() != null)
+				$(":text[name='cName']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cProvince == "" || cProvince == null) {
+		$(":text[name='cProvince']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cProvince']").change(function() {
+			if ($(":text[name='cProvince']").val() != null)
+				$(":text[name='cProvince']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cCity == "" || cCity == null) {
+		$(":text[name='cCity']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cCity']").change(function() {
+			if ($(":text[name='cCity']").val() != null)
+				$(":text[name='cCity']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cDistrict == "" || cDistrict == null) {
+		$(":text[name='cDistrict']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cDistrict']").change(function() {
+			if ($(":text[name='cDistrict']").val() != null)
+				$(":text[name='cDistrict']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cStreetAddress == "" || cStreetAddress == null) {
+		$(":text[name='cStreetAddress']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cStreetAddress']").change(function() {
+			if ($(":text[name='cStreetAddress']").val() != null)
+				$(":text[name='cStreetAddress']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	if (cZipCode == "" || cZipCode == null) {
+		$(":text[name='cZipCode']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cZipCode']").change(function() {
+			if ($(":text[name='cZipCode']").val() != null)
+				$(":text[name='cZipCode']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (cPhone == "" || cPhone == null) {
+		$(":text[name='cPhone']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='cPhone']").change(function() {
+			if ($(":text[name='cPhone']").val() != null)
+				$(":text[name='cPhone']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if(parceValue==""||parceValue==null||isNaN(parceValue)){
+		$(":text[name='parceValue']").css({ "border-color": "red" });
+		$(":text[name='parceValue']").change(function(){
+			if(!isNaN($(":text[name='parceValue']").val()))
+				$(":text[name='parceValue']").css({ "border-color": "" });
+		});
+		return false;
+	}
+	if(premium==""||premium==null||isNaN(premium)){
+		$(":text[name='premium']").css({ "border-color": "red" });
+		$(":text[name='premium']").change(function(){
+			if(!isNaN($(":text[name='premium']").val()))
+				$(":text[name='premium']").css({ "border-color": "" });
+		});
+		return false;
+	}
+	
+
+	var str = '"cName":"' + cName + '",' + '"cProvince":"' + cProvince
+			+ '",' + '"cCity":"' + cCity + '",' + '"cDistrict":"'
+			+ cDistrict + '",' + '"cZipCode":"' + cZipCode + '",'
+			+ '"cPhone":"' + cPhone + '",' + '"mail":"' + mail + '",'
+			+ '"parceValue":"' + parceValue + '",' + '"remark":"' + remark+ '",'
+			+ '"premium":"' + premium + '",' + '"cStreetAddress":"' + cStreetAddress + '"';
+	/*var i = 0;
+	$("select[name='commodityName']")
+			.each(
+					function() {
+						var cname = $(this).val();
+
+						var cxiangqingObj = $(this).parent().find(
+								":input[name='commodifyxiangqing']");
+						var cquantityObj = $(this).parent().find(
+								":input[name='commodifyQuantity']");
+						var cxiangqing = cxiangqingObj.val();
+						var cquantity = cquantityObj.val();
+
+						if (cquantity == "" || cquantity == null
+								|| isNaN(cquantityObj.val())) {
+							cquantityObj.css({
+								"border-color" : "red"
+							});
+							cquantityObj.change(function() {
+								if (cquantityObj.val() != null
+										&& !isNaN(cquantityObj.val()))
+									cquantityObj.css({
+										"border-color" : ""
+									});
+							});
+							validate = false;
+						}
+						if (cxiangqing == "" || cxiangqing == null) {
+							cxiangqingObj.css({
+								"border-color" : "red"
+							});
+							cxiangqingObj.change(function() {
+								if (cxiangqingObj.val() != null)
+									cxiangqingObj.css({
+										"border-color" : ""
+									});
+							});
+							validate = false;
+						}
+
+						str += ',"details[' + i + '].commodityId":"'
+								+ cname + '"';
+						str += ',"details[' + i + '].quantity":"'
+								+ cquantity + '"';
+						str += ',"details[' + i + '].xiangqing":"'
+								+ cxiangqing + '"';
+						i = i + 1;
+					});
+
+	if (i == 0) {
+		alert("运单商品不能为空，请按添加商品按钮，填写商品信息!");
+		return false;
+	}*/
+	if (!validate) {
+		alert("红色框中的信息必须正确填写，才可以提交！");
+		return false;
+	}
+	var obj = $.parseJSON("{" + str + "}");
+	$.ajax({
+		type : "post",
+		url : order_online_submit_url,
+		data : obj,
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+				alert("提交成功,请记下您的当前运单编号：" + response.data.orderId
+						+ "把包裹拿到任何一家门店即可");
+				nav12Click();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("7提交网上置件信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+////////////////////////////////////////////
+function loadNav13Data() {
+	var forwardState = window.sessionStorage.getItem("searchState");
+	if(forwardState != null){
+		$("#stateSelect").val(forwardState);
+	}
+	window.sessionStorage.clear();
+	loaddhybinfo("1");
+	getNeedFocusCount();
+	// 设置点击跳转的事件
+	$("#datatable tfoot #page a").click(function() {
+		// 跳页
+		var pn = $(this).attr("href");
+		loaddhybinfo(pn);
+		return false;
+	});
+
+	$("#datatable tfoot input").keydown(function(event) {
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				loaddhybinfo(pn);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});
+	
+
+	function loaddhybinfo(pn) {
+		$.ajax({
+			type : "get",
+			url : transh_search_url,
+			data : {
+				"pageIndex" : pn,
+				state : $("#stateSelect").val()
+			},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					if (response.data != null) {
+						showdhyblist(response.data.datas);
+						showpagesplit(response.data);
+					} else {
+						showdhyblist(null);
+						showpagesplit(null);
+					}
+					aftershow();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					// 失败
+					alert("获取预报记录信息失败，原因是:" + response.message);
+				}
+			}
+		});
+	}
+	// kai 20151001 修改转运信息显示
+	//kia 20151004 modify
+	
+	function showdhyblist(list) {
+		$("#datatable tbody").html("");
+		if (list != null && list.length > 0) {
+			$
+					.each(
+							list,
+							function() {
+
+								var str = "<tr id='" + this.id + "'>";
+								str += "<td>" + this.id + "</td>";
+								str += "<td>" + this.transitNo + "</td>";
+								var pm = "";
+								var number = 0;
+								$
+										.each(
+												this.commoditys,
+												function() {
+
+													number = number + 1;
+													pm += number
+															+ "、商品分类：<span style='color:blue;'>"
+															+ this.commodityName
+															+ "</span>, 商品数量：<span style='color:blue;'>"
+															+ this.quantity
+															+ "</span>, 商品描述：<span style='color:blue;'>"
+															+ this.xiangqing
+															+ "</span>; <br>  ";
+
+												});
+								str += "<td style='text-align:left;'>" + pm
+										+ "</td>";
+								
+								if(this.state!='-10')
+								{								
+									str += "<td style='text-align:left;'>" + removenull(this.remark)
+									+ "</td>";
+								}
+								else
+								{
+									str += "<td style='text-align:left;color:red;'>" + removenull(this.wrongRemark)
+									+ "</td>";
+								}
+						
+								
+								if (this.awt == null) {
+									str += "<td>&nbsp;</td>";
+								} else {
+									str += "<td>" + this.awt + "</td>";
+								}
+								if (this.weight == null) {
+									str += "<td>&nbsp;</td>";
+								} else {
+									str += "<td>" + this.weight + "</td>";
+								}
+								str += "<td>" + this.warehouseName + "</td>";
+								
+								str += "<td>" + this.channelsName + "</td>";
+								str += "<td name='tranwarehouseId' style='display:none;'>" + this.warehouseId + "</td>";
+								str += "<td name='tranchannelId' style='display:none;'>" + this.channelId + "</td>";
+								if (this.state == "1" ) {//
+									str += "<td>是</td>";
+								} else if (this.state == "0") {
+									str += "<td>否</td>";
+								} else {
+									str += "<td>转运中</td>";
+								}
+								if (this.state == "1")// 表示已经入库
+								{
+									str += "<td><input type='checkbox' name='tijiao_submit' value='"
+											+ this.id + "' /></td>";
+								} else {
+									str += "<td><input type='checkbox' disabled='true' name='tijiao_submit' value='"
+											+ this.id + "' /></td>";
+								}
+
+								if (this.state == "0") {
+									str += "<td><a href='#' name='a_del_link'>删除</a></td></tr>";
+								} else if (this.state == "1") {
+									str += "<td><a href='#' name='a_return_package_link'>退货</a></td></tr>";
+								} else if (this.state == "2") {
+									str += "<td>等待审核</td></tr>";
+								} else if (this.state == "3") {
+									str += "<td><a href='#' name='a_pay_tran_order_link'><span style='color:blue'>支付订单</span></a></td></tr>";
+								}else if (this.state == "4") {
+									if(removenull(this.orderId)=="")
+									{
+										str += "<td>已付款</td></tr>";
+									}
+									else
+									{
+										str += "<td>已付款,运单号:"+this.orderId+"</td></tr>";
+									}
+								}else if (this.state == "5") {
+									if(removenull(this.orderId)=="")
+									{
+										str += "<td>分拣完成</td></tr>";
+									}
+									else
+									{
+										str += "<td>分拣完成,运单号:"+this.orderId+"</td></tr>";
+									}
+								}else if (this.state == "-6") {
+									str += "<td>转运出库</td></tr>";
+								}else if (this.state == "-7") {
+									str += "<td>转运入库</td></tr>";
+								} else if(this.state == "-8"){
+									str += "<td>已退货</td></tr>";
+								} else if(this.state == "-9"){
+									var cancelOver = '"取消"';
+									var cancelOut = '"退货中"';
+									str += "<td><a href='#' name='a_cancel_return_package_link' onmouseover='javascript: this.innerHTML="+cancelOver+"' onmouseout='javascript: this.innerHTML="+cancelOut+"'>退货中</a></td></tr>";
+								}else if(this.state == "-10"){
+									str += "<td>包裹异常</td></tr>";
+								}  else {
+									str += "<td></td></tr>";
+								}
+								
+								
+								
+								$("#datatable tbody").append(str);
+							});
+			
+			//kai 20151004 点击选择的运行事件
+			
+			$(":checkbox[name='tijiao_submit']")
+			.click(
+					function() {
+						var wid="";
+						var cid="";
+						var checkbox =document.getElementsByName("tijiao_submit");
+						for (var i = 0; i < checkbox.length; i++) {
+							if (checkbox[i].checked == true) {
+								wid=$(checkbox[i]).parent().parent().find("td[name='tranwarehouseId']").html();
+								cid=$(checkbox[i]).parent().parent().find("td[name='tranchannelId']").html();
+								break;
+							}
+						}
+						if ($(this).is(':checked'))//这个被选中，开始比较
+						{
+							var thiswid=$(this).parent().parent().find("td[name='tranwarehouseId']").html();
+							var thiscid=$(this).parent().parent().find("td[name='tranchannelId']").html();
+							if((wid!="")&&(cid!=""))
+							{
+								if((thiswid!=wid)||(thiscid!=cid))
+								{
+									alert("对不起，只能选择同一仓库和同一渠道的运单！");
+									$(this).removeAttr("checked");
+								}
+							}
+						}
+						
+					});
+		} else {
+			var str = "<tr><td colspan='11'>暂无预报数据，您可以在包裹预报中预报您的包裹！或者到订单中查看已经提交后的订单</tr>";
+			$("#datatable tbody").append(str);
+		}
+
+		function showpagesplit(pageSplit) {
+			var rowCount = 0;
+			var pageSize = 0;
+			var pageNow = 0;
+			var pageCount = 0;
+			if (pageSplit != null) {
+				rowCount = pageSplit.rowCount;
+				pageSize = pageSplit.pageSize;
+				pageNow = pageSplit.pageNow;
+				pageCount = pageSplit.pageCount;
+			}
+			$("#trsize").html(rowCount);
+			$("#tpsize").html(pageCount);
+			$("#first_page").attr("href", "1");
+			$("#pre_page").attr("href", pageNow - 1);
+			$("#next_page").attr("href", pageNow + 1);
+			$("#last_page").attr("href", pageCount);
+		}
+
+	}
+
+	function aftershow() {
+		
+		
+		
+		
+		
+		$("a[name='a_pay_tran_order_link']").click(function() {
+			//var chk_value = [];
+			var id = $(this).parent().parent().attr("id");
+			//alert(id);
+			tranorderpayClick(id);
+			return false;
+		});
+		
+		
+		$("a[name='a_del_link']").click(function() {
+			var chk_value = [];
+			var id = $(this).parent().parent().attr("id");
+			chk_value.push(id);
+			if (confirm("您是否确认要删除此预报记录?")) {
+				$.ajax({
+					type : "post",
+					url : transh_delete_url,
+					data : $.param({
+						"id" : chk_value,
+					}, true),
+					success : function(response) {
+						var code = response.code;
+						if (code == "200") {
+							alert("删除成功");
+							loadNav13Data();
+						} else if ("607" == code) {
+							alert("您尚未登录或登录已失效！");
+							logout();
+						} else {
+							// 失败
+							alert("删除信息失败，原因是:" + response.message);
+						}
+					}
+				});
+			}
+			return false;
+		});
+		$("a[name='a_return_package_link']").click(function() {
+			var id = $(this).parent().parent().attr("id");
+			if (confirm("您是否确认要退货?")) {
+				var sessionStorage = window.sessionStorage;
+				sessionStorage.setItem("transhipmentId", id);
+				$("#main-content").load("../user/returnPackageAdd.jsp");
+			}
+			return false;
+		});
+		$("a[name='a_cancel_return_package_link']").click(function() {
+			var id = $(this).parent().parent().attr("id");
+			if (confirm("确认取消退货?")) {
+				$.ajax({
+					type : "post",
+					url : "../user/returnPackage/cancel",
+					data : {
+						transhipmentId : id,
+					},
+					success : function(response) {
+						var code = response.code;
+						if (code == "200") {
+							alert("取消成功");
+							loadNav13Data();
+						} else if ("607" == code) {
+							alert("您尚未登录或登录已失效！");
+							logout();
+						} else {
+							// 失败
+							alert("删除信息失败，原因是:" + response.message);
+						}
+					}
+				});
+			}
+			return false;
+		});
+	}
+
+}
+
+function bgcxsubmit() {
+	
+	getglobalargs_cur_usa_cn();//获取汇率
+	
+	if($("input[name='protocol_namep']").is(':checked'))
+	{}
+	else
+	{
+		alert("请勾选\" 同意本站转运协议\"才能提交!");
+		return;
+	}
+	var chk_value = "";
+	$(':checkbox[name="tijiao_submit"]:checked').each(function() {
+		chk_value += $(this).val() + ",";
+	});
+	if (chk_value.length == 0) {
+		alert("至少选择一个运单！ ");
+	} else {
+		chk_value = chk_value.substring(0, chk_value.length - 1);
+		nav131Click(chk_value);
+		// window.location.href = "tijiaoyundan.jsp?tid=" + chk_value;
+	}
+	return false;
+}
+
+function caibao() {
+	var chk_value = "";
+	var i = 0;
+	$(':checkbox[name="tijiao_submit"]:checked').each(function() {
+		chk_value = $(this).val();
+		i = i+1;
+	});
+	if (i == 0) {
+		alert("您还没有选择要提交的预报单或预报单已经入库！");
+	} else if (i > 1){
+		alert("拆包操作一次只能选择一个订单！");
+	}
+	else{
+		nav132Click(chk_value);
+		//window.location.href = "baoguocaibao.jsp?tid=" + chk_value;
+	}
+	return false;
+	}
+
+//kai 20151001 提交选择的包裹
+function bgtogetherchoose() {
+	var chk_value = "";
+	$(':checkbox[name="tijiao_submit"]:checked').each(function() {
+		chk_value += $(this).val() + ",";
+	});
+	if (chk_value.length == 0) {
+		alert("您选择的包裹尚未入库 ");
+	} else {
+		chk_value = chk_value.substring(0, chk_value.length - 1);
+		nav131Click(chk_value);
+		// window.location.href = "tijiaoyundan.jsp?tid=" + chk_value;
+	}
+	return false;
+}
+
+
+///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+function loadNav131Data() {
+
+	
+	get_tranpricetable();//获取转运价格
+	getglobalargs_commrate();//获取转运参数
+	
+	
+	
+	// 开始获取数据
+	var regx = /\d+/g;
+	var value = $(":hidden[name='s_tid']").val();
+	var arrs = value.match(regx);
+
+	if (arrs != null) {
+		// 加载数据
+		loadTData(arrs);
+	}
+	showLocation();
+	showusaLocation();
+	//adduseraddrebook
+	//kai 20151002 点击显示或隐藏地址薄
+	$("a[id='adduseraddrebook']").click(function() {
+		
+		//alert($("#adduseraddrebook").attr("state"));
+		if($("#adduseraddrebook").attr("state")=="no")
+		{
+			$("#addressbook").attr("style","");
+			$("#adduseraddrebook").html("隐藏地址薄&nbsp;&nbsp;");
+			$("#adduseraddrebook").attr("state","yes");
+		}
+		else
+		{
+			$("#addressbook").attr("style","display:none");
+			$("#adduseraddrebook").html("引用地址薄&nbsp;&nbsp;");
+			$("#adduseraddrebook").attr("state","no");
+		}
+	});
+	$(":text[name='premium']").change(userModifyCalcFreight_dhyb);//保险改变时,重新计算价格
+	
+	//全选按键kai 20151003
+	$("#tijiao_allcheckbox").click(function() {
+		// alert("asdfas");
+		if ($(this).is(':checked')) {
+			$('input[name="commdity_nums"]').attr("checked", 'true');
+		} else {
+			$('input[name="commdity_nums"]').removeAttr("checked");
+		}
+		userModifyCalcFreight_dhyb();
+		//countorderchecked();
+	});
+	
+	$("#use_pct").click(function() {
+		
+		if($("#use_pct").is(':checked')==true)
+		{
+			$("#loc_province").attr("disabled","disabled");
+			$("#loc_city").attr("disabled","disabled");
+			$("#loc_town").attr("disabled","disabled");
+			
+		}
+		else
+		{
+			$("#loc_province").removeAttr("disabled");
+			$("#loc_city").removeAttr("disabled");
+			$("#loc_town").removeAttr("disabled");
+		}
+	});
+	//获取是否要上传身份证
+	$.ajax({
+		type : "get",
+		url : "../user/globalArgs/getUseIdCard",
+		success : function(response){
+			var code = response.code;
+			if("200" == code){
+				document.getElementById("useIdcardText").value = response.data;
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				// alert("获取仓库数据失败，原因是:" + response.message);
+			}
+		}
+	});
+	
+	
+	// 获取用户数据
+	$.ajax({
+		type : "get",
+		url : user_get_self_url,
+		success : function(response) {
+			var code = response.code;
+			if (code == "200") {
+				var data = response.data;
+
+				$("#usd_money").html("$" + data.usdBalance);
+				$("#rmb_money").html("￥" + data.rmbBalance);
+				
+				 $(":hidden[name='s_usa_money']").val(data.usdBalance);
+				 $(":hidden[name='s_china_money']").val(data.rmbBalance);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+	
+	
+	//获取汇率等全局变量
+	var flags="cur_usa_cn,premium_rate";//汇率,保险率
+	 $.ajax({
+			type : "post",
+			url : user_globalargs_getcontents_url,
+			data : {
+				"flags" : flags
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+
+					if (response.data != null) {
+						
+						
+							if((response.data[0]=="")||(response.data[0]=="null")||(response.data[0]=="undefined")||(response.data[0]==null))
+							{							
+								//alert("汇率获取失败");
+								
+							}
+							else
+							{
+								
+								$("#usa_rmb_rate").html(response.data[0]);
+								$(":hidden[name='s_usa_rmb_rate']").val(response.data[0]);
+							}
+							
+							if((response.data[1]=="")||(response.data[1]=="null")||(response.data[1]=="undefined")||(response.data[1]==null))
+							{							
+								//alert("汇率获取失败");
+								$(":hidden[name='premiumratevalue']").val("0");
+							}
+							else
+							{
+								
+								$(":hidden[name='premiumratevalue']").val(response.data[1]);
+							}
+							
+							
+						
+					} else {
+
+					}
+				}  else {
+
+				}
+				
+			}
+		});
+		$(":text[name='premium']").change(countpremiummoney_user);
+	loadCaddress();
+
+	$("a[name='a_search_link']").click(function() {
+		var tid = $(":text[name='tid']").val();
+		var arrs = [];
+		arrs.push(tid);
+		loadTData(arrs);
+	});
+	// 设置点击退出链接时候进行的操作
+	$("a[name='a_exit_link']").click(function() {
+		$.ajax({
+			type : "get",
+			url : "user/logout",
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("退出失败，失败原因是:" + response.message);
+				}
+			}
+		});
+	});
+
+}
+
+
+function countpremiummoney_user()
+{
+	var rate=$(":hidden[name='premiumratevalue']").val();
+	//alert(rate);
+	if((rate=="0")||(rate==null))
+	{
+		return false;
+	}
+	 rate = parseFloat(rate);
+	if (isNaN(rate))
+	{
+		return false;
+	}
+	var premium1=parseFloat($(":text[name='premium']").val());
+	
+	if(isNaN(premium1))
+	{
+		return false;
+	}
+	if(premium1>0)
+	{}
+	else if(premium1<0)
+	{
+		alert("保险不能小于0!");
+		return false;
+	}
+	else
+	{
+		return false;
+	}
+	var premiumt=parseFloat(premium1/rate);
+	
+	if (isNaN(premiumt))
+	{
+		return false;
+	}
+	if(parseFloat(premium_max_value)!="NaN")
+	{
+		if(premiumt>parseFloat(premium_max_value))
+		{
+			alert("最大保险额度不能超过"+premium_max_value+"美元!");
+			$(":text[name='premium']").val(premium_max_value*rate);
+			$(":text[name='premiumtotal']").val(premium_max_value);
+		}
+		else 
+		{
+			$(":text[name='premiumtotal']").val(premiumt);
+		}
+	}
+	else
+	{
+		$(":text[name='premiumtotal']").val(premiumt);
+	}
+	
+}
+
+function loadCaddress() {
+	$
+			.ajax({
+				type : "get",
+				url : consignee_all_url,
+				success : function(response) {
+					var code = response.code;
+					if (code == "200") {
+						$("#cdatatable tbody").html("");
+						$
+								.each(
+										response.data,
+										function() {
+											var str = "<tr>";
+											str += '<td><input type="radio" name="addresscid" value="'
+													+ this.id + '"/></td>';
+											str += '<td name="conName">'
+													+ this.name + '</td>';
+											str += '<td name="conPhone">'
+													+ this.phone + '</td>';
+											str += '<td name="conZipCode">'
+													+ this.zipCode + '</td>';
+											str += '<td colspan="4">'
+													+ this.province + '&nbsp;'
+													+ this.city + '&nbsp;'
+													+ this.district + '&nbsp;'
+													+ this.streetAddress
+													+ '</td>';
+											str += '<td name="conProvince" style="display:none;">'
+													+ this.province + '</td>';
+											str += '<td name="conCity" style="display:none;">'
+													+ this.city + '</td>';
+											str += '<td name="conDistrict" style="display:none;">'
+													+ this.district + '</td>';
+											str += '<td name="conStreetAddress" style="display:none;">'
+												+ this.streetAddress + '</td>';
+											str += '<td name="conCardId" >'
+												+ this.cardId + '</td>';
+											
+											if (this.cardUrl == null
+													|| this.cardUrl == ''
+													|| this.cardUrl == 'null') {
+												str += "<td style='text-align:center;'>无</td>";
+											} else {
+												var url = this.cardUrl;
+												url = baseUrl + url;
+												str += "<td style='text-align:center;'><a href='"
+														+ url
+														+ "'  target='_blank'><img width='30px' height='30px' src='"
+														+ url + "'/></a></td>";
+											}
+                                            //alert(this.cardurlother);
+											if (this.cardurlother == null
+													|| this.cardurlother == ''
+													|| this.cardurlother == 'null') {
+												str += "<td style='text-align:center;'>无</td>";
+											} else {
+												var url = this.cardurlother;
+												url = baseUrl + url;
+												str += "<td style='text-align:center;'><a href='"
+														+ url
+														+ "'  target='_blank'><img width='30px' height='30px' src='"
+														+ url + "'/></a></td>";
+											}
+											
+											if (this.cardurltogether == null
+													|| this.cardurltogether == ''
+													|| this.cardurltogether == 'null') {
+												str += "<td style='text-align:center;'>无</td>";
+											} else {
+												var url = this.cardurltogether;
+												url = baseUrl + url;
+												str += "<td style='text-align:center;'><a href='"
+														+ url
+														+ "'  target='_blank'><img width='30px' height='30px' src='"
+														+ url + "'/></a></td>";
+											}
+											str += '<td name="conCardUrl" style="display:none;">'
+													+ this.cardUrl + '</td>';
+											str += '<td name="conCardUrlother" style="display:none;">'
+													+ this.cardurlother
+													+ '</td>';
+											str += '<td name="conCardUrltogether" style="display:none;">'
+													+ this.cardurltogether
+													+ '</td>';
+											str += '</tr>';
+											$("#cdatatable tbody").append(str);
+										});
+						// $("#cdatatable tbody
+						// :radio").first().attr("checked",true);
+
+						$(":radio[name='addresscid']")
+								.click(
+										function() {
+											
+											// alert($(this).parent().parent().find("a[name='conName']").html());
+											
+											
+											
+											
+											$(":text[name='name']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conName']")
+																	.html());
+											
+											$(
+													"#loc_province option[name="
+															+ $(this).parent().parent().find(
+																	"td[name='conProvince']").html()).attr(
+													'selected', true);
+											var loc = new Location();
+											var title = [ '省份', '地级市', '市、县、区' ];
+											$.each(title, function(k, v) {
+												title[k] = '<option value="">' + v + '</option>';
+											});
+											$('#loc_city').empty();
+											$('#loc_city').append(title[1]);
+											loc.fillOption('loc_city', '0,' + $('#loc_province').val());
+											$('#loc_town').empty();
+											$('#loc_town').append(title[2]);
+
+											$(
+													"#loc_city option[name="
+															+ $(this).parent().parent().find(
+																	"td[name='conCity']").html()).attr(
+													'selected', true);
+											$('#loc_town').empty();
+											$('#loc_town').append(title[2]);
+											loc.fillOption('loc_town', '0,' + $('#loc_province').val()
+													+ ',' + $('#loc_city').val());
+											$(
+													"#loc_town option[name="
+															+ $(this).parent().parent().find(
+																	"td[name='conDistrict']").html()).attr(
+													'selected', true);
+
+											
+											
+											/*$(":text[name='cProvince']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conProvince']")
+																	.html());
+										
+											
+											
+											
+											$(":text[name='cCity']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conCity']")
+																	.html());
+											$(":text[name='cDistrict']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conDistrict']")
+																	.html());*/
+											$(":text[name='sadd']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conStreetAddress']")
+																	.html());
+											$(":text[name='zcode']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conZipCode']")
+																	.html());
+											$(":text[name='phone']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conPhone']")
+																	.html());
+											$(":text[name='cid']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conCardId']")
+																	.html());
+
+											$(":text[name='idurlcard']")
+													.val(
+															$(this)
+																	.parent()
+																	.parent()
+																	.find(
+																			"td[name='conCardUrl']")
+																	.html());
+											var cardurl1 = $(this)
+													.parent()
+													.parent()
+													.find(
+															"td[name='conCardUrl']")
+													.html();
+											// $(":file[name='file']").val(
+											// $(this).parent().parent()
+											// .find("td[name='conCardUrl']").html());
+											if ((cardurl1 != "")
+													&& (cardurl1 != "null")
+													&& (cardurl1 != "无"))// 地址中包含有身份证图片，显示出来
+											{
+												// alert(cardurl1);
+												$("#showcardpicid").attr(
+														"style",
+														"display:block;");
+												$(":text[name='idurlcard']")
+														.val(cardurl1);
+												cardurl1 = getRootPath()
+														+ cardurl1;
+												$("#imacardurlid").attr("href",
+														cardurl1);
+												$("#imacardurlid img").attr(
+														"src", cardurl1);
+
+											} else {
+												
+												
+												
+												$("#showpics")
+												.attr("style",
+														"");
+												
+												$("#showcardpicid")
+														.attr("style",
+																"display:none");
+
+												$(":text[name='idurlcard']")
+														.val("");// 已经重新上传，清空原有的图片
+											}
+
+											$(":file[name='file']").val("");// 清空原来选择过上传的图片
+
+											cardurl1 = $(this)
+													.parent()
+													.parent()
+													.find(
+															"td[name='conCardUrlother']")
+													.html();
+											if ((cardurl1 != "")
+													&& (cardurl1 != "null")
+													&& (cardurl1 != "无"))// 地址中包含有身份证图片，显示出来
+											{
+												// alert(cardurl1);
+												$("#showcardpicidother").attr(
+														"style",
+														"display:block;");
+												$(
+														":text[name='idurlcardother']")
+														.val(cardurl1);
+												cardurl1 = getRootPath()
+														+ cardurl1;
+												$("#imacardurlidother").attr(
+														"href", cardurl1);
+												$("#imacardurlidother img")
+														.attr("src", cardurl1);
+
+											} else {
+												$("#showpics")
+												.attr("style",
+														"");
+												$("#showcardpicidother")
+														.attr("style",
+																"display:none");
+
+												$(
+														":text[name='idurlcardother']")
+														.val("");// 已经重新上传，清空原有的图片
+											}
+
+											$(":file[name='fileother']")
+													.val("");// 清空原来选择过上传的图片
+
+											// 提取合成图
+											cardurl1 = $(this)
+													.parent()
+													.parent()
+													.find(
+															"td[name='conCardUrltogether']")
+													.html();
+											if ((cardurl1 != "")
+													&& (cardurl1 != "null")
+													&& (cardurl1 != "无"))// 地址中包含有身份证图片，显示出来
+											{
+												$("#showpics")
+												.attr("style",
+														"");
+
+												$(
+														":text[name='idurlcardtogether']")
+														.val(cardurl1);
+
+											} else {
+
+												$(
+														":text[name='idurlcardtogether']")
+														.val("");// 已经重新上传，清空原有的图片
+											}
+
+										});
+						// 当上传图片时，用于实时隐藏原地址薄中的图片
+						$("#cardpicid")
+								.on(
+										"change",
+										function() {
+											// alert("555");
+											var picValue = $(
+													":file[name='file']").val();
+											// alert(picValue);
+											if ((picValue != null)
+													&& ("" != picValue)) {// 包含图片,要单独处理
+												$("#showcardpicid")
+														.attr("style",
+																"display:none");
+
+												// $(":text[name='idurlcard']").val("");//
+												// 已经重新上传，清空原有的图片
+
+											} else {
+												var url2 = $(
+														":text[name='idurlcard']")
+														.val();
+
+												// alert(url2);
+												if ((url2 != null)
+														&& (url2 != "")
+														&& (url2 != "null")) {
+													$("#showcardpicid").attr(
+															"style",
+															"display:block;");
+													var cardurl1 = getRootPath()
+															+ url2;
+
+													$("#imacardurlid").attr(
+															"href", cardurl1);
+													$("#imacardurlid img")
+															.attr("src",
+																	cardurl1);
+
+												}
+											}
+											// $("#imacardurlid").attr("href",$("#cardpicid").val());
+											// $("#imacardurlid
+											// img").attr("src",$("#cardpicid").val());
+										});
+
+						// 当上传图片时，用于实时隐藏原地址薄中的图片
+						$("#cardpicidother")
+								.on(
+										"change",
+										function() {
+											// alert(666);
+											var picValue = $(
+													":file[name='fileother']")
+													.val();
+											if ((picValue != null)
+													&& ("" != picValue)) {// 包含图片,要单独处理
+												$("#showcardpicidother")
+														.attr("style",
+																"display:none");
+
+												// $(":text[name='idurlcardother']").val("");//
+												// 已经重新上传，清空原有的图片
+
+											} else {
+												var url2 = $(
+														":text[name='idurlcardother']")
+														.val();
+												if ((url2 != null)
+														&& (url2 != "")
+														&& (url2 != "null")) {
+													$("#showcardpicidother")
+															.attr("style",
+																	"display:block;");
+													var cardurl1 = getRootPath()
+															+ url2;
+													$("#imacardurlidother")
+															.attr("href",
+																	cardurl1);
+													$("#imacardurlidother img")
+															.attr("src",
+																	cardurl1);
+
+												}
+											}
+											// $("#imacardurlid").attr("href",$("#cardpicid").val());
+											// $("#imacardurlid
+											// img").attr("src",$("#cardpicid").val());
+										});
+
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						// 失败
+						alert("获取地址信息失败，原因是:" + response.message);
+					}
+				}
+			});
+}
+
+function loadCaddress00() {
+	$.ajax({
+		type:"get",
+		url:consignee_all_url,
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				$("#cdatatable tbody").html("");
+				$.each(response.data, function(){
+					var str = "<tr>";
+					str += '<td><input type="radio" name="cid" value="' + this.id + '"/></td>';
+					str += '<td>' + this.name + '</td>';
+					str += '<td>' + this.phone + '</td>';
+					str += '<td>' + this.cardId + '</td>';
+					str += '<td>' + this.province + '&nbsp;' + this.city + '&nbsp;' + this.district + '&nbsp;' + this.streetAddress + '</td>';
+					str += '</tr>';
+					$("#cdatatable tbody").append(str);
+				});
+				$("#cdatatable tbody :radio").first().attr("checked",true);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取地址信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+function loadTData(ids) {
+	$.ajax({
+		type : "get",
+		url : transh_get_by_id_url,
+		data : $.param({
+			"id" : ids,
+		}, true),
+		success : function(response) {
+
+			var code = response.code;
+			if (code == "200") {
+				// showydtjlist(response.data);
+				var warehouseId = "";
+				var channelId = "";
+				var warehousename = "";
+				var channelname = "";
+				var ii = 0;
+				var flagnon = true;
+
+				//
+				$.each(response.data, function() {
+					if (ii == 0) {
+						warehouseId = this.warehouseId;
+						channelId = this.channelId;
+
+						warehousename = this.warehouseName;
+						channelname = this.channelsName;
+					} else {
+						if ((warehouseId != this.warehouseId)
+								|| (channelId != this.channelId)) {
+							//alert("必须选择同一仓库和渠道!");
+							flagnon = false;
+							nav13Click();
+							return false;
+						}
+					}
+					ii = ii + 1;
+				});
+
+				if (flagnon == false) {
+					alert("必须选择同一仓库和渠道!");
+
+					nav13Click();
+				} else {
+
+					$(":text[name='wid_dhbg']").val(warehousename);
+					$(":text[name='cid_dhbg']").val(channelname);
+					
+					$(":hidden[name='s_warehouseid']").val(warehouseId);
+					$(":hidden[name='s_channelid']").val(channelId);
+					
+					
+					$(":text[name='wid_dhbg']").attr("readonly", "value");
+					$(":text[name='cid_dhbg']").attr("readonly", "value");
+					
+					loadchannelinfo_dhyb(channelId);
+					
+					loadCommodityInfo_dhyb(warehouseId, channelId,
+							response.data);
+				}
+
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取转运单信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+//获取渠道信息
+function loadchannelinfo_dhyb(cid)
+{
+	$.ajax({
+		post : "get",
+		url : "../channel/getcannelbyid",
+		data : {
+			"cid" : cid
+		},
+		success : function(response) {
+			var code = response.code;
+			//alert(code);
+			//alert(response.data.additivePrice);
+			if ("200" == code) {
+				$(":text[name='additivePrice']").val(response.data.additivePrice);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+function loadCommodityInfo_dhyb(wid, cid, data) {
+	
+	
+	
+	
+	$.ajax({
+		post : "get",
+		url : "../commodity/user_all",
+		data : {
+			"wid" : wid,
+			"cid" : cid
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				// showCommodityList(response.data);;
+				/*
+				 * var str = ""; $.each(response.data,function() { str += "<option
+				 * value='" + this.id+"' price='" + this.price+"' msPrice='" +
+				 * this.msPrice+"' >" + this.name+ "</option>"; });
+				 */
+				
+				$(":hidden[name='s_commoditylist']").val(response.data);
+				
+				
+				
+				showydtjlist(data, response.data);
+				// $("select[name='commodityName']").html(str);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			}
+		}
+	});
+}
+
+// eachjweight 商品重量 commoditylist商品价格列表
+function Cal_dhyb_eachprice(weight, commoditylist, commodityid) {
+	var userType = $(":hidden[name='userType']").val();
+	var comprice = 0;
+	var flag = false;
+	var firstFee = 0;
+	$.each(commoditylist, function() {
+		if (this.id == commodityid) {
+			if (userType == "0") {
+				comprice = this.price;
+			} else if (userType == "1") {
+				comprice = this.msPrice;
+
+			} else if (userType == "2") {
+				comprice = this.vipOnePrice;
+
+			} else if (userType == "3") {
+				comprice = this.vipTwoPrice;
+
+			} else if (userType == "4") {
+				comprice = this.vipThreePrice;
+
+			} else {
+				comprice = this.price;
+
+			}
+			//firstFee=this.firstFee;//首磅费用
+			
+			flag = true;
+			return false;
+		}
+	});
+	if (flag == false) {
+		alert("商品类型对应失败,计算价钱失败!");
+		nav13Click();
+		return false;
+	}
+
+	//var commodityPrice = parseFloat(firstFee) + parseFloat(comprice) * parseFloat(weight);
+	//去掉关联商品的首磅费用，使用渠道的附加费替代
+	var commodityPrice =  parseFloat(comprice) * parseFloat(weight);
+	if (commodityPrice == "NaN") {
+		alert("计算价钱失败!");
+		nav13Click();
+		return false;
+	}
+	return commodityPrice;
+}
+function Cal_dhyb_firstFee(commoditylist, commodityid) {
+	var flag = false;
+	var firstFee = 0;
+	$.each(commoditylist, function() {
+		if (this.id == commodityid) {
+			firstFee=this.firstFee;//首磅费用
+			flag = true;
+			return false;
+		}
+	});
+	if (flag == false) {
+		alert("商品类型对应失败,计算价钱失败!");
+		nav13Click();
+		return false;
+	}
+	return firstFee;
+}
+
+
+
+
+//kai 20151002 动态计算价格并显示总价
+
+//eachjweight 商品重量 commoditylist商品价格列表
+function Cal_dhyb_autototalmoney() {
+	
+	var commtotalmoney=0;
+	var totalmeny=0;
+	var totalFirstFee = 0;
+	var additivePrice=0;
+	var checkbox = document.getElementsByName("commdity_nums"); // id表示你的checkbox的name属性
+	for (var i = 0; i < checkbox.length; i++) {
+		if (checkbox[i].checked == true) {
+			var eachmoney=$(checkbox[i]).parent().parent().find("td[name='eachcommidtymoney']").html();
+			commtotalmoney=parseFloat(eachmoney)+parseFloat(commtotalmoney);
+			//totalFirstFee += parseFloat($(checkbox[i]).parent().parent().find("td[name='firstFee']").html());
+		}
+	}
+	
+	additivePrice=parseFloat($(":text[name='additivePrice']").val());
+	totalmeny=parseFloat($(":text[name='premium']").val())+commtotalmoney+additivePrice;
+	if(totalmeny=="NaN")
+	{
+		alert("总价计算错误,请检查输入格式是否正确!");
+		$(":text[name='totalmoney']").val("0");
+		$("#totalFirstFee").val("0");
+	}
+	else
+	{
+		$(":text[name='totalmoney']").val(totalmeny);
+		//$("#totalFirstFee").val(totalFirstFee);
+	}
+	return totalmeny;
+	//this.parent().pa
+	//alert(m);
+}
+
+//kai 20151002 计算算择商品的个数及相关信息
+function count_choose_tran_no() {
+	
+	var str="";
+	var checkbox = document.getElementsByName("commdity_nums"); // id表示你的checkbox的name属性
+	var no=0;
+	var commodityIdList = [];
+	for (var i = 0; i < checkbox.length; i++) {
+		if (checkbox[i].checked == true) {
+			var id=$(checkbox[i]).parent().parent().find("td[name='commditytableid']").html();
+			//alert(id);
+			//str=str+'"commodityIdList['+no+']":"'+id+'"'+",";
+			commodityIdList[no]=id;
+			no=no+1;
+			
+		}
+	}
+	if(commodityIdList.length>0)
+	{
+		return commodityIdList;
+	}
+	
+	return str;
+	//this.parent().pa
+	//alert(m);
+}
+
+function removenull(str)
+{
+    if((str=="")||(str=="undefined")||(str=="null")||(str==null))	
+    {
+    	return "";
+    }
+    else
+    {
+    	return str;
+    }
+}
+
+//kai 20151002 modify
+function showydtjlist(list, commoditylist) {
+	if (list != null && list.length > 0) {
+		// 设置提交按钮可以使用
+		$("a[name='mulitsub']").css("display", "inline");
+		$("#tdatatable tbody").html("");
+		var iii = 0;
+		$
+				.each(
+						list,
+						function() {
+
+							var str = "";
+							var pm = "";
+							var color1 = "#CCDAD1";
+							var color2 = "#F1E9E9";
+							var color3 = "#D9F581";
+							var color4 = "#81B1F5";
+							var color = "";
+							var transitNo = this.transitNo;
+							var id = this.id;
+							if (iii % 2 == 0) {
+								color = color1;
+							} else if (iii % 2 == 1) {
+								color = color2;
+							} else {
+								color = "";
+							}
+							var ii = 0;
+
+							$
+									.each(
+											this.commoditys,
+											function() {
+
+												var skucolor = "";
+
+												if (ii % 2 == 0) {
+
+													skucolor = color3;
+												} else {
+													skucolor = color4;
+												}
+
+												if (this.quantity > 0) {
+
+													for (var i = 0; i < this.quantity; i++) {
+
+														pm += "<tr name='"+this.id+"'>";
+														
+														pm += "<td name='commditytableid' style='display:none;'>"
+															+ this.id
+															+ "</td>";
+
+														pm += "<td style='text-align:center;background-color:"
+																+ color
+																+ "'>"
+																+ "<input type='checkbox' name='commdity_nums'></td>";
+														pm += "<td id='tranid' style='background-color:"
+																+ color
+																+ "'>"
+																+ id + "</td>";
+														pm += "<td style='background-color:"
+																+ color
+																+ "'>";
+																if(removenull(this.transitNo)=="")
+																{
+																	pm += transitNo;
+																}
+																else
+																{
+																	pm += this.transitNo;
+																}
+														
+																+ this.transitNo
+																+ "</td>";
+														pm += "<td style='background-color:"
+																+ color
+																+ "'>"
+																+ this.commodityName
+																+ "</td>";
+														
+														pm += "<td name='commodityId' style='display:none'>"
+															+ this.commodityId
+															+ "</td>";
+														
+														pm += "<td name='commoditySku' style='background-color:"
+																+ skucolor
+																+ "'>"
+																+ this.commoditySku
+																+ "</td>";
+														pm += "<td style='background-color:"
+																+ color
+																+ "'>"
+																+ this.xiangqing
+																+ "</td>";
+														pm += "<td name='eachweight' style='background-color:"
+																+ color
+																+ "'>"
+																+ this.eachjfweight
+																+ "</td>";
+														pm += "<td style='background-color:"
+																+ color
+																+ "'>"
+																+ "1" + "</td>";
+														pm += "<td name='eachcommidtymoney' style='background-color: "
+																+ color
+																+ " ;display:none'>"
+																+ Cal_dhyb_eachprice(
+																		this.eachjfweight,
+																		commoditylist,
+																		this.commodityId)
+																+ "</td>";
+														pm += "<td name='firstFee' style='display:none;'>"
+															+ Cal_dhyb_firstFee(commoditylist, this.commodityId)
+															+ "</td>";
+														pm += "<td name='commodityid' style='background-color: "
+															+ color
+															+ " ;display:none'>"
+															+ this.commodityId
+															+ "</td>";
+														pm += "<td name='tranWarehouseId' style='background-color: "
+															+ color
+															+ " ;display:none'>"
+															+ this.tranWarehouseId
+															+ "</td>";
+														var str3="";
+														var id2=this.commodityId;
+														$.each(commoditylist, function() {
+															if(this.id==id2)
+															{
+																str3 = " value='" + this.id + "'  price='"
+																	+ this.price + "' msPrice='" + this.msPrice
+																	+ "' vipOnePrice='" + this.vipOnePrice
+																	+ "' vipTwoPrice='" + this.vipTwoPrice
+																	+ "' vipThreePrice='" + this.vipThreePrice + "'";
+																	
+															}
+														});
+														
+														pm += "<td name='commodityNamePrice' style='background-color: "
+															+ color
+															+ " ;display:none' "
+														    +str3
+															+ "></td>";
+														
+													
+													
+													}
+												} else {
+													alert("商品数量不对");
+													nav13Click();
+													return false;
+												}
+												ii = ii + 1;
+
+											});
+							str += "" + pm + "";
+							iii = iii + 1;
+
+							$("#tdatatable tbody").append(str);
+						});
+		
+		
+		$(":checkbox[name='commdity_nums']")
+		.click(
+				function() {
+					// Cal_dhyb_autototalmoney();
+					userModifyCalcFreight_dhyb();
+					
+				});
+		
+		
+	} else {
+		$("a[name='mulitsub']").css("display", "none");
+	}
+}
+function showydtjlist00(list) {
+	if (list != null && list.length > 0) {
+		//设置提交按钮可以使用
+		$("a[name='mulitsub']").css("display","inline");
+		$("#tdatatable tbody").html("");
+		$.each(list,function(){
+			var str = "<tr id='" + this.id + "'>";
+			str += "<input type='hidden' name='tid' value='" + this.id + "'/>";
+			str += "<td>" + this.id + "</td>";
+			if (this.awt == null) {
+				str += "<td>&nbsp;</td>";
+			} else {
+				str += "<td>" + this.awt + "</td>";
+			}
+			if (this.weight == null) {
+				str += "<td>&nbsp;</td>";
+			} else {
+				str += "<td>" + this.weight + "</td>";
+			}
+			if (this.tariff == null) {
+				str += "<td>&nbsp;</td>";
+			} else {
+				str += "<td>" + this.tariff + "</td>";
+			}
+			if (this.other == null) {
+				str += "<td>&nbsp;</td>";
+			} else {
+				str += "<td>" + this.other + "</td>";
+			}
+			if (this.or == null) {
+				str += "<td>&nbsp;</td>";
+			} else {
+				str += "<td>" + this.or + "</td>";
+			}
+			var pm = "";
+			$.each(this.commoditys,function(){
+				pm += this.xiangqing + ":" + this.quantity + ";"; 
+			});
+			str += "<td>" + pm + "</td></tr>";
+			
+			$("#tdatatable tbody").append(str);
+		});
+	} else {
+		$("a[name='mulitsub']").css("display","none");
+	}
+}
+
+function mulitSubmitOrder() {
+	// 这里的提交一定是合并箱子或者是正常提交
+	var consigneeId = $(":radio:checked").val();
+	var premium = $(":text[name='premium']").val();
+	var parceValue = $(":text[name='parceValue']").val();
+	var remark = $("textarea[name='remark']").val();
+	var mail = $("select[name='mail']").val();
+	
+	//var validate = true;
+	if(consigneeId==""||consigneeId==null){
+		alert("没有选中收件人信息，请点击增加地址后，再来提交运单！");
+		return false;
+	}
+	
+	if(parceValue==""||parceValue==null||isNaN(parceValue)){
+		$(":text[name='parceValue']").css({ "border-color": "red" });
+		$(":text[name='parceValue']").change(function(){
+			if(!isNaN($(":text[name='parceValue']").val()))
+				$(":text[name='parceValue']").css({ "border-color": "" });
+		});
+		alert("请输入商品申报价值后，再提交运单！");
+		return false;
+	}
+	if(premium==""||premium==null||isNaN(premium)){
+		$(":text[name='premium']").css({ "border-color": "red" });
+		$(":text[name='premium']").change(function(){
+			if(!isNaN($(":text[name='premium']").val()))
+				$(":text[name='premium']").css({ "border-color": "" });
+		});
+		return false;
+	}
+	
+	var str = '"orders[0].consigneeId":"' + consigneeId + '",' + 
+			'"orders[0].premium":"' + premium + '",' +
+			'"orders[0].parceValue":"' + parceValue + '",' +
+			'"orders[0].premium":"' + premium + '",' +
+			'"orders[0].remark":"' + remark + '",' +
+			'"orders[0].mail":"' + mail + '",' +
+			'"type":"0"';
+	var i = 0;
+	$("#tdatatable :hidden[name='tid']").each(function(){
+		str += ',"orders[0].details[' + i + '].transhipmentId":"' + $(this).val() + '"';
+		i = i+1;
+	});
+	
+	if(i==0){
+		alert("没有选中包裹，请在预报单号输入框中输入预报单号，然后确认，选出包裹，再来提交运单！如不知预报单号，可以包裹记录中查看预报单号");
+		return false;
+	}
+	
+	var obj = $.parseJSON("{" + str + "}");
+	submitOrder(obj);
+	return false;
+}
+
+function submitOrder(obj) {
+	$.ajax({
+		type:"post",
+		url:order_submit_url,
+		data:obj,
+		success:function(response){
+			var code = response.code;
+			if (code == "200") {
+				alert("提交运单成功");
+				var r_oid = "";
+				$.each(response.data,function(){
+					r_oid += this+",";
+				});
+				r_oid=r_oid.substring(0,r_oid.length-1);
+				nav442Click(r_oid);
+				//window.location.href = "dingdanzhifu.jsp?oid=" + r_oid;
+				//window.location.href = "tijiaoyundan.jsp";
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("提交运单信息失败，原因是:" + response.message);
+			}
+		}
+	});
+	return  false;
+}
+
+
+//kai 20151002 提交预报组合订单
+function mux_to_SubmitOrder() {
+	
+	
+	if($("input[name='protocol_namep']").is(':checked'))
+	{}
+	else
+	{
+		alert("请勾选\" 同意本站转运协议\"才能提交!");
+		return;
+	}
+	
+	var name = $(":text[name='name']").val();
+	var province =$("#loc_province").find("option:selected").text();  // 省份
+	
+	var city =$("#loc_city").find("option:selected").text(); // 城市
+	var dist = $("#loc_town").find("option:selected").text(); // 区
+	
+	
+	$(":hidden[name='province']").val(province);
+	$(":hidden[name='city']").val(city);
+	$(":hidden[name='dist']").val(dist);
+	
+	var sadd = $(":text[name='sadd']").val();
+	var phone = $(":text[name='phone']").val();
+	var zipCode = $(":text[name='zcode']").val();
+	var cardId = $(":text[name='cid']").val();
+	var cardurl = $(":text[name='idurlcard']").val();
+	cardurl = encodeURI(cardurl);
+	var cardurlother = $(":text[name='idurlcardother']")
+			.val();
+	cardurlother = encodeURI(cardurlother);
+	var cardurltogether = $(
+			":text[name='idurlcardtogether']").val();
+	cardurltogether = encodeURI(cardurltogether);
+
+	var premium = $(":text[name='premium']").val();
+	var parceValue = $(":text[name='parceValue']").val();
+	var remark = $("textarea[name='remark']").val();
+
+	var wid=$(":hidden[name='s_warehouseid']").val();
+	var cid=$(":hidden[name='s_channelid']").val();
+	
+	var validate = true;
+	
+	
+	
+	var usd_money= $(":hidden[name='s_usa_money']").val();
+	var china_money= $(":hidden[name='s_china_money']").val();
+	var usa_rmb_rate= $(":hidden[name='s_usa_rmb_rate']").val();
+	
+	
+	var totalmoney=$(":text[name='totalmoney']").val();
+	
+	var commlist=count_choose_tran_no();
+	if(commlist=="")
+	{
+		alert("至少选择一个商品!");
+		return;
+	}
+	
+	if(parseFloat(totalmoney)=="NaN")
+	{
+		alert("计算出来的价钱格式不对!");
+		return;
+	}
+	else if(parseFloat(totalmoney)==0)
+	{
+		alert("价格有误!");
+		return;
+	}
+	
+	if(parseFloat(premium)=="NaN")
+	{
+		alert("计算出来的价钱格式不对!");
+		return;
+	}
+	else
+	{
+		if(parseFloat(premium)<0)
+		{
+			alert("保险费用不能小于0!");
+			return;
+		}
+	}
+		
+	//alert(usd_money);
+	//alert(totalmoney);
+	
+	if(parseFloat(usd_money)>=parseFloat(totalmoney))//美元足够使用
+	{
+		//alert("你的余额不足，请充值后再试!");
+		//return;
+	}
+	else
+	{
+		if((parseFloat(china_money)>0)&&(parseFloat(usa_rmb_rate)>0))
+		{
+			if((parseFloat(totalmoney)-parseFloat(usd_money))*usa_rmb_rate<=(parseFloat(china_money)))//有足够的钱
+			{
+				
+			}
+			else
+			{
+				alert("你的余额不足，请充值后再试!");
+				return;
+			}
+		}
+		else
+		{
+			alert("你的余额不足，请充值后再试!");
+			return;
+		}
+	}
+	
+	
+	if (province == "省份" ) {
+		alert("请选择收货省份");
+		validate = false;
+		return;
+	} 
+	if (city == "地级市") {
+		alert("请选择收货城市");
+		validate = false;
+		return;
+	} 
+	if (dist == "市、县、区") {
+		alert("请选择收货市、县、区");
+		validate = false;
+		return;
+	}
+	
+	
+	if (name == null || name == "") {
+		$(":text[name='name']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='name']").change(function() {
+			if ($(":text[name='name']").val() != null)
+				$(":text[name='name']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	
+
+	if (sadd == null || sadd == "") {
+		$(":text[name='sadd']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='sadd']").change(function() {
+			if ($(":text[name='sadd']").val() != null)
+				$(":text[name='sadd']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (phone == null || phone == "") {
+		$(":text[name='phone']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='phone']").change(function() {
+			if ($(":text[name='phone']").val() != null)
+				$(":text[name='phone']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (zipCode == null || zipCode == "") {
+		$(":text[name='zcode']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='zcode']").change(function() {
+			if ($(":text[name='zcode']").val() != null)
+				$(":text[name='zcode']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+
+	//var mail = $("select[name='mail']").val();
+
+
+
+	if (parceValue == "" || parceValue == null || isNaN(parceValue)) {
+		$(":text[name='parceValue']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='parceValue']").change(function() {
+			if (!isNaN($(":text[name='parceValue']").val()))
+				$(":text[name='parceValue']").css({
+					"border-color" : ""
+				});
+		});
+		alert("请输入商品申报价值后，再提交运单！");
+		return false;
+	}
+	if (premium == "" || premium == null || isNaN(premium)) {
+		$(":text[name='premium']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='premium']").change(function() {
+			if (!isNaN($(":text[name='premium']").val()))
+				$(":text[name='premium']").css({
+					"border-color" : ""
+				});
+		});
+		return false;
+	}
+/*
+	var str = '"orders[0].consigneeId":"' + consigneeId + '",'
+			+ '"orders[0].premium":"' + premium + '",'
+			+ '"orders[0].parceValue":"' + parceValue + '",'
+			+ '"orders[0].premium":"' + premium + '",' + '"orders[0].remark":"'
+			+ remark + '",' + '"orders[0].mail":"' + mail + '",' + '"type":"0"';
+	var i = 0;
+	$("#tdatatable :hidden[name='tid']").each(
+			function() {
+				str += ',"orders[0].details[' + i + '].transhipmentId":"'
+						+ $(this).val() + '"';
+				i = i + 1;
+			});*/
+	var str="";
+
+
+
+	
+	
+	str = '"consigneeInfo.name":"' + name + '",'
+	+ '"consigneeInfo.province":"' + province + '",'
+	+ '"consigneeInfo.city":"' + city + '",'
+	+ '"consigneeInfo.district":"' + dist + '",'
+	+ '"consigneeInfo.streetAddress":"' + sadd + '",'
+	+ '"consigneeInfo.zipCode":"' + zipCode + '",'
+	+ '"consigneeInfo.phone":"' + phone + '",'
+	+ '"consigneeInfo.cardId":"' + cardId + '",'
+	+ '"consigneeInfo.cardUrl":"' + cardurl + '",'
+	+ '"consigneeInfo.cardurlother":"' + cardurlother + '",'
+	+ '"consigneeInfo.cardurltogether":"' + cardurltogether + '"';
+	
+	str =str + 
+	',"orders[0].premium":"' + premium + '",'
+	+ '"orders[0].parceValue":"' + parceValue + '",'
+	+ '"orders[0].warehouseId":"' + wid + '",'
+	+ '"orders[0].channelId":"' + cid + '",'
+	 + '"orders[0].remark":"' + remark + '"' ;
+	
+	str=str+',"commodityIdList":"' + commlist + '"';
+
+
+	if (validate == false) {
+		alert("没有选中包裹，请在预报单号输入框中输入预报单号，然后确认，选出包裹，再来提交运单！如不知预报单号，可以包裹记录中查看预报单号");
+		return false;
+	}
+//alert(str);
+	
+	var picValue = $(":file[name='file']").val();
+	var picValueother = $(":file[name='fileother']").val();
+	if (((picValue != null) && ("" != picValue))
+			|| ((picValueother != null) && ("" != picValueother))) {// 包含图片,要单独处理
+		
+		
+		$(":hidden[name='s_commidty_list']").val(commlist);
+		if (confirm("确定提交此订单?")) {
+		submitonlinetranorderhavepic();
+		}
+
+		return;
+	}
+	
+var obj = $.parseJSON("{" + str + "}");
+
+if (confirm("确定提交此订单?")) {
+	$.ajax({
+		type : "post",
+		url : "../order/tran_mux_submit",
+		data : obj,
+		success : function(response) {
+			var code = response.code;
+			/**
+			 * the following code can be deleted after 2015.12.25
+			 */
+			//var data=response.data;
+			//var message=response.message;
+			//alert(code);
+			//alert(data);
+			//alert(data[0]);
+			//alert(data[1]);
+			//alert(message);
+			
+			if (code == "200") {
+				alert("提交成功");
+				/**
+				 * deadline 2015.12.25
+				 */
+//				var r_oid = "";
+//				$.each(response.data, function() {
+//					r_oid += this + ",";
+//				});
+//				r_oid = r_oid.substring(0, r_oid.length - 1);
+				nav13Click();
+				// window.location.href = "dingdanzhifu.jsp?oid=" + r_oid;
+				// window.location.href = "tijiaoyundan.jsp";
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("提交运单信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+	return false;
+}
+
+//kai 20151004 提交合成订单，包含要上传新身份证图片的
+function submitonlinetranorderhavepic() {
+	
+	$("#tran_order_mux_submit").ajaxSubmit(
+			{
+				type : "post",
+				url : "../order/tran_mux_submit_have_pics",
+				success : function(data) {
+					// alert(data);
+					$("#tmpmsgdiv2").html(data);
+					var str = $("#tmpmsgdiv2 pre").html();
+
+					var obj = $.parseJSON(str);
+
+					var code = obj.code;
+					
+
+					if (code == "200") {
+						alert("提交成功!");
+						nav13Click();
+						/**
+						 * the following code can delete after 2015.12.20
+						
+						var r_oid = "";
+						$.each(obj.data, function() {
+							r_oid += this + ",";
+						});
+						r_oid = r_oid.substring(0, r_oid.length - 1);
+						nav443Click(r_oid);
+ */
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("提交网上置件信息失败，原因是:" + obj.message);
+					}
+					return false;
+				},
+				error : function(XmlHttpRequest, textStatus, errorThrown) {
+					alert("操作失败");
+					return false;
+				}
+			});
+}
+//提交包含有图片的混合转运单20160102
+function submittrantomuxhavepic()
+{
+	$("#tran_order_mux_submit").ajaxSubmit(
+			{
+				type : "post",
+				url : "../user/transh/mux_modify_havepic",
+				success : function(data) {
+					//alert(data);
+					var code=data.code;
+					if(removenull(code)=="")
+					{
+						$("#tmpmsgdiv2").html(data);
+						var str = $("#tmpmsgdiv2 pre").html();
+	
+						var obj = $.parseJSON(str);
+	
+						code = obj.code;
+					}
+					
+					
+					
+
+					if (code == "200") {
+						alert("提交成功!");
+						nav13Click();
+						/**
+						 * the following code can delete after 2015.12.20
+						
+						var r_oid = "";
+						$.each(obj.data, function() {
+							r_oid += this + ",";
+						});
+						r_oid = r_oid.substring(0, r_oid.length - 1);
+						nav443Click(r_oid);
+ */
+					} else if (code == "607") {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("提交信息失败，原因是:" + obj.message);
+					}
+					return false;
+				},
+				error : function(XmlHttpRequest, textStatus, errorThrown) {
+					alert("操作失败");
+					return false;
+				}
+			});
+}
+
+
+//kai 20151230 提交预报组合转运订单到后台等待审核
+function mux_to_SubmitTranorder() {
+	
+	
+	if($("input[name='protocol_namep']").is(':checked'))
+	{}
+	else
+	{
+		alert("请勾选\" 同意本站转运协议\"才能提交!");
+		return;
+	}
+	
+	var checkbox =document.getElementsByName("protocol_use_money");				
+	if(checkbox[0].checked==true)
+	{
+		 $(":hidden[name='au_protocol_use_money']").val("1");
+	}
+	else
+	{
+		 $(":hidden[name='au_protocol_use_money']").val("0");
+	}
+	
+	var authorizeMoveMoney= $(":hidden[name='au_protocol_use_money']").val();
+	//alert(authorizeMoveMoney);
+	var name = $(":text[name='name']").val();
+	var province =$("#loc_province").find("option:selected").text();  // 省份
+	
+	var city =$("#loc_city").find("option:selected").text(); // 城市
+	var dist = $("#loc_town").find("option:selected").text(); // 区
+	
+	
+
+	
+	var sadd = $(":text[name='sadd']").val();
+	var phone = $(":text[name='phone']").val();
+	var zipCode = $(":text[name='zcode']").val();
+	var cardId = $(":text[name='cid']").val();
+	var cardurl = $(":text[name='idurlcard']").val();
+	cardurl = encodeURI(cardurl);
+	var cardurlother = $(":text[name='idurlcardother']")
+			.val();
+	cardurlother = encodeURI(cardurlother);
+	var cardurltogether = $(
+			":text[name='idurlcardtogether']").val();
+	cardurltogether = encodeURI(cardurltogether);
+
+	var premium = $(":text[name='premium']").val();
+	var parceValue = $(":text[name='parceValue']").val();
+	var remark = $("textarea[name='remark']").val();
+
+	var wid=$(":hidden[name='s_warehouseid']").val();
+	var cid=$(":hidden[name='s_channelid']").val();
+	
+	var validate = true;
+	var or=$(":text[name='moneyor']").val();
+	
+	
+	var usd_money= $(":hidden[name='s_usa_money']").val();
+	var china_money= $(":hidden[name='s_china_money']").val();
+	var usa_rmb_rate= $(":hidden[name='s_usa_rmb_rate']").val();
+	
+	
+	var totalmoney=$(":text[name='totalmoney']").val();
+	var CommodityCost=$(":hidden[name='t_CommodityCost']").val();
+	
+	var commlist=count_choose_tran_no();
+	if(commlist=="")
+	{
+		alert("至少选择一个商品!");
+		return;
+	}
+	
+	if(parseFloat(totalmoney)=="NaN")
+	{
+		alert("计算出来的价钱格式不对!");
+		return;
+	}
+	else if(parseFloat(totalmoney)==0)
+	{
+		alert("价格有误!");
+		return;
+	}
+	
+	if(parseFloat(premium)=="NaN")
+	{
+		alert("计算出来的价钱格式不对!");
+		return;
+	}
+	else
+	{
+		if(parseFloat(premium)<0)
+		{
+			alert("保险费用不能小于0!");
+			return;
+		}
+		
+		var maxvalpremium = $(":text[name='premiumtotal']").val();
+		if(parseFloat(premium_max_value)!="NaN")
+		{
+			if(parseFloat(maxvalpremium)>parseFloat(premium_max_value))
+			{
+				alert("保险额度不能超过保额为"+premium_max_value+"美元!");
+				return;
+			}
+		}
+	}
+		
+	//alert(usd_money);
+	//alert(totalmoney);
+	
+	/*if(parseFloat(usd_money)>=parseFloat(totalmoney))//美元足够使用
+	{
+		//alert("你的余额不足，请充值后再试!");
+		//return;
+	}
+	else
+	{
+		if((parseFloat(china_money)>0)&&(parseFloat(usa_rmb_rate)>0))
+		{
+			if((parseFloat(totalmoney)-parseFloat(usd_money))*usa_rmb_rate<=(parseFloat(china_money)))//有足够的钱
+			{
+				
+			}
+			else
+			{
+				alert("你的余额不足，请充值后再试!");
+				return;
+			}
+		}
+		else
+		{
+			alert("你的余额不足，请充值后再试!");
+			return;
+		}
+	}*/
+	
+	if($("#use_pct").is(':checked')==true)//禁止使用
+	{
+		province="";
+		city="";
+		dist="";
+	}
+	else
+	{
+		if (province == "省份" ) {
+			alert("请选择收货省份");
+			validate = false;
+			return;
+		} 
+		if (city == "地级市") {
+			alert("请选择收货城市");
+			validate = false;
+			return;
+		} 
+		if (dist == "市、县、区") {
+			alert("请选择收货市、县、区");
+			validate = false;
+			return;
+		}
+	}
+	$(":hidden[name='province']").val(province);
+	$(":hidden[name='city']").val(city);
+	$(":hidden[name='dist']").val(dist);
+	if (name == null || name == "") {
+		$(":text[name='name']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='name']").change(function() {
+			if ($(":text[name='name']").val() != null)
+				$(":text[name='name']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+
+	
+
+	if (sadd == null || sadd == "") {
+		$(":text[name='sadd']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='sadd']").change(function() {
+			if ($(":text[name='sadd']").val() != null)
+				$(":text[name='sadd']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	if (phone == null || phone == "") {
+		$(":text[name='phone']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='phone']").change(function() {
+			if ($(":text[name='phone']").val() != null)
+				$(":text[name='phone']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}
+	/*if (zipCode == null || zipCode == "") {
+		$(":text[name='zcode']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='zcode']").change(function() {
+			if ($(":text[name='zcode']").val() != null)
+				$(":text[name='zcode']").css({
+					"border-color" : ""
+				});
+		});
+		validate = false;
+	}*/
+
+
+	//var mail = $("select[name='mail']").val();
+
+
+
+	if (parceValue == "" || parceValue == null || isNaN(parceValue)) {
+		$(":text[name='parceValue']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='parceValue']").change(function() {
+			if (!isNaN($(":text[name='parceValue']").val()))
+				$(":text[name='parceValue']").css({
+					"border-color" : ""
+				});
+		});
+		alert("请输入商品申报价值后，再提交运单！");
+		return false;
+	}
+	else
+	{
+		if(parseFloat(parceValue)=="NaN")
+		{
+			$(":text[name='parceValue']").css({
+				"border-color" : "red"
+			});
+			$(":text[name='parceValue']").change(function() {
+				if (!isNaN($(":text[name='parceValue']").val()))
+					$(":text[name='parceValue']").css({
+						"border-color" : ""
+					});
+			});
+			alert("商品申报价格不对!");
+			return false;
+		}
+		else
+		{
+			if(parseFloat(parceValue)<=0)
+			{
+				$(":text[name='parceValue']").css({
+					"border-color" : "red"
+				});
+				$(":text[name='parceValue']").change(function() {
+					if (!isNaN($(":text[name='parceValue']").val()))
+						$(":text[name='parceValue']").css({
+							"border-color" : ""
+						});
+				});
+				alert("商品申报价格必须大于0!");
+				return false;
+			}
+		}
+	}
+	if (premium == "" || premium == null || isNaN(premium)) {
+		$(":text[name='premium']").css({
+			"border-color" : "red"
+		});
+		$(":text[name='premium']").change(function() {
+			if (!isNaN($(":text[name='premium']").val()))
+				$(":text[name='premium']").css({
+					"border-color" : ""
+				});
+		});
+		return false;
+	}
+/*
+	var str = '"orders[0].consigneeId":"' + consigneeId + '",'
+			+ '"orders[0].premium":"' + premium + '",'
+			+ '"orders[0].parceValue":"' + parceValue + '",'
+			+ '"orders[0].premium":"' + premium + '",' + '"orders[0].remark":"'
+			+ remark + '",' + '"orders[0].mail":"' + mail + '",' + '"type":"0"';
+	var i = 0;
+	$("#tdatatable :hidden[name='tid']").each(
+			function() {
+				str += ',"orders[0].details[' + i + '].transhipmentId":"'
+						+ $(this).val() + '"';
+				i = i + 1;
+			});*/or
+	var str="";
+	str = '"cName":"' + name + '",'
+	+ '"cProvince":"' + province + '",'
+	+ '"cCity":"' + city + '",'
+	+ '"cDistrict":"' + dist + '",'
+	+ '"cStreetAddress":"' + sadd + '",'
+	+ '"cZipCode":"' + zipCode + '",'
+	+ '"cPhone":"' + phone + '",'
+	+ '"or":"' + or + '",'
+	+ '"cardid":"' + cardId 
+	+ '",'+ '"cardurlother":"' + cardurlother + '",'+ '"cardurltogether":"' + cardurltogether + '",'
+	+ '"cardurl":"' + cardurl  + '"';
+	
+	str =str + 
+	',"premium":"' + premium + '",'
+	+ '"parcelValue":"' + parceValue + '",'
+	+ '"warehouseId":"' + wid + '",'
+	+ '"channelId":"' + cid + '",'
+	+ '"CommodityCost":"' + CommodityCost + '",'
+	+ '"authorizeMoveMoney":"' + authorizeMoveMoney + '",'
+	 + '"remark":"' + remark + '"' ;
+	
+	str=str+',"commodityIdList":"' + commlist + '"';
+
+
+	if (validate == false) {
+		alert("必须填写整信息才能提交!");
+		return false;
+	}
+//alert(str);
+	
+//	var picValue = $(":file[name='file']").val();
+//	var picValueother = $(":file[name='fileother']").val();
+	
+	var picflag=0;
+	 if($("#useIdcardText").val() == "1"){//表示必上传身份证
+		 
+		 if(cardId=="")
+		{
+			 alert("必须填写身份证号!");
+				return false;
+		}
+ }
+
+	var file = $(":file[name='file']").val();//身份证正面图片上传
+	if ((file == null || file == ''))
+	{
+		if($("#useIdcardText").val() == "1"){//表示必上传身份证
+			if((cardurl=="")||(cardurl==null)||(cardurl=="null"))
+			{
+				alert("必须上传身份证正面图!");
+				return false;
+			}
+		}
+		
+	}
+	else
+	{
+		picflag=1;
+	}
+	
+	var fileother = $(":file[name='fileother']").val();//身份证正面图片上传
+	if ((fileother == null || fileother == ''))
+	{
+		if($("#useIdcardText").val() == "1"){//表示必上传身份证
+			
+		
+			if((cardurlother=="")||(cardurlother==null)||(cardurlother=="null"))
+			{
+				alert("必须上传身份证反面图!");
+				return false;
+			}
+		}
+	}
+	else
+	{
+		picflag=1;
+	}
+	
+	
+	if (picflag!=0) {// 包含图片,要单独处理
+		
+		
+		$(":hidden[name='s_commidty_list']").val(commlist);
+		if (confirm("确定提交此订单?")) {
+		//submitonlinetranorderhavepic();
+			submittrantomuxhavepic();
+		}
+
+		return;
+	}
+	
+var obj = $.parseJSON("{" + str + "}");
+
+if (confirm("确定提交此订单?")) {
+	$.ajax({
+		type : "post",
+		url : "../user/transh/mux_modify",
+		data : obj,
+		success : function(response) {
+			var code = response.code;
+			/**
+			 * the following code can be deleted after 2015.12.25
+			 */
+			//var data=response.data;
+			//var message=response.message;
+			//alert(code);
+			//alert(data);
+			//alert(data[0]);
+			//alert(data[1]);
+			//alert(message);
+			
+			if (code == "200") {
+				alert("提交成功");
+				/**
+				 * deadline 2015.12.25
+				 */
+//				var r_oid = "";
+//				$.each(response.data, function() {
+//					r_oid += this + ",";
+//				});
+//				r_oid = r_oid.substring(0, r_oid.length - 1);
+				nav13Click();
+				// window.location.href = "dingdanzhifu.jsp?oid=" + r_oid;
+				// window.location.href = "tijiaoyundan.jsp";
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("提交运单信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+	return false;
+}
+
+
+function loadtranorderpayData()
+{
+
+	getglobalargs_cur_usa_cn();//获取汇率
+	// 开始获取数据
+	//var regx=/[a-zA-Z]*\d+/g;  
+	//update by chenkanghua  订单号为 WY+8位+US
+	
+	var regx=/[A-Z]{2}[\d]{8}[A-Z]{2}|[a-zA-Z]*\d+/g
+	var value = $(":hidden[name='oid']").val();
+	var arrs = value.match(regx);
+	if (arrs!=null) {
+		search(arrs);
+	}
+	
+	$("a[name='a_tran_order_pay_link']").click(function(){
+		
+		
+		var totalMoney=	$(":hidden[name='tranorder_totalmoney']").val();
+		var rmb=$(":hidden[name='user_rmbBalance']").val();
+		var usd=$(":hidden[name='user_usdBalance']").val();
+		if(parseFloat(totalMoney)>parseFloat(usd))
+		{
+			if(((parseFloat(totalMoney)-parseFloat(usd))*parseFloat(usa_to_rmb_rate_bgyb))>rmb)
+			{
+				alert("余额不足，请充值后操作!");
+				nav61Click();
+				return false;
+			}
+		}
+		
+		
+		var value = $(":hidden[name='oid']").val();
+		var arrs = value.match(regx);
+		if (confirm("您是否确认支付?"))
+		{}
+		else
+		{
+			return false;
+		}
+		if (arrs!=null) {
+			$.ajax({
+				type:"post",
+				url:"../user/transh/paymoney",
+				data : $.param({
+					"id" : arrs
+				}, true),
+				success:function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("支付成功,运单号为："+response.data);
+						nav13Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else if ("18005" == code) {
+						alert("账户余额不足，请去充值！");
+						nav61Click();
+					} else {
+						// 失败
+						alert("支付运单失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	});
+
+
+function search(arrs) {
+	
+	$.ajax({
+		type : "get",
+		url : "../user/transhipment/getById",
+		data : $.param({
+			"id" : arrs,
+		}, true),
+		success : function(response) {
+
+			var code = response.code;
+			//alert(code);
+			if (code == "200") {
+				
+				showTranOrders(response.data);
+				
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取转运单信息失败，原因是:" + response.message);
+			}
+		}
+	});
+	
+	
+	
+}
+
+	function showTranOrders(data) {
+		$("#tranorder_pay_info").html("");
+		if (data != null) {
+			var rmb = 0.0;
+			var usd = 0.0;
+			var totalMoney = 0.0;
+
+			var str = '<div>';
+			str += '<label>转运单号：</label>' + data.id + '<br/>';
+			str += '<label>收货信息：</label>' + data.cName + '&nbsp;' + data.cPhone
+					+ '&nbsp;' + data.cProvince + '&nbsp;' + data.cCity
+					+ '&nbsp;' + data.cDistrict + '&nbsp;'
+					+ data.cStreetAddress + '&nbsp;' + data.cZipCode + '<br/>';
+			var pm = " <br/> ";
+			var num=1;
+			$.each(data.commoditys, function() {
+				pm +="&nbsp&nbsp&nbsp&nbsp"+ num+",&nbsp;商品名称：<span style='color:red;'>"+this.commodityName + " </span>,&nbsp;商品数量：<span style='color:red;'>" + this.quantity + "</span>,&nbsp;商品SKU：<span style='color:red;'>"
+						+ this.commoditySku + "</span>,&nbsp;归属包裹：<span style='color:red;'>" + this.transitNo+
+				"</span> <br/> ";
+				num=num+1;
+			});
+			str += '<label>包裹信息：</label>' + pm + '<br/>';
+			//str += '<label>运费(￥)：</label>' + data.totalMoney + '<br/>';
+			str += '</div><hr/><br/>';
+			totalMoney = parseFloat(data.totalMoney);
+			var totalMoneyrmb=parseFloat(usa_to_rmb_rate_bgyb)*parseFloat(totalMoney);
+			rmb = data.rmbBalance;
+			usd = data.usdBalance;
+			$("#tranorder_pay_info").append(str);
+
+			$("#tranorder_pay_info").append(
+					"账户余额:￥" + rmb + "&nbsp;/&nbsp;$" + usd + "<br/>"+ "<hr/><br/>");
+			$("#tranorder_pay_info").append("总运费:<span style='color:red;'>$" + totalMoney + "</span>"+"&nbsp;(等值人民币:<span style='color:red;'>￥" +totalMoneyrmb+")<span><hr/><br/>");
+			
+			
+			$(":hidden[name='tranorder_totalmoney']").val(totalMoney);
+			$(":hidden[name='user_rmbBalance']").val(rmb);
+			$(":hidden[name='user_usdBalance']").val(usd);
+			
+
+		}
+}
+
+}

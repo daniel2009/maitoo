@@ -1,0 +1,53 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+
+<body>
+
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">交易记录</p>
+
+		<div class="box_content">
+			<div class="content_title">交易记录</div>
+			<div class="content_text">
+				
+					<table id="datatable" class="table">
+						<thead>
+							<tr>
+								<th style="width:30px">序号</th>
+								<th style="width:80px">名称</th>
+								<th style="width:30px">操作</th>
+								<th style="width:30px">币种</th>
+								<th style="width:30px">金额</th>
+								<th style="width:120px">操作日期</th>
+								<th>备注</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="8" align="right">
+								共<span id="trsize">0</span>条
+								<a id="first_page" href="1"  name="to_page">首页</a> | 
+								<a id="pre_page" name="to_page">上一页</a> | 
+								<input type="text"  size="2" /> /
+								<span id="tpsize">0</span>| 
+								<a id="next_page" name="to_page">下一页</a> | 
+								<a id="last_page" name="to_page">未页</a></td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+			
+			</div>
+		</div>
+	</div>
+
+</body>
+
+</html>

@@ -1,0 +1,297 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+</head>
+<meta charset="utf-8">
+<style>
+.fastArticle{
+	display: none;
+}
+.radio:checked ~ .fastArticle{
+	display: block;
+}
+</style>
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"	data-target="#chart-container" style="font-size:20px">代用户进行包裹预报
+			<a href="#" id="a_back_transhipment_list_link" class="button">返回列表</a>
+		</p>
+	<div class="box_content">
+			<div class="content_title">代用户进行包裹预报</div>
+			<div class="content_text">
+				<div class="tab-content" id="tab2">
+		          <form action="" id="form" method="post" enctype="multipart/form-data">
+		            <p>
+		              <label class="cllabel">快递公司:</label>
+		              <input class="text-input small-input" type="text" name="transitCompany" maxlength="16" placeholder="填写运单公司" required/><span class="gl_message">*</span>
+		            </p>
+		             <p>
+		              <label class="cllabel">运单号公司:</label>
+		              <input class="text-input small-input" type="text" name="transitNo" maxlength="16" placeholder="填写运单号" required/><span class="gl_message">*</span>
+		            </p>
+		            <br/>
+					<label class="center">运单收发用户信息：</label>
+					<section style="display: flex; ">
+						<section style="flex: 1; margin: 30px;">
+							寄件人Email/RealName/Phone/QQ:
+							<input class="text-input old-input" type="text" name="key" />
+							<input id="searchBt" class="button" type="submit" value="查询" />
+							<div id="u5402">
+								<table id="user_info_table">
+									<col width="7%" />
+									<col width="31%" />
+									<col width="31%" />
+									<col width="21%" />
+									<thead>
+										<tr>
+											<th>&nbsp;</th>
+											<th>寄件人电话</th>
+											<th>真实姓名</th>
+											<th>账户余额</th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+							</div>
+							<table id="sjdztable" class="table">
+								<thead>
+									<tr>
+										<th style="width:7%"></th><th style="width:15%">收货人</th><th style="width:18%">电话</th><th style="width:25%">国家/地区</th><th style="width:35%">详细地址</th><th style="width:10%">邮编</th>
+									</tr>
+								</thead>
+								<tfoot>
+									<tr>
+										<td colspan="8" align="right"><span>共</span><span id="trsize">0</span><span>条</span> <a id="first_page" href="1" name="to_page">首页</a> <span>|</span> <a id="pre_page" name="to_page">上一页</a><span> |</span> <input type="text" class="bor" size="2" /> <span>/</span><span id="tpsize">0</span><span>|</span> <a id="next_page" name="to_page">下一页</a> <span>|</span> <a id="last_page" name="to_page">未页</a></td>
+									</tr>
+								</tfoot>
+								<tbody>
+								</tbody>
+							</table>
+						</section>
+						<div style="flex: 1; margin: 30px;">
+							<input type="radio" class="typeRadio" name="transitType" value="0" checked >普通转运
+							<input type="radio" class="radio" name="transitType" value="1" >急速转运
+							<article class="fastArticle">
+								<label style="display: inline;">寄件人手机号码：</label>
+								<input id="fromUser" name="from_user_name" class="text-input" type="text" maxlength="16" value="${param.username}"/>
+								<label style="display: inline;">寄件人姓名：</label>
+								<input name="from_user_real_name" class="text-input" type="text" maxlength="50" value="${param.realname}"/>
+								<hr/>
+								<label style="display: inline;">收件人姓名：</label>
+								<input name="cName" class="text-input" type="text" maxlength="16"/>
+								<hr />
+								<label style="display: inline;">中国：</label>
+								<input type="hidden" name="cUserId"/>
+								<select id="loc_province" style="width:100px" ></select>/<select id="loc_city"style="width:100px"></select>/<select id="loc_town"style="width:100px"></select>&nbsp;&nbsp;
+								禁用<input type="checkbox" name="use_pct" id="use_pct" value="">
+								<br/>
+								<hr />
+								<label style="display: inline;">详&nbsp;细&nbsp;地&nbsp;址：</label>
+								<input type="text" name="cStreetAddress" class="text-input medium-input" maxlength="36"/>
+								<hr />
+								<label style="display: inline;">邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编：</label>
+								<input type="text" name="cZipCode" class="text-input" maxlength="6" />
+								<hr />
+								<label style="display: inline;">联&nbsp;系&nbsp;电&nbsp;话：</label>
+								<input type="text" name="cPhone" class="text-input" maxlength="12"/>
+								 <hr/>
+								<label style="display: inline;">身份证号：</label>
+								<input name="cardidname" type="text" maxlength="18" class="text-input"/>
+								<br/><br/>
+								<label style="display: inline;">身份证正面：</label>
+								
+								<input id="cardpicid" name="file" type="file" />
+								<label style="display: inline;">身份证反面：</label>
+								
+								<input id="cardpicidother" name="fileother" type="file" />
+								
+								<br/>
+								注意：支持JPG，PNG，BMP等图片格式的身体证图片，最大不超过4MB<br>
+								<span id="card_file"></span>
+								<input name="old_file" type="hidden" />
+								
+								<input type="text" id="idurlcard" name="idurlcard" style="width:120px;display:none;" />
+								<input type="text" id="idurlcardother" name="idurlcardother" style="width:120px;display:none;" />
+								<input type="text" id="idurlcardtogether" name="idurlcardtogether" style="width:120px;display:none;" />
+										
+								<span id="showcardpicid" style="display:none;">身份证图片正面预览:<a href="" target="_blank" id="imacardurlid"><img width="150px" height="150px" src=""></a></span>
+								<span id="showcardpicidother" style="display:none;">身份证图片反面预览:<a href="" target="_blank" id="imacardurlidother"><img width="150px" height="150px" src=""></a></span>
+								
+								 <hr/>
+							</article>
+						</div>
+					</section>
+					<hr />
+					<input class="button" style="margin-left: 100px;" type="button" value="提交" onclick="javascript:transhipmentAdd();"/>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+	</div>
+<!-- 不要删除这个div -->
+<div id="tmpmsgdiv2" style="display:none;">
+</div>
+</body>
+
+<script type="text/javascript">
+	$("#main-content").ready(function(){
+		$("#sjdztable tfoot a").click(function() {
+			// 跳页
+			var pn = $(this).attr("href");
+			loadconsigneeinfo($(":radio[name='userId']:checked").val(), pn);
+			return false;
+		});
+
+		$("#sjdztable tfoot input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					loadconsigneeinfo($(":radio[name='userId']:checked").val(), pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+		
+		/*
+		 * kai 20151026
+		 * 添加禁用省请市区事件
+		 * */
+		$("#use_pct").click(function() {
+			if($("#use_pct").is(':checked')==true) {
+				$("#loc_province").attr("disabled","disabled");
+				$("#loc_city").attr("disabled","disabled");
+				$("#loc_town").attr("disabled","disabled");
+			}
+			else {
+				$("#loc_province").removeAttr("disabled");
+				$("#loc_city").removeAttr("disabled");
+				$("#loc_town").removeAttr("disabled");
+			}
+		});
+
+		loadMsjFirstUserList();
+		$("#a_back_transhipment_list_link").click(function() {
+			nav51Click();
+			return false;
+		});
+		$(":text[name='from_user_name']").change(function() {
+			$(":radio[name='userId']").attr("checked", false);
+			$(":radio[name='consigneeId']").attr("checked", false);
+		});
+
+		$("#searchBt").click(function() {
+			var key = $(":text[name='key']").val();
+			$(":text[name='from_user_name']").val("");
+			$(":text[name='from_user_real_name']").val("");
+			loadMsjUserList(key);
+			return false;
+		});
+		showLocation();
+	});
+	function transhipmentAdd(){
+		var transitType = $(":radio[name=transitType]:checked").val();
+		var formData;
+		if(0==transitType){
+			formData = new FormData();
+			formData.append("transitType", transitType);
+			formData.append("userId", $(":radio[name=userId]:checked").val());
+			formData.append("transitCompany", $(":text[name=transitCompany]").val());
+			formData.append("transitNo", $(":text[name=transitNo]").val());
+		}else{
+			var formData = new FormData(document.getElementById("form"));
+			formData.append("fromUser", $("#fromUser").val());
+			formData.append("cProvince", $("#loc_province option:selected").text());
+			formData.append("cCity", $("#loc_city option:selected").text());
+			formData.append("cDistrict", $("#loc_town option:selected").text());
+			formData.append("cardurl", $("#idurlcard").val());
+			formData.append("cardurlother", $("#idurlcardother").val());
+			formData.append("cardurltogether", $("#idurlcardtogether").val());
+		}
+		
+		var httpRequest = new XMLHttpRequest();
+		var url = "../admin/transhipment/addTranshipment";
+		httpRequest.onreadystatechange = function(){
+			if(4 == httpRequest.readyState){
+				if(200 == httpRequest.status){
+					var response = eval("(" + httpRequest.responseText + ")");
+					var code = response.code;
+					if("200" == code){
+						alert("添加成功");
+						nav51Click();
+					}else if("607" == code){
+						alert("您尚未登录或登录已失效！");
+						logout();
+					}else{
+						alert("添加预报数据失败，原因是:" + response.message);
+					}
+				}
+			}
+		};
+		httpRequest.open("post", url, true);
+		httpRequest.send(formData);
+		return false;
+	}
+	
+	function loadMsjFirstUserList() {
+		loadMsjUserList("", null);
+	}
+
+	function loadMsjUserList(key, id) {
+		$.ajax({
+			type : "get",
+			url : admin_user_all,
+			data : {
+				key : key
+			},
+			success : function(response) {
+				var code = response.code;
+				if (code == "200") {
+					var str = "";
+					$("#user_info_table tbody").html("");
+					if (response.data != null) {
+						$.each(response.data.datas, function() {
+							str += '<tr id="' + this.phone + '"><td id="'+ this.type+ '"><input type="radio" name="userId" value="'+ this.id + '"/></td>';
+							str += '<td>' + this.phone + '</td>';
+							str += '<td>' + this.realName + '</td>';
+							var rmb = "0";
+							if (this.rmbBalance != null) {
+								rmb = this.rmbBalance;
+							}
+							var usd = "0";
+							if (this.usdBalance != null) {
+								usd = this.usdBalance;
+							}
+							str += '<td>' + rmb + '&nbsp;&nbsp;/&nbsp;&nbsp;' + usd+ '</td>';
+						});
+						$("#user_info_table tbody").html(str);
+						$(":radio[name='userId']").click(function() {
+							$(":hidden[name='userType']").val($(this).parent().attr("id"));
+							var phone = $(this).parent().parent().attr("id");
+							var name = $(this).parent().next().next().text();
+							$(":text[name='from_user_name']").val(phone);
+							$(":text[name='from_user_real_name']").val(name);
+							loadconsigneeinfo($(this).val(), 1);
+						});
+					} else {
+						addUserDlg(key);
+					}
+				} else {
+					alert("获取会员信息失败");
+					nav51Click();
+				}
+			}
+		});
+	}
+</script>
+
+
+</html>
+
+

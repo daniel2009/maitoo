@@ -1,0 +1,258 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+	<input type="hidden" name="key" value="" />
+	<input type="hidden" name="type" value="" />
+	<input type="hidden" name="state" value="" />
+	<input type="hidden" name="sdate" value="" />
+	<input type="hidden" name="edate" value="" />
+	<input type="hidden" name="pn" value="1" />
+	<input type="hidden" name="wid" value="" />
+	<input type="hidden" name="cid" value="" />
+	<input type="hidden" name="typekey" value=""/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">订单下载操作</p>
+
+		<div class="box_content">
+			<div class="content_title">订单列表</div>
+			<div class="content_text">
+
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u52" style="padding-top: 5px;">
+						<div id="u520">
+							<form action="">
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;运单号：<input type="text"
+									name="search_order_no" class="text-input" size="20"
+									style="width:100px;" /> <input class="button" type="button"
+									value="运单号搜索" name="searchSub" style="height:20px" />
+									
+									
+									
+									
+									
+							</form>
+							
+							<br />
+
+							<form action="">
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;航班号：<input type="text"
+									name="search_fly_no" class="text-input" size="20"
+									style="width:100px;" /> <input class="button" type="submit"
+									value="航班搜索" name="searchSub_fly" style="height:20px" />
+							</form>
+							<br />
+														
+							<form action="${pageContext.request.contextPath }/admin/order/exporeorderlist" id="searchkeyall_form"  method="post" enctype="multipart/form-data">
+								<!--运单号：<input type="text" name="search_order_no" class="text-input" size="10"/>-->
+								&nbsp; &nbsp;
+								创建日期：
+								<input type="text" class="text-input Wdate" size="15" name="sdate" id="sd" onClick="WdatePicker()" style="width:100px;"/>
+								~
+								<input type="text" class="text-input Wdate" size="15" name="edate" id="ed" onClick="WdatePicker()" style="width:100px;"/>
+								&nbsp;
+								关键字：
+								<input class="text-input" size="10" type="text" name="key" style="width:100px;" />
+								<input class="text-input" size="10" type="text" name="commudity_hidden"  style="display:none;" value="1,2" />
+								<select class="text-input" name="type" style="width:100px;">
+									<option value="-1">
+										请选择搜索方式
+									</option>
+									<option value="0">
+										运单号
+									</option>
+									<option value="1">
+										转运单号
+									</option>
+									<option value="2">
+										所属用户
+									</option>
+									<option value="3">
+										收件人姓名
+									</option>
+								</select>
+								<select class="text-input" name="state" style="width:100px;">
+									<option value="-1">
+										请选择状态
+									</option>
+									<!-- kai 20150911-1 -->
+									<option value="-10">网上置单</option>
+									<option value="0">等待审核</option>
+									<option value="1">未付款</option>
+									<option value="2">已入库</option>
+									<option value="3">送往集散中心</option>
+									<option value="4">集散中心已入库</option>
+									<option value="5">送往机场</option>
+									<option value="6">空运中</option>
+									<option value="7">海关清关</option>
+									<option value="8">目的地第三方快递</option>
+									<option value="9">收件人已接收</option>
+								</select>
+									<select class="text-input" name="typekey" style="width:100px;">
+									<option value="">
+										请选择类型
+									</option>
+									
+									<option value="1">门市运单</option>
+									<option value="2">转运运单</option>
+									<option value="3">网上置单</option>
+									<option value="4">第三方运单</option>
+									<!-- <option value="5">上门收货</option> -->
+									<option value="6">空运单</option>
+									<option value="7">批量生成门市运单</option>
+									
+								</select>
+								
+								<br/>
+								
+			            	 <span id="span_wid">&nbsp;&nbsp;&nbsp;选择门店：</span> <select
+										class="text-input" name="wid_download">
+										<option value="-1">
+										请选择门店
+									</option>
+									</select> &nbsp;&nbsp;&nbsp;&nbsp;选择渠道： <select class="text-input"
+										name="cid_downloadload">
+										<option value="-1">
+										请选择渠道
+									</option>
+									</select>
+			            
+				            
+				             
+				           
+								
+								
+								
+								<input class="button" type="button" value="高级搜索" name="searchSub" />
+								<input class="button" type="submit" value="直接下载运单" name="download_orders_direct" />
+							</form>
+
+						</div>
+						
+
+						<div style="clear: both;"></div>
+					</div>
+
+				
+									
+									<br /> 
+									<br /> 
+									<br /> 
+									<br /> 
+									<br /> 
+									<br /> 
+									
+			<form action="${pageContext.request.contextPath }/admin/order/exporepics" name="submitdownn" id="submitdownn" method="post" onSubmit="return submitorderdowloadclik()">
+					
+					
+										<p >
+										<input type="checkbox" name="o_order_checked_all"
+												id="o_order_checked_all" />
+											<strong>全选</strong>
+											
+											<span id="orders_no">
+										</span>
+										<span id="orderschecked_no">
+										</span>
+										
+										&nbsp;&nbsp;&nbsp;&nbsp;<strong>身份证下载方式:</strong>
+											<input type="checkbox" name="o_order_checked_pics"
+												id="o_order_checked_pics" value=0 />正面图
+											&nbsp;&nbsp;
+											<input type="checkbox" name="o_order_checked_pics"
+												id="o_order_checked_pics" value=1 />反面图
+											&nbsp;&nbsp;
+											<input type="checkbox" name="o_order_checked_pics"
+												id="o_order_checked_pics" value=2 checked="true"/>合成图
+											
+											&nbsp;&nbsp;&nbsp;&nbsp;<strong>商品数据下载方式:</strong>
+											<input type="checkbox" name="o_order_checked_commoditys"
+												id="o_order_checked_commoditys" value=0 onclick="onclick_checked_commoditys()"/>商品类型
+											&nbsp;&nbsp;
+											<input type="checkbox" name="o_order_checked_commoditys"
+												id="o_order_checked_commoditys" value=1 checked="true" onclick="onclick_checked_commoditys()"/>商品详情
+											&nbsp;&nbsp;
+											<input type="checkbox" name="o_order_checked_commoditys"
+												id="o_order_checked_commoditys" value=2 checked="true" onclick="onclick_checked_commoditys()"/>商品数量
+												&nbsp;&nbsp;
+											<input type="checkbox" name="o_order_checked_commoditys"
+												id="o_order_checked_commoditys" value=3 onclick="onclick_checked_commoditys()"/>商品重量
+										
+										</p>
+										
+					
+					<div id="u5402" style="height:500px;max-height:800px">
+					
+						<table id="user_info_table">
+							<colgroup>
+								<col width="4%">
+								<col width="5%">
+								<col width="10%">
+								<col width="15%">
+								<col width="11%">
+								<col width="10%">
+								<col width="10%">
+								<col width="10%">
+								<col width="8%">
+								<col width="8%">
+								<col width="9%">
+							</colgroup>
+							<thead>
+								<tr>
+									<th>序号</th>
+									<th>操作</th>
+									<th>运单号</th>
+									<th>货物品名</th>
+									<th>所属用户</th>
+									<th>收件人姓名</th>
+									<th>状态</th>
+									<th>创建时间</th>
+									<th>身份证正面图</th>
+									<th>身份证反面图</th>
+									<th>身份证合成图</th>
+								</tr>
+							</thead>
+	
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+					<input id="pics_submit" name="button_submit" class="button" type="submit" value="pictures download" />
+					&nbsp;
+					<input id="excel_submit" name="button_submit" class="button" type="submit" value="orders download" />
+</form>
+<div>
+<br/>
+<p><strong>归属航班操作:</strong></p>
+<p>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;航班号：<input type="text" name="ordertofly_name" class="text-input" size="20" style="width:140px;">&nbsp;&nbsp;
+						<select class="text-input" name="fly_state"
+							style="width:140px;">
+							<option value="-1">请选择运单状态</option>
+							<option value="3">送往集散中心</option>
+							<option value="4">集散中心已入库</option>
+							<option value="5">送往机场</option>
+							<option value="6">空运中</option>
+							<option value="7">海关清关</option>
+							<option value="8">目的地第三方快递</option>
+						</select>&nbsp;&nbsp;
+						<input type="button" value="确定" style="background-color:green;width:50px" id="inputorderstoflyno"/></p>
+</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav521Data();
+	});
+</script>
+</html>

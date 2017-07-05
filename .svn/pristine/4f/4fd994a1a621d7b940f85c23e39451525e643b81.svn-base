@@ -1,0 +1,246 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">审核退货信息
+			<a href="javascript:nav_returnPackage_click();" id="a_back_renling_list_link" class="button">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">审核退货信息</div>
+			<div class="content_text">
+		
+				<div class="tab-content" id="tab2">
+		          
+					<div style="display:flex; flex-wrap: wrap;">
+						<div style="flex-basis: 300px;"><label class="cllabel" style="padding: 0px">退货单号：</label><label class="vallabel" style="padding: 0px;color:red;" id="id_read"></label></div>
+						<div style="flex-basis: 300px;"><label class="cllabel" style="padding: 0px">申请人：</label><label class="vallabel" style="padding: 0px;color:red;" id="userId">&nbsp;</label></div>
+						<div style="flex-basis: 300px;"><label class="cllabel" style="padding: 0px">是否有回执：</label><label class="vallabel" style="padding: 0px;color:red;" id="receipt">&nbsp;</label></div>
+						<br />
+					</div>
+					<div style="display:flex; flex-wrap: wrap;">		
+						<div style="flex-basis: 300px;"><label class="cllabel" style="padding: 0px">当前状态：</label><label class="vallabel" style="padding: 0px;color:red;" id="state">审核中</label></div>
+						<div style="flex-basis: 300px;"><label class="cllabel" style="padding: 0px">处理员工：</label><label class="vallabel" style="padding: 0px;color:red;" id="empId">&nbsp;</label></div>
+						<div style="flex-basis: 300px;"><label class="cllabel" style="padding: 0px">创建日期：</label><label class="vallabel" style="padding: 0px;color:red;" id="createDate">&nbsp;</label></div>
+						<br />
+					</div>
+					<p>		
+						<label class="cllabel" style="padding: 0px">员工留言：</label><label class="vallabel" style="padding: 0px;color:red;" id="empRemark_read">&nbsp;</label>
+					</p>
+			            <hr />
+				<section id="section">
+			    	<h4 style="color:red;">退货信息：</h4>
+					<div style="display: flex; flex-wrap: wrap;">
+						<div style="flex-basis: 500px;">
+		           			<label class="cllabel">转运单号：</label>
+		              		<label class="vallabel" style="padding: 0px;color:red;" id="transhipmentId"></label>
+		              		<label class="vallabel" style="padding: 0px;color:red;" id="transhipmentIdInfo"></label>
+		           		</div>
+						<div style="flex-basis: 500px;">
+		           			<label class="cllabel">包裹单号：</label>
+		              		<label class="vallabel" style="padding: 0px;color:red;" id="packageNo"></label>
+		           		</div>
+		           		<div style="flex-basis: 300px;">
+		           			<label class="cllabel">电话：</label>
+		              		<label class="vallabel" style="padding: 0px;color:red;" id="phone"></label>
+		           		</div>
+		            </div>
+		            <p>
+	           			<label class="cllabel">地址：</label>
+	              		<label class="vallabel" style="padding: 0px;color:red;" id="address"></label>
+	           		</p>
+	           		<br/>
+		            <p>
+		              <label class="cllabel">备注：</label>
+		               <label class="vallabel" style="padding: 0px;color:red;" id="remark"></label>
+		            </p>
+		            <br/>
+		            <div style="display:flex; flex-flow: wrap;">
+		             	<label class="cllabel">证据图：</label>
+		            	<img style="max-width: 200px; max-height: 200px;" id="pic1" src="">
+		            	<img style="max-width: 200px; max-height: 200px;" id="pic2" src="">
+		            	<img style="max-width: 200px; max-height: 200px;" id="pic3" src="">
+		            	<img style="max-width: 200px; max-height: 200px;" id="pic4" src="">
+		            	<img style="max-width: 200px; max-height: 200px;" id="pic5" src="">
+		            </div>
+		            <h4 style="color:red;">审核结果：</h4>
+		            <label id="returnFee" hidden>退货费用: </label><label id="userBalance" hidden>用户余额:</label><br/>
+		            
+		            <form id="form">
+		            	<input type="text" style="display:none;" id="id" name="id" readonly>
+		            	快递单号：<input type="text" class="text-input" id="empExpressNo" name="empExpressNo"><br/>
+		            	快递公司：<input type="text" class="text-input" id="empExpressCompany" name="empExpressCompany"><br/>
+		            	邮寄费：<input type="number" class="text-input" id="shippingFee" name="shippingFee"><br/>
+		            	<figure style="display: flex;">
+		            		<figcaption>图片上传:</figcaption>
+		            		<input type="file" name="empPicture">
+		            		<img id="empPic" style="max-width: 150px; max-height: 150px;">
+		            	</figure>
+		            	<label class="cllabel"><span style="color:blue;">审核结果：</span></label>
+		          		<select id="stateSelect" name="state" class="text-input" onchange="changeState();">
+							<option value="0" selected="selected" >未处理</option>
+			              	<option value="1">已处理</option>
+			              	<option value="2">有问题</option>
+				        </select>
+				        <span class="gl_message">*</span>
+			              <input class="button" style="margin-left: 100px;" type="button" value="提交" onclick="javascript:auditSubmit();"/>
+					    <p>
+			              <label class="cllabel"><span style="color:blue;">审核备注：</span></label>
+			             <textarea rows="2" cols="10" class="text-input textarea wysiwyg" id="empRemark" name="empRemark"></textarea><span class="gl_message">*</span>
+			            </p>
+		            </form>
+		        </section>
+			        
+			      	</div>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		        </div>
+			</div>
+		</div>
+		
+		<div id="tmpmsgdiv1" style="display:none;"></div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		var sessionStorage = window.sessionStorage;
+		var id = sessionStorage.getItem("returnPackageId");
+		document.getElementById("id").value = id;
+		sessionStorage.removeItem("returnPackageId");
+		$.ajax({
+			type: "get",
+			url: "../admin/returnPackage/getById",
+			data: {
+				id:id
+			},
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var data = response.data;
+					if(data != null){
+						document.getElementById("id_read").innerHTML = id;
+						document.getElementById("id").innerHTML = id;
+						document.getElementById("userId").innerHTML = data.userId;
+						if(data.receipt == "1"){
+							document.getElementById("receipt").innerHTML = "有";
+						}else{
+							document.getElementById("receipt").innerHTML = "无";
+						}
+						var state = "未处理";
+						if(data.state == "1"){
+							state = "已处理";
+						}else if(data.state == "2"){
+							state = "有问题";
+						}
+						document.getElementById("state").innerHTML = state;
+						document.getElementById("empId").innerHTML = data.empId;
+						document.getElementById("createDate").innerHTML = data.createDate;
+						document.getElementById("empRemark").innerHTML = data.empRemark;
+						document.getElementById("empExpressNo").value = data.empExpressNo;
+						document.getElementById("empExpressCompany").value = data.empExpressCompany;
+						document.getElementById("shippingFee").value = data.shippingFee;
+						document.getElementById("empRemark").value = data.empRemark;
+						document.getElementById("empPic").src = baseUrl + data.empPic;
+						var packageNoInfo = "";
+						if(data.packageNoInTranshipment<=0){
+							packageNoInfo = "在转运数据里没有对应数据";
+						}
+						document.getElementById("packageNo").innerHTML = data.packageNo;
+						document.getElementById("transhipmentId").innerHTML = data.transhipmentId;
+						document.getElementById("transhipmentIdInfo").innerHTML = packageNoInfo;
+						document.getElementById("phone").innerHTML = data.phone;
+						document.getElementById("address").innerHTML = data.address;
+						document.getElementById("remark").innerHTML = data.remark;
+						document.getElementById("pic1").src = baseUrl + data.pic1;
+						document.getElementById("pic2").src = baseUrl + data.pic2;
+						document.getElementById("pic3").src = baseUrl + data.pic3;
+						clearWrongImg();
+						$.ajax({
+							type: "get",
+							url: "../admin/user/show_one",
+							data: {
+								id: data.userId
+							},
+							success: function(response){
+								var code = response.code;
+								if("200" == code){
+									var data = response.data;
+									if(data != null){
+										document.getElementById("userBalance").innerHTML = "用户余额: $" + data.usdBalance + "￥" + data.rmbBalance;
+									}
+								}else{
+									alert("审核失败，原因是:" + response.message);
+								}
+							}
+						});
+					}
+				}else if("607" == code){
+					alert("您尚未登录或登录已失效！");
+					logout();
+				}else{
+					alert("审核失败，原因是:" + response.message);
+				}
+			}
+		});
+		$.ajax({
+			type: "get",
+			url: "../globalArgs/getReturnPackageReturnFee",
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					var data = response.data;
+					if(data != null){
+						document.getElementById("returnFee").innerHTML = "退货费用: $" + data;
+					}
+				}else{
+					alert("审核失败，原因是:" + response.message);
+				}
+			}
+		});
+	});
+	function changeState(){
+		if(document.getElementById("stateSelect").value=="1"){
+			document.getElementById("returnFee").hidden = false;
+			document.getElementById("userBalance").hidden = false;
+		}else{
+			document.getElementById("returnFee").hidden = true;
+			document.getElementById("userBalance").hidden = true;
+		}
+	}
+	function auditSubmit(){
+		if(document.getElementById("stateSelect").value=="3"){
+			alert("请更新审核结果");
+			return false;
+		}else{
+			var httpRequest = new XMLHttpRequest();
+			var url = "../admin/returnPackage/audit";
+			httpRequest.onreadystatechange = function(){
+				if(4 == httpRequest.readyState){
+					if(200 == httpRequest.status){
+						var response = eval("(" + httpRequest.responseText + ")");
+						var code = response.code;
+						if("200" == code){
+							alert("审核成功");
+							nav_returnPackage_click();
+						}else if("607" == code){
+							alert("您尚未登录或登录已失效！");
+							logout();
+						}else{
+							alert("获取仓库数据失败，原因是:" + response.message);
+						}
+						return false;
+					}
+				}
+			};
+			httpRequest.open("post", url, true);
+			httpRequest.send(new FormData(document.getElementById("form")));
+			return false;
+		}
+	}
+</script>
+</html>

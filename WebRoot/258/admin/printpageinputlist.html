@@ -1,0 +1,1080 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script src="../resources/js/jquery-1.10.2.min.js"></script>
+<title>打印页面</title>
+<style type="text/css">
+* {
+	font-family: 'Microsoft YaHei';
+	font-size: 9px;
+	word-break: break-all;
+	padding: 0px;
+}
+
+p {
+	margin: 3px 0px;
+}
+
+.fontsize14 {
+	font-size: 14px;
+}
+
+.fontsize16 {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+td {
+	width: 25%;
+	padding-left: 2px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+div {
+	padding: 2px;
+}
+</style>
+</head>
+<body>
+
+	<!-- <p id="showhead">美淘转运中国,网址：<span id="print_site_url"></span>, 门店名称：<span id="warehousename"></span>, 电话：<span id="warehousephone"></span></p> -->
+	<table style="BORDER-COLLAPSE: collapse; margin-top:10px;"
+		bordercolor=#000000 cellpadding=1 width=720 align=center border=0
+		id="">
+		<tr>
+			<td style="text-align:center;"><img
+				src="../../258/frontpage/images/logo2.png" class="logo" alt=""
+				style="width:150px;"></td>
+			<td style="font-size: 35px;text-align:left;">美淘转运入库凭证</td>
+		</tr>
+	</table>
+	<hr />
+
+	<table style="BORDER-COLLAPSE: collapse; margin-top:5px;"
+		bordercolor=#000000 cellpadding=1 width=720 align=center border=1
+		id="orderListId_table">
+		<thead>
+			<tr>
+				<th>序号</th>
+				<th>运单单号</th>
+				<th>入库门店</th>
+				<th>所属门店</th>
+				<th>总价钱</th>
+
+				<th>成本</th>
+				<th>计费重</th>
+				<th>实际重</th>
+				<th>入库重</th>
+				<th>入库进</th>
+				<th>操作人</th>
+				<th>支付方式</th>
+				<th>入库时间</th>
+				<th>异常备注</th>
+
+			</tr>
+		</thead>
+		<tbody>
+
+		</tbody>
+	</table>
+
+</body>
+<script type="text/javascript">
+	function removenull(str) {
+		if ((str == "null") || (str == "") || (str == null)
+				|| (str == "undefined")) {
+			return "";
+		} else {
+			return str;
+		}
+	}
+	function getPar(par) {
+		//获取当前URL
+		var local_url = document.location.href;
+		//获取要取得的get参数位置
+		var get = local_url.indexOf(par + "=");
+		if (get == -1) {
+			return false;
+		}
+		//截取字符串
+		var get_par = local_url.slice(par.length + get + 1);
+		//判断截取后的字符串是否还有其他get参数
+		var nextPar = get_par.indexOf("&");
+		if (nextPar != -1) {
+			get_par = get_par.slice(0, nextPar);
+		}
+		return get_par;
+	}
+	var jw_commodity_rate=0;
+	var lowest_weight_value_flag=0;
+	getglobally();
+	$(document)
+			.ready(
+					function() {
+						id = getPar("id");
+						//alert(id);
+						$
+								.ajax({
+									type : "post",
+									url : "/admin/m_order/get_in_many",
+									data : {
+										"ids" : id
+									},
+									success : function(response) {
+										var code = response.code;
+										if ("200" == code) {
+
+											var storeid = "";
+											var flag = "";
+											if (response.data != null) {
+
+												var allweight = 0;//总重量
+												var allsjweight = 0;//总实际重量
+												var all_i_weight = 0;//总入库重量
+												var allquestion = 0;//总问题数量
+
+												var all_i_jwweight = 0;//入库进位总重量
+												var morder_right_num = 0;//正确的运单数量
+
+												var pay_ye_no = 0;//余额支付运单数
+												var pay_ye_money = 0;//余额支付总费用
+												var pay_ye_cost = 0;//余额支付成本费用
+												var pay_ye_q_no = 0;//余额支付问题数
+												var pay_ye_weight = 0;//余额支付重量
+												var pay_ye_sjweight = 0;//余额支付实际重量
+												var pay_ye_i_weight = 0;//余额支付入库重量
+												var pay_ye_i_jwweight = 0;//余额支付入库进位重量
+
+												var pay_cash_no = 0;//现金支付运单数量
+												var pay_cash_money = 0;//现金支付总费用
+												var pay_cash_cost = 0;//现金支付总成本
+												var pay_cash_q_no = 0;//现金支付问题数
+												var pay_cash_weight = 0;//现金支付重量
+												var pay_cash_sjweight = 0;//现金支付实际重量
+												var pay_cash_i_weight = 0;//现金支付入库重量
+												var pay_cash_i_jwweight = 0;//现金支付入库进位重量
+
+												var pay_self_no = 0;//用户支付数量
+												var pay_self_money = 0;//用户支付总费用
+												var pay_self_cost = 0;//用户支付总成本
+												var pay_self_q_no = 0;//用户支付问题数
+												var pay_self_weight = 0;//用户支付重量
+												var pay_self_sjweight = 0;//用户支付实际重量
+												var pay_self_i_weight = 0;//用户支付入库重量
+												var pay_self_i_jwweight = 0;//用户支付入库进位重量
+
+												var pay_way_wrong = 0;//支付方式错误数量
+
+												var morder_nopay_no = 0;//未付款运单数
+												var morder_nopay_totalmoney = 0;//未付款总费用
+												var morder_nopay_cost = 0;//未付款总成本
+												var morder_nopay_weight = 0;//未付款计费重量
+												var morder_nopay_sjweight = 0;//未付款实际重量
+												var morder_nopay_i_weight = 0;//未付款入库重量
+												var morder_nopay_i_jwweight = 0;//未付款入库进位重量
+												var morder_nopay_q_no = 0;//未付款问题单数
+
+												var all_wrong_weight = 0;//所有错误计费重量
+												var all_wrong_sjweight = 0;//所有错误实际重量
+												var all_wrong_i_weight = 0;//所有错误入库重量
+												var all_wrong_i_jwweight = 0;//所有错误入库进位重量
+												var all_wrong_cost = 0;//所有错误成本
+												var all_wrong_totalmoney = 0;//所有总价钱
+
+												var no = 0;
+												$
+														.each(
+																response.data,
+																function() {
+																	no++;
+																	
+																	var jwweight = 0;
+																	if (parseFloat(jw_commodity_rate) <= 0
+																			|| parseFloat(lowest_weight_value_flag) <= 0) {
+																	} else {
+																		if (jw_commodity_rate > 0
+																				&& jw_commodity_rate < 1)//进位值正常
+																		{
+																			if (parseFloat(this.i_weight) <= parseFloat(lowest_weight_value_flag)) {
+																				jwweight = lowest_weight_value_flag;
+																			} else {
+																				if ((parseFloat(this.i_weight) - parseInt(this.i_weight)) <= parseFloat(jw_commodity_rate)) {
+																					jwweight = parseInt(this.i_weight);
+																				} else {
+																					var temp = parseInt(this.i_weight) + 1;
+																					jwweight = temp;
+																				}
+																			}
+																		}
+
+																	}
+																	
+
+																	var str = "<tr>";
+																	str += "<td style='width:3%'>"
+																			+ no
+																			+ "</td>";
+
+																	str += "<td style='width:10%'>"
+																			+ this.orderId
+																			+ "</td>";
+
+																	if ((removenull(this.i_storeName) != "")) {
+																		str += "<td style='width:10%'>"
+																				+ this.i_storeName
+																				+ "</td>";
+																	} else {
+																		str += "<td style='width:10%'>"
+																				+ ""
+																				+ "</td>";
+																	}
+																	if ((removenull(this.storeName) != "")) {
+																		str += "<td style='width:10%'>"
+																				+ this.storeName
+																				+ "</td>";
+																	} else {
+																		str += "<td style='width:10%'>"
+																				+ ""
+																				+ "</td>";
+																	}
+																	if ((removenull(this.totalmoney) != "")) {
+																		str += "<td style='width:5%'>"
+																				+ this.totalmoney
+																				+ "</td>";
+																	} else {
+																		str += "<td style='width:5%'>"
+																				+ ""
+																				+ "</td>";
+																	}
+
+																	if ((removenull(this.totalcost) != "")) {
+																		str += "<td style='width:5%'>"
+																				+ this.totalcost
+																				+ "</td>";
+																	} else {
+																		str += "<td style='width:5%'>"
+																				+ ""
+																				+ "</td>";
+																	}
+																	if ((removenull(this.weight) != "")) {
+																		str += "<td style='width:5%'>"
+																				+ this.weight
+																				+ "</td>";
+																	} else {
+																		str += "<td style='width:5%'>"
+																				+ ""
+																				+ "</td>";
+																	}
+																	if ((removenull(this.sjweight) != "")) {
+																		str += "<td style='width:5%'>"
+																				+ this.sjweight
+																				+ "</td>";
+																	} else {
+																		str += "<td style='width:5%'>"
+																				+ ""
+																				+ "</td>";
+																	}
+																	if ((removenull(this.i_weight) != "")) {
+																		str += "<td style='width:5%'>"
+																				+ this.i_weight
+																				+ "</td>";
+																	} else {
+																		str += "<td style='width:5%'>"
+																				+ ""
+																				+ "</td>";
+																	}
+																	if ((removenull(jwweight) != "")) {
+																		str += "<td style='width:5%'>"
+																				+ jwweight
+																				+ "</td>";
+																	} else {
+																		str += "<td style='width:5%'>"
+																				+ ""
+																				+ "</td>";
+																	}
+																	
+																	if ((removenull(this.i_employeeName) != "")) {
+																		str += "<td style='width:7%'>"
+																				+ this.i_employeeName
+																				+ "</td>";
+																	} else {
+																		str += "<td style='width:7%'>"
+																				+ ""
+																				+ "</td>";
+																	}
+
+																	str += "<td style='width:8%'>"
+																			+ morderpaywaymap(this.payWay)
+																			+ "</td>";
+																	str += "<td style='width:10%'>"
+																			+ this.i_date
+																			+ "</td>";
+
+																	
+
+																	var questionq = "";
+																	if (this.payWay == "0")//余额支付
+																	{
+																		pay_ye_no++;
+																		if (isNaN(parseFloat(this.totalmoney))
+																				|| parseFloat(this.totalmoney) <= 0) {
+																			questionq = "总价钱异常";
+																			pay_ye_q_no++;
+																			allquestion++;
+																			all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																			all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																			all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																			all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																			all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																			
+																			all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																		} else {
+
+																			if (isNaN(parseFloat(this.totalcost))
+																					|| parseFloat(this.totalcost) <= 0) {
+																				questionq = "成本异常";
+																				pay_ye_q_no++;
+																				allquestion++;
+																				all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																				all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																				all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																				all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																				all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																				all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																			} else {
+																				if (isNaN(parseFloat(this.weight))
+																						|| parseFloat(this.weight) <= 0) {
+																					questionq = "计费重量异常";
+																					pay_ye_q_no++;
+																					allquestion++;
+																					all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																					all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																					all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																					all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																					all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																					all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																				} else {
+																					if (isNaN(parseFloat(this.sjweight))
+																							|| parseFloat(this.sjweight) <= 0) {
+																						questionq = "实际重量异常";
+																						pay_ye_q_no++;
+																						allquestion++;
+																						all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																						all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																						all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																						all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																						all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																						all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																					} else {
+																						if (isNaN(parseFloat(this.i_weight))
+																								|| parseFloat(this.i_weight) <= 0) {
+																							questionq = "入库重量异常";
+																							pay_ye_q_no++;
+																							allquestion++;
+																							all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																							all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																							all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																							all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																							all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																							all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																						} else {
+																							pay_ye_cost += parseFloat(this.totalcost);
+																							pay_ye_money += parseFloat(this.totalmoney);
+																							pay_ye_weight += parseFloat(this.weight);
+																							pay_ye_sjweight += parseFloat(this.sjweight);
+																							pay_ye_i_weight += parseFloat(this.i_weight);
+																							allweight += parseFloat(this.weight);
+																							allsjweight += parseFloat(this.sjweight);
+																							all_i_weight += parseFloat(this.i_weight);
+																							
+																							pay_ye_i_jwweight+=parseFloat(jwweight);
+     					                        											all_i_jwweight+=parseFloat(jwweight);
+																							morder_right_num++;
+																						}
+																					}
+																				}
+
+																			}
+																		}
+
+																	} else if (this.payWay == "1")//现金支付
+																	{
+																		pay_cash_no++;
+																		if (isNaN(parseFloat(this.totalmoney))
+																				|| parseFloat(this.totalmoney) <= 0) {
+																			questionq = "总价钱异常";
+																			pay_cash_q_no++;
+																			allquestion++;
+																			all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																			all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																			all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																			all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																			all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																			all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																		} else {
+
+																			if (isNaN(parseFloat(this.totalcost))
+																					|| parseFloat(this.totalcost) <= 0) {
+																				questionq = "成本异常";
+																				pay_cash_q_no++;
+																				allquestion++;
+																				all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																				all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																				all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																				all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																				all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																				all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																			} else {
+																				if (isNaN(parseFloat(this.weight))
+																						|| parseFloat(this.weight) <= 0) {
+																					questionq = "计费重量异常";
+																					pay_cash_q_no++;
+																					allquestion++;
+																					all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																					all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																					all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																					all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																					all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																					all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																				} else {
+																					if (isNaN(parseFloat(this.sjweight))
+																							|| parseFloat(this.sjweight) <= 0) {
+																						questionq = "实际重量异常";
+																						pay_cash_q_no++;
+																						allquestion++;
+																						all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																						all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																						all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																						all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																						all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																						all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																					} else {
+																						if (isNaN(parseFloat(this.i_weight))
+																								|| parseFloat(this.i_weight) <= 0) {
+																							questionq = "入库重量异常";
+																							pay_cash_q_no++;
+																							allquestion++;
+																							all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																							all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																							all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																							all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																							all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																							all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																						} else {
+																							pay_cash_cost += parseFloat(this.totalcost);
+																							pay_cash_money += parseFloat(this.totalmoney);
+																							pay_cash_weight += parseFloat(this.weight);
+																							pay_cash_sjweight += parseFloat(this.sjweight);
+																							pay_cash_i_weight += parseFloat(this.i_weight);
+																							allweight += parseFloat(this.weight);
+																							allsjweight += parseFloat(this.sjweight);
+																							all_i_weight += parseFloat(this.i_weight);
+																							morder_right_num++;
+																							
+																							pay_cash_i_jwweight+=parseFloat(jwweight);
+     					                        											all_i_jwweight+=parseFloat(jwweight);
+																						}
+																					}
+																				}
+
+																			}
+																		}
+
+																	} else if (this.payWay == "2")//用户自付
+																	{
+																		pay_self_no++;
+																		if (isNaN(parseFloat(this.totalmoney))
+																				|| parseFloat(this.totalmoney) <= 0) {
+																			questionq = "总价钱异常";
+																			pay_self_q_no++;
+																			allquestion++;
+																			all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																			all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																			all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																			all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																			all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																			all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																		} else {
+
+																			if (isNaN(parseFloat(this.totalcost))
+																					|| parseFloat(this.totalcost) <= 0) {
+																				questionq = "成本异常";
+																				pay_self_q_no++;
+																				allquestion++;
+																				all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																				all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																				all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																				all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																				all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																				all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																			} else {
+																				if (isNaN(parseFloat(this.weight))
+																						|| parseFloat(this.weight) <= 0) {
+																					questionq = "计费重量异常";
+																					pay_self_q_no++;
+																					allquestion++;
+																					all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																					all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																					all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																					all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																					all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																					all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																				} else {
+																					if (isNaN(parseFloat(this.sjweight))
+																							|| parseFloat(this.sjweight) <= 0) {
+																						questionq = "实际重量异常";
+																						pay_self_q_no++;
+																						allquestion++;
+																						all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																						all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																						all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																						all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																						all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																						all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																					} else {
+																						if (isNaN(parseFloat(this.i_weight))
+																								|| parseFloat(this.i_weight) <= 0) {
+																							questionq = "入库重量异常";
+																							pay_self_q_no++;
+																							allquestion++;
+																							all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																							all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																							all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																							all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																							all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																							all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																						} else {
+																							pay_self_cost += parseFloat(this.totalcost);
+																							pay_self_money += parseFloat(this.totalmoney);
+																							pay_self_weight += parseFloat(this.weight);
+																							pay_self_sjweight += parseFloat(this.sjweight);
+																							pay_self_i_weight += parseFloat(this.i_weight);
+																							allweight += parseFloat(this.weight);
+																							allsjweight += parseFloat(this.sjweight);
+																							all_i_weight += parseFloat(this.i_weight);
+																							morder_right_num++;
+																							pay_self_i_jwweight+=parseFloat(jwweight);
+     					                        											all_i_jwweight+=parseFloat(jwweight);
+																						}
+																					}
+																				}
+
+																			}
+																		}
+
+																	} else {
+																		questionq = "支付方式错误";
+																		pay_way_wrong++;
+																		allquestion++;
+																		all_wrong_weight += parseFloat(this.weight);//所有错误计费重量
+																		all_wrong_sjweight += parseFloat(this.sjweight);//所有错误实际重量
+																		all_wrong_i_weight += parseFloat(this.i_weight);//所有错误入库重量
+																		all_wrong_cost += parseFloat(this.totalcost);//所有错误成本
+																		all_wrong_totalmoney += parseFloat(this.totalmoney);//所有总价钱
+																		all_wrong_i_jwweight+=parseFloat(jwweight);//所有错误进位重量
+																	}
+
+																	//未付款处理
+
+																	if (this.payornot == "0")//未付款
+																	{
+																		questionq = " 未付款";
+																		morder_nopay_no++;
+																		if (isNaN(parseFloat(this.totalmoney))
+																				|| parseFloat(this.totalmoney) <= 0) {
+																			morder_nopay_q_no++;
+
+																		} else {
+
+																			if (isNaN(parseFloat(this.totalcost))
+																					|| parseFloat(this.totalcost) <= 0) {
+																				morder_nopay_q_no++;
+																			} else {
+																				if (isNaN(parseFloat(this.weight))
+																						|| parseFloat(this.weight) <= 0) {
+																					morder_nopay_q_no++;
+																				} else {
+																					if (isNaN(parseFloat(this.sjweight))
+																							|| parseFloat(this.sjweight) <= 0) {
+																						morder_nopay_q_no++;
+																					} else {
+																						if (isNaN(parseFloat(this.i_weight))
+																								|| parseFloat(this.i_weight) <= 0) {
+																							morder_nopay_q_no++;
+																						} else {
+																							morder_nopay_cost += parseFloat(this.totalcost);
+																							morder_nopay_totalmoney += parseFloat(this.totalmoney);
+																							morder_nopay_weight += parseFloat(this.weight);
+																							morder_nopay_sjweight += parseFloat(this.sjweight);
+																							morder_nopay_i_weight += parseFloat(this.i_weight);
+																							
+																							morder_nopay_i_jwweight+=parseFloat(jwweight);
+																						}
+
+																					}
+																				}
+
+																			}
+																		}
+
+																	} else {
+																		if (this.payornot != "1")//未付款
+																		{
+																			questionq = " 支付异常";
+																		}
+
+																	}
+
+																	str += "<td style='width:12%'>"
+																			+ questionq
+																			+ "</td>";
+
+																	str += "</tr>";
+																	$(
+																			"#orderListId_table tbody")
+																			.append(
+																					str);
+																	str = "";
+																});
+
+												var summary = "";
+												summary = "总运单数量：" + no + "条";
+												//summary += ", 总问题数："
+												//		+ allquestion + "条";
+												
+												var temp=parseFloat(allweight)+parseFloat(all_wrong_weight);
+												summary += ", 总计费重量："
+														+  temp + "lb";
+												
+												temp=parseFloat(allsjweight)+parseFloat(all_wrong_sjweight);		
+												summary += ", 总实际重量："
+														+ temp + "lb";
+												
+												temp=parseFloat(all_i_weight)+parseFloat(all_wrong_i_weight);		
+												summary += ", 总入库重量:"
+														+ temp + "lb";
+												
+												temp=parseFloat(all_i_jwweight)+parseFloat(all_wrong_i_jwweight);	
+												summary += ", 总入库进位重量:"
+														+  temp + "lb";
+														
+												
+												summary += "<br/>";
+												summary += "总正确数量：" + morder_right_num + "条";		
+												summary += ", 总正确计费重量："
+														+ allweight + "lb";
+												summary += ", 总正确实际重量："
+														+ allsjweight + "lb";
+												summary += ", 总正确入库重量："
+														+ all_i_weight + "lb";
+												summary += ", 总正确入库进位重量："
+														+ all_i_jwweight + "lb";		
+												summary += "<br/>";
+
+												summary += "总问题数："
+														+ allquestion + "条";
+												summary += ", 总错误计费重量："
+														+ all_wrong_weight
+														+ "lb";
+												summary += ", 总错误实际重量："
+														+ all_wrong_sjweight
+														+ "lb";
+												summary += ", 总错误入库重量："
+														+ all_wrong_i_weight
+														+ "lb";
+														
+												summary += ", 总错误入库进位重量："
+														+ all_wrong_i_jwweight
+														+ "lb";
+
+												summary += ", 总错误入成本："
+														+ all_wrong_cost + "lb";
+												summary += ", 总错误费用："
+														+ all_wrong_totalmoney
+														+ "lb";
+												summary += "<br/>";
+
+												summary += "余额支付总运单数："
+														+ pay_ye_no + "条";
+												summary += ",余额支付总费用："
+														+ pay_ye_money + "美元";
+												summary += ",余额支付运单成本费用："
+														+ pay_ye_cost + "美元";
+												summary += ",余额支付计费总重量："
+														+ pay_ye_weight + "lb";
+												summary += ",余额支付实际总重量："
+														+ pay_ye_sjweight
+														+ "lb";
+												summary += ",余额支付入库总重量："
+														+ pay_ye_i_weight
+														+ "lb";
+												summary += ",余额支付入库进位总重量："
+														+ pay_ye_i_jwweight
+														+ "lb";		
+												summary += ",余额支付运单问题数："
+														+ pay_ye_q_no + "条";
+												summary += "<br/>";
+												summary += "现金支付总运单数："
+														+ pay_cash_no + "条";
+												summary += ",现金支付总费用："
+														+ pay_cash_money + "美元";
+												summary += ",现金支付运单成本费用："
+														+ pay_cash_cost + "美元";
+												summary += ",现金支付计费总重量："
+														+ pay_cash_weight
+														+ "lb";
+												summary += ",现金支付实际总重量："
+														+ pay_cash_sjweight
+														+ "lb";
+												summary += ",现金支付入库总重量："
+														+ pay_cash_i_weight
+														+ "lb";
+														
+												summary += ",现金支付入库进位总重量："
+														+ pay_cash_i_jwweight
+														+ "lb";		
+												summary += ",现金支付运单问题数："
+														+ pay_cash_q_no + "条";
+
+												summary += "<br/>";
+												summary += "用户自付总运单数："
+														+ pay_self_no + "条";
+												summary += ",用户自付总费用："
+														+ pay_self_money + "美元";
+												summary += ",用户自付运单成本费用："
+														+ pay_self_cost + "美元";
+												summary += ",用户自付计费总重量："
+														+ pay_self_weight
+														+ "lb";
+												summary += ",用户自付实际总重量："
+														+ pay_self_sjweight
+														+ "lb";
+												summary += ",用户自付入库总重量："
+														+ pay_self_i_weight
+														+ "lb";
+												summary += ",用户自付入库进位总重量："
+														+ pay_self_i_jwweight
+														+ "lb";		
+												summary += ",用户自付运单问题数："
+														+ pay_self_q_no + "条";
+
+												summary += "<br/>";
+												summary += "支付方式错误："
+														+ pay_way_wrong + "条";
+
+												summary += "<br/>";
+												summary += "未付款总运单数："
+														+ morder_nopay_no + "条";
+												summary += ",未付款总费用："
+														+ morder_nopay_totalmoney
+														+ "美元";
+												summary += ",未付款成本费用："
+														+ morder_nopay_cost
+														+ "美元";
+												summary += ",未付款计费重量："
+														+ morder_nopay_weight
+														+ "lb";
+												summary += ",未付款实际重量："
+														+ morder_nopay_sjweight
+														+ "lb";
+												summary += ",未付款入库重量："
+														+ morder_nopay_i_weight
+														+ "lb";
+												summary += ",未付款入库进位重量："
+														+ morder_nopay_i_jwweight
+														+ "lb";		
+														
+												summary += ",未付款问题数："
+														+ morder_nopay_q_no
+														+ "条";
+
+												var str1 = "<tr><td colspan='14'>"
+														+ summary
+														+ "</td></tr>";
+												$("#orderListId_table tbody")
+														.append(str1);
+											} else {
+												alert("获取不到运单信息!");
+											}
+
+											if ((removenull(storeid) == "")
+													|| (flag != "")) {
+
+												$("#showhead").html("");
+												window.print();
+											} else {
+
+												getprintwarehouse(storeid);
+											}
+
+										} else if ("607" == code) {
+											alert("您尚未登录或登录已失效！");
+											top.location.href = "../admin/login.html";
+										} else {
+											alert("提交出错，出错原因："
+													+ response.message);
+										}
+
+									}
+								});
+
+					});
+
+	function getprintwarehouse(warehouseid) {
+		$.ajax({
+			async : true,
+			type : "get",
+			url : "../../admin/warehouse/get_one",
+			data : {
+				"id" : warehouseid
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+
+					if (removenull(response.data.printUrl) == "") {
+						$("#print_site_url").html("");
+					} else {
+						$("#print_site_url").html(response.data.printUrl);
+					}
+					if (removenull(response.data.name) == "") {
+						$("#warehousename").html("");
+					} else {
+						$("#warehousename").html(response.data.name);
+					}
+					if (removenull(response.data.telephone) == "") {
+						$("#warehousephone").html("");
+					} else {
+						$("#warehousephone").html(response.data.telephone);
+					}
+					setTimeout("getglobalargs()", 100);
+
+					return false;
+
+					$("#warehouseAddress").html(
+							removenull(response.data.address) + "&nbsp;&nbsp;"
+									+ removenull(response.data.city) + "&nbsp;"
+									+ removenull(response.data.province)
+									+ "&nbsp;"
+									+ removenull(response.data.country)
+									+ "&nbsp;"
+									+ removenull(response.data.zipCode));
+
+					var url = response.data.print2Code;
+					//alert(url);
+					if (removenull(url) == "") {
+
+						$("#qrcodeurl").attr("src", "");
+						$("#qrcodeurl2").attr("src", "");
+					} else {
+						$("#qrcodeurl").attr("src", "../.." + url);
+						$("#qrcodeurl2").attr("src", "../.." + url);
+					}
+					if (removenull(response.data.printPhoneUSA) == "") {
+						$("#usa_phone").html("");
+						$("#usa_phone2").html("");
+					} else {
+						$("#usa_phone").html(response.data.printPhoneUSA);
+						$("#usa_phone2").html(response.data.printPhoneUSA);
+					}
+					if (removenull(response.data.printPhoneCN)) {
+						$("#china_phone").html("");
+						$("#china_phone2").html("");
+					} else {
+						$("#china_phone").html(response.data.printPhoneCN);
+						$("#china_phone2").html(response.data.printPhoneCN);
+					}
+
+				}
+				//logo处理
+				if (removenull(response.data.printLogo) == "") {
+
+				} else {
+
+					$("#print_logo").attr("src",
+							"../.." + response.data.printLogo);
+					$("#print_logo2").attr("src",
+							"../.." + response.data.printLogo);
+				}
+
+				//var site="Website/网址:";
+				var site = "";
+				if (removenull(response.data.printUrl) != "") {
+					site = site + response.data.printUrl;
+
+				}
+				$("#print_site_url").html(site);
+				$("#print_site_url2").html(site);
+
+				setTimeout("getglobalargs()", 200);
+				//getglobalargs();
+			}
+		});
+	}
+
+	function getglobalargs() {
+		//var flags="print_logo_flag,print_order_hit,print_site_url";//获取logo图片,包裹提示,网站的url
+		var flags = "print_order_hit,print_site_url,print_commudity_ornot,print_label_send_name,print_label_send_phone";//获取logo图片,包裹提示,网站的url
+		$.ajax({
+			type : "post",
+			url : "../../admin/globalargs/getcontents",
+			data : {
+				"flags" : flags
+			},
+			success : function(response) {
+				var code = response.code;
+
+				if ("200" == code) {
+
+					if (response.data != null) {
+
+						/*if((response.data[0]=="")||(response.data[0]=="null")||(response.data[0]=="undefined")||(response.data[0]==null))
+						{
+							
+						}
+						else
+						{
+							
+							//$("#print_logo").attr("src",getRootPath()+response.data[0]);
+							//$("#print_logo2").attr("src",getRootPath()+response.data[0]);
+						}*/
+
+						if ((response.data[0] == "")
+								|| (response.data[0] == "null")
+								|| (response.data[0] == "undefined")
+								|| (response.data[0] == null)) {
+
+						} else {
+							$("#print_order_hit").html(response.data[0]);
+
+						}
+						//alert(response.data[1]);
+						if ((response.data[1] == "")
+								|| (response.data[1] == "null")
+								|| (response.data[1] == "undefined")
+								|| (response.data[1] == null)) {
+
+						} else {
+							//$("#print_site_url").html(response.data[1]);
+							//$("#print_site_url2").html(response.data[1]);
+							if ($("#print_site_url").html() == "") {
+								$("#print_site_url").html(response.data[1]);
+							}
+
+							if ($("#print_site_url2").html() == "") {
+								$("#print_site_url2").html(response.data[1]);
+							}
+
+						}
+
+						var print_commudity_ornot = response.data[2];
+						//alert(print_commudity_ornot);
+						//alert($("#print_table1 div[name='remark2']").html());
+						if (print_commudity_ornot != "yes") {
+							$("#commudityinfo2").html("");
+						}
+
+						var print_label_send_name = response.data[3];
+						if (print_label_send_name == "no") {
+							//id="from_user2"
+							$("#send_name2").html("&nbsp;");//不显示发件人信息
+						}
+						var print_label_send_phone = response.data[4];
+						if (print_label_send_phone == "no") {
+							$("#send_phone2").html("&nbsp;");//不显示发件人的电话
+
+						}
+
+					} else {
+
+					}
+				} else {
+
+				}
+				$(document).ready(function() {
+					//setTimeout(window.print(), 100);
+					//printDom();
+					isImgLoad(printA4);
+				});
+			}
+		});
+	}
+
+	function printA4() {
+		setTimeout(window.print());
+	}
+
+	var t_img; // 定时器
+	var isLoad = true; // 控制变量
+
+	// 判断图片加载状况，加载完成后回调
+	isImgLoad(function() {
+		// 加载完成
+		//alert("45545");
+	});
+
+	// 判断图片加载的函数
+	function isImgLoad(callback) {
+
+		$("img").each(function() {
+
+			if (this.height === 0) {
+				isLoad = false;
+				return false;
+			}
+		});
+		// 为true，没有发现为0的。加载完毕
+		if (isLoad) {
+			clearTimeout(t_img); // 清除定时器
+			// 回调函数
+			callback();
+			// 为false，因为找到了没有加载完成的图，将调用定时器递归
+		} else {
+			isLoad = true;
+			t_img = setTimeout(function() {
+				isImgLoad(callback); // 递归扫描
+			}, 500); // 我这里设置的是500毫秒就扫描一次，可以自己调整
+		}
+	}
+
+	//支付方式映射
+	function morderpaywaymap(value) {
+		if (value == "1") {
+			return "现金支付";
+		} else if (value == "0") {
+			return "余额支付";
+		} else if (value == "2") {
+			return "用户自付";
+		} else {
+			return "非法支付";
+		}
+	}
+	function getglobally()
+	{
+		var flags="jw_commodity_rate,lowest_weight_value_flag";
+	    $.ajax({
+	        type: "post",
+	        url: "/admin/globalargs/getcontents",
+	        data: {
+	            "flags": flags
+	        },
+	        success: function (response) {
+	            var code = response.code;
+	            if ("200" == code) {
+	            	jw_commodity_rate=response.data[0];
+	            	lowest_weight_value_flag=response.data[1];
+	            }
+	            else if ("607" == code) {
+	                alert("您尚未登录或登录已失效！");
+	                top.location.href = "../admin/login.html";
+	            }
+	            else {
+	                alert("错误，原因是：" + response.message);
+	            }
+	        }
+	    });	
+	}
+</script>
+</html>

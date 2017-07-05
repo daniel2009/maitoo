@@ -1,0 +1,73 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>重置密码-快递中美专线</title>
+<link rel="shortcut icon" href="img/favicon.ico" /> 
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript">
+	
+	
+	function resetpwd() {
+		var email = $(":hidden[name='email']").val();
+		var token = $(":hidden[name='token']").val();
+		var newpwd = $(":password[name='newpwd']").val();
+		$.ajax({
+			type:"post",
+			url:"user/reset_pwd2",
+			data:{
+				"email":email,
+				"token":token,
+				"password":newpwd,
+				"vcode":"1234"
+			},
+			success:function(response) {
+				var code = response.code;
+				if (code == "200") {
+					alert("重置密码成功，请登录！");
+					window.location.href = "login.jsp";
+				} else {
+					alert("重置密码失败，原因是:" + response.message);
+					window.location.href = "resetPwd.html";
+				}
+				return false;
+			}
+		});
+		return false;
+	}
+</script>
+</head>
+
+<body>
+
+
+<div class="main">
+
+	<div class="main_box">
+		<div style="margin:80px 200px">
+			<div class="register">
+				<input type="hidden" name="email" value="${param.email }"/>
+				<input type="hidden" name="token" value="${param.token }"/>
+				<div class="d_tr">
+					<label>新密码：</label>
+					<input name="newpwd" type="password" style="width:200px;height:25px"maxlength="16"/><span class="red">*</span>
+				</div>
+				
+				<div class="d_tr">
+					<label>确认密码：</label>
+					<input name="confirmpwd" type="password" maxlength="16"style="width:200px;height:25px"/><span class="red">*</span>
+				</div>
+				<a class="btn" onclick="resetpwd()" href="#" style="margin-left:105px;">提交</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!--end main-->
+
+
+</body>
+</html>

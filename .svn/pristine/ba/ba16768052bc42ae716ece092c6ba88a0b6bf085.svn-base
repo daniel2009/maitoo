@@ -1,0 +1,23 @@
+//清理数据库中为空的img，ajax部分，必须用在全部pic加载完成后
+function clearWrongImg(){
+	clearWrongImgAllKinds(true);
+}
+function clearWrongImgNoBaseUrl(){
+	clearWrongImgAllKinds(false);
+}
+function clearWrongImgAllKinds(hasBaseUrl){
+	var url = hasBaseUrl ? baseUrl : "";
+	$("img[src]").each(function(){
+		var src = $(this).attr("src");
+		var reg = /(.*)(https?:\/\/.*)/g;
+		src = src.replace(reg,"$2");
+		if(src==url || src==url+"null" || src==url+".noFile" || src=="../" || src=="../null" ||  src=="../.noFile"){
+			src = "";
+		}
+		var dataImgIndex = src.indexOf("data:image/");
+		if(dataImgIndex<5 || dataImgIndex <= url.length){
+			src = src.substring(dataImgIndex);
+		}
+		$(this).attr("src", src);
+	});
+}

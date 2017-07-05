@@ -1,0 +1,10 @@
+package com.weiye.service;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.SpiderOrder;
+
+public interface SpiderOrderService {
+
+	ResponseObject<SpiderOrder> search(String url) throws ServiceException;
+}

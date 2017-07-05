@@ -1,0 +1,64 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" id="e_d_id" value="${param.id }"/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">职工信息详情</p>
+
+		<div class="box_content">
+			<div class="content_title">职工信息详情</div>
+			<div class="content_text">
+				<div class="tab-content" id="tab2">
+		          <form action="#" method="post">
+		            <fieldset>
+			            <p>
+			              <label style="display: inline;">用户编号：</label>
+			              <label style="display: inline;">${param.id }</label>
+			            </p>
+			            <hr/>
+			            <p>
+			              <label style="display: inline;">&nbsp;&nbsp;&nbsp;用户名：</label>
+			              <label style="display: inline;" id="e_d_account"></label>
+			            </p>
+			            <hr/>
+			            <p>
+			              <label style="display: inline;">门市编号：</label>
+			              <label style="display: inline;" id="e_d_store_id">无</label>
+			            </p>
+			            <hr/>
+			            <p>
+			              <label style="display: inline;">门市名称：</label>
+			              <label style="display: inline;" id="e_d_store_name">无</label>
+			            </p>
+			            <hr/>
+			            <p>
+			              <label style="display: inline;">手机号码：</label>
+			              <label style="display: inline;" id="e_d_phone">无</label>
+			            </p>
+			            <hr/>
+			            <p>
+			            	<label style="display: inline;">&nbsp;&nbsp;&nbsp;照&nbsp;&nbsp;&nbsp;片：</label>
+			                <label style="display: inline;" id="e_d_pic">无</label>
+			            </p>
+			            <hr/>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+	</div>	
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav23Data();
+	});
+</script>
+</html>

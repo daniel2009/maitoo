@@ -1,0 +1,640 @@
+var project_base_name = "";
+var admin_login_page_url = "/admin/login.jsp";
+var admin_message_count_url = "/admin/message/getcount";
+var admin_message_list_url = "/admin/message/search";
+var admin_message_add_url = "/admin/message/add";
+var admin_login_info_url = "/logininfo/get_self";
+var admin_login_info_user_url = "/logininfo/get_user";
+var admin_emp_logout_url = "/admin/emp/logout";
+
+var admin_create_code_url = "/code/generate";
+var admin_reset_pwd_url = "/admin/resetPwd.jsp";
+var admin_reset_pwd = "/admin/emp/reset_pwd";
+var admin_emp_list_page_url = "/admin/empList.jsp";
+var admin_emp_list_url = "/admin/emp/search";
+var admin_add_emp_page_url = "/admin/empAdd.jsp";
+var admin_add_emp_url_with_pic = "/admin/emp/add";
+var admin_add_emp_url_with_no_pic = "/admin/emp/add_no_pic";
+var admin_delete_emp_url = "/admin/emp/delete";
+var admin_detail_emp_page_url = "/admin/empDetail.jsp";
+var admin_detail_emp_url = "/admin/emp/get_one";
+var admin_modify_emp_page_url = "/admin/empModify.jsp";
+var admin_modify_emp_url_with_pic = "/admin/emp/modify";
+var admin_modify_emp_url_with_no_pic = "/admin/emp/modify_no_pic";
+
+var admin_get_emp_self = "/admin/emp/get_self";
+var admin_dingdanzhifu_url = "/admin/dingdanzhifu.jsp";
+
+var admin_user_list_page_url = "/admin/userList.jsp";
+var admin_user_list_url = "/admin/user/search";
+var admin_user_all = "/admin/user/all";
+var admin_add_user_page_url = "/admin/userAdd.jsp";
+var admin_add_user_url = "/admin/user/add";
+var admin_add_msuser_url = "/admin/user/addms";
+var admin_show_one_user_url = "/admin/user/show_one";
+var admin_user_show_one_by_phone_url = "/admin/user/show_one_by_phone";
+var admin_modify_user_page_url = "/admin/userModify.jsp";
+var admin_modify_user_url = "/admin/user/add";
+var admin_modify_user_pwd_page_url = "/admin/userPwdModify.jsp";
+var admin_modify_user_pwd_url = "/admin/user/modify_pwd";
+var admin_detail_user_page_url = "/admin/userDetail.jsp";
+var admin_delete_user_url = "/admin/user/del";
+var admin_user_export_page_url = "/admin/userExport.jsp";
+//权限管理
+var admin_emp_authority_page_url = "/admin/authority.jsp";
+//展示权限列表
+var admin_emp_authority_list="/admin/emp/getmenuinfo";
+//修改权限
+var admin_emp_authority_modify="/admin/emp/modifyauthority";
+
+//客服管理
+var admin_message_list_page_url = "/admin/messageList.jsp";
+
+// 异常运单管理
+var admin_error_order_list_page_url = "/admin/errorOrderList.jsp";
+var admin_error_order_list_url = "/admin/error/order/search";
+var admin_error_order_add_url = "/admin/error/order/add";
+var admin_error_order_del_url = "/admin/error/order/del";
+var admin_error_order_modify_state_url = "/admin/error/order/modify_state";
+
+// 异常预报运单管理
+var admin_error_torder_list_page_url = "/admin/errorOrderListdingdan.jsp";
+var admin_error_torder_list_url = "/admin/error/transh/search";
+var admin_error_torder_add_url = "/admin/error/transh/add";
+var admin_error_torder_del_url = "/admin/error/transh/del";
+var admin_error_torder_modify_state_url = "/admin/error/transh/modify_state";
+
+// 美国转运单
+var admin_tranship_list_page_url = "/admin/transhipList.jsp";
+var admin_tranship_list_url = "/admin/transh/search";
+var admin_tranship_searchlist_url = "/admin/transh/searchnew";
+var admin_tranship_downlist_url = "/admin/transh/downlist";
+var admin_modify_tranship_page_url = "/admin/transhipModify.jsp";
+var admin_modify_tranship_url = "/admin/transh/modify";
+var admin_detail_tranship_page_url = "/admin/transhipDetail.jsp";
+var admin_detail_tranship_delete_url = "/admin/transh/delete";
+var admin_tranship_show_one_url = "/admin/transh/get_one";
+var admin_tranship_get_by_order_url = "/admin/transh/getbyorderid";
+var admin_count_order_money_page_url = "/admin/CountOrdersMoney.jsp";
+
+//认领包裹
+var admin_renling_list_page_url = "/admin/renlingList.jsp";
+var admin_renling_baoguo_add_page_url = "/admin/RenlingbaoguoAdd.jsp";
+var admin_renling_baoguo_add_url = "/admin/renling/add";
+var admin_renling_list_url="/admin/renling/search";
+var admin_detail_renling_delete_url = "/admin/renling/delete";
+var admin_renling_baoguo_modify_page_url = "/admin/RenlingbaoguoModify.jsp";
+var admin_renling_show_one_url = "/admin/renling/get_one";
+var admin_renling_baoguo_modify_url = "/admin/renling/modifyhavepic";
+var admin_modify_renling_nopic_url = "/admin/renling/modifyhavenopic";
+
+
+// 仓库
+var admin_warehouse_add_page_url = "/admin/warehouseAdd.jsp";
+var admin_warehouse_page_url = "/admin/warehouseList.jsp";
+var admin_modify_warehouse_page_url = "/admin/warehouseModify.jsp";
+var admin_modify_warehouse_url = "/admin/warehouse/modify";
+var admin_warehouse_get_one_url = "/admin/warehouse/get_one";
+var admin_warehouse_list_url = "/admin/warehouse/search";
+var admin_warehouse_add_url = "/admin/warehouse/add";
+var admin_warehouse_addhavepic_url = "/admin/warehouse/addhavepic";
+var admin_warehouse_modifyhavepic_url = "/admin/warehouse/modifyhavepic";
+var admin_warehouse_delete_url = "/admin/warehouse/del";
+var admin_warehosue_all = "/warehouse/all";
+// 运单
+var admin_order_list_page_url = "/admin/orderList.jsp";
+var admin_order_list_url = "/admin/weborder/search";
+var admin_order_modify_page_url = "/admin/orderModify.jsp";
+var admin_order_modify_url = "/admin/order/modify";
+var admin_detail_order_delete_url = "/admin/order/delete";
+var admin_order_get_one_url = "/admin/order/get_one";
+var admin_order_search_by_ids_url = "/admin/order/search_by_ids";
+var admin_order_route_search_url = "/route/search";
+var admin_order_export_to_meitao = "/admin/order/export_to_meitao"; //chenkanghua  
+
+var admin_order_import_from_meitao = "/admin/order/import_from_meitao";//chenkanghua
+var admin_order_import_from_weiyi = "/admin/order/import_from_weiyi";//kai
+
+var admin_third_order_import_from_weiyi = "/admin/order/third_import_from_weiyi";//kai
+
+var admin_report = "/admin/report.jsp";//chenkanghua
+
+var admin_order_get_url = "/admin/order/get";
+var admin_order_payorders_url = "/admin/order/payorders";
+
+
+// 门市件
+var admin_msj_order_list_page_url = "/admin/msjOrderList.jsp";
+var admin_msj_order_list_url = "/admin/msjorder/search";
+var admin_msj_order_add_page_url = "/admin/msjOrderAdd.jsp";
+var admin_msj_order_add_url = "/admin/msjorder/submit";
+var admin_msj_order_calc_freight = "/admin/msjorder/calc_freight";
+var admin_msg_order_pay_page_url = "/admin/msjOrderPay.jsp";
+var admin_msg_order_pay_url = "/admin/order/pay";
+var admin_msg_order_delete_url = "/admin/msjorder/delete";
+var admin_msj_order_add_no_userid_url="/admin/msjorder_no_userid/submit";
+
+//网上置件
+//var admin_wszj_order_list_page_url = "/admin/wszjOrderList.jsp";
+
+//空运单
+var admin_empty_order_list_page_url = "/admin/emptyOrderList.jsp";
+var admin_empty_order_add_url = "/admin/emptyorder/submit";
+var admin_empty_order_list_url = "/admin/emptyorder/search";
+var admin_empty_order_modify_page_url = "/admin/emptyOrderModify.jsp";
+var admin_empty_order_modify_url = "/admin/emptyorder/modify";
+var admin_empty_order_delete_url = "/admin/emptyorder/delete";
+
+//身份证处理
+var admin_order_pics_process_link_url = "/admin/picsManage.jsp";
+
+// 路由
+var admin_route_list_page_url = "/admin/routeList.jsp";
+var admin_route_list_url = "/admin/order/search";
+var admin_route_export_out_page_url = "/admin/routeExportOut.jsp";
+var admin_route_export_in_page_url = "/admin/routeExportIn.jsp";
+var admin_tran_route_export_in_page_url = "/admin/tranrouteExportIn.jsp";
+var admin_route_order_delete_url = "/admin/order/delete";
+var admin_route_modify_state_url = "/admin/order/modify_state_flight";
+var admin_route_modify_flight_url = "/admin/order/modify_flight";
+var admin_route_order_detail_page_url = "/admin/routeOrderDetail.jsp";
+var admin_tran_route_order_detail_page_url= "/admin/TranRouteOrderDetail.jsp";
+var admin_import_order_state_url = "/admin/order/import";
+var admin_import_order_weiyi_state_url = "/admin/order/import_weiyi_state";
+
+
+
+var arbms_page_url = "/admin/routeBatchModify.jsp";
+var arbms_url = "/admin/route/batch_search";
+var arbmm_url = "/admin/route/batch_modify";
+
+// 散件管理
+var admin_retail_order_page_url = "/admin/rlOrderList.jsp";
+var admin_retail_order_create_url = "/admin/rlorder/create";
+var admin_retail_order_count_url = "/admin/rlorder/getcount";
+var admin_retail_order_get_url = "/admin/rlorder/get";
+var admin_retail_order_delete_url = "/admin/rlorder/delete";
+var admin_retail_order_import_url = "/admin/rlorder/import";
+
+// 预充值管理
+var admin_account_list_page_url = "/admin/accountList.jsp";
+var admin_account_list_url = "/admin/account/detail/search";
+var admin_account_get_one_url = "/admin/account/detail/get_one";
+var admin_account_modify_page_url = "/admin/accountModify.jsp";
+var admin_account_modify_url = "/admin/account/detail/modify";
+
+// 账户管理
+var admin_manager_account_list_page_url = "/admin/accountManagerList.jsp";
+var admin_manager_ms_recharge = "/admin/msrecharge";
+var admin_user_account_detail_page_url = "/admin/accountDetail.jsp";
+var admin_user_account_detail_url  = "/admin/account/get_one";
+
+var admin_print_page_url = "/admin/print.jsp";//热敏打印
+var admin_print_A4_page_url = "/admin/print_A4.jsp";//A4打印
+
+var admin_print_sea_page_url= "/admin/print-sea-meitao.jsp";//海关单打印
+
+var admin_print_empty_order_page_url = "/admin/printemptyorder.jsp";
+//新闻公告管理
+var admin_news_list_page_url="/admin/news.jsp";
+var admin_news_add_page_url="/admin/newAdd.jsp";
+var admin_news_modify_page_url="/admin/newsModify.jsp";
+var admin_news_add_url="/admin/news/add";
+var admin_news_get_one_url="/admin/news/get_one";
+var admin_news_modify_url="/admin/news/modify";
+var admin_news_dele_url="/admin/news/del";
+var admin_news_list_url = "/admin/news/search";
+var user_news_list_url = "/news/search";
+
+var admin_gonggao_dele_url="/admin/gonggao/del";
+var admin_gonggao_list_url="/admin/gonggao/search";;
+var admin_gonggao_add_url="/admin/gonggao/add";
+var admin_gonggao_list_page_url="/admin/gonggao.jsp";
+var admin_gonggao_add_page_url="/admin/gonggaoAdd.jsp";
+var admin_gonggao_modify_page_url="/admin/gonggaoModify.jsp";
+var admin_gonggao_get_one_url="/admin/gonggao/get_one";
+var admin_gonggao_modify_url="/admin/gonggao/modify";
+
+
+//商品类型管理
+var admin_commodity_list_page_url = "/admin/commodityList.jsp";
+var admin_commodity_list_url = "/commodity/all";
+var admin_commodity_modify_url = "/admin/commodity/modify";
+var admin_add_commodity_url = "/admin/commodity/add";
+
+//特别商品管理
+var admin_special_commodity_list_page_url = "/admin/Special_commodityList.jsp";
+var admin_special_commodity_list_url = "/spencialcommodity/all";
+var admin_special_commodity_modify_url = "/admin/spencialcommodity/modify";
+var admin_special_add_commodity_url = "/admin/spencialcommodity/add";
+var admin_special_commodity_countrylist_url = "/spencialcommodity/countrylist_all";//在线特定渠道下的国家列表
+
+//
+var admin_consignee_search_by_emp = "/admin/consignee/search_by_emp";
+var admin_consignee_add_no_pic = "/admin/consignee/add_no_pic";
+var admin_consignee_add = "/admin/consignee/add";
+
+var admin_send_sms_page_url = "/admin/sendSms.jsp";
+var admin_sms_send_url = "/admin/sms/send";
+var admin_call_order_list_page_url = "/admin/callOrderList.jsp";
+var admin_call_order_list_url = "/admin/call_order/all";
+var admin_call_order_modify_url = "/admin/call_order/modify";
+//渠道
+var admin_channel_page_list_url = "/admin/channelList.jsp";
+var admin_channel_list_url = "/channel/all";//表示启用的渠道
+var admin_channel_goodorstop_list_url = "/channel/allgoodorstodp";//表示怕有渠道
+var admin_channel_modify_url = "/admin/channel/modify";
+var admin_add_channel_url = "/admin/channel/add";
+
+//特殊渠道管理
+var admin_special_channel_page_list_url = "/admin/special_channelList.jsp";
+var admin_special_channel_list_url = "/spencialchannel/all";//表示启用的渠道
+var admin_special_channel_goodorstop_list_url = "/spencialchannel/allgoodorstodp";//表示所有渠道
+var admin_special_channel_modify_url = "/admin/spencialchannel/modify";
+var admin_special_add_channel_url = "/admin/spencialchannel/add";
+
+//海淘推荐
+var admin_ocean_store_list_page_url = "/admin/oceanStoreList.jsp";
+var admin_ocean_store_all_url = "/admin/oceanStore/all";
+var admin_ocean_store_add_url = "/admin/oceanStore/add";
+var admin_ocean_store_modify_url = "/admin/oceanStore/modify";
+var admin_ocean_store_delete_url = "/admin/oceanStore/delete";
+
+//全局参数
+var admin_globalargs_page_list_url = "/admin/globalargs.jsp";
+var admin_globalargs_list_url = "/admin/globalargs/all";
+var admin_globalargs_add_page_url = "/admin/Addglobalargs.jsp";
+var admin_globalargs_text_url="/admin/globalargs/textadd";
+var admin_globalargs_pic_url="/admin/globalargs/picadd";
+var admin_globalargs_page_modify_url = "/admin/globalargsModify.jsp";
+var admin_globalargs_getone_url = "/admin/globalargs/getone";
+var admin_globalargs_modify_text_url = "/admin/globalargs/modifytext";
+var admin_globalargs_modify_pic_url = "/admin/globalargs/modifypic";
+var admin_globalargs_delone_url = "/admin/globalargs/delone";
+var user_globalargs_getcontent_url= "/globalargs/getcontent";
+var admin_globalargs_getcontents_url= "/admin/globalargs/getcontents";
+
+var admin_flyinfo_add_url = "/admin/flyinfo/add";
+var admin_flyinfo_list_url = "/admin/flyinfo/search";
+var admin_flyinfo_modify_url = "/admin/flyinfo/modify";
+var admin_flyinfo_del_url = "/admin/flyinfo/del";
+var admin_flyinfo_modify_havepic_url = "/admin/flyinfo/modify_havepic_url";
+
+//endicia
+var admin_endicialabel_admin_page_url = "/admin/endicialabel_admin.jsp";
+
+
+var admin_endicialabel_list_page_url = "/admin/EndiciaLabelList.jsp";
+
+var admin_import_tran_order_state_url = "/admin/tran/import_order_state";
+
+var admin_sea_create_page_url = "/admin/seacreat.jsp";//海关打印页面
+var admin_seaprintcreate_add_url = "/admin/seaprint/add";//海关批次添加
+var admin_seaprint_list_url = "/admin/seaprint/searchlist";//海关打印搜索
+var admin_seaprint_get_one_url = "/admin/seaprint/get_one";//获取一条批次信息
+var admin_seaprint_one_page_url = "/admin/seaprintpage.jsp";//显示一个批次的详细信息
+var admin_seaprint_del_url="/admin/seaprint/del";
+
+var admin_cardid_import_page_url = "/admin/CardIdImport.jsp";//身份证导入连接
+var admin_import_cardid_info_url = "/admin/cardid/import";//导入身份证信息
+var admin_porder_import_form = "/admin/seaprint/porder_form";//导入海关单号
+
+var admin_seaprint_porder_get_one_url = "/admin/seaprint/get_one_porder";//获取海关的一条运单
+
+var admin_spencial_ms_admin_page_url = "/admin/Spencial_msjOrderAdd.jsp";
+
+
+
+function firstSetUrl(baseUrl) {
+	project_base_name = baseUrl;
+	admin_login_page_url = baseUrl + admin_login_page_url;
+	admin_message_count_url = baseUrl + admin_message_count_url;
+	admin_message_list_url = baseUrl + admin_message_list_url;
+	admin_message_add_url = baseUrl + admin_message_add_url;
+	admin_login_info_url = baseUrl + admin_login_info_url;
+	admin_login_info_user_url = baseUrl + admin_login_info_user_url;
+	admin_reset_pwd_url = baseUrl + admin_reset_pwd_url;
+	admin_reset_pwd = baseUrl + admin_reset_pwd;
+	admin_emp_logout_url = baseUrl + admin_emp_logout_url;
+	admin_create_code_url = baseUrl + admin_create_code_url;
+	admin_delete_emp_url = baseUrl + admin_delete_emp_url;
+	admin_emp_list_page_url = baseUrl + admin_emp_list_page_url;
+	admin_emp_list_url = baseUrl + admin_emp_list_url;
+	admin_detail_emp_page_url = baseUrl + admin_detail_emp_page_url;
+	admin_detail_emp_url = baseUrl + admin_detail_emp_url;
+	admin_modify_emp_page_url = baseUrl + admin_modify_emp_page_url;
+	admin_modify_emp_url_with_pic = baseUrl + admin_modify_emp_url_with_pic;
+	admin_modify_emp_url_with_no_pic = baseUrl + admin_modify_emp_url_with_no_pic;
+	
+	admin_get_emp_self = baseUrl + admin_get_emp_self;
+	admin_dingdanzhifu_url=baseUrl + admin_dingdanzhifu_url;
+	
+	admin_order_get_url=baseUrl + admin_order_get_url;
+	admin_order_payorders_url=baseUrl + admin_order_payorders_url;
+	
+	admin_order_pics_process_link_url=baseUrl+admin_order_pics_process_link_url;
+	
+	admin_add_emp_page_url = baseUrl + admin_add_emp_page_url;
+	admin_add_emp_url_with_pic = baseUrl + admin_add_emp_url_with_pic;
+	admin_add_emp_url_with_no_pic = baseUrl + admin_add_emp_url_with_no_pic;
+	admin_user_list_page_url = baseUrl + admin_user_list_page_url;
+	admin_user_list_url = baseUrl + admin_user_list_url;
+	admin_user_all = baseUrl + admin_user_all;
+	admin_add_user_page_url = baseUrl + admin_add_user_page_url;
+	admin_add_user_url = baseUrl + admin_add_user_url;
+	admin_add_msuser_url= baseUrl + admin_add_msuser_url;
+	admin_show_one_user_url = baseUrl + admin_show_one_user_url;
+	admin_user_show_one_by_phone_url = baseUrl + admin_user_show_one_by_phone_url;
+	admin_modify_user_page_url = baseUrl + admin_modify_user_page_url;
+	admin_modify_user_url = baseUrl + admin_modify_user_url;
+	admin_modify_user_pwd_page_url = baseUrl + admin_modify_user_pwd_page_url;
+	admin_modify_user_pwd_url = baseUrl + admin_modify_user_pwd_url;
+	admin_detail_user_page_url = baseUrl + admin_detail_user_page_url;
+	admin_delete_user_url = baseUrl + admin_delete_user_url;
+	admin_user_export_page_url = baseUrl + admin_user_export_page_url;
+	admin_message_list_page_url = baseUrl + admin_message_list_page_url;
+	
+	admin_error_order_list_page_url = baseUrl + admin_error_order_list_page_url;
+	admin_error_order_list_url = baseUrl + admin_error_order_list_url;
+	admin_error_order_add_url = baseUrl + admin_error_order_add_url;
+	admin_error_order_del_url = baseUrl + admin_error_order_del_url;
+	admin_error_order_modify_state_url = baseUrl + admin_error_order_modify_state_url;
+
+	admin_error_torder_list_page_url = baseUrl + admin_error_torder_list_page_url;
+	admin_error_torder_list_url = baseUrl + admin_error_torder_list_url;
+	admin_error_torder_add_url = baseUrl + admin_error_torder_add_url;
+	admin_error_torder_del_url = baseUrl + admin_error_torder_del_url;
+	admin_error_torder_modify_state_url = baseUrl + admin_error_torder_modify_state_url;
+	
+	admin_tranship_list_page_url = baseUrl + admin_tranship_list_page_url;
+	admin_tranship_list_url = baseUrl + admin_tranship_list_url;
+	admin_modify_tranship_page_url = baseUrl + admin_modify_tranship_page_url;
+	admin_modify_tranship_url = baseUrl + admin_modify_tranship_url;
+	admin_tranship_searchlist_url= baseUrl + admin_tranship_searchlist_url;
+	admin_tranship_downlist_url= baseUrl + admin_tranship_downlist_url;
+	
+	admin_detail_tranship_page_url = baseUrl + admin_detail_tranship_page_url;
+	admin_detail_tranship_delete_url = baseUrl + admin_detail_tranship_delete_url;
+	admin_tranship_show_one_url = baseUrl + admin_tranship_show_one_url;
+	admin_tranship_get_by_order_url = baseUrl + admin_tranship_get_by_order_url;
+	
+	admin_count_order_money_page_url= baseUrl + admin_count_order_money_page_url;
+	
+	admin_renling_list_page_url= baseUrl + admin_renling_list_page_url;
+	admin_renling_baoguo_add_page_url= baseUrl + admin_renling_baoguo_add_page_url;
+	admin_renling_baoguo_add_url= baseUrl + admin_renling_baoguo_add_url;
+	admin_renling_list_url= baseUrl + admin_renling_list_url;
+	admin_detail_renling_delete_url= baseUrl + admin_detail_renling_delete_url;
+	admin_renling_baoguo_modify_page_url= baseUrl + admin_renling_baoguo_modify_page_url;
+	admin_renling_show_one_url= baseUrl + admin_renling_show_one_url;
+	admin_renling_baoguo_modify_url=baseUrl + admin_renling_baoguo_modify_url;
+	admin_modify_renling_nopic_url=baseUrl + admin_modify_renling_nopic_url;
+
+	admin_modify_warehouse_page_url = baseUrl + admin_modify_warehouse_page_url;
+	admin_modify_warehouse_url = baseUrl + admin_modify_warehouse_url;
+	admin_warehouse_get_one_url = baseUrl + admin_warehouse_get_one_url;
+	admin_warehouse_add_page_url = baseUrl + admin_warehouse_add_page_url;
+	admin_warehouse_page_url = baseUrl + admin_warehouse_page_url;
+	admin_warehouse_list_url = baseUrl + admin_warehouse_list_url;
+	admin_warehouse_add_url = baseUrl + admin_warehouse_add_url;
+	admin_warehouse_addhavepic_url = baseUrl + admin_warehouse_addhavepic_url;
+	admin_warehouse_modifyhavepic_url= baseUrl + admin_warehouse_modifyhavepic_url;
+	admin_warehouse_delete_url = baseUrl + admin_warehouse_delete_url;
+	admin_warehosue_all = baseUrl + admin_warehosue_all;
+
+	admin_order_list_page_url = baseUrl + admin_order_list_page_url;
+	admin_order_list_url = baseUrl + admin_order_list_url;
+	admin_order_modify_page_url = baseUrl + admin_order_modify_page_url;
+	admin_order_modify_url = baseUrl + admin_order_modify_url;
+	admin_detail_order_delete_url = baseUrl + admin_detail_order_delete_url;
+	admin_order_get_one_url = baseUrl + admin_order_get_one_url;
+	admin_order_search_by_ids_url = baseUrl + admin_order_search_by_ids_url;
+	admin_order_route_search_url = baseUrl + admin_order_route_search_url;
+	admin_order_export_to_meitao = baseUrl + admin_order_export_to_meitao;
+	admin_order_import_from_meitao = baseUrl + admin_order_import_from_meitao;
+	admin_order_import_from_weiyi = baseUrl + admin_order_import_from_weiyi;
+	admin_third_order_import_from_weiyi= baseUrl + admin_third_order_import_from_weiyi;
+	admin_report = baseUrl + admin_report;
+
+	admin_msj_order_list_page_url = baseUrl + admin_msj_order_list_page_url;
+	admin_msj_order_list_url = baseUrl + admin_msj_order_list_url;
+	admin_msj_order_add_page_url = baseUrl + admin_msj_order_add_page_url;
+	admin_msj_order_add_url = baseUrl + admin_msj_order_add_url;
+	admin_msj_order_calc_freight = baseUrl + admin_msj_order_calc_freight;
+	admin_msg_order_pay_page_url = baseUrl + admin_msg_order_pay_page_url;
+	admin_msg_order_pay_url = baseUrl + admin_msg_order_pay_url;
+	admin_msg_order_delete_url = baseUrl + admin_msg_order_delete_url;
+	admin_msj_order_add_no_userid_url = baseUrl + admin_msj_order_add_no_userid_url;
+	//admin_wszj_order_list_page_url = baseUrl + admin_wszj_order_list_page_url
+	
+	admin_empty_order_list_page_url = baseUrl + admin_empty_order_list_page_url;
+	admin_empty_order_add_url = baseUrl + admin_empty_order_add_url;
+	admin_empty_order_list_url = baseUrl + admin_empty_order_list_url;
+	admin_empty_order_modify_page_url = baseUrl + admin_empty_order_modify_page_url;
+	admin_empty_order_modify_url = baseUrl + admin_empty_order_modify_url;
+	admin_empty_order_delete_url = baseUrl + admin_empty_order_delete_url;
+
+	admin_route_list_page_url = baseUrl + admin_route_list_page_url;
+	admin_route_list_url = baseUrl + admin_route_list_url;
+	admin_route_export_out_page_url = baseUrl + admin_route_export_out_page_url;
+	admin_route_export_in_page_url = baseUrl + admin_route_export_in_page_url;
+	admin_tran_route_export_in_page_url= baseUrl + admin_tran_route_export_in_page_url;
+	admin_route_order_delete_url = baseUrl + admin_route_order_delete_url;
+	admin_route_modify_state_url = baseUrl + admin_route_modify_state_url;
+	admin_route_modify_flight_url = baseUrl + admin_route_modify_flight_url;
+	admin_route_order_detail_page_url = baseUrl + admin_route_order_detail_page_url;
+	admin_tran_route_order_detail_page_url= baseUrl + admin_tran_route_order_detail_page_url;
+	admin_import_order_state_url = baseUrl + admin_import_order_state_url;
+	admin_import_order_weiyi_state_url= baseUrl + admin_import_order_weiyi_state_url;
+	
+	arbms_page_url = baseUrl + arbms_page_url;
+	arbms_url = baseUrl + arbms_url;
+	arbmm_url = baseUrl + arbmm_url;
+
+	admin_retail_order_page_url = baseUrl + admin_retail_order_page_url;
+	admin_retail_order_create_url = baseUrl + admin_retail_order_create_url;
+	admin_retail_order_count_url = baseUrl + admin_retail_order_count_url;
+	admin_retail_order_get_url = baseUrl + admin_retail_order_get_url;
+	admin_retail_order_delete_url = baseUrl + admin_retail_order_delete_url;
+	admin_retail_order_import_url = baseUrl + admin_retail_order_import_url;
+
+	admin_account_list_page_url = baseUrl + admin_account_list_page_url;
+	admin_account_list_url = baseUrl + admin_account_list_url;
+	admin_account_get_one_url = baseUrl + admin_account_get_one_url;
+	admin_account_modify_page_url = baseUrl + admin_account_modify_page_url;
+	admin_account_modify_url = baseUrl + admin_account_modify_url;
+
+	admin_manager_account_list_page_url = baseUrl + admin_manager_account_list_page_url;
+	admin_manager_ms_recharge = baseUrl + admin_manager_ms_recharge;
+	admin_user_account_detail_page_url = baseUrl + admin_user_account_detail_page_url;
+	admin_user_account_detail_url = baseUrl + admin_user_account_detail_url;
+
+	admin_print_page_url = baseUrl + admin_print_page_url;
+	admin_print_A4_page_url= baseUrl + admin_print_A4_page_url;
+	
+	admin_print_empty_order_page_url = baseUrl + admin_print_empty_order_page_url;
+	
+	admin_emp_authority_page_url = baseUrl+admin_emp_authority_page_url;
+	admin_emp_authority_list = baseUrl + admin_emp_authority_list; 
+	admin_emp_authority_modify = baseUrl + admin_emp_authority_modify;
+	//新闻公告管理
+	admin_news_list_page_url = baseUrl + admin_news_list_page_url;
+	admin_news_dele_url= baseUrl + admin_news_dele_url;
+	admin_news_list_url = baseUrl + admin_news_list_url;
+	user_news_list_url = baseUrl + user_news_list_url;
+	admin_news_add_url = baseUrl + admin_news_add_url;
+	admin_news_get_one_url = baseUrl + admin_news_get_one_url;
+	
+	admin_news_modify_url  = baseUrl + admin_news_modify_url;
+	
+	admin_gonggao_list_page_url = baseUrl + admin_gonggao_list_page_url;
+	admin_gonggao_list_url = baseUrl + admin_gonggao_list_url;
+	admin_gonggao_dele_url=baseUrl + admin_gonggao_dele_url;
+	admin_gonggao_add_url=baseUrl + admin_gonggao_add_url;
+	admin_gonggao_modify_page_url=baseUrl + admin_gonggao_modify_page_url;
+	admin_gonggao_modify_url=baseUrl + admin_gonggao_modify_url;
+	
+	admin_news_add_page_url = baseUrl + admin_news_add_page_url;
+	admin_gonggao_add_page_url = baseUrl + admin_gonggao_add_page_url;
+	admin_news_modify_page_url = baseUrl + admin_news_modify_page_url;
+	admin_gonggao_get_one_url  = baseUrl + admin_gonggao_get_one_url;
+	
+	admin_commodity_list_page_url = baseUrl + admin_commodity_list_page_url;
+	admin_commodity_list_url = baseUrl + admin_commodity_list_url;
+	admin_commodity_modify_url = baseUrl + admin_commodity_modify_url;
+	admin_add_commodity_url = baseUrl + admin_add_commodity_url;
+	
+	admin_special_commodity_list_page_url = baseUrl + admin_special_commodity_list_page_url;
+	admin_special_commodity_list_url = baseUrl + admin_special_commodity_list_url;
+	admin_special_commodity_modify_url = baseUrl + admin_special_commodity_modify_url;
+	admin_special_add_commodity_url = baseUrl + admin_special_add_commodity_url;
+	admin_special_commodity_countrylist_url= baseUrl + admin_special_commodity_countrylist_url;
+	
+	
+	admin_consignee_search_by_emp = baseUrl + admin_consignee_search_by_emp;
+	admin_consignee_add_no_pic = baseUrl + admin_consignee_add_no_pic;
+	admin_consignee_add = baseUrl + admin_consignee_add;
+	
+	admin_send_sms_page_url = baseUrl + admin_send_sms_page_url;
+	admin_sms_send_url = baseUrl + admin_sms_send_url;
+	admin_call_order_list_page_url = baseUrl + admin_call_order_list_page_url;
+	
+	admin_call_order_list_url = baseUrl + admin_call_order_list_url;
+	admin_call_order_modify_url= baseUrl + admin_call_order_modify_url;
+	
+	admin_channel_page_list_url = baseUrl + admin_channel_page_list_url;
+	admin_channel_list_url = baseUrl + admin_channel_list_url;
+	admin_channel_goodorstop_list_url= baseUrl + admin_channel_goodorstop_list_url;
+	admin_channel_modify_url = baseUrl + admin_channel_modify_url;
+	admin_add_channel_url = baseUrl + admin_add_channel_url;
+	
+	admin_special_channel_page_list_url= baseUrl + admin_special_channel_page_list_url;
+	admin_special_channel_list_url= baseUrl + admin_special_channel_list_url;
+	admin_special_channel_goodorstop_list_url= baseUrl + admin_special_channel_goodorstop_list_url;
+	admin_special_channel_modify_url= baseUrl + admin_special_channel_modify_url;
+	admin_special_add_channel_url= baseUrl + admin_special_add_channel_url;
+	
+	
+	
+	admin_ocean_store_list_page_url = baseUrl + admin_ocean_store_list_page_url;
+	admin_ocean_store_all_url = baseUrl + admin_ocean_store_all_url;
+	admin_ocean_store_add_url = baseUrl + admin_ocean_store_add_url;
+	admin_ocean_store_modify_url = baseUrl + admin_ocean_store_modify_url;
+	admin_ocean_store_delete_url = baseUrl + admin_ocean_store_delete_url;
+	
+	admin_globalargs_page_list_url= baseUrl + admin_globalargs_page_list_url;
+	admin_globalargs_list_url= baseUrl + admin_globalargs_list_url;
+	admin_globalargs_add_page_url= baseUrl + admin_globalargs_add_page_url;
+	admin_globalargs_text_url= baseUrl + admin_globalargs_text_url;
+	admin_globalargs_pic_url= baseUrl + admin_globalargs_pic_url;
+	admin_globalargs_page_modify_url= baseUrl + admin_globalargs_page_modify_url;
+	admin_globalargs_getone_url= baseUrl + admin_globalargs_getone_url;
+	admin_globalargs_modify_text_url= baseUrl + admin_globalargs_modify_text_url;
+	admin_globalargs_modify_pic_url= baseUrl + admin_globalargs_modify_pic_url;
+	admin_globalargs_delone_url= baseUrl + admin_globalargs_delone_url;
+	user_globalargs_getcontent_url= baseUrl + user_globalargs_getcontent_url;
+	admin_globalargs_getcontents_url= baseUrl + admin_globalargs_getcontents_url;
+	
+	admin_flyinfo_add_url= baseUrl + admin_flyinfo_add_url;
+	admin_flyinfo_list_url= baseUrl + admin_flyinfo_list_url;
+	admin_flyinfo_modify_url= baseUrl + admin_flyinfo_modify_url;
+	admin_flyinfo_del_url= baseUrl + admin_flyinfo_del_url;
+	admin_flyinfo_modify_havepic_url= baseUrl + admin_flyinfo_modify_havepic_url;
+	
+	admin_endicialabel_admin_page_url= baseUrl + admin_endicialabel_admin_page_url;
+	admin_endicialabel_list_page_url= baseUrl + admin_endicialabel_list_page_url;
+	
+	admin_import_tran_order_state_url= baseUrl + admin_import_tran_order_state_url;
+	admin_sea_create_page_url=baseUrl + admin_sea_create_page_url;
+	
+	admin_seaprintcreate_add_url=baseUrl + admin_seaprintcreate_add_url;
+	admin_seaprint_list_url=baseUrl + admin_seaprint_list_url;
+	
+	admin_seaprint_get_one_url=baseUrl + admin_seaprint_get_one_url;
+	admin_seaprint_one_page_url=baseUrl + admin_seaprint_one_page_url;
+	
+	admin_seaprint_del_url=baseUrl + admin_seaprint_del_url;
+	admin_cardid_import_page_url=baseUrl + admin_cardid_import_page_url;
+	
+	admin_import_cardid_info_url=baseUrl + admin_import_cardid_info_url;
+	admin_porder_import_form=baseUrl + admin_porder_import_form;
+	admin_print_sea_page_url=baseUrl + admin_print_sea_page_url;
+	
+	admin_seaprint_porder_get_one_url=baseUrl + admin_seaprint_porder_get_one_url;
+	
+	admin_spencial_ms_admin_page_url=baseUrl + admin_spencial_ms_admin_page_url;
+
+}
+
+Date.prototype.format = function(format) {
+	var o = {
+		"M+" : this.getMonth() + 1, // month
+		"d+" : this.getDate(), // day
+		"h+" : this.getHours(), // hour
+		"m+" : this.getMinutes(), // minute
+		"s+" : this.getSeconds(), // second
+		"q+" : Math.floor((this.getMonth() + 3) / 3), // quarter
+		"S" : this.getMilliseconds()
+	// millisecond
+	};
+
+	if (/(y+)/.test(format)) {
+		format = format.replace(RegExp.$1, (this.getFullYear() + "")
+				.substr(4 - RegExp.$1.length));
+	}
+
+	for ( var k in o) {
+		if (new RegExp("(" + k + ")").test(format)) {
+			format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k]
+					: ("00" + o[k]).substr(("" + o[k]).length));
+		}
+	}
+	return format;
+};
+
+function logout() {
+	$.get(admin_emp_logout_url, function(response) {
+		window.location.href = admin_login_page_url;
+	});
+	return false;
+}
+
+function createPaginationHtmlStr(rowCount, pageSize, pageNow, pageCount) {
+	var prePage = pageNow - 1;
+	prePage = prePage < 1 ? 1 : prePage;
+	var nextPage = pageNow + 1;
+	nextPage = nextPage > pageCount ? pageCount : nextPage;
+	var info = "共" + rowCount + "条/共" + pageCount + "页&nbsp;";
+	info += "当前第" + pageNow + "页&nbsp;&nbsp;";
+	info += "<a href='1' id='a_first_page'>首页</a>|";
+	info += "<a href='" + prePage + "' id='a_pre_page'>上一页</a>";
+	info += "<input style='width: 30px;' type='text' name='pageNow' />";
+	info += "<a href='" + nextPage + "' id='a_next_page'>下一页</a>|";
+	info += "<a href='" + pageCount + "' id='a_last_page'>尾页</a>";
+	return info;
+}
+
+function resetValidateCode(event) {
+	$(event).attr('src',
+			admin_create_code_url + '?timestamp=' + new Date().getTime());
+}

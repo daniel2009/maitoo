@@ -1,0 +1,54 @@
+package com.weiye.model;
+
+import java.io.Serializable;
+
+public class TranPrice implements Serializable {
+
+	private static final long serialVersionUID = 6137201254624971606L;
+	private String id;
+	private String warehouseId;//所属仓库价格表
+	
+	private String tranwarehouseId; //从此仓库来的包裹价格tranwarehouseId
+	private String cost;     	 //成本价格
+	private String price;      //计算价格,是指回国一类订算
+	private String selfPrice;//转运自提的计算价格
+	public String getSelfPrice() {
+		return selfPrice;
+	}
+	public void setSelfPrice(String selfPrice) {
+		this.selfPrice = selfPrice;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getWarehouseId() {
+		return warehouseId;
+	}
+	public void setWarehouseId(String warehouseId) {
+		this.warehouseId = warehouseId;
+	}
+	public String getTranwarehouseId() {
+		return tranwarehouseId;
+	}
+	public void setTranwarehouseId(String tranwarehouseId) {
+		this.tranwarehouseId = tranwarehouseId;
+	}
+	public String getCost() {
+		return cost;
+	}
+	public void setCost(String cost) {
+		this.cost = cost;
+	}
+	public String getPrice() {
+		return price;
+	}
+	public void setPrice(String price) {
+		this.price = price;
+	}
+	
+	
+	
+}

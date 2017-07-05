@@ -1,0 +1,33 @@
+package com.weiye.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.FlyInfo;
+import com.weiye.model.Order;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+import com.weiye.model.Warehouse;
+import com.weiye.model.temp.ImportFlyInfo;
+
+
+public interface FlyInfoService {
+	/**
+	 * 添加航班信息
+	 * 
+	 * @param warehouse
+	 * @return
+	 * @throws ServiceException
+	 */
+	public ResponseObject<Object> addFlyInfo(FlyInfo flyinfo) throws ServiceException;
+	public ResponseObject<PageSplit<FlyInfo>> searchFlyInfo(String flightno, String key, String sdate,
+	        String edate, String state, int pageSize, int pageNow,String storeId) throws ServiceException;
+	public ResponseObject<Object> modifyFlyInfo(FlyInfo flyinfo,String changeorderflag,String empName) throws ServiceException;
+	public ResponseObject<Object> deleteFlyInfoById(String id) throws ServiceException;
+	public ResponseObject<Map<String, String>> modifyFlyInfohaveexcel(FlyInfo flyinfo,String changeorderflag,String empName,List<String> orderid) throws ServiceException;
+	public ResponseObject<Object> modifyFlyInfohaveexcelbyflyinfo(FlyInfo flyinfo,String changeorderflag,String empName,List<ImportFlyInfo> importflyInfo,String storeId) throws ServiceException;
+
+	public ResponseObject<FlyInfo> getbyid(String id) throws ServiceException;
+	public ResponseObject<FlyInfo> getbyflyno(String flyno) throws ServiceException;
+}

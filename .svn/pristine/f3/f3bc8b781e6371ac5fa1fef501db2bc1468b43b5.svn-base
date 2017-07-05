@@ -1,0 +1,1021 @@
+
+
+
+//kai 20150911-1 modify
+//js获取项目根路径，如： http://localhost:8083/uimcardprj
+base_url_set_has_sub = false;
+function getRootPath() {
+	// 获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+	var curWwwPath = window.document.location.href;
+	// 获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+	var pathName = window.document.location.pathname;
+	var pos = curWwwPath.indexOf(pathName);
+	// 获取主机地址，如： http://localhost:8083
+	var localhostPaht = curWwwPath.substring(0, pos);
+	// 获取带"/"的项目名，如：/uimcardprj
+	var projectName = pathName
+			.substring(0, pathName.substr(1).indexOf('/') + 1);
+	
+	if(base_url_set_has_sub==true)
+	{
+		return (localhostPaht + projectName);
+	}
+	else
+	{
+		return localhostPaht;
+	}
+}
+
+
+
+/*
+ * 包裹认领入口
+ * kai 20151019
+ * */
+function loadNavRLData()
+{
+
+	loadFirstRenlingList();
+	getNeedAuditNumber();
+	$(":submit[name='searchSub']").click(
+			function() {
+				var rid = $(":text[name='tid']").val();
+				
+				var state = $("select[name='renling_state']").val();
+				if(state==-1)
+				{
+					state="";
+				}
+				
+				var sdate = $(":text[name='sdate']").val();
+				var edate = $(":text[name='edate']").val();
+				var key = $(":text[name='key']").val();
+				var type = $("select[name='type']").val();
+				if(type==0)
+				{
+					type="";
+				}
+
+
+				// alert(key);
+				if (rid != null && rid != '') {
+					$(":text[name='sdate']").val('');
+					$(":text[name='edate']").val('');
+					$(":text[name='key']").val('');
+					$("select[name='type']").val('');
+					sdate = '';
+					edate = '';
+					key = '';
+					type = '';
+					tranType = '';
+					state = '';
+				}
+			
+				loadRenlingList(rid, key, type, state,sdate, edate, 1);
+				
+				return false;
+			});
+
+	
+
+	$("#a_delete_renling_link")
+			.click(
+					function() {
+						var chk_value = [];
+						var flag=true;
+						$('input[name="del_id"]:checked').each(function() {
+							var state=$(this).parent().parent().find("td[name='stateid']").html();
+							//alert(state);
+							if(state==1)
+							{
+								flag=false;
+								return false;
+							}
+							
+							chk_value.push($(this).val());
+						});
+						if(flag==false)
+						{
+							alert("已经完成的认领单不能删除!");
+							return;
+						}
+						if (chk_value.length == 0) {
+							alert("您还没有选择要删除的认领单号！");
+						} else {
+							if (confirm("您是否确认要删除认领单?如果认领单产生的认领还没有完成流程,删除认领单可能导致在查询认领的过程中某些信息无法获取！")) {
+								$.ajax({
+									type : "post",
+									url : admin_detail_renling_delete_url,
+									data : $.param({
+										"id" : chk_value,
+									}, true),
+									success : function(response) {
+										var code = response.code;
+										
+										if ("200" == code) {
+											alert("删除成功");
+											
+											nav_renling_Click();
+										} else if ("607" == code) {
+											alert("您尚未登录或登录已失效！");
+											logout();
+										} else {
+											alert("删除认领单失败，原因是:"
+													+ response.message);
+										}
+										return false;
+									}
+								});
+							}
+						}
+						return false;
+					});
+
+	$("#t_del_check_all").click(function() {
+		if ($(this).is(':checked')) {
+			$('input[name="del_id"]').attr("checked", 'true');
+		} else {
+			$('input[name="del_id"]').removeAttr("checked");
+		}
+	});
+	
+}
+
+
+
+function loadFirstRenlingList() {
+	loadRenlingList("", "", "", "", "","", "1");
+}
+function getNeedAuditNumber(){
+	$.ajax({
+		type : "get",
+		url : "../admin/claimPackage/countNeedAudit",
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				document.getElementById("countNeedAudit").innerHTML=response.data;
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+			}
+			return false;
+		}
+	});
+}
+/*
+ * kai 20151020 
+ * 搜索清单
+ * rid----认领单号
+ * key----搜索关键字
+ * type---查找的类型（列）
+ * state--查找的状态
+ * sdate--查找的起始日期
+ * edate--查找的结束日期
+ * pn-----查找的页数
+ * */
+function loadRenlingList(rid, key, type, state,sdate, edate, pn) {
+	$(":hidden[name='tid']").val(rid);
+	$(":hidden[name='key']").val(key);
+	$(":hidden[name='type']").val(type);
+	$(":hidden[name='state']").val(state);
+	$(":hidden[name='sdate']").val(sdate);
+	$(":hidden[name='edate']").val(edate);
+	$(":hidden[name='pn']").val(pn);
+	$.ajax({
+		type : "get",
+		url : admin_renling_list_url,
+		data : {
+			rid : rid,
+			key : key,
+			type : type,
+			state: state,
+			sd : sdate,
+			ed : edate,
+			pageIndex : pn
+		},
+		success : function(response) {
+			var code = response.code;
+			//alert(code);
+			if ("200" == code) {
+				if (response.data == null) {
+					showRenlingList(null);
+					showRenlingshipLink(null);
+				} else {
+					showRenlingList(response.data.datas);
+					showRenlingshipLink(response.data);
+				}
+				afterRenlingList();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				var info = "<td style='text-align: left;' colspan='10'>"
+						+ "<span>&nbsp;&nbsp;获取转运单列表信息失败!</span></td>";
+				$("#tab1 table tbody").html(info);
+			}
+			return false;
+		}
+	});
+}
+
+
+
+/*
+ * kai 20151020
+ * 列出显示的认领清单
+ * */
+
+function showRenlingList(list) {
+	var str = "";
+	if (list != null) {
+		$
+				.each(
+						list,
+						function() {
+							str += "<tr id='" + this.id + "'>";
+							str += "<td><input type='checkbox' name='del_id' value='"
+									+ this.id + "'/></td>";
+							str += "<td>" + this.id + "</td>";
+							str += "<td>" + this.company + "</td>";							
+							str += "<td>" + this.baoguoId + "</td>";
+							str += "<td>" + this.title + "</td>";
+							str += "<td>" + this.content + "</td>";
+							if((this.userId=="")||(this.userId==null)||(this.userId=="null")||(this.userId=="undefined"))
+							{
+								str += "<td>" + "无" + "</td>";
+							}
+							else
+							{
+								str += "<td>" + this.userId + "</td>";
+							}
+							
+							if((this.tranId=="")||(this.tranId==null)||(this.tranId=="null")||(this.tranId=="undefined"))
+							{
+								str += "<td>" + "无" + "</td>";
+							}
+							else
+							{
+								str += "<td>" + this.tranId + "</td>";
+							}
+							str += "<td>" + this.revName + "</td>";
+							str += "<td>" + this.baoguoPhone + "</td>";
+							
+							if (this.state == "0") {
+								if(this.totalAudit > 0){
+									str += "<td>待审核&nbsp;"+this.totalAudit+"</td>";
+								}else{
+									str += "<td>未认领</td>";
+								}
+							} else if (this.state == "1") {
+								str += "<td>已认领</td>";
+							} else if (this.state == "2") {
+								str += "<td>已失效</td>";
+							} else {
+								str += "<td>" + this.state + "</td>";
+							}
+							str += "<td id='stateid' style='display:none;'>" + this.state + "</td>";
+							var operation = "";
+							if (this.state == "0") {
+								if(this.totalAudit > 0){
+									operation += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='#' name='a_claim_package_audit_link'>审核</a>";
+								}else{
+									operation += "<a href='#' name='a_renling_modify_link'>修改</a>";
+								}
+							}else{
+								operation += "<a href='#' name='a_renling_info_link'>查看</a>";
+							}
+							str += "<td>" + operation + "</td>";
+							str += "</tr>";
+						});
+	} else {
+		if (str == null || str == '') {
+			str = "<td style='text-align: left;' colspan='12'>"
+					+ "<span>&nbsp;&nbsp;没有符合您查找要求的认领单信息!</span></td>";
+		}
+	}
+	$("#tab1 table tbody").html(str);
+}
+
+function showRenlingshipLink(pageSplit) {
+	if (pageSplit != null) {
+		var rowCount = pageSplit.rowCount;
+		var pageSize = pageSplit.pageSize;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("tfoot .bulk-actions").show();
+		$("tfoot .pagination")
+				.html(
+						createPaginationHtmlStr(rowCount, pageSize, pageNow,
+								pageCount));
+
+		$("tfoot .pagination a").click(function() {
+			var pn = $(this).attr("href");
+			var rid = $(":hidden[name='tid']").val();
+			var key = $(":hidden[name='key']").val();
+			var type = $(":hidden[name='type']").val();
+			var state = $(":hidden[name='state']").val();
+			var sdate = $(":hidden[name='sdate']").val();
+			var edate = $(":hidden[name='edate']").val();
+			if (rid != null && rid != '') {
+				$(":hidden[name='key']").val('');
+				$(":hidden[name='type']").val('');
+				$(":hidden[name='sdate']").val('');
+				$(":hidden[name='edate']").val('');
+				$(":hidden[name='state']").val('');
+				sdate = '';
+				edate = '';
+				key = '';
+				type = '';
+				state='';
+			}
+			//loadTranshipList(tid, key, type, sdate, edate, pn);
+			loadRenlingList(rid, key, type, state,sdate, edate, pn);
+			
+			
+			return false;
+		});
+
+		$("tfoot .pagination input").keydown(function(event) {
+			if (event.which == 13) {
+				var pn = $(this).val();
+				if (/^\d*$/.test(pn)) {
+					var rid = $(":hidden[name='tid']").val();
+					var key = $(":hidden[name='key']").val();
+					var type = $(":hidden[name='type']").val();
+					var state= $(":hidden[name='state']").val();
+					var sdate = $(":hidden[name='sdate']").val();
+					var edate = $(":hidden[name='edate']").val();
+					if (rid != null && rid != '') {
+						$(":hidden[name='key']").val('');
+						$(":hidden[name='type']").val('');
+						$(":hidden[name='sdate']").val('');
+						$(":hidden[name='edate']").val('');
+						$(":hidden[name='state']").val('');
+						sdate = '';
+						edate = '';
+						key = '';
+						type = '';
+						state='';
+					}
+					//loadTranshipList(key, type, sdate, edate, pn);
+					loadRenlingList(rid, key, type, state,sdate, edate, pn);
+				} else {
+					alert("只能输入数字");
+				}
+				$(this).blur();
+			}
+		});
+	} else {
+		$("tfoot .bulk-actions").hide();
+		$("tfoot .pagination").html("");
+	}
+}
+
+function afterRenlingList() {
+	/*$("a[name='a_tranship_detail_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = admin_detail_tranship_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});*/
+
+	$("a[name='a_renling_modify_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var url = admin_renling_baoguo_modify_page_url + "?id=" + id;
+		$("#main-content").load(url);
+		return false;
+	});
+	$("a[name='a_renling_info_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("claimPackageId", id);
+		var url = "../admin/claimPackageInfo.jsp";
+		$("#main-content").load(url);
+		return false;
+	});
+	$("a[name='a_claim_package_audit_link']").click(function(){
+		var id = $(this).parent().parent().attr("id");
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("claimPackageId", id);
+		var url = "../admin/claimPackageAudit.jsp";
+		$("#main-content").load(url);
+		return false;
+	});
+	/*$("a[name='a_tranship_modify_state_link']").click(function() {
+		var id = $(this).parent().parent().attr("id");
+		$.ajax({
+			type : "post",
+			url : admin_modify_tranship_url,
+			data : {
+				id : id,
+				state : "3"
+			},
+			success : function(response) {
+				var code = response.code;
+				if ("200" == code) {
+					alert("入库成功，该转运单已经被拆分成几个运单，请去运单管理界面对该转运单的运单进行称重操作！");
+					// $("#nav52").click();
+					nav52Click();
+				} else if ("607" == code) {
+					alert("您尚未登录或登录已失效！");
+					logout();
+				} else {
+					alert("入库失败，失败原因是：" + response.message);
+				}
+			}
+		});
+
+		return false;
+	});*/
+}
+
+
+/*
+ *装载添加认领包裹页面
+ *kai 20151019
+ * */
+function addRenlingDlg()
+{
+	$("#main-content").load(admin_renling_baoguo_add_page_url);
+	return false;
+}
+/*
+ * 添加认领包裹时，使用的接口函数
+ * kai 20151019
+ * */
+function loadNavRL01Data()
+{
+	$("#bt_add_renlingbaoguo").click(function() {
+		saveRenlingInfo();
+
+		return false;
+	});
+	//返回清单界面
+	$("#a_back_renling_list_link").click(function() {
+		nav_renling_Click();
+		return false;
+	});
+}
+
+/*
+ * 保存包裹认领信息
+ * kai 20151019
+ * */
+function saveRenlingInfo()
+{
+	var baoguoId = $(":text[name='baoguoId']").val();
+	var company = $(":text[name='company']").val();
+	var revName = $(":text[name='revName']").val();
+	var baoguoPhone = $(":text[name='baoguoPhone']").val();
+	var title = $(":text[name='title']").val();
+	var content = $("textarea[name='content']").val();
+	//判断是否包含上传图片
+	var pic1 = $(":file[name='file1']").val();
+	var pic2 = $(":file[name='file2']").val();
+	var pic3 = $(":file[name='file3']").val();
+	if((baoguoId=="")||(baoguoId==null)||(baoguoId=="undefined"))
+	{
+		alert("必须填写包裹运单号!");
+		return false;
+	}
+	if((title=="")||(title==null)||(title=="undefined"))
+	{
+		alert("必须填写认领标题!");
+		return false;
+	}
+	if((content=="")||(content==null)||(content=="undefined"))
+	{
+		alert("必须填写认领的内容信息!");
+		return false;
+	}
+	
+	if ((pic1 != null && pic1 != '')||(pic2 != null && pic2 != '')||(pic3 != null && pic3 != ''))
+	{
+		addrenlinghavepic();
+	}
+	else
+	{
+		alert("至少要上传一个图片!");
+		return false;
+	}
+}
+
+function addrenlinghavepic() {
+	$("#add_form_renling").ajaxSubmit(
+			{
+				type : "post",
+				url : admin_renling_baoguo_add_url,
+				success : function(data) {
+					// alert(data);
+					$("#tmpmsgdiv1").html(data);
+					var str = $("#tmpmsgdiv1 pre").html();
+					var obj = $.parseJSON(str);
+					var code = obj.code;
+					if (code == "200") {
+						alert("添加成功");
+						// $("#nav53").click();
+						nav_renling_Click();
+					} else if (code == "607") {
+						alert("登录过期，请重新登录");
+						window.location.href = "login.jsp";
+					} else {
+						alert("添加失败，原因是:" + obj.message);
+					}
+					return false;
+				},
+				error : function(XmlHttpRequest, textStatus, errorThrown) {
+					alert("操作失败");
+					return false;
+				}
+			});
+}
+
+
+/*
+ * 修改认领清单的入口函数
+ * 
+ */
+function loadNavRL02Data()
+{
+	//开始调用一条认领信息的内容出来
+	$.ajax({
+		type : "get",
+		url : admin_renling_show_one_url,
+		data : {
+			"id" : $(":hidden[name='renling_id']").val()
+		},
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				if (response.data != null) {
+					showRenlingInfo(response.data);
+				} else {
+					alert("没有对应id的认领记录!");
+					// $("#nav52").click();
+					nav_renling_Click();
+				}
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取认领详情失败，失败原因是：" + response.message);
+				// $("#nav52").click();
+				nav_renling_Click();
+			}
+		}
+	});
+	
+	$("#bt_modify_renlingbaoguo").click(function() {
+		modifyRenlingInfo();
+
+		return false;
+	});
+}
+
+/*
+ * 修改记录时，显示原来信息
+ * kai 20151020
+ * 
+ * */
+function showRenlingInfo(list)
+{
+	
+	//基本信息
+	$("#t_id").html(list.id);
+	$("#u_name").html(list.empName);
+	$("#u_warehouse").html(list.warehouseName);
+	
+	
+	var str_state="";
+	if (list.state == "0") {
+		str_state="未认领";
+	} else if (list.state == "1") {
+		str_state="已认领";
+	} else if (list.state == "2") {
+		str_state="已失效";
+	}
+	else
+	{
+		str_state="&nbsp;";
+	}
+
+	$("#u_state").html(str_state);
+	if((list.userId=="")||(list.userId==null)||(list.userId=="null"))
+	{
+		$("#u_user_no").html("&nbsp;");
+	}
+	else
+	{
+		$("#u_user_no").html(list.userId);
+	}
+
+	
+	$("#u_tran_no").html(list.tranId);
+	
+	
+	$(":hidden[name='modifyid']").val(list.id);
+	$(":text[name='baoguoId']").val(list.baoguoId);
+	$(":text[name='company']").val(list.company);
+	$(":text[name='revName']").val(list.revName);
+	$(":text[name='baoguoPhone']").val(list.baoguoPhone);
+	$(":text[name='title']").val(list.title);
+	$("textarea[name='content']").val(list.content);
+	$("select[name='renling_state']").val(list.state);
+	
+	
+	
+	if((list.reninfo!=null)&&(list.reninfo!="")&&(list.reninfo!="undefined")&&(list.reninfo!="null"))
+	{
+		var str1=list.reninfo.phone+"/"+list.reninfo.userName+"/"+list.userId+"/";
+		if(str1=="//")
+		{
+			$("#u_user_no").html("&nbsp;");
+		}
+		else
+		{
+		$("#u_user_no").html(str1);
+		}
+		
+		$(":text[name='phone']").val(list.reninfo.phone);
+		$(":text[name='username']").val(list.reninfo.userName);
+		$("textarea[name='userremark']").val(list.reninfo.baoguoRemark);
+		$(":hidden[name='renlingPersonId']").val(list.reninfo.id);
+		
+		var p_url="";
+		if((list.reninfo.pic1!="")&&(list.reninfo.pic1!="null")&&(list.reninfo.pic1!=null)&&(list.reninfo.pic1!="undefined"))
+		{
+			
+			$(":hidden[name='p_file_1']").val(list.reninfo.pic1);
+			p_url=getRootPath()+list.reninfo.pic1;
+			$("#p_showpic1").attr("href",p_url);
+			$("#p_showpic1 img").attr("src",p_url);
+		}
+		if((list.reninfo.pic2!="")&&(list.reninfo.pic2!="null")&&(list.reninfo.pic2!=null)&&(list.reninfo.pic2!="undefined"))
+		{
+			
+			$(":hidden[name='p_file_2']").val(list.reninfo.pic2);
+			p_url=getRootPath()+list.reninfo.pic2;
+			$("#p_showpic2").attr("href",p_url);
+			$("#p_showpic2 img").attr("src",p_url);
+		}
+		if((list.reninfo.pic3!="")&&(list.reninfo.pic3!="null")&&(list.reninfo.pic3!=null)&&(list.reninfo.pic3!="undefined"))
+		{
+			
+			$(":hidden[name='p_file_3']").val(list.reninfo.pic3);
+			p_url=getRootPath()+list.reninfo.pic3;
+			$("#p_showpic3").attr("href",p_url);
+			$("#p_showpic3 img").attr("src",p_url);
+		}
+		if((list.reninfo.pic4!="")&&(list.reninfo.pic4!="null")&&(list.reninfo.pic4!=null)&&(list.reninfo.pic4!="undefined"))
+		{
+			
+			$(":hidden[name='p_file_4']").val(list.reninfo.pic4);
+			p_url=getRootPath()+list.reninfo.pic4;
+			$("#p_showpic4").attr("href",p_url);
+			$("#p_showpic4 img").attr("src",p_url);
+		}
+		if((list.reninfo.pic5!="")&&(list.reninfo.pic5!="null")&&(list.reninfo.pic5!=null)&&(list.reninfo.pic5!="undefined"))
+		{
+			
+			$(":hidden[name='p_file_5']").val(list.reninfo.pic5);
+			p_url=getRootPath()+list.reninfo.pic5;
+			$("#p_showpic5").attr("href",p_url);
+			$("#p_showpic5 img").attr("src",p_url);
+		}
+	}
+	
+	
+	if(list.state==1)//已认领状态
+	{
+		$("#show_renlinginfo").attr("style","");
+	}
+	
+	
+	var url="";
+	if((list.pic1!="")&&(list.pic1!="null")&&(list.pic1!=null)&&(list.pic1!="undefined"))
+	{
+		
+		$(":hidden[name='file_1']").val(list.pic1);
+		url=getRootPath()+list.pic1;
+		$("#showpic1").attr("href",url);
+		$("#showpic1 img").attr("src",url);
+	}
+	if((list.pic2!="")&&(list.pic2!="null")&&(list.pic2!=null)&&(list.pic2!="undefined"))
+	{
+		$(":hidden[name='file_2']").val(list.pic2);
+		url=getRootPath()+list.pic2;
+		$("#showpic2").attr("href",url);
+		$("#showpic2 img").attr("src",url);
+	}
+	if((list.pic3!="")&&(list.pic3!="null")&&(list.pic3!=null)&&(list.pic3!="undefined"))
+	{
+		$(":hidden[name='file_3']").val(list.pic3);
+		url=getRootPath()+list.pic3;
+		$("#showpic3").attr("href",url);
+		$("#showpic3 img").attr("src",url);
+	}
+	
+/*	
+	private String id;	//
+	private String warehouseId;//仓库id
+	private String userId;//已经认领的用户id
+	private String empId;//入库员id
+	private String company;//快递公司
+	private String state;//包裹状态
+	private String baoguoId;//快递的包裹单号
+	private String title; // 认领的标题
+	private String content; // 认领内容
+	private String tranId;//认领后的转运id
+	private String pic1;//认领的图片
+	private String pic2;//
+	private String pic3;
+	private String createDate;//创建时间
+	private String modifyDate;//修改时间
+	private String revName;//收件人
+	private String baoguoPhone;//包裹的收件电话
+	private String remark;
+	
+	private String userName;
+    private String warehouseName;*/
+}
+
+/*
+ * 清空原有的图片数据
+ * kai 2015
+ */
+function clear_pic1()
+{
+	$(":hidden[name='file_1']").val("");
+	$("#showpic1").attr("href","");
+	$("#showpic1 img").attr("src","");
+	$(":file[name='file1']").val("");
+	
+}
+function clear_pic2()
+{
+	$(":hidden[name='file_2']").val("");
+	$("#showpic2").attr("href","");
+	$("#showpic2 img").attr("src","");
+	$(":file[name='file2']").val("");
+	
+}
+function clear_pic3()
+{
+	$(":hidden[name='file_3']").val("");
+	$("#showpic3").attr("href","");
+	$("#showpic3 img").attr("src","");
+	$(":file[name='file3']").val("");
+	
+}
+
+function p_clear_pic1()
+{
+	$(":hidden[name='p_file_1']").val("");
+	$("#p_showpic1").attr("href","");
+	$("#p_showpic1 img").attr("src","");
+	$(":file[name='p_file1']").val("");
+	
+}
+function p_clear_pic2()
+{
+	$(":hidden[name='p_file_2']").val("");
+	$("#p_showpic2").attr("href","");
+	$("#p_showpic2 img").attr("src","");
+	$(":file[name='p_file2']").val("");
+	
+}
+function p_clear_pic3()
+{
+	$(":hidden[name='p_file_3']").val("");
+	$("#p_showpic3").attr("href","");
+	$("#p_showpic3 img").attr("src","");
+	$(":file[name='p_file3']").val("");
+	
+}
+function p_clear_pic4()
+{
+	$(":hidden[name='p_file_4']").val("");
+	$("#p_showpic4").attr("href","");
+	$("#p_showpic4 img").attr("src","");
+	$(":file[name='p_file4']").val("");
+	
+}
+function p_clear_pic5()
+{
+	$(":hidden[name='p_file_5']").val("");
+	$("#p_showpic5").attr("href","");
+	$("#p_showpic5 img").attr("src","");
+	$(":file[name='p_file5']").val("");
+	
+}
+
+/*
+ * 保存修改认领信息
+ * 
+ */
+function modifyRenlingInfo()
+{
+	var id = $(":hidden[name='modifyid']").val();
+	var baoguoId = $(":text[name='baoguoId']").val();
+	var company = $(":text[name='company']").val();
+	var revName = $(":text[name='revName']").val();
+	var baoguoPhone = $(":text[name='baoguoPhone']").val();
+	var title = $(":text[name='title']").val();
+	var content = $("textarea[name='content']").val();
+	var state=$("select[name='renling_state']").val();
+	//判断是否包含上传图片
+	var pic1 = $(":file[name='file1']").val();
+	var pic2 = $(":file[name='file2']").val();
+	var pic3 = $(":file[name='file3']").val();
+	var pre_pic1=$(":hidden[name='file_1']").val();
+	var pre_pic2=$(":hidden[name='file_2']").val();
+	var pre_pic3=$(":hidden[name='file_3']").val();
+	
+	var p_pic1 = $(":file[name='p_file1']").val();
+	var p_pic2 = $(":file[name='p_file2']").val();
+	var p_pic3 = $(":file[name='p_file3']").val();
+	var p_pic4 = $(":file[name='p_file4']").val();
+	var p_pic5 = $(":file[name='p_file5']").val();	
+	
+	var pre_p_pic1=$(":hidden[name='p_file_1']").val();
+	var pre_p_pic2=$(":hidden[name='p_file_2']").val();
+	var pre_p_pic3=$(":hidden[name='p_file_3']").val();
+	var pre_p_pic4=$(":hidden[name='p_file_4']").val();
+	var pre_p_pic5=$(":hidden[name='p_file_5']").val();
+	
+	var phone = $(":text[name='phone']").val();
+	var username = $(":text[name='username']").val();
+	var userremark = $(":text[name='userremark']").val();
+	var renlingPersonId=$(":hidden[name='renlingPersonId']").val();
+	
+	
+	if((baoguoId=="")||(baoguoId==null)||(baoguoId=="undefined"))
+	{
+		alert("必须填写包裹运单号!");
+		return false;
+	}
+	if((title=="")||(title==null)||(title=="undefined"))
+	{
+		alert("必须填写认领标题!");
+		return false;
+	}
+	if((content=="")||(content==null)||(content=="undefined"))
+	{
+		alert("必须填写认领的内容信息!");
+		return false;
+	}
+	if((state=="")||(state==null)||(state=="undefined")||(state=="-1"))
+	{
+		alert("必须选择状态！");
+		return false;
+	}	
+	
+	
+	if ((pic1 != null && pic1 != '')||(pic2 != null && pic2 != '')||(pic3 != null && pic3 != ''))
+	{
+		
+		modifyrenlinghavepic();
+		return false;
+	}
+	else
+	{
+		if((pre_pic1!="")||(pre_pic2!="")||(pre_pic3!=""))
+		{
+			var nopicflag=false;
+			if(state==1)//已认领状态
+			{
+				
+				if((phone=="")||(phone==null)||(phone=="undefined"))
+				{
+					alert("必须填写认领人电话!");
+					return false;
+				}
+				if ((p_pic1 != null && p_pic1 != '')||(p_pic2 != null && p_pic2 != '')||(p_pic3 != null && p_pic3 != '')||(p_pic4 != null && p_pic4 != '')||(p_pic5 != null && p_pic5 != ''))
+				{
+					modifyrenlinghavepic();
+					return false;
+				}
+				else
+				{
+					
+				}
+			}
+			//开始执行没有图片的提交, this string does NOT work
+			var str = '"id":"' + id + '",' + '"company":"' + company + '",' + '"baoguoId":"'
+			+ baoguoId + '",' + '"revName":"' + revName + '",' + '"baoguoPhone":"' + baoguoPhone
+			+ '",' + '"title":"' + title + '",' + '"content":"' + content + '",' + '"state":"' + state + '",' +
+
+			'"pic1":"' + pre_pic1 + '",' + '"pic2":"' + pre_pic2 + '",'+ '"pic3":"' + pre_pic3 + '"';
+			var formData = new FormData();
+			formData.append("id", id);
+			formData.append("company", company);
+			formData.append("baoguoId", baoguoId);
+			formData.append("revName", revName);
+			formData.append("baoguoPhone", baoguoPhone);
+			formData.append("title", title);
+			formData.append("content", content);
+			formData.append("state", state);
+			formData.append("pic1", pre_pic1);
+			formData.append("pic2", pre_pic2);
+			formData.append("pic3", pre_pic3);
+			if(state=="1")//已认领状态
+			{
+				var str1 = '"reninfo.id":"' + renlingPersonId + '",' + '"reninfo.pic1":"' + pre_p_pic1 + '",' + '"reninfo.pic2":"'
+				+ pre_p_pic2 + '",' + '"reninfo.pic3":"' + pre_p_pic3 + '",' + '"reninfo.pic4":"' + pre_p_pic4
+				+ '",' + '"reninfo.pic5":"' + pre_p_pic5 + '",' + '"reninfo.phone":"' + phone + '",' + '"reninfo.userName":"' + username + '",' +
+
+				'"reninfo.baoguoRemark":"' + userremark + '"';
+				str=str+","+str1;
+			}
+			$.ajax({
+				type : "post",
+				url : admin_modify_renling_nopic_url,
+				data : formData,
+				processData : false,
+				contentType : false,
+				success : function(response) {
+					var code = response.code;
+					if ("200" == code) {
+						alert("添加成功");
+						// $("#nav53").click();
+						nav_renling_Click();
+						
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						alert("修改失败，原因是:" + response.message);
+					}
+					return false;
+				}
+			});
+			return false;
+		
+			
+		}
+		else
+		{
+		      alert("至少包含或上传一个说明图片!");
+		}
+		
+		
+		
+		
+		return false;
+	}
+}
+/*
+ * 修改认领信息包含有图片
+ * 
+ * */
+function modifyrenlinghavepic() {
+	$("#modify_form_renling").ajaxSubmit(
+			{
+				type : "post",
+				url : admin_renling_baoguo_modify_url,
+				success : function(data) {
+					// alert(data);
+					$("#tmpmsgdiv1").html(data);
+					var str = $("#tmpmsgdiv1 pre").html();
+					var obj = $.parseJSON(str);
+					var code = obj.code;
+					if (code == "200") {
+						alert("添加成功");
+						// $("#nav53").click();
+						nav_renling_Click();
+					} else if (code == "607") {
+						alert("登录过期，请重新登录");
+						window.location.href = "login.jsp";
+					} else {
+						alert("添加失败，原因是:" + obj.message);
+					}
+					return false;
+				},
+				error : function(XmlHttpRequest, textStatus, errorThrown) {
+					alert("操作失败");
+					return false;
+				}
+			});
+}
+
+
+
+
+
+/*
+ * kai 20151022
+ * 点选择状态时，是否显示认领信息
+ * */
+function state_click()
+{
+	var state=$("select[name='renling_state']").val();
+	if(state==1)//选择了认领状态
+	{
+		$("#show_renlinginfo").attr("style","");
+	}
+	else
+	{
+		$("#show_renlinginfo").attr("style","display:none");
+	}
+}

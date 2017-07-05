@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meitao.dao.CardIdManageDao">
+
+	<resultMap id="basic_result_map" type="com.meitao.cardid.manage.CardId_lib">
+		<id column="id" property="id" javaType="String" />
+		<result column="cname" property="cname" javaType="String" />
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String" />
+		<result column="province" property="province" javaType="String" />
+		<result column="city" property="city" javaType="String" />
+		<result column="dist" property="dist" javaType="String" />
+		<result column="address" property="address" javaType="String" />
+		<result column="card_id" property="cardid" javaType="String" />
+		<result column="picurl" property="picurl" javaType="String" />
+		<result column="phone" property="phone" javaType="String" />
+		
+	</resultMap>
+
+
+
+
+	<insert id="insertcaridinfo" parameterType="com.meitao.cardid.manage.CardId_lib"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		cardid_lib(cname,create_date,modify_date,province,city,dist,address,card_id,picurl,phone)
+		values(#{cname},#{createDate},#{modifyDate},#{province},#{city},#{dist},#{address},#{cardid},#{picurl},#{phone})
+	</insert>
+	<select id="countbycardid" resultType="java.lang.Integer">
+		select count(distinct `cardid_lib`.`id`) 
+		from `cardid_lib`
+		where `card_id`=#{cardid} 
+	</select>
+	
+	
+	<select id="getcardidbyname" resultMap="basic_result_map">
+		select `cardid_lib`.* 
+		from `cardid_lib`
+		where `cname`=#{cname}
+	</select>
+	
+	<select id="countOfSearchKeys" resultType="java.lang.Integer">
+		select count(distinct `cardid_lib`.id) 
+		from `cardid_lib`
+		<where>
+			<if test="key!=null and key!=''">
+				`cardid_lib`.cname like #{key} or `cardid_lib`.province like #{key} or `cardid_lib`.city like #{key} or `cardid_lib`.dist like #{key} 
+				or `cardid_lib`.address like #{key} or `cardid_lib`.card_id like #{key}	or `cardid_lib`.phone like #{key}	
+			</if>
+		</where>
+	</select>
+	<select id="searchByKeys" resultMap="basic_result_map">
+		select distinct `cardid_lib`.* 
+		from `cardid_lib`
+		<where>
+			<if test="key!=null and key!=''">
+				`cardid_lib`.cname like #{key} or `cardid_lib`.province like #{key} or `cardid_lib`.city like #{key} or `cardid_lib`.dist like #{key} 
+				or `cardid_lib`.address like #{key} or `cardid_lib`.card_id like #{key}	or `cardid_lib`.phone like #{key}	
+			</if>
+		</where>
+		order by `cardid_lib`.`create_date` desc
+		limit
+		#{index},#{size}
+	</select>
+	
+	<delete id="deleteonecard" parameterType="java.lang.String">
+		delete from cardid_lib
+		where id=#{id}
+	</delete>
+	<select id="getbyid" parameterType="java.lang.String"
+		resultMap="basic_result_map">
+		select * from cardid_lib where id=#{id} 
+	</select>
+	<select id="getonebyrand" resultMap="basic_result_map" parameterType="java.lang.Integer">
+		<!--  SELECT * FROM cardid_lib WHERE id >= ((SELECT MAX(id) FROM cardid_lib)-(SELECT MIN(id) FROM cardid_lib)) * RAND() + (SELECT MIN(id) FROM cardid_lib)  LIMIT 1-->
+		SELECT * FROM cardid_lib WHERE id >= #{randnumber}  LIMIT 1
+	</select>
+	
+	<select id="getmaxid" resultType="java.lang.String">
+		SELECT MAX(`cardid_lib`.`id`) FROM cardid_lib
+	</select>
+	<select id="getminid" resultType="java.lang.String">
+		SELECT MIN(`cardid_lib`.`id`) FROM cardid_lib
+	</select>
+	
+	<select id="getcardidbysearcnames" resultMap="basic_result_map">
+		select distinct `cardid_lib`.* 
+		from `cardid_lib`
+		<where>
+			<if test="key!=null and key!=''">
+				`cardid_lib`.cname like #{key}	
+			</if>
+		</where>
+		
+	</select>
+	
+	
+	<select id="getbycardid" resultMap="basic_result_map">
+		select distinct `cardid_lib`.* 
+		from `cardid_lib`
+		where `cardid_lib`.card_id=#{cardid}
+	</select>
+	
+	<update id="updatepicurl">
+		update `cardid_lib`
+		set `picurl`=#{picurl},
+		`modify_date`=#{modifyDate},
+		`phone`=#{phone}
+		where id=#{id}
+	</update>
+	
+	
+	<select id="countphoneandname" resultType="java.lang.Integer">
+		select count(distinct `cardid_lib`.id) 
+		from `cardid_lib`
+		<where>
+			`phone`=#{phone} and `cname`=#{name}
+			<if test="modifyDate!=null and modifyDate!=''">
+				and	`cardid_lib`.modify_date <![CDATA[>=]]> #{modifyDate}	
+			</if>
+		</where>
+	</select>
+	
+</mapper>

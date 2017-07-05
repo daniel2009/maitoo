@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.RenlingPersonDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.RenlingPersons">
+		<id column="id" property="id" javaType="String" />
+		<result column="warehouse_id" property="warehouseId" javaType="String" />
+		<result column="user_id" property="userId" javaType="String" />
+		<result column="renling_id" property="renlingId" javaType="String" />
+		<result column="baoguo_id" property="baoguoId" javaType="String" />
+		<result column="baoguo_remark" property="baoguoRemark" javaType="String" />
+		<result column="audit_remark" property="auditRemark" javaType="String"/>
+		<result column="pic1" property="pic1" javaType="String"/>
+		<result column="pic2" property="pic2" javaType="String"/>
+		<result column="pic3" property="pic3" javaType="String"/>
+		<result column="pic4" property="pic4" javaType="String"/>
+		<result column="pic5" property="pic5" javaType="String"/>
+		<result column="user_name" property="userName" javaType="String"/>
+		<result column="user_phone" property="phone" javaType="String"/>
+		<result column="create_person" property="createPerson" javaType="String"/>
+		<result column="create_date" property="createDate" javaType="String" />
+		<result column="modify_date" property="modifyDate" javaType="String"/>
+		<result column="state" property="state" javaType="String"></result>
+	</resultMap>
+	<resultMap type="com.weiye.model.RenlingPersons" id="result_map_with_renlingBaoguo">
+		<id column="id" property="id" javaType="String"/>
+		<result column="warehouse_id" property="warehouseId" javaType="String" />
+		<result column="user_id" property="userId" javaType="String"/>
+		<result column="renling_id" property="renlingId" javaType="String"/>
+		<result column="baoguo_id" property="baoguoId" javaType="String"/>
+		<result column="baoguo_remark" property="baoguoRemark" javaType="String"/>
+		<result column="audit_remark" property="auditRemark" javaType="String"/>
+		<result column="pic1" property="pic1" javaType="String"/>
+		<result column="pic2" property="pic2" javaType="String"/>
+		<result column="pic3" property="pic3" javaType="String"/>
+		<result column="pic4" property="pic4" javaType="String"/>
+		<result column="pic5" property="pic5" javaType="String"/>
+		<result column="user_name" property="userName" javaType="String"/>
+		<result column="user_phone" property="phone" javaType="String"/>
+		<result column="create_person" property="createPerson" javaType="String"/>
+		<result column="create_date" property="createDate" javaType="String"/>
+		<result column="modify_date" property="modifyDate" javaType="String"/>
+		<result column="state" property="state" javaType="String"></result>
+		<association property="renlingBaoguo" javaType="com.weiye.model.RenlingBaoguo">
+			<id column="renling_id" property="id"/>
+			<result column="title" property="title" javaType="String"/>
+			<result column="content" property="content" javaType="String"/>
+			<result column="company" property="company" javaType="String"/>
+			<result column="tran_id" property="tranId" javaType="String"/>
+			<result column="state" property="state" javaType="String"/>
+			<result column="create_date" property="createDate" javaType="String"></result>
+			<result column="pic1" property="pic1" javaType="String"/>
+			<result column="pic2" property="pic2" javaType="String"/>
+			<result column="pic3" property="pic3" javaType="String"/>
+		</association>
+	</resultMap>
+
+
+
+	<insert id="insertRenlingPersons" parameterType="com.weiye.model.RenlingPersons"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		renling_person(renling_id,user_id,user_name,user_phone,baoguo_id,baoguo_remark,pic1,pic2,pic3,pic4,pic5,modify_date,create_date,create_person, state)
+		SELECT #{renlingId},#{userId}, real_name, phone,#{baoguoId},#{baoguoRemark},#{pic1},#{pic2},#{pic3},#{pic4},#{pic5},#{modifyDate},#{createDate},#{createPerson}, #{state} FROM users WHERE id=#{userId}
+	</insert>
+	
+	
+	<delete id="deleteMultiRenlingPersion">
+		delete from `renling_person`
+		where `renling_id` in
+		<foreach collection="bills" item="bill" open="(" close=")"
+			separator=",">
+			#{bill}
+		</foreach>
+	</delete>
+	
+	<update id="updateRenlingPersonbyid" parameterType="com.weiye.model.RenlingPersons"> update 
+		renling_person set user_id=#{userId} , baoguo_id=#{baoguoId} ,renling_id=#{renlingId}, baoguo_remark=#{baoguoRemark},user_phone=#{phone},user_name=#{userName}
+		,pic1=#{pic1},pic2=#{pic2},pic3=#{pic3},pic4=#{pic4},pic5=#{pic5},modify_date=#{modifyDate}
+		 where id=#{id}</update>
+		 
+	<select id="getRenlingPersonbyRenlinginfo" resultMap="basic_result_map">
+		select renling_person.*	
+		from `renling_person` 				
+		where `renling_person`.`renling_id`=#{renlingId} and `renling_person`.`create_person`=#{createPerson}
+	</select>
+	 
+	 <select id="countByUser" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT COUNT(p.id) FROM renling_person p LEFT JOIN renling_bill b ON p.renling_id = b.id 
+		WHERE p.user_id=#{userId} 
+		<if test="state != null and state != ''">
+			AND p.state=#{state}
+		</if>
+		<if test="nameCondition != null and nameCondition != ''">
+			AND (title LIKE #{nameCondition} OR content LIKE #{nameCondition})
+		</if>
+	</select>
+	<select id="findByUser" resultMap="result_map_with_renlingBaoguo">
+		SELECT p.*, b.* FROM renling_person p LEFT JOIN renling_bill b ON p.renling_id = b.id 
+		WHERE p.user_id=#{userId}
+			<if test="state != null and state != ''">
+				AND p.state=#{state}
+			</if>  
+			<if test="nameCondition != null and nameCondition != ''">
+			AND (title LIKE  #{nameCondition} OR content LIKE  #{nameCondition})
+			</if>
+		ORDER BY p.modify_date DESC, p.create_date DESC;
+	</select>
+	 
+	<select id="countByClaimPackage" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM renling_person WHERE renling_id = #{claimPackageId} AND state=3
+	</select>
+	<select id="findByClaimPackage" resultMap="basic_result_map">
+		SELECT * FROM renling_person WHERE renling_id = #{claimPackageId} AND state=3 LIMIT #{firstResult}, #{maxResult}
+	</select>
+	<select id="countAllByClaimPackage" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM renling_person WHERE renling_id = #{claimPackageId}
+	</select>
+	<select id="findAllByClaimPackage" resultMap="basic_result_map">
+		SELECT * FROM renling_person WHERE renling_id = #{claimPackageId} LIMIT #{firstResult}, #{maxResult}
+	</select>
+	<update id="updateOtherByAudit">
+		UPDATE renling_person SET state = #{state}, audit_remark = #{auditRemark} WHERE renling_id = #{renlingId} AND id != #{id}
+	</update>
+	<update id="updateStateAndRemark">
+		UPDATE renling_person SET state = #{state}, audit_remark = #{auditRemark} WHERE id = #{id}
+	</update>
+	
+	<select id="findLastClaimedByClaimPackageAndUser" resultMap="result_map_with_renlingBaoguo">
+		SELECT p.*, b.* FROM renling_person p LEFT JOIN renling_bill b ON p.renling_id = b.id 
+		WHERE p.renling_id = #{renlingId} AND p.user_id = #{userId} ORDER BY p.modify_date DESC, p.create_date DESC LIMIT 1 
+	</select>
+	<delete id="deleteByUser">
+		DELETE FROM renling_person WHERE id=#{id} AND user_id=#{userId}
+	</delete>
+	<select id="findById" resultMap="result_map_with_renlingBaoguo">
+		SELECT p.*, b.* FROM renling_person p LEFT JOIN renling_bill b ON p.renling_id = b.id 
+		WHERE p.id = #{id} 
+	</select>
+	<update id="updateByReclaim">
+		UPDATE renling_person SET baoguo_id=#{baoguoId}, baoguo_remark=#{baoguoRemark}, pic1=#{pic1}, pic2=#{pic2}, pic3=#{pic3}, pic4=#{pic4}, pic5=#{pic5}, state=#{state}, modify_date=#{modifyDate} WHERE id=#{id}
+	</update>
+	
+	<select id="countByKey" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM renling_person p
+		<where>
+			<if test="userId!=null and userId!=''">
+				and p.user_id=#{userId}
+			</if>
+			<if test="state!=null and state!='' and state!='-1'">
+				and p.state=#{state}
+			</if>
+		</where>
+	</select>
+	<select id="searchByKey" resultMap="basic_result_map">
+		SELECT * FROM renling_person p
+		<where>
+			<if test="userId!=null and userId!=''">
+				and p.user_id=#{userId}
+			</if>
+			<if test="state!=null and state!='' and state!='-1'">
+				and p.state=#{state}
+			</if>
+		</where>
+		ORDER BY p.create_date DESC
+		LIMIT #{firstResult}, #{pageSize}
+	</select>
+</mapper>

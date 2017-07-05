@@ -1,0 +1,176 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+
+<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse" data-target="#chart-container" style="font-size:20px">购物车管理</p>
+		<div class="box_content">
+			<div class="content_title">购物车&nbsp;&nbsp;<a href="#" onclick="javascript: clearCart();">清空购物车</a></div>
+				<div class="content_text">
+					<div class="tab_box" >
+						<table id="datatable" class="table">
+							<thead>
+								<tr>
+									<th style="width: 50px;">编号</th>
+									<th>商品名</th>
+									<th style="width: 100px;">价格</th>
+									<th style="width: 50px;">数量</th>
+									<th>图1</th>
+									<th style="width: 100px;">操作</th>
+								</tr>
+							</thead>
+							<tbody id="tbody">
+								<tr><td colspan="8">没有数据</td></tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td id="pagination" colspan="8" style="text-align: right;">共<span id="trsize">0</span>条
+										<a id="first_page" href="1" name="to_page">首页</a> |
+										<a id="pre_page" name="to_page">上一页</a> |
+										<input type="number" class="bor" style="width: 50px;" min="0" step="1" /> / <span id="tpsize">0</span>|
+										<a id="next_page" name="to_page">下一页</a> |
+										<a id="last_page" name="to_page">未页</a>&nbsp;&nbsp;
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+</body>
+<script>
+	$("#main-content").ready(function(){
+		search();
+		$("#datatable tfoot a[name='to_page']").click(function() {
+			var pageIndex = $(this).attr("href");
+			var formData = new FormData(document.getElementById("searchForm"));
+			formData.append("pageIndex", pageIndex);
+			loadList(formData);
+			return false;
+		});
+
+		$("#datatable tfoot input").keydown(function(event) {
+			if (event.which == 13) {
+				var pageIndex = $(this).val();
+				var formData = new FormData(document.getElementById("searchForm"));
+				formData.append("pageIndex", pageIndex);
+				loadList(formData);
+				return false;
+				$(this).blur();
+			}
+		});
+	});
+	function search(){
+		var formData = new FormData(document.getElementById("searchForm"));
+		loadList(formData);
+	}
+	function loadList(formData){
+		$.ajax({
+			type: "post",
+			url: "../user/product/findByUserCart",
+			data : formData,
+			processData : false,
+			contentType : false,
+			success: function(response){
+				var code = response.code;
+				if("200" == code){
+					showList(response.data.datas);
+					showPage(response.data);
+					clearWrongImg();
+				}else if(36011 == code){
+					$("#tbody").html("<tr><td style='text-align: left;' colspan='6'><span>&nbsp;&nbsp;对不起，没有找到对应的信息!</span></td></tr>");
+				}else if(607 == code){
+					alert("请登录");
+					location.href = "../r/login.jsp";
+				}else{
+					alert("获取购物车列表失败，原因是：" + response.message);
+				}
+			}
+		});
+	}
+	function showList(list){
+		var string = "";
+		$("#tbody").html(string);
+		if (list != null) {
+			$.each(list, function() {
+				string += "<tr>";
+				string += "<td>" + this.productId + "</td>";
+				string += "<td>" + this.product.name + "</td>";
+				var price = this.product.price;
+				if(price == "" || price == -999999){
+					price = "<span style='color: #f00;'>待定</span>";
+				}
+				string += "<td>" + this.product.currency + "&nbsp;" + price + "</td>";
+				string += "<td>" + this.quantity + "</td>";
+				string += "<td><img src='../" + this.product.pic1 + "' style='max-width: 50px; max-height: 50px;'></td>";
+				string += "<td><a href='#' onclick='javascript: checkout("+this.id+")'>付款</a>|<a href='#' onclick='javascript: deleteCart(" + this.id + ")'>删除</a>";
+				string += "</tr>";
+			});
+		} else {
+			if (string == null || string == '') {
+				string = "<tr><td style='text-align: left;' colspan='6'><span>&nbsp;&nbsp;对不起，没有找到对应的信息!</span></td></tr>";
+			}
+		}
+		$("#tbody").html(string);
+	}
+	function showPage(pageSplit){
+		var rowCount = pageSplit.rowCount;
+		var pageNow = pageSplit.pageNow;
+		var pageCount = pageSplit.pageCount;
+		$("#trsize").html(rowCount);
+		$("#tpsize").html(pageCount);
+		$("#first_page").attr("href","1");
+		$("#pre_page").attr("href", pageNow - 1);
+		$("#next_page").attr("href",pageNow + 1);
+		$("#last_page").attr("href", pageCount);
+	}
+	
+	function checkout(id){
+		sessionStorage.setItem("cartId", id);
+		$("#main-content").load("../user/productCheckout.jsp");
+	}
+	function deleteCart(id){
+		if(confirm("确认删除吗?")){
+			$.ajax({
+				type: "post",
+				url: "../user/cart/delete",
+				data : {id : id},
+				success: function(response){
+					var code = response.code;
+					if("200" == code){
+						alert("删除成功");
+						navCartClick();
+					}else{
+						alert("获取列表失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+	}
+	function clearCart(){
+		if(confirm("确认清空吗?")){
+			$.ajax({
+				type: "post",
+				url: "../user/cart/deleteAll",
+				success: function(response){
+					var code = response.code;
+					if("200" == code){
+						alert("清空成功");
+						navCartClick();
+					}else{
+						alert("获取列表失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+	}
+</script>
+</html>
+
+

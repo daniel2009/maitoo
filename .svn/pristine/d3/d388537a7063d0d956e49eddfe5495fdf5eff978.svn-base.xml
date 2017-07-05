@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.SpencialCommodityDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.SpencialCommodity">
+		<id column="id" property="id" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="price" property="price" javaType="String"/>
+		<result column="ms_price" property="msPrice" javaType="String"/>
+		<result column="vip_one_price" property="vipOnePrice" javaType="String" />
+		<result column="vip_two_price" property="vipTwoPrice" javaType="String" />
+		<result column="vip_three_price" property="vipThreePrice" javaType="String" />
+		<result column="first_fee" property="firstFee" javaType="String" />
+		<result column="store_id" property="storeId" javaType="String" />
+		<result column="cost" property="cost" javaType="String" />
+		<result column="channel_id" property="channelId" javaType="String" />
+		<result column="country_id" property="countryId" javaType="String" />
+		
+	</resultMap>
+
+	<select id="getCommoditys" resultMap="basic_result_map">
+		select * from spencial_commodity where store_id = #{storeId} and channel_id = #{channelId} and country_id = #{countryId}
+	</select>
+
+	<select id="getById" parameterType="java.lang.String" resultMap="basic_result_map">
+		select * from spencial_commodity where id=#{id} and store_id = #{storeId} 
+	</select><!-- WTF -->
+	<select id="getByOnlyId" resultMap="basic_result_map">
+		SELECT * FROM spencial_commodity WHERE id=#{id}
+	</select>
+
+	<insert id="insertCommodity" parameterType="com.weiye.model.SpencialCommodity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into spencial_commodity(name,price,ms_price,vip_one_price,vip_two_price,vip_three_price,store_id,cost,channel_id,first_fee,country_id) values(#{name},#{price},#{msPrice},#{vipOnePrice},#{vipTwoPrice},#{vipThreePrice},#{storeId},#{cost},#{channelId},#{firstFee},#{countryId})
+	</insert>
+	
+	<insert id="insertCommodityByList" parameterType="com.weiye.model.SpencialCommodity">
+		 insert into spencial_commodity(name,price,ms_price,vip_one_price,vip_two_price,vip_three_price,store_id,cost,channelId,first_fee,country_id) 
+		 values
+		<foreach collection="list" item="commodity" separator=",">
+			(#{commodity.name},#{commodity.price},#{commodity.msPrice},#{commodity.vipOnePrice},#{commodity.vipTwoPrice},#{commodity.vipThreePrice},#{commodity.storeId},#{commodity.cost},#{commodity.channelId},#{commodity.firstFee},#{commodity.countryId})
+		</foreach>
+	</insert>
+	
+	<select id="getPriceById" resultType="java.lang.String">
+		select 
+			<if test="priceType=='price'">
+					price
+			</if>
+			<if test="priceType=='ms_price'">
+					ms_price
+			</if>
+			<if test="priceType=='vip_one_price'">
+					vip_one_price
+			</if>
+			<if test="priceType=='vip_two_price'">
+					vip_two_price
+			</if>
+			<if test="priceType=='vip_three_price'">
+					vip_three_price
+			</if>
+			<if test="priceType=='cost'">
+					cost
+			</if>
+		 from `spencial_commodity` where id = #{id} 
+	</select>
+	
+	<select id="selectMaxPriceByCommoditys" resultType="java.lang.String">
+		select max(price) as price from `spencial_commodity`
+		where `spencial_commodity`.`id` in
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+		and store_id = #{storeId}
+	</select>
+	<select id="selectMaxMsPriceByCommoditys" resultType="java.lang.String">
+		select max(ms_price) as msPrice from `spencial_commodity`
+		where `spencial_commodity`.`id` in
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+		and store_id = #{storeId}
+	</select>
+	
+	<select id="selectMaxVipOnePriceByCommoditys" resultType="java.lang.String">
+		select max(vip_one_price) as msPrice from `spencial_commodity`
+		where `spencial_commodity`.`id` in
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+		and store_id = #{storeId}
+	</select>
+	
+	<select id="selectMaxVipTwoPriceByCommoditys" resultType="java.lang.String">
+		select max(vip_two_price) as msPrice from `spencial_commodity`
+		where `spencial_commodity`.`id` in
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+		and store_id = #{storeId}
+	</select>
+	
+	<select id="selectMaxVipThreePriceByCommoditys" resultType="java.lang.String">
+		select max(vip_three_price) as msPrice from `spencial_commodity`
+		where `spencial_commodity`.`id` in
+		<foreach collection="ids" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+		and store_id = #{storeId}
+	</select>
+	
+	<update id="modifyCommodity">
+		update`spencial_commodity`
+		set `name`=#{name},
+		`price`=#{price},
+		`ms_price`=#{msPrice},
+		`vip_one_price`=#{vipOnePrice},
+		`vip_two_price`=#{vipTwoPrice},
+		`vip_three_price`=#{vipThreePrice},
+		`first_fee`=#{firstFee},
+		`cost`=#{cost}
+		where id = #{id} and store_id = #{storeId} and channel_id = #{channelId}
+	</update>
+	
+	<select id="getChannelCountrysById" resultType="java.lang.String">
+		select country_id from `spencial_commodity`
+		where store_id = #{storeId} and channel_id = #{channelId}
+	</select>
+	
+</mapper>

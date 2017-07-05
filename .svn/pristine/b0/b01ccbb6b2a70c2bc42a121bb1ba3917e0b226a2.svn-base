@@ -1,0 +1,63 @@
+// JavaScript Document
+$(function()
+{
+	
+	
+	
+	
+	//------------------------   轮播切换 -----------------------------------
+	
+	var totalWidth=0;
+	$(".ul_list li").each(function(index, element) {
+        totalWidth+=$(this).outerWidth()+14;
+    });
+	$(".ul_list").width(totalWidth);
+	
+	var lock=false; //防止多次触发
+	var totalPage=Math.ceil($(".ul_list li").length/4); //总页数
+	var curIndex=1;
+	
+	//下一页
+	$(".a_prev").on("click",function()
+	{
+		if(!lock)
+		{
+			lock=true;
+			if(curIndex!=totalPage)
+			{
+				$(".ul_list").animate({"left":$(".ul_list").position().left-1104+"px"},500,function()
+				{
+					lock=false;
+				});
+				curIndex++;
+			}
+			else
+			{
+				lock=false;
+			}
+		}
+		
+	});
+	
+	//上一页
+	$(".a_next").on("click",function()
+	{
+		if(!lock)
+		{
+			lock=true;
+			if(curIndex!=1)
+			{
+				$(".ul_list").animate({"left":$(".ul_list").position().left+1104+"px"},500,function()
+				{
+					lock=false;
+				});
+				curIndex--;
+			}
+			else
+			{
+				lock=false;
+			}
+		}
+	});
+	
+})

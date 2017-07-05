@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.ReturnPackageDao">
+	<resultMap id="basic_result_map" type = "com.weiye.model.ReturnPackage">
+		<id column="id" property="id" javaType="String"/>
+		<result column="user_id" property="userId" javaType="String"/>
+		<result column="transhipment_id" property="transhipmentId" javaType="String"/>
+		<result column="package_no" property="packageNo" javaType="String"/>
+		<result column="shipping_fee" property="shippingFee" javaType="String"/>
+		<result column="pic1" property="pic1" javaType="String"/>
+		<result column="receipt" property="receipt" javaType="String"/>
+		<result column="address" property="address" javaType="String"/>
+		<result column="pic2" property="pic2" javaType="String"/>
+		<result column="pic3" property="pic3" javaType="String"/>
+		<result column="pic4" property="pic4" javaType="String"/>
+		<result column="pic5" property="pic5" javaType="String"/>
+		<result column="remark" property="remark" javaType="String"/>
+		<result column="create_date" property="createDate" javaType="String"/>
+		<result column="modify_date" property="modifyDate" javaType="String"/>
+		<result column="emp_id" property="empId" javaType="String"/>
+		<result column="emp_remark" property="empRemark" javaType="String"/>
+		<result column="state" property="state" javaType="String"/>
+		<result column="emp_express_no" property="empExpressNo" javaType="String"/>
+		<result column="emp_express_company" property="empExpressCompany" javaType="String"/>
+		<result column="emp_pic" property="empPic" javaType="String"/>
+		<result column="package_no_in_transhipment" property="packageNoInTranshipment" javaType="String"/>
+		<result column="transhipment_pre_state" property="transhipmentPreState" javaType="String"/>
+	</resultMap>
+	
+	<insert id="insert" parameterType="com.weiye.model.ReturnPackage" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO return_package(transhipment_id, package_no, user_id, receipt, pic1, pic2, pic3, pic4, pic5, phone, address, remark, create_date, modify_date, emp_id, emp_remark, state, shipping_fee, transhipment_pre_state)
+		SELECT #{transhipmentId}, #{packageNo}, #{userId}, #{receipt}, #{pic1}, #{pic2}, #{pic3}, #{pic4}, #{pic5}, #{phone}, #{address}, #{remark}, #{createDate}, #{modifyDate}, #{empId}, #{empRemark}, #{state}, #{shippingFee}, state FROM transhipment_bill WHERE id=#{transhipmentId}
+	</insert>
+	<select id="countAll" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM return_package
+	</select>
+	<select id="findAll" resultMap="basic_result_map">
+		SELECT * FROM return_package ORDER BY modify_date DESC LIMIT #{firstResult}, #{pageSize}
+	</select>
+	<select id="countByUser" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM return_package WHERE user_id = #{userId};
+	</select>
+	<select id="findByUser" resultMap = "basic_result_map">
+		SELECT * FROM return_package WHERE user_id = #{userId} ORDER BY modify_date DESC, create_date DESC LIMIT #{firstResult}, #{pageSize} 
+	</select>
+	<update id="audit">
+		UPDATE return_package SET emp_id = #{empId}, state = #{state}, emp_remark = #{empRemark}, emp_express_no=#{empExpressNo}, emp_express_company=#{empExpressCompany}, emp_pic=#{empPic}, shipping_fee=#{shippingFee}, modify_date=#{modifyDate} WHERE id = #{id}
+	</update>
+	<select id="findById" resultMap = "basic_result_map">
+		SELECT *, (SELECT COUNT(id) FROM transhipment_bill t WHERE t.id=r.transhipment_id AND t.user_id=r.user_id) AS package_no_in_transhipment FROM return_package r WHERE id = #{id}
+	</select>
+	<select id="checkState" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM return_package WHERE id = #{id} AND state = #{state}
+	</select>
+	<update id="updateByUser">
+		UPDATE return_package SET 
+		package_no = #{packageNo}, pic1 = #{pic1}, pic2 = #{pic2}, pic3 = #{pic3} , pic4 = #{pic4}, pic5 = #{pic5}, receipt = #{receipt}, phone = #{phone}, address = #{address}, remark = #{remark}, modify_date = #{modifyDate}, state=#{state}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="countByKey" resultType="java.lang.Integer">
+		select COUNT(id) from return_package r
+		<where>
+		    <if test="id != null and id != ''">
+				r.id = #{id}
+			</if>
+			<if test="type!=null and type!='' and type!='-1' and key!=null and key!=''">
+				r.${type} like #{key}
+			</if>
+			<if test="createDateStart!=null and createDateStart !=''">
+				and r.create_date <![CDATA[>=]]> #{createDateStart}
+			</if>
+			<if test="createDateEnd!=null and createDateEnd!=''">
+				and r.create_date <![CDATA[<=]]> #{createDateEnd}
+			</if>
+			<if test="userId!=null and userId!=''">
+				and r.user_id=#{userId}
+			</if>
+			<if test="state!=null and state!='' and state!='-1'">
+				and r.state=#{state}
+			</if>
+		</where>
+	</select>
+	<select id="searchByKey" resultMap="basic_result_map">
+		select * from return_package r
+		<where>
+		    <if test="id != null and id != ''">
+				r.id = #{id}
+			</if>
+			<if test="type!=null and type!='' and type!='-1' and key!=null and key!=''">
+				r.${type} like #{key}
+			</if>
+			<if test="createDateStart!=null and createDateStart !=''">
+				and r.create_date <![CDATA[>=]]> #{createDateStart}
+			</if>
+			<if test="createDateEnd!=null and createDateEnd!=''">
+				and r.create_date <![CDATA[<=]]> #{createDateEnd}
+			</if>
+			<if test="userId!=null and userId!=''">
+				and r.user_id=#{userId}
+			</if>
+			<if test="state!=null and state!='' and state!='-1'">
+				and r.state=#{state}
+			</if>
+		</where>
+		order by create_date desc
+		limit #{firstResult}, #{pageSize}
+	</select>
+	<delete id="deleteByTranshipmentIdAndUserId">
+		DELETE FROM return_package WHERE transhipment_id=#{transhipmentId} AND user_id=#{userId}
+	</delete>
+</mapper>

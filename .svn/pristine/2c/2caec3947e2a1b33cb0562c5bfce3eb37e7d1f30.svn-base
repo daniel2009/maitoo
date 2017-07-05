@@ -1,0 +1,122 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<input type="hidden" name="oid"/>
+	<input type="hidden" name="pn" value="1"/>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">异常订单</p>
+
+		<div class="box_content">
+			<div class="content_title">异常订单</div>
+			<div class="content_text">
+				<div class="tab-content default-tab" id="tab1">
+					<div id="u31" style="padding-top: 5px;">
+						<div id="u310">
+							<form action="">
+								<!--运单号：<input class="text-input small-input" type="text" name="oid"maxlength="16" />
+								<input class="button" type="submit" value="搜索" name="searchSub" />-->
+								运单号：<input class="text-input small-input" type="text" name="oid"maxlength="16" />
+								<input class="button" type="submit" value="搜索异常" name="searchSub" />
+							</form>
+							<!--<form action="">
+							</form>-->
+						</div>
+						<div id="u320">
+							<span>
+								<a href="#addeoinfo" id="a_add_error_order_info_link">添加异常件</a>
+							</span>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+
+					<table id="msgtable" style="width: 100%">
+						<col width="100px"/>
+						<col/>
+						<col width="150px" />
+						<col width="120px"/>
+						<col width="100px" />
+						<thead>
+							<tr>
+								<th id="m_id">
+									运单编号
+								</th>
+								<th id="m_content">
+									包裹异常处理流程
+								</th>
+								<th id="m_state">
+									创建时间
+								</th>
+								<!--<th id="m_create_date">
+									更新时间
+								</th>-->
+								<th id="m_style">
+									完成状态
+								</th>
+								<th id="m_modify_date">
+									操作
+								</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="4">
+									<div class="pagination" style="font-size: 15px;">
+										共0条/共0页&nbsp;&nbsp;
+										<a href="">首页</a>|
+										<a href="#">上一页</a>
+										<input style="width: 20px;" type="text" name="pageNow" />
+										<a href="#">下一页</a>|
+										<a href="#">尾页</a>
+									</div>
+									<!-- End .pagination -->
+									<div class="clear"></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div id="addeoinfo" style="display: none;">
+          <h3>异常件添加</h3>
+          <fieldset>
+          <form action=""  style="width: 300px;">
+          	<p>
+          		<span name='msg'></span>
+          	</p>
+            <p>
+              <label style="display: inline;">运单编号：</label>
+              <input class="text-input" type="text" name="oid"maxlength="16" />
+              <!--<span class="gl_message">*</span>-->
+              <!--这个验证是验证输入的运单号是否是运单号，本来让在前面加一个运单搜索验证是不是我觉得没必要就想到了这个方法-->
+              <input class="button" type="submit" value="验证" name="v_btn_order" />
+            </p>
+            <p>
+              <label style="display: inline;">异常内容：</label>
+              <small>最多200个字符</small>
+              <span class="gl_message">*</span>
+              <textarea rows="10" cols="10" class="text-input" name="content"></textarea>
+            </p>
+            <p style="margin-left: 50px;">
+              <input class="button" type="submit" name="bt_add_error_order_info" value="提交" />
+              <input class="button" type="reset" onclick="" value="取消">
+            </p>
+           </form>
+           </fieldset>
+      	</div>
+      	</div>
+	</body>
+	<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNav72Data();
+	});
+</script>
+</html>

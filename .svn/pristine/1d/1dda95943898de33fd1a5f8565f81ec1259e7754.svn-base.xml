@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.WarehouseLocationDao">
+
+	<resultMap id="basic_result_map" type="com.weiye.model.WarehouseLocation">
+		<id column="id" property="id" javaType="String" />
+		<result column="name" property="name" javaType="String" />
+		<result column="warehouseId" property="warehouse_id" javaType="String" />
+		<result column="state" property="state" javaType="String" />
+		<result column="modifyDate" property="modify_date" javaType="String" />
+	</resultMap>
+
+	<insert id="insertWarehouseLocation" parameterType="com.weiye.model.WarehouseLocation"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		warehouse_location(name,warehouse_id,state,modify_date)
+		values(#{name},#{warehouseId},#{state},#{modifyDate})
+	</insert>
+
+	<update id="updateWarehouseLocationState" parameterType="com.weiye.model.WarehouseLocation">
+		update warehouse_location
+		set
+		state=#{state}, modify_date=#{modifyDate}
+		where id=#{id}
+	</update>
+
+	
+</mapper>

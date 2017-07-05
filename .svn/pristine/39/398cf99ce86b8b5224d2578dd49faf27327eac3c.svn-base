@@ -1,0 +1,59 @@
+﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+<body>
+
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">全局参数管理</p>
+
+		<div class="box_content">
+			<div class="content_title">全局参数配置</div>
+			<div class="content_text">
+			<div class="tab-content default-tab" id="tab1">
+				
+				<div  style="margin-left: 80%;margin-top: 20px;">
+							<span>
+								<a href="#" id="a_add_globalargs_link">添加全局参数</a>
+							</span>
+						</div>
+						<div style="clear: both;">
+				</div>
+					
+
+				<table style="width: 100%" id="tableshow">
+					<thead>
+						<tr>
+							<th>分类</th>
+							<th>类型</th>
+							<th>创建时间</th>
+							<th>修改时间</th>
+							<th>唯一标志</th>
+							<th>参数内容</th>
+							<th>参数备注</th>
+							<th>操作</th>							
+						</tr>
+						
+					</thead>
+					
+					<tbody>
+						
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		//alert("asdfasf");
+		loadNav94Data();
+		//$("html,body").animate({scrollTop: $("#body-wrapper").offset().top}, 1000);
+	});	
+</script>
+</html>

@@ -1,0 +1,12 @@
+function setFooter(cssQuery){
+	$.ajax({
+		type: "get",
+		url: "../globalargs/getcontent",
+		data : {flag : "foot"},
+		success: function(response) {
+			if(200==response.code ){
+				$(cssQuery).html(response.data);
+			}
+		}
+	});
+}

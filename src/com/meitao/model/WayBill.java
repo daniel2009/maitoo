@@ -1,0 +1,114 @@
+package com.meitao.model;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+public class WayBill implements Serializable {
+
+	private static final long serialVersionUID = -9006027449924592428L;
+	private List<Order> orders = new ArrayList<Order>();
+	private long totalFreight;
+	private String userId;
+	private String name; // 操作者姓名
+	private String type; // 1：表示预拆箱提交，0表示合并箱子提交也包括一个运单提交一次(正常提交)
+	private String orderType; // 该邮件属于什么类型的邮件，1表示网上发送，2表示门店发送，3表示vip发送
+	@JsonIgnore
+	private String userType; // 该提交所属会员的会员类型，主要用户计算运费
+	private String premium;
+	private ConsigneeInfo consigneeInfo;//kai 20151002 保存用户提交的地址
+    private String[] commodityIdList;//kai 20151002 用于转运提交商品列表的id清单
+    private String trantype;//标识用户提交的类型
+
+	
+
+	public String getTrantype() {
+		return trantype;
+	}
+
+	public void setTrantype(String trantype) {
+		this.trantype = trantype;
+	}
+
+	public String[] getCommodityIdList() {
+		return commodityIdList;
+	}
+
+	public void setCommodityIdList(String[] commodityIdList) {
+		this.commodityIdList = commodityIdList;
+	}
+
+	public String getPremium() {
+		return this.premium;
+	}
+
+	public void setPremium(String premium) {
+		this.premium = premium;
+	}
+
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
+	}
+
+	public ConsigneeInfo getConsigneeInfo() {
+		return consigneeInfo;
+	}
+
+	public void setConsigneeInfo(ConsigneeInfo consigneeInfo) {
+		this.consigneeInfo = consigneeInfo;
+	}
+
+	public String getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public List<Order> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(List<Order> orders) {
+		this.orders = orders;
+	}
+
+	public long getTotalFreight() {
+		return totalFreight;
+	}
+
+	public void setTotalFreight(long totalFreight) {
+		this.totalFreight = totalFreight;
+	}
+}

@@ -1,0 +1,165 @@
+﻿function loadNav01Data() {
+	// 获取用户数据
+	$.ajax({
+		type:"get",
+		url:user_get_self_url,
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				var data = response.data;
+				//$("#username").html(data.phone);
+				
+				if((data.realName=="")||(data.realName=="null")||(data.realName==null)||(data.realName=="undefined"))
+				{
+					if((data.nickName=="")||(data.nickName=="null")||(data.nickName==null)||(data.nickName=="undefined"))
+					{
+						if((data.phone=="")||(data.phone=="null")||(data.phone==null)||(data.phone=="undefined"))
+						{
+							if((data.email=="")||(data.email=="null")||(data.email==null)||(data.email=="undefined"))
+							{
+								
+							}
+							else
+							{
+								$("#u_username").html(data.email);
+							}
+						}
+						else
+						{
+							$("#u_username").html(data.phone);
+						}
+						
+					}
+					else
+					{
+						$("#u_username").html(data.nickName);
+					}
+					
+				}
+				else
+				{
+					$("#u_username").html(data.realName);
+				}
+				$("#usercode").html(data.usercode);
+				$("#usercode1").html(data.usercode);
+				$("#usercode2").html(data.usercode);
+				$("#useralias").html(data.useralias);
+				
+				$("#firstName1").html(data.realName+" "+data.useralias);
+				$("#firstName2").html(data.realName+" "+data.useralias);
+
+				$("#rmb").html("￥" + data.rmbBalance);
+				$("#usd").html("$" + data.usdBalance);
+				
+				$(":hidden[name='userType']").val(data.type);//保存用户类型，用于计算
+				loadwarehouse_firstpage(data.realName,data.usercode,data.useralias);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+//				//注意，使用不同前端模板时，要指引到不同的登陆界面
+				//window.location.href='../frontpage/gobox/register-login.html';
+				logout();
+			} else {
+				// 失败
+				alert("获取会员信息失败，原因是:" + response.message);
+			}
+		}
+	});
+	getNeedFocusCount();
+}
+
+//装载仓库及相关联的数据
+function loadwarehouse_firstpage(realname,usercode,useralias)
+{
+	if((realname=="")||(realname=="null")||(realname==null)||(realname=="undefined"))
+	{
+		realname="<a href='javascript:nav73Click()'>请在“修改资料”处，修改你的姓名(拼音)</a>";
+	}
+	$.ajax({
+		type:"get",
+		async:false,
+		url:"../user/warehouse/all",
+		success:function(response){
+			var code = response.code;
+			if (code == '200') {
+				
+				if(response.data != null) {
+					
+					var str = "";
+					var flag=0;
+					$.each(response.data,function(){
+						
+						if(this.type=="1")
+						{
+							
+						
+						
+						
+							str+='<div class="span6" style="float:left;margin-left:5px;margin-right:5px;margin-top: 15px;border:1px solid #999;padding:3px;">';
+							str+="<div class='ax_text' style='font-size:14px;color:blue;'>"+this.name+"</div>";
+							str+="<table><tr>";
+							str+="<td>姓名/Name:</td><td><span style='color:red'>"+realname+"</span><span style='color:red'> "+useralias+"</span></td>";
+							str+="</tr>";
+							
+							str+="<tr>";
+							str+="<td>地址/Address:</td><td><span>"+this.address+"</span><span style='color:red'> #"+usercode+"</span></td>";
+							str+="</tr>";
+							
+							str+="<tr>";
+							str+="<td>城市/City:</td><td><span>"+this.city+"</span></td>";
+							str+="</tr>";
+							
+							str+="<tr>";
+							str+="<td>州/State:</td><td><span>"+this.province+"</span></td>";
+							str+="</tr>";
+							
+							str+="<tr>";
+							str+="<td>邮编/Zip Code:</td><td><span>"+this.zipCode+"</span></td>";
+							str+="</tr>";
+							
+							str+="<tr>";
+							str+="<td>电话/Tel:</td><td><span>"+this.telephone+"</span></td>";
+							str+="</tr>";
+							str+="</table>";
+							str+="</div>";
+							/*if(flag%2==1)
+							{
+								str+="<hr/>";
+							}*/
+							flag=flag+1;
+						}
+						
+					});
+					if(str=="")
+					{
+						$("#showzytitle").hide();
+						$("#showzyremark").hide();
+					}
+					else
+					{
+						$("#show_warehouse_div").html(str);
+					}
+					
+				}
+			}
+		}
+	});	
+}
+
+function getNeedFocusCount(){
+	$.ajax({
+		type:"get",
+		url: "../user/getNeedFocusCount",
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				var array = response.data;
+				for(var i=0; i<array.length>>1; i++){
+					$("#" + array[2*i]).html(array[2*i+1]);
+				}
+			} else {
+				// 失败
+				alert("获取数量信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}

@@ -1,0 +1,74 @@
+package com.weiye.controller;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import jxl.common.Logger;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.weiye.common.constants.ResponseCode;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ProductType;
+import com.weiye.model.ResponseObject;
+import com.weiye.service.ProductTypeService;
+
+@Controller
+public class ProductTypeController extends BasicController {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4544907817740050996L;
+	private static final Logger log = Logger.getLogger(ProductTypeController.class);
+	@Resource(name = "productTypeService")
+	private ProductTypeService productTypeService;
+	private int defaultPageSize = 30;//弄长点，反正没什么信息
+	
+	private <T> ResponseObject<T> catchException(Exception e, String message){
+		log.error(message, e);
+		return generateResponseObject(ResponseCode.SHOW_EXCEPTION, message);
+	}
+	@RequestMapping(value = {"/admin/productType/findAll", "/productType/findAll"}, method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<PageSplit<ProductType>> findAll(HttpServletRequest request,
+			@RequestParam(value = "key", required = false, defaultValue = "") String key,
+			@RequestParam(value = "pageIndex", required = false, defaultValue="1")int pageIndex){
+		try{
+			return productTypeService.findByKey(key, pageIndex, defaultPageSize);
+		}catch(Exception e){
+			return this.catchException(e, "获取商品类型列表异常");
+		}
+	}
+	@RequestMapping(value = "/admin/productType/add", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> add(HttpServletRequest request, ProductType productType){
+		try{
+			return productTypeService.add(productType);
+		}catch(Exception e){
+			return this.catchException(e, "添加商品类型异常");
+		}
+	}
+	@RequestMapping(value = "/admin/productType/update", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> update(HttpServletRequest request, ProductType productType){
+		try{
+			return productTypeService.update(productType);
+		}catch(Exception e){
+			return this.catchException(e, "修改商品类型异常");
+		}
+	}
+	@RequestMapping(value = "/admin/productType/delete", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseObject<Object> delete(HttpServletRequest request, ProductType productType){
+		try{
+			return productTypeService.delete(productType);
+		}catch(Exception e){
+			return this.catchException(e, "删除商品类型异常");
+		}
+	}
+	
+}

@@ -1,0 +1,20 @@
+package com.weiye.service;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ProductType;
+import com.weiye.model.ResponseObject;
+
+public interface ProductTypeService {
+
+	ResponseObject<Object> add(ProductType productType) throws ServiceException;
+
+	ResponseObject<ProductType> findById(ProductType productType) throws ServiceException;
+
+	ResponseObject<Object> update(ProductType productType) throws ServiceException;
+
+	ResponseObject<PageSplit<ProductType>> findByKey(String key, int pageIndex, int pageSize) throws ServiceException;
+
+	ResponseObject<Object> delete(ProductType productType) throws ServiceException;
+
+}

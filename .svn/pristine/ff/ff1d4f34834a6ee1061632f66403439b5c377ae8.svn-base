@@ -1,0 +1,173 @@
+
+		$(function(){
+			$("#cd-signup").keydown(function(event) {
+				if (event.which == 13) {
+					register();
+				}
+			});
+			$("#cd-signup-email").keydown(function(event) {
+				if (event.which == 13) {
+					emailReg();
+				}
+			});
+			var $form_modal = $('.cd-user-modal'),
+				$form_login = $form_modal.find('#cd-signup-email'),
+				$form_signup = $form_modal.find('#cd-signup'),
+				$form_modal_tab = $('.cd-switcher'),
+				$tab_login = $form_modal_tab.children('li').eq(0).children('a'),
+				$tab_signup = $form_modal_tab.children('li').eq(1).children('a'),
+				$main_nav = $('.main_nav');
+		
+			//弹出窗口
+			$main_nav.on('click', function(event){
+		
+				if( $(event.target).is($main_nav) ) {
+					// on mobile open the submenu
+					$(this).children('ul').toggleClass('is-visible');
+				} else {
+					// on mobile close submenu
+					$main_nav.children('ul').removeClass('is-visible');
+					//show modal layer
+					$form_modal.addClass('is-visible');	
+					//show the selected form
+					( $(event.target).is('.cd-signup') ) ? signup_selected() : login_selected();
+				}
+		
+			});
+		
+			//关闭弹出窗口
+			/*$('.cd-user-modal').on('click', function(event){
+				if( $(event.target).is($form_modal) || $(event.target).is('.cd-close-form') ) {
+					$form_modal.removeClass('is-visible');
+				}	
+			});*/
+			//使用Esc键关闭弹出窗口
+			/*$(document).keyup(function(event){
+		    	if(event.which=='27'){
+		    		$form_modal.removeClass('is-visible');
+			    }
+		    });*/
+		
+			//切换表单
+			$form_modal_tab.on('click', function(event) {
+				event.preventDefault();
+				( $(event.target).is( $tab_login ) ) ? login_selected() : signup_selected();
+			});
+		
+			function login_selected(){
+				$form_login.addClass('is-selected');
+				$form_signup.removeClass('is-selected');
+				//$form_forgot_password.removeClass('is-selected');
+				$tab_login.addClass('selected');
+				$tab_signup.removeClass('selected');
+			}
+		
+			function signup_selected(){
+				$form_login.removeClass('is-selected');
+				$form_signup.addClass('is-selected');
+				//$form_forgot_password.removeClass('is-selected');
+				$tab_login.removeClass('selected');
+				$tab_signup.addClass('selected');
+			}
+		
+		});
+
+		function register() {
+			var telphone = $("#telphone").val();
+			var password = $("#password").val();
+			var recommender = $(":hidden[name='recommender']").val();
+			if (recommender == null || recommender == "") {
+				recommender = "-1";
+			}
+
+			if(!validaTelphone(telphone)||!validatePwd(password)){
+				return false;
+			}
+
+			if ($(":checkbox[name='accept_terms']").is(':checked')){
+				$.ajax({
+					type:"post",
+					url:"user/register",
+					data:{
+						"password":password,
+						"phone":telphone,
+						"vcode":"123456",
+						"recommender":recommender,
+						"isloging":"1"
+					},
+					success:function(response) {
+						var code = response.code;
+						if (code == "200") {
+							alert("注册成功");
+							window.location.href = "user/index.jsp";
+						} else {
+							alert("注册失败，失败原因是:" + response.message);
+						}
+					}
+				});
+			} else {
+				alert("请选择用户注册协议");
+			}
+		}
+		
+		function validaTelphone(telphone){
+			if(!checkUserPhone(telphone)){
+				alert("手机号是无效的,请输入正确的手机.");
+				return false;
+			}
+			return true;
+		}
+		function validatePwd(password){
+			if(!checkUserPassword(password)){
+				alert("密码长度不对.");
+				return false;
+			}
+			return true;
+		}
+		
+		function validaEmail(email){
+			if(!checkUserEmailRegex(email)){
+				alert("邮箱无效,请输入正确的邮箱.");
+				return false;
+			}
+			return true;
+		}
+		
+		
+		
+		function emailReg() {
+			var email = $("#email").val();
+			var password = $("#email_password").val();
+			var recommender = $(":hidden[name='recommender']").val();
+			if (recommender == null || recommender == "") {
+				recommender = "-1";
+			}
+			if(!validaEmail(email)||!validatePwd(password)){
+				return false;
+			}
+
+			if ($(":checkbox[name='accept_email_terms']").is(':checked')){
+				$.ajax({
+					type:"post",
+					url:"user/email_register",
+					data:{
+						"password":password,
+						"email":email,
+						"recommender":recommender,
+						"isloging":"1"
+					},
+					success:function(response) {
+						var code = response.code;
+						if (code == "200") {
+							alert("注册成功");
+							window.location.href = "user/index.jsp";
+						} else {
+							alert("注册失败，失败原因是:" + response.message);
+						}
+					}
+				});
+			} else {
+				alert("请选择用户注册协议");
+			}
+		}
+		

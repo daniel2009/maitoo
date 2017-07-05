@@ -1,0 +1,454 @@
+﻿<!DOCTYPE html>
+<!-- saved from url=(0038)http://www.xlobo.com/Public/Login.aspx -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link href="./login_page_files/reset.css" rel="stylesheet">
+<link href="./login_page_files/layout.css" rel="stylesheet">
+<link href="./login_page_files/no_login.css" rel="stylesheet">
+<script src="./login_page_files/jquery-1.4.4.min.js"></script>
+
+
+
+    <style>
+        .logindiv {
+            position: absolute;
+            right: 0;
+            top: 22px;
+            text-align: right;
+        }
+
+            .logindiv a {
+                color: #999;
+                font: normal 12px/1.6 "Microsoft YaHei";
+            }
+    </style>
+    <script type="text/javascript" charset="utf-8" async src="http://hb.crm2.qq.com/?nameAccount=4006812520&uid=5868861440&cb=JSONP_CALLBACK_45_68"></script><script type="text/javascript" charset="utf-8" async src="./shining_files/saved_resource"></script><script type="text/javascript" charset="utf-8" async src="./shining_files/saved_resource(1)"></script><script type="text/javascript" charset="utf-8" async src="./shining_files/saved_resource(2)"></script><script type="text/javascript" charset="utf-8" async src="./shining_files/saved_resource(3)"></script><script type="text/javascript" charset="utf-8" async src="./shining_files/crmqq.php"></script><script type="text/javascript" charset="utf-8" async src="./shining_files/crmqq.php"></script><script type="text/javascript" charset="utf-8" async src="./shining_files/contains.js"></script><script type="text/javascript" charset="utf-8" async src="./shining_files/localStorage.js"></script><script type="text/javascript" charset="utf-8" async src="./shining_files/Panel.js"></script>
+<title>
+	阳光国际速递
+</title>
+<link rel="stylesheet" type="text/css" href="./shining_files/bootstrap.css">
+
+    <link href="./shining_files/reset.css" rel="stylesheet">
+<link href="./shining_files/site.css" rel="stylesheet">
+
+   <script async src="./shining_files/analytics.js"></script><script src="./shining_files/Ymt.min.js"></script>
+<script src="./shining_files/jquery-1.5.2.min.js"></script></head>
+
+<body class="" style="background-color: #494039;" role="application">
+<link href="./login_page_files/jquery-ui-1.8.6.custom.css" rel="stylesheet">
+<link href="./login_page_files/reset(1).css" rel="stylesheet">
+
+    <script src="./login_page_files/jquery-1.4.4.min.js"></script>
+<script src="./login_page_files/jquery-ui-1.8.6.custom.min.js"></script>
+
+     <script src="./login_page_files/jquery.cookie.js"></script>
+
+<style>
+        .ly_remember_status {
+        }
+         .ly_remember_label {
+            vertical-align:middle; 
+        }
+    </style>
+<script type="text/javascript">
+    function LoginOnKeyDown(obj, event) {
+        // 输入回车时，焦点转移同一行的重量输入框
+        if (event.keyCode == '13') {
+            if (event.preventDefault) {
+                event.preventDefault();
+            }
+            else {
+                event.returnValue = false;
+            }
+
+            try {
+                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions("ctl00$MainContent$LoginButton", "", true, "LoginUserValidationGroup", "", false, true));
+                return false;
+            }
+            catch (e) {
+                alert(e);
+                return;
+            }
+        }
+    }
+
+
+    function OpenWinMailValideX(un, em, country, cType) {
+        $("#iframeForMailValidatex").attr("src", "/Account/Certification/TransferInfo.aspx?un=" + un + "&em=" + em + "&icountry=" + country + "&cType=" + cType);
+        $("#MainContent_mailValidatex").dialog({
+            autoOpen: true,
+            width: 580,
+            modal: true,
+            close: function () {
+            }
+        });
+    }
+
+     
+    $(function () {
+        $.cookie('login', 'true', { path: '/' });
+
+        $('.logindiv').hide();
+    });
+</script>
+
+    <form method="post" action="./login_page_files/login_page.html" onsubmit="javascript:return WebForm_OnSubmit();" id="form2" style="background-color: #F2F2F2;">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="">
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUJLTE0NTE5NTIzD2QWAmYPZBYCAgIPZBYCAgEPZBYIAgEPDxYCHgxFcnJvck1lc3NhZ2UFFeW/hemhu+i+k+WFpeeUqOaIt+WQjWRkAgMPDxYCHwAFEuW/hemhu+i+k+WFpeWvhueggWRkAgUPDxYCHgRUZXh0BQbnmbvlvZVkZAIIDxYCHgV0aXRsZQUM6YKu5Lu26aqM6K+BZBgBBR5fX0NvbnRyb2xzUmVxdWlyZVBvc3RCYWNrS2V5X18WAQUcY3RsMDAkTWFpbkNvbnRlbnQkUmVtZW1iZXJNZQ==">
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form2'];
+if (!theForm) {
+    theForm = document.form2;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="./login_page_files/WebResource.axd" type="text/javascript"></script>
+
+
+<script src="./login_page_files/WebResource(1).axd" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+function WebForm_OnSubmit() {
+if (typeof(ValidatorOnSubmit) == "function" && ValidatorOnSubmit() == false) return false;
+return true;
+}
+//]]>
+</script>
+
+     <div class="xlobo_hd">
+        <div class="ly_in">
+           <h1> <img src="./shining_files/shining_logo_.png"></h1>
+           
+            <div class="main_nav">
+                <ul class="main_nav_list">
+                    <li class="cur"><a href="./index.html">首页</a></li>
+                    <li><a href="./pricing.html">收费标准</a></li>
+                    <li><a href="./about_us.html">关于我们</a></li>
+                    <li><a href="./location.html">地点</a></li>
+		    <li><a href="./../newsandgonggao.jsp"  target="_blank">公告</a>/ <a href="./xieyi_mt.html" target="_blank">协议</a> </li>
+                    <li><a href="./../login.jsp">注册</a> &nbsp;/&nbsp; <a href="./../login.jsp">登陆</a> </li>
+                    <li><a href="./../shangchuan.jsp" target="_blank">上传身份证</a></li> 
+
+            	    <li> <a class="qqOn" target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=76085666&site=qq&menu=yes"><img border="0" src="http://wpa.qq.com/pa?p=2:2278808484:41 &r=0.8940031429092906" alt="美国洛杉矶" title="美国洛杉矶"></a> </li>
+
+                </ul>
+            </div>
+
+       </div>
+      </div> 
+    
+    <div class="ly_main ly_nologin_main">
+    <div class="ly_in">
+        <div class="ly_main_content ly_nologin_content">
+            <div class="hd" style="height: 127px;">
+                <!--<h2>登录</h2>-->
+                <div class="row">
+                	<div class="col-xs-12">
+                    	<img src="./login_page_files/banner.jpg" width=100% height=100% alt="">
+                    </div>
+                    <!--<div class="col-xs-2">
+                    </div>
+                    <div class="col-xs-2">
+                    </div>
+                    <div class="col-xs-2">
+                    </div>
+                    <div class="col-xs-2">
+                    </div>
+                    <div class="col-xs-2">
+                    </div>-->
+                </div>
+            </div>
+            <div class="bd ly_login_bd">
+                <div class="ly_login_wrap">
+                	<div class="row">
+                    <div class="col-xs-6">
+                    <div class="ly_login_box">
+                        <ul class="ly_login_fill_list">
+                            <li>
+                                <p>
+                                    <label for="username">用户名</label>
+                                </p>
+                                <p>
+                                    
+                                    <input name="ctl00$MainContent$UserName" type="text" id="MainContent_UserName" class="c_form_text" onkeydown="LoginOnKeyDown(this, event);">
+                                 <span id="MainContent_UserNameRequired" title="User Name is required." class="failureNotification" style="visibility:hidden;">*</span>
+
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <label for="pwd">密码</label>
+                                </p>
+                                <p>
+                                    
+                                    <input name="ctl00$MainContent$Password" type="password" id="MainContent_Password" class="c_form_text" onkeydown="LoginOnKeyDown(this, event);"> 
+                                    <span id="MainContent_PasswordRequired" title="Password is required." class="failureNotification" style="visibility:hidden;">*</span>
+                               
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span class="ly_remember_status"><input id="MainContent_RememberMe" type="checkbox" name="ctl00$MainContent$RememberMe"></span>
+                                 
+                                    <label class="ly_remember_label" for="MainContent_RememberMe">记住我的登录状态</label>
+                                </p>
+                            </li>
+                        </ul>
+                        <p style="width: 300px">
+                              <a id="LoginButton" name="btnLogin" class="c_btn_sure_big" href="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions("ctl00$MainContent$LoginButton", "", true, "LoginUserValidationGroup", "", false, true))" style="width: 200px;">登录</a>
+                             <a class="ly_forgot_pwd" href="http://www.xlobo.com/Public/ForgetPassword.aspx"><b>忘记密码？</b></a>
+                      </p><div id="MainContent_LoginUserValidationSummary" class="failureNotification" style="display:none;">
+
+</div>
+                            <label class="l"></label><span class="failureNotification"></span>
+                        <p></p>
+                      </div>
+                      </div>
+                        <div class="col-xs-6"> 
+                        <script>
+                        	function email_form(){
+									document.getElementById("email_re").style.display="inline";
+									document.getElementById("mo_re").style.display="none";
+									document.getElementById("code_re").style.display="none";
+								}
+							function moble_form(){
+									document.getElementById("email_re").style.display="none";
+									document.getElementById("mo_re").style.display="inline";
+									document.getElementById("code_re").style.display="inline";
+								}
+                        </script>
+                        	<div class="ly_login_box">
+                            <h2 style="font-weight:700; color:#ff8d07; height:55px;">新用户？</h2>
+                            	 <ul class="ly_login_fill_list">
+                            <li>
+                            <label class="radio-inline">
+											<input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="Used_Car" checked="checked" onClick="email_form()"> 邮箱注册
+										</label>
+										<label class="radio-inline">
+											<input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="New_Car"  onClick="moble_form()"> 手机注册
+										</label></li>
+                                        <li>
+                                <div style="display:inline;" id="email_re"><p>
+                                    <label for="username">邮箱</label>
+                                </p>
+                                <p>
+                                    
+                                    <input name="ctl00$MainContent$UserName" type="email" id="Email" class="c_form_text" onkeydown="LoginOnKeyDown(this, event);">
+                                 <span id="MainContent_UserNameRequired" title="User Name is required." class="failureNotification" style="visibility:hidden;">*</span>
+
+                                </p></div>
+                            </li>
+                            <li>
+                                <div style="display:none;" id="mo_re"><p>
+                                    <label for="username">请输入手机号</label><button type="button">获取验证码</button>
+                                </p>
+                                <p>
+                                    
+                                    <input name="ctl00$MainContent$UserName" type="email" id="Email" class="c_form_text" onkeydown="LoginOnKeyDown(this, event);">
+                                 <span id="MainContent_UserNameRequired" title="User Name is required." class="failureNotification" style="visibility:hidden;">*</span>
+
+                                </p></div>
+                            </li>
+                            <li>
+                                <div style="display:none;" id="code_re"><p>
+                                    <label for="username">请输入验证码</label>
+                                </p>
+                                <p>
+                                    
+                                    <input name="ctl00$MainContent$UserName" type="email" id="Email" class="c_form_text" onkeydown="LoginOnKeyDown(this, event);">
+                                 <span id="MainContent_UserNameRequired" title="User Name is required." class="failureNotification" style="visibility:hidden;">*</span>
+
+                                </p></div>
+                            </li>
+                            <li>
+                                <p>
+                                    <label for="pwd">输入密码</label>
+                                </p>
+                                <p>
+                                    
+                                    <input name="ctl00$MainContent$Password" type="password" id="passWord" class="c_form_text" onkeydown="LoginOnKeyDown(this, event);"> 
+                                    <span id="MainContent_PasswordRequired" title="Password is required." class="failureNotification" style="visibility:hidden;">*</span>
+                               
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <span class="ly_remember_status"><input id="MainContent_RememberMe" type="checkbox" name="ctl00$MainContent$RememberMe"></span>
+                                 
+                                    <label class="ly_remember_label" for="MainContent_RememberMe">我已阅读并同意 用户协议</label>
+                                </p>
+                            </li>
+                        </ul>
+                            	
+                                <a id="LoginButton" name="btnLogin" class="c_btn_sure_big"  style="width: 200px;">立即注册</a>
+                         	</div>
+                      </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+  <div id="MainContent_mailValidatex" style="display:none;" title="邮件验证">
+    <iframe id="iframeForMailValidatex" style="width: 545px; height: 356px;" scrolling="no" frameborder="0" marginwidth="0"></iframe>
+    </div>
+   
+
+    
+<script type="text/javascript">
+//<![CDATA[
+var Page_ValidationSummaries =  new Array(document.getElementById("MainContent_LoginUserValidationSummary"));
+var Page_Validators =  new Array(document.getElementById("MainContent_UserNameRequired"), document.getElementById("MainContent_PasswordRequired"));
+//]]>
+</script>
+
+<script type="text/javascript">
+//<![CDATA[
+var MainContent_UserNameRequired = document.all ? document.all["MainContent_UserNameRequired"] : document.getElementById("MainContent_UserNameRequired");
+MainContent_UserNameRequired.controltovalidate = "MainContent_UserName";
+MainContent_UserNameRequired.errormessage = "必须输入用户名";
+MainContent_UserNameRequired.validationGroup = "LoginUserValidationGroup";
+MainContent_UserNameRequired.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+MainContent_UserNameRequired.initialvalue = "";
+var MainContent_PasswordRequired = document.all ? document.all["MainContent_PasswordRequired"] : document.getElementById("MainContent_PasswordRequired");
+MainContent_PasswordRequired.controltovalidate = "MainContent_Password";
+MainContent_PasswordRequired.errormessage = "必须输入密码";
+MainContent_PasswordRequired.validationGroup = "LoginUserValidationGroup";
+MainContent_PasswordRequired.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+MainContent_PasswordRequired.initialvalue = "";
+var MainContent_LoginUserValidationSummary = document.all ? document.all["MainContent_LoginUserValidationSummary"] : document.getElementById("MainContent_LoginUserValidationSummary");
+MainContent_LoginUserValidationSummary.validationGroup = "LoginUserValidationGroup";
+//]]>
+</script>
+
+
+<script type="text/javascript">
+//<![CDATA[
+
+var Page_ValidationActive = false;
+if (typeof(ValidatorOnLoad) == "function") {
+    ValidatorOnLoad();
+}
+
+function ValidatorOnSubmit() {
+    if (Page_ValidationActive) {
+        return ValidatorCommonOnSubmit();
+    }
+    else {
+        return true;
+    }
+}
+        //]]>
+</script>
+</form>
+
+    
+
+
+<div class="xlobo_ft">
+    <div class="ly_in">
+        
+        
+        <div class="global_site"> <span>联系我们：</span>
+            <ul class="global_site_list">
+                <li class="st1"><i></i><a href="./location.html">地址：18513 Gale Ave. City of Industry CA 91748</a></li>
+                <li class="st2"><i></i><a href="#" target="_blank">联系电话：(310)997-0057</a></li>
+                <li class="st3"><i></i><a href="#" target="_blank">Email(电子邮箱)：info@shiningexpress.com</a></li>
+                <li class="st4"><i></i><a href="#" target="_blank"></a></li>
+            </ul>
+        </div>
+
+        
+       
+        <div class="copy_right">
+            <p>
+            
+            
+            
+                <a href="#">帮助及问答</a>
+                <a href="#">资源下载</a>
+                <a href="#">加盟合作</a>
+                <a href="#">服务协议</a>
+
+            
+                
+            </p>
+            <p>Copyright © 2015 Shining Express. All Rights Reserved.</p>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#gocn').click(function() {
+            $.ajax({
+                url: "/api/changelanguageapi/ChangeLanguageToCn",
+                type: 'post',
+
+                contentType: 'application/json',
+                success: function (result) {
+                    location.href = "/";
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+    $(function () {
+        $('#cnBtn').click(function () {
+            changeLanguageToCn();
+        });
+        $('#enBtn').click(function () {
+            changeLanguageToEn();
+
+        });
+
+    });
+
+    function changeLanguageToCn() {
+        $.ajax({
+            url: "/api/changelanguageapi/ChangeLanguageToCn",
+            type: 'post',
+
+            contentType: 'application/json',
+            success: function (result) {
+                location.reload();
+            }
+        });
+    }
+    function changeLanguageToEn() {
+        $.ajax({
+            url: "/api/changelanguageapi/ChangeLanguageToEn",
+            type: 'post',
+
+            contentType: 'application/json',
+            success: function (result) {
+                location.reload();
+            }
+        });
+    }
+</script>
+</body></html>

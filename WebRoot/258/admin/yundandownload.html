@@ -1,0 +1,303 @@
+﻿
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+
+    <title>系统管理平台</title>
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <!-- 页面内联样式 -->
+    <link href="../resources/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="../resources/css/ui.jqgrid.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../resources/ace/css/bootstrap-multiselect.css">
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-part2.min.css" class="ace-main-stylesheet" >
+    <![endif]-->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="../resources/ace/css/ace-ie.min.css" >
+    <![endif]-->
+
+    <link rel="stylesheet" href="../resources/DateTimePicker/bootstrap-datetimepicker.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap-switch/bootstrap-switch.min.css">
+
+    <!-- 最后引入基本样式 -->
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../resources/bootstrap/css/bootstrap-responsive.min.css">
+
+    <!-- 文本字体 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace-fonts.min.css">
+    <!-- ace 样式 -->
+    <link rel="stylesheet" href="../resources/ace/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style">
+
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="../resources/site.css">
+    <!-- JQuery作为一等公民，页面内部随时可能使用 -->
+    <script src="../resources/js/jquery-1.10.2.min.js"></script>
+</head>
+<body style="overflow-x:hidden">
+    <div class="panel panel-default">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <ul class="breadcrumb">
+
+                <li>
+                    <i class="ace-icon fa fa-home home-icon"></i>
+                    <a href="#">运单管理</a>
+                </li>
+
+                <li>
+                    <a href="#">运单下载</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="page-content">
+            <div class="row searchrow" id="divYundanhao">
+                <div class="col-xs-12">
+                    <div class="col-xs-6">
+                        <label for="yundan" class="control-label width60px">运单号:</label>
+                        <input name="q" id="yundanhao"  placeholder="" style="width:126px">
+
+                        <button type="button" class="btn btn-purple btn-sm" id="btnYundanhao">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            运单搜索
+                        </button>
+                    </div>
+                    <div class="col-xs-6" id="divHangbanhao">
+                        <label for="yundan" class="control-label width60px">航班号:</label>
+                        <input name="q" id="hangbanhao"  placeholder="" style="width:126px">
+                        <button type="button" class="btn btn-purple btn-sm" id="btnHangbanhao">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            航班搜索
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row searchrownoborder advsearch">
+                <div class="col-xs-12">
+                    <div style="float:left">
+                        <label class="control-label width60px" for="dtStart">创建日期：</label>
+                        <span class=" width60px"><i class="fa fa-calendar"></i></span>
+                        <input name="dtStart" id="dtStart" dateformat="yyyy-mm-dd" class=" form_datetime" style="width: 110px;">
+                        至
+                        <span class=" width60px"><i class="fa fa-calendar"></i></span>
+                        <input name="dtEnd" id="dtEnd" dateformat="yyyy-mm-dd" class=" form_datetime" style="width: 110px;">
+
+                    </div>
+                    <div style="float:left">
+                        <label class="control-label width60px" for="keyword">
+                            关键字：
+                        </label>
+                        <input name="keyword" id="keyword" placeholder="">
+                    </div>
+                    <div style="float:left">
+
+
+                        <select name="type" class="table-selectheight" style="width:130px;margin-left:5px">
+                            <option value="-1">
+                                请选择搜索方式
+                            </option>
+                            <option value="0">
+                                运单号
+                            </option>
+                            <option value="1">
+                                转运单号
+                            </option>
+                            <option value="2">
+                                所属用户
+                            </option>
+                            <option value="3">
+                                收件人姓名
+                            </option>
+                        </select>
+
+                        <select name="state" class="table-selectheight" style="width:120px;margin-left:5px">
+                            <option value="-1">
+                                请选择状态
+                            </option>
+                            <!-- kai 20150911-1 -->
+                            <option value="-10">网上置单</option>
+                            <option value="-9">转运置单</option>
+                            <option value="0">运单作废</option>
+                            <option value="1">包裹异常</option>
+                            <option value="2">已揽收</option>
+                            <option value="3">送往集散中心</option>
+                            <option value="4">已打件</option>
+                            <option value="5">送往机场</option>
+                            <option value="6">空运中</option>
+                            <option value="7">海关清关</option>
+                            <option value="8">美淘中国分部已揽收</option>
+                            <option value="9">收件人已接收</option>
+                        </select>
+                        <select name="typekey" class="table-selectheight" style="width:120px;margin-left:5px">
+                            <option value="">
+                                请选择类型
+                            </option>
+
+                            <option value="1">门市运单</option>
+                            <option value="2">转运运单</option>
+                            <option value="3">网上置单</option>
+                            <option value="4">第三方运单</option>
+                            <option value="5">上门收货</option>
+                            <option value="6">空运单</option>
+                            <option value="7">批量生成门市运单</option>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row searchrownoborder advsearch">
+                <div class="col-xs-12">
+                    <div style="float:left">
+                        <label class="control-label width60px" for="wid_download">选择门店：</label>
+                        <select class="table-selectheight" style="width:125px; margin-right:10px;" name="wid_download"><option value="5">LasVegas</option></select>
+                        <label class="control-label width60px" for="cid_downloadload">选择渠道：</label>
+                        <select class="table-selectheight" style="width:124px" name="cid_downloadload"><option value="-1">请选择渠道</option><option value="2">meitao</option><option value="7">上海线路</option></select>
+
+                        <button type="button" class="btn btn-purple btn-sm" id="btnAdvanceSearch">
+                            <span class="ace-icon fa fa-search icon-on-right bigger-110"></span>
+                            高级搜索
+                        </button>
+
+                        <button type="button" class="btn btn-primary btn-sm">
+                            <span class=" icon-download"></span>
+                            直接下载订单
+                        </button>
+                    </div>
+
+                    <div style="clear:both">
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <table class="table table-bordered  table-striped table-condensed ">
+                    <thead>
+                        <tr>
+                            <th colspan="2">
+                                <strong style="color:#F1692A">身份证下载方式:</strong>
+                                <input type="checkbox" name="o_order_checked_pics" id="zm" value="0" >
+                                <label for="zm">正面图</label> 
+                               
+                                <input type="checkbox" name="o_order_checked_pics" id="fm" value="1"><label for="fm">正面图</label> 
+
+                                <input type="checkbox" name="o_order_checked_pics" id="hc" value="2" checked="true"><label for="hc">合成图</label> 
+
+                                &nbsp;&nbsp; &nbsp;&nbsp;<strong style="color:#F1692A">商品数据下载方式:</strong>
+                                <input type="checkbox" name="o_order_checked_commoditys" id="splx" value="0" onclick="onclick_checked_commoditys()">
+                                <label for="splx">商品类型</label> 
+                                
+
+                                <input type="checkbox" name="o_order_checked_commoditys" id="spxq" value="1" checked="true" onclick="onclick_checked_commoditys()">
+                                <label for="spxq">商品详情</label> 
+                                <input type="checkbox" name="o_order_checked_commoditys" id="spsl" value="2" checked="true" onclick="onclick_checked_commoditys()">
+                                <label for="spsl">商品数量</label> 
+                                <input type="checkbox" name="o_order_checked_commoditys" id="spzl" value="3" onclick="onclick_checked_commoditys()">
+                                <label for="spzl">商品重量</label> 
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="height:35px;line-height:35px;">
+
+                            <td class="value" style="line-height:35px;">
+                                <span > 总订单数:<span id="orders_no" style="color:red;font-weight:bold; font-size:14px;">0</span>条</span>
+                                <span > 选中订单数:<span id="orderschecked_no" style="color:red;font-weight:bold;font-size:14px;">0</span>条</span>
+                                <button type="button" class="btn btn-primary btn-sm">
+                                    <span class=" icon-download"></span>
+                                    pictures download
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm">
+                                    <span class=" icon-download"></span>
+                                    orders download
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table id="yundangrid-table"></table>
+                <div id="yundangrid-pager"></div>
+
+            </div>
+
+            <div class="row">
+                <table class="table table-bordered  table-striped table-condensed ">
+                    <thead>
+                        <tr style="height:30px;line-height:30px;">
+                            <th colspan="2">
+                                归属航班操作
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="height:35px;line-height:35px;">
+
+                            <td class="value" style="line-height:25px;">
+                                <label for="yundan" class="control-label width60px">航班号:</label>
+                                <input name="q" id="yundan" placeholder="" style="width:126px;padding:0px;">
+                                <select class="" style="width:150px; margin-right:10px; height:27px;" name="fly_state">
+                                    <option value="-1">请选择运单状态</option>
+                                    <option value="3">送往集散中心</option>
+                                    <option value="4">已打件</option>
+                                    <option value="5">送往机场</option>
+                                    <option value="6">空运中</option>
+                                    <option value="7">海关清关</option>
+                                    <option value="8">美淘中国分部已揽收</option>
+                                </select>
+
+
+                                <button type="submit" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-ok"></i><strong>确定</strong></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- 最早引入基本脚本 -->
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../resources/ace/js/bootstrap-multiselect.js"></script>
+
+    <!-- ace 设置 -->
+    <script src="../resources/ace/js/ace.min.js"></script>
+    <script src="../resources/ace/js/ace-elements.min.js"></script>
+    <script src="../resources/ace/js/ace-extra.min.js"></script>
+
+    <!--grid 控件-->
+    <script src="../resources/ace/js/jqGrid/jquery.jqGrid.min.js"></script>
+    <script src="../resources/ace/js/jqGrid/i18n/grid.locale-en.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="../resources/js/html5shiv.min.js"></script>
+    <script src="../resources/js/respond.min.js"></script>
+    <![endif]-->
+    <!--日历控件支持-->
+
+    <script src="../resources/DateTimePicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="../resources/DateTimePicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+    <!--开关插件-->
+    <script src="../resources/bootstrap-switch/bootstrap-switch.min.js"></script>
+
+    <script src="../resources/js/fuelux/fuelux.spinner.min.js"></script>
+    <script src="../resources/scripts/common.js"></script>
+    <script src="../resources/scripts/yundandownload.js"></script>
+</body>
+</html>

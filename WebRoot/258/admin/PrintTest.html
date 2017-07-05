@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+ 
+    <script src="../resources/scripts/LodopFuncs.js"></script>
+</head>
+<body>
+
+    <button style="height:50px;" onclick="printIframe()">点击我开始打印整个页面</button>
+    <button style="height:50px;" onclick="printIframe2()">点击我开始预览整个页面</button>
+    <iframe src="printpage.html?id=78" width="0" height="0" id="printpage"></iframe>
+     <script src="../resources/js/jquery-1.10.2.min.js"></script>
+    <script language="javascript" type="text/javascript">
+        var LODOP; //声明为全局变量
+
+
+        function initPrintControl() {
+       
+        var url="printpage.html?id=78&ran="+Math.random();
+        $("#printpage").attr("src",url);
+       // alert(url);
+            LODOP = getLodop();
+            var win = document.getElementById('printpage').contentWindow;
+            //alert(win);
+            //ADD_PRINT_HTM(Top,Left,Width,Height,strHtmlContent)
+            LODOP.ADD_PRINT_HTM("2cm", "0cm", "RightMargin:0cm", "BottomMargin:1cm", win.document.documentElement.innerHTML);
+        }
+
+        function printIframe() {
+            initPrintControl();
+            LODOP.PRINT();
+        };
+
+        function printIframe2() {
+            initPrintControl();
+            LODOP.PREVIEW();
+        };
+
+        
+    </script>
+</body>
+</html>

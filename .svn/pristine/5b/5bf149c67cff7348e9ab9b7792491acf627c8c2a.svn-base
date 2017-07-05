@@ -1,0 +1,7 @@
+package com.weiye.dao;
+
+import com.weiye.model.OrderBatch;
+
+public interface OrderBatchDao {
+	public int inserBatch(OrderBatch batch) throws Exception;
+}

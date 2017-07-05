@@ -1,0 +1,225 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>全球速递  美国快递公司 专为华人美国购物 海淘 转运</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" href='css/bootstrap.css' type="text/css" media="screen">
+<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/inner.css" type="text/css" media="screen">
+<link rel="stylesheet" href="demo/switcher.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/es-carousel.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/prettyphoto.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/color1.css" type="text/css" id="theme" />
+<link rel="stylesheet" href="css/footer-color.css" type="text/css" media="screen">
+<!-- CSS STYLE -->
+
+<link rel="stylesheet" href='css/common.css'> 
+<link rel="stylesheet" type="text/css" media="all" href="css/style3.css">
+<link id="main_stylesheet" rel="stylesheet" href='css/indexstyle.css' type="text/css">
+<link rel="stylesheet" type="text/css" href='css/common1.css'>
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css" media="screen" />
+
+<link rel="stylesheet" href="css/rs-plugin/style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/preview.css" type="text/css" media="screen" />
+<!-- REVOLUTION BANNER CSS SETTINGS -->
+<link rel="stylesheet" href="css/rs-plugin/settings.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/rs-plugin/captions.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css/portfolio.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/portfolio-shape.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/elements.css" type="text/css" media="screen">
+<!--[if lt IE 9]>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+  <![endif]-->
+</head>
+
+<body class="inner-page stretched" data-spy="scroll" data-target=".bs-docs-sidebar">
+	<div id="wrapper">
+		<%@ include file="header.jsp"%>
+
+		<!--==============================content=================================-->
+		<div class="breadcrumb-wrapper">
+			<div class="shadowdrop"></div>
+			<div class="container">
+				<h2>禁运物品</h2>
+				<ul class="breadcrumb fright">
+					<li><a href="index.jsp">首页</a> <span class="divider">/</span>
+					</li>
+					<li class="active">禁运物品</li>
+				</ul>
+			</div>
+		</div>
+
+      <!-- Global Bootstrap settings
+        ================================================== -->
+		<section id="global">
+		<div >
+			<h1>极速转运线路最新暂停承运物品:</h1>
+
+			<h2>香水、刀类、烟油、CD光盘、首饰、巧克力；</h2>
+			<br>
+
+
+			<h1>海关管制物品:</h1>
+
+			<h2>1. 彩票和当地州、联邦法律禁止进口的赌博设备；</h2>
+			<br>
+			<h2>2. 伪造的货币及伪造的有价证券，及货币（钱币，现金，货币，纸币和有价证券，如背书的股票，债券和现金运送单均为禁运品）；</h2>
+			<br>
+			<h2>3. 用来收藏的钱币和邮票；</h2>
+			<br>
+			<h2>4. 各种磁铁及带有较强磁性地物体，因为会影响到飞机信号，不能通过安检；</h2>
+			<br>
+			<h2>5. 电子元件。如：单独寄递的纽扣电池、单独邮寄批量的干电池，无法通过安检；</h2>
+			<br>
+			<h2>6. 汽车及摩托车配件及附件；</h2>
+			<br>
+			<h2>7. 对中国有危害的印刷品及影音制品，或色情或淫秽内容；</h2>
+			<br>
+			<h2>8. 使用过的二手物品；</h2>
+			<br> <br>
+
+
+
+			<h1>航空管制作类:</h1>
+
+			<h2>1. 各种处方药品及各类烈性毒药。如铊、氰化物、砒霜等；</h2>
+			<br>
+			<h2>2.
+				各类麻醉药物：鸦片(包括罂粟壳、花、苞、叶)、吗啡、可卡因、海洛因、大麻、冰毒、麻黄素及其它能使人成瘾的麻醉品、精神物品等；</h2>
+			<br>
+			<h2>3.
+				毒性和传染性物质：各种可通过吞入/吸入/皮肤接触等进入人体后导致死亡或危害健康地物质。如毒药、有毒细菌/病毒/寄生虫/寄生菌/真菌等；</h2>
+			<br>
+			<h2>4. 有碍人畜健康的、来自疫区的，以及其他能传播疾病的食品、药品或其他物品：如炭疽、危险性病菌、医药用废弃物等；</h2>
+			<br>
+			<h2>5. 有害的废料，包括但不限于使用过的针头或注射器或其他医药废料；</h2>
+			<br>
+			<h2>6. 放射性物质：如铀、钴、镭、钚等；</h2>
+			<br>
+			<h2>7. 氧化剂和有机过氧化物：如过氧化氢、过氧化钠、硝酸钾、三氧化铬等；</h2>
+			<br>
+			<h2>8. 仿真枪、消防枪、子弹及弹壳。如：任何仿真枪、可射击子弹的玩具枪均属禁寄，只有全塑料玩具水枪可通过安检；</h2>
+			<br>
+			<h2>9. 各种管制刀具、弩箭；</h2>
+			<br>
+			<h2>
+				10.
+				易燃固体、自然物质和遇水释放易燃气体地物质：如活性炭、钛粉、椰肉干、蓖麻制品、橡胶碎屑、安全火柴、黄磷（白磷）、赤磷、硫磺、硝化棉、镁粉、<br>金属钙粉、钙合金物、金属钛粉、金属皓粉、浸油地麻/棉/质/纸及其制品等；
+			</h2>
+			<br>
+			<h2>11. 爆炸品，枪械，武器装备及其零部件，如炸药、烟花爆竹、雷管、火冒等所有在运输途中可能引起爆炸地物品；</h2>
+			<br>
+			<h2>12. 压缩气体：包含液化气体、深冷液化气体、加压溶解气体等（含储气罐体等）；</h2>
+			<br>
+			<h2>13.
+				易燃液体：如油漆、汽油、酒精类、机油、樟脑油、发动机启动液、松节油、天拿水、胶水、香水等所有可燃及在一定条件下可燃地液体；</h2>
+			<br>
+			<h2>14. 腐蚀性物质：各种因接触而产生化学反应能够不同程度损伤，接触地人体、物品、运输工具等；</h2>
+			<br>
+
+
+
+			<h1>动物及动物产品类:</h1>
+
+			<h2>1. 活动物，包括所有的哺乳动物、鸟类、鱼类、两栖类、爬行类、昆虫类和其他无脊椎动物，动物遗传物质。</h2>
+			<br>
+			<h2>2. （生或熟）肉类（含脏器类）及其制品；水生动物产品。</h2>
+			<br>
+			<h2>3. 动物源性奶及奶制品，包括生奶、鲜奶、酸奶，动物源性的奶油、黄油、奶酪及其它未经高温处理的奶类产品。</h2>
+			<br>
+			<h2>4. 蛋及其制品，包括鲜蛋、皮蛋、咸蛋、蛋液、蛋壳、蛋黄酱及其它未经热处理的蛋源产品等。</h2>
+			<br>
+			<h2>5. 燕窝（罐头装燕窝除外）</h2>
+			<br>
+			<h2>6. 油脂类，皮张、毛类，蹄、骨、角类及其制品。</h2>
+			<br>
+			<h2>7. 动物源性饲料（乳清粉、血粉等）、动物源性中药材、动物源性肥料。</h2>
+			<br>
+
+
+
+			<h1>植物及植物品类:</h1>
+
+			<h2>1. 新鲜水果、蔬菜。</h2>
+			<br>
+			<h2>2. 烟叶（不含烟丝）。</h2>
+			<br>
+			<h2>3. 种子（苗）、苗木及其他具有繁殖能力的植物材料。</h2>
+			<br>
+			<h2>4. 有机栽培介质。</h2>
+			<br>
+			<h2>5. 土壤。</h2>
+			<br>
+
+
+
+			<h1>其他检疫物类:</h1>
+
+			<h2>1. 动物尸体、动物标本、动物源性废弃物。</h2>
+			<br>
+			<h2>2. 菌种、毒种等动植物病原体，害虫及其他有害生物，细胞、器官组织、血液及其制品等生物材料。</h2>
+			<br>
+			<h2>3. 转基因生物材料。</h2>
+			<br>
+			<h2>4. 国家禁止进境的其他动植物、动植物产品和其他检疫物。。</h2>
+			<br>
+
+		</div>
+
+		</section>
+
+
+	 <%@ include file="footer.jsp" %>
+</div>
+ 
+ 
+ 
+ 
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="js/jquery.sliderTabs.js"></script>
+<!-- jQuery Slider  -->
+<script type="text/javascript" src="js/rs-plugin/jquery.themepunch.plugins.min.js"></script>
+<script type="text/javascript" src="js/rs-plugin/jquery.themepunch.revolution.min.js"></script>
+<!-- Elastislider  -->
+<script type="text/javascript" src="js/jquery.elastislide.js"></script>
+<!-- Pretty photo  -->
+<script type="text/javascript" src="js/jquery.prettyphoto.js"></script>
+<!-- Carousel  -->
+<script type="text/javascript" src="js/carousel.js"></script>
+<!-- totop  -->
+<script type="text/javascript" src="js/jquery.ui.totop.js"></script>
+<script type="text/javascript" src="js/prettify.js"></script>
+<script type="text/javascript" src="js/application.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.js"></script>
+<!-- Quicksand  -->
+<script type="text/javascript" src="js/jquery.quicksand.js"></script>
+<!-- Image animated Style  -->
+<script type="text/javascript" src="js/jquery.gridrotator.js"></script>
+<script type="text/javascript" src="js/jquery.mobile.customized.min.js"></script>
+<!-- Accordion  -->
+<script type="text/javascript" src="js/accordion.js"></script>
+<!-- Tabs  -->
+<script type="text/javascript" src="js/tabs.js"></script>
+<!-- Sitemap  -->
+<script type="text/javascript" src="js/sitemap.js"></script>
+<!-- Navigation  -->
+<script type="text/javascript" src="js/nav-small.js"></script>
+<script type="text/javascript" src="js/jquery.mobilemenu.js"></script>
+<!-- Isotope  -->
+<script type="text/javascript" src="js/jquery.isotope.min.js"></script>
+<!-- Metro Style  -->
+<script type="text/javascript" src="js/boxgrid.js"></script>
+<script type="text/javascript" src="demo/switcher.js"></script>
+</body>
+</html>

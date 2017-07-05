@@ -1,0 +1,37 @@
+package com.weiye.service;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.weiye.exception.ServiceException;
+import com.weiye.model.Employee;
+import com.weiye.model.EndiciaLabel;
+import com.weiye.model.News;
+import com.weiye.model.Order;
+import com.weiye.model.PageSplit;
+import com.weiye.model.ResponseObject;
+
+
+/**
+ * Endicail 接口操作
+ */
+public interface EndiciaService {
+
+	/**
+	 * 查询价格
+	 * 
+	 */
+	public ResponseObject<Object> checkediciaprices(EndiciaLabel label) throws ServiceException;
+	public ResponseObject<Object> checkediciapricesbyadmin(EndiciaLabel label) throws ServiceException;//管理员检查
+
+	/**
+	 * 打印标签
+	 * 
+	 */
+	public ResponseObject<Object> printlabel(EndiciaLabel label,HttpServletRequest request) throws ServiceException;
+	public ResponseObject<Object> printlabelbyadmin(EndiciaLabel label,HttpServletRequest request,String adminname) throws ServiceException;	
+	
+
+	public ResponseObject<PageSplit<EndiciaLabel>> searchEndiciaLabelByKeys( String userId,String userInfo,  String labelInfo, String sdate,  String edate,int pageSize, int pageNow) throws ServiceException;
+}

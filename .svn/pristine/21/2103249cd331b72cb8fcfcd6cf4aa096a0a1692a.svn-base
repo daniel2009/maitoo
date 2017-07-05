@@ -1,0 +1,184 @@
+var project_base_name = "";
+var user_login_url = "/login.jsp";
+var user_index_url = "/index.jsp";
+var user_logout_url = "/user/logout";
+var user_firstpage_url = "/user/firstPage.jsp";
+var user_baoguoyubao_url = "/user/baoguoyubao.jsp";
+var user_baoguocaibao_url = "/user/baoguocaibao.jsp";
+
+var user_print_page_url = "/user/print.jsp";
+var user_print_endcialabel_page_url = "/user/EndicaLabelprint.jsp";
+
+
+var user_zaixianchongzi_url = "/user/zaixianchongzi.jsp";
+var user_weixin_QRCode_url = "/user/weixinQRCode.jsp";
+var weixin_recharge = "/weixin/recharge";
+var user_weixin_check_if_scan_pay= "/user/weixin/checkIfScanPay";
+var user_caiwujilu_url = "/user/caiwujilu.jsp";
+var user_get_self_url = "/user/get_self";
+var account_detail_search_url = "/account/detail/search";
+var user_shouhuodizi_url = "/user/shouhuodizi.jsp";
+var consignee_search_url = "/consignee/search";
+var consignee_del_url = "/consignee/del";
+var consignee_add_no_pic_url = "/consignee/add_no_pic";
+var consignee_add_url = "/consignee/add";
+var consignee_get_one_url = "/consignee/get_one";
+var consignee_all_url = "/consignee/all";
+var user_xiugaimima_url = "/user/xiugaimima.jsp";
+
+var user_zhengjiadizi_url = "/user/zhengjiadizi.jsp";
+var user_wangshangzhijian_url = "/user/wangshangzhijian.jsp";
+var commodity_all_url = "/commodity/all";
+var commodity_all_user_url="/commodity/user_all";
+var order_online_submit_url ="/order/online_submit";
+var order_online_submit_has_cardurl_url ="/order/online_submit_has_cardurl";
+var user_lishiyundan_url = "/user/lishiyundan.jsp";
+var order_search_url = "/order/search";
+var order_delete_url = "/order/delete";
+var order_get_url = "/order/get";
+var route_search_url = "/route/search";
+var route_kuaidi100_url = "/route/kuaidi100";
+var route_kuaidi_url = "/route/guest";
+var user_yundanxiangqing_url = "/user/yundanxiangqing.jsp";
+var order_pay_url = "/order/pay";
+var user_dingdanzhifu_url = "/user/dingdanzhifu.jsp";
+var user_dingdanzhifuinfopayed_url = "/user/dingdanzhifuinfopayed.jsp";
+var user_yonghuxinxi_url = "/user/yonghuxinxi.jsp";
+
+var user_save_info_url = "/user/save_info";
+var user_warehouse_all_url = "/user/warehouse/all";
+var stripe_recharge_url = "/stripe/recharge";
+var alipay_recharge_url ="/alipay/recharge";
+var user_liuyanguanli_url = "/user/liuyanguanli.jsp";
+var message_search_url = "/message/search";
+var message_add_url = "/message/add";
+var user_wodeziliao_url = "/user/wodeziliao.jsp";
+var user_kucunliebiao_url = "/user/kucunliebiao.jsp";
+var user_modify_code_url = "/user/reset_pwd_byuser";
+var user_verify_info_url = "/user/verify_info";
+var user_verify_info_email_url = "/user/verify_info_email";
+
+var user_yubaojilu_url = "/user/yubaojilu.jsp";
+var transh_search_url = "/transh/search";
+var transh_delete_url = "/transh/delete";
+var user_yundantijiao_url = "/user/yundantijiao.jsp";
+var transh_get_by_id_url = "/transh/get_by_id";
+var order_submit_url = "/order/submit";
+var transh_add_url = "/transh/add";
+var user_xiugaidizi_url = "/user/xiugaidizi.jsp";
+var consignee_modify_no_pic_url = "/consignee/modify_no_pic";
+var consignee_modify_url = "/consignee/modify";
+
+var user_shangmenqujian_url = "/user/shangmenqujian.jsp";
+var user_lipeiguanli_url = "/user/lipeiguanli.jsp";
+var user_tousuguanli_url = "/user/tousuguanli.jsp";
+var user_tuikuanshenqing_url = "/user/tuikuanshenqing.jsp";
+var user_tuihuoguanli_url = "/user/tuihuoguanli.jsp";
+var user_baoguorenling_url = "/user/baoguorenling.jsp";
+var call_order_add_url = "/call_order/add";
+var user_globalargs_getcontents_url= "/globalargs/getcontents";
+
+var user_Endicia_label_url = "/user/endicialabel.jsp";
+
+
+var user_tran_dingdanzhifu_url="/user/trandingdanzhifu.jsp";
+
+
+function firstSetUrl(baseUrl) {
+	project_base_name = baseUrl;
+	user_login_url = baseUrl + user_login_url;
+	user_logout_url = baseUrl + user_logout_url;
+	user_firstpage_url = baseUrl + user_firstpage_url;
+	user_baoguoyubao_url = baseUrl + user_baoguoyubao_url;
+	user_baoguocaibao_url = baseUrl + user_baoguocaibao_url;
+	
+	user_zaixianchongzi_url = baseUrl + user_zaixianchongzi_url;
+	user_weixin_QRCode_url = baseUrl + user_weixin_QRCode_url;
+	weixin_recharge = baseUrl + weixin_recharge;
+	user_weixin_check_if_scan_pay = baseUrl + user_weixin_check_if_scan_pay;
+	user_caiwujilu_url = baseUrl + user_caiwujilu_url;
+	user_get_self_url = baseUrl + user_get_self_url;
+	account_detail_search_url = baseUrl + account_detail_search_url;
+	user_shouhuodizi_url = baseUrl + user_shouhuodizi_url;
+	consignee_search_url = baseUrl + consignee_search_url;
+	user_zhengjiadizi_url = baseUrl + user_zhengjiadizi_url;
+	consignee_del_url = baseUrl + consignee_del_url;
+	consignee_add_no_pic_url = baseUrl + consignee_add_no_pic_url;
+	consignee_add_url = baseUrl + consignee_add_url;
+	consignee_get_one_url = baseUrl + consignee_get_one_url;
+	user_wangshangzhijian_url = baseUrl + user_wangshangzhijian_url;
+	commodity_all_url = baseUrl + commodity_all_url;
+	commodity_all_user_url== baseUrl + commodity_all_user_url;
+	consignee_all_url = baseUrl + consignee_all_url;
+	order_online_submit_url = baseUrl + order_online_submit_url;
+	order_online_submit_has_cardurl_url = baseUrl + order_online_submit_has_cardurl_url;
+	user_lishiyundan_url = baseUrl + user_lishiyundan_url;
+	order_search_url = baseUrl + order_search_url;
+	order_delete_url = baseUrl + order_delete_url;
+	
+	user_xiugaimima_url= baseUrl + user_xiugaimima_url;
+	order_get_url = baseUrl + order_get_url;
+	route_search_url = baseUrl + route_search_url;
+	route_kuaidi100_url = baseUrl + route_kuaidi100_url;
+	route_kuaidi_url = baseUrl + route_kuaidi_url;
+	user_yundanxiangqing_url = baseUrl + user_yundanxiangqing_url;
+	
+	order_pay_url = baseUrl + order_pay_url;
+	user_dingdanzhifu_url = baseUrl + user_dingdanzhifu_url;
+	user_dingdanzhifuinfopayed_url = baseUrl + user_dingdanzhifuinfopayed_url;
+	
+	user_print_page_url= baseUrl + user_print_page_url;
+	user_print_endcialabel_page_url= baseUrl + user_print_endcialabel_page_url;
+	
+	user_yonghuxinxi_url = baseUrl + user_yonghuxinxi_url;
+	user_save_info_url = baseUrl + user_save_info_url;
+	user_warehouse_all_url = baseUrl + user_warehouse_all_url;
+	stripe_recharge_url = baseUrl + stripe_recharge_url;
+	alipay_recharge_url = baseUrl + alipay_recharge_url;
+	
+	user_verify_info_url= baseUrl + user_verify_info_url;
+	user_verify_info_email_url= baseUrl + user_verify_info_email_url;
+	
+	user_liuyanguanli_url = baseUrl + user_liuyanguanli_url;
+	message_search_url = baseUrl + message_search_url;
+	message_add_url = baseUrl + message_add_url;
+	user_wodeziliao_url = baseUrl + user_wodeziliao_url;
+	user_kucunliebiao_url = baseUrl + user_kucunliebiao_url;
+	user_yubaojilu_url = baseUrl + user_yubaojilu_url;
+	transh_search_url = baseUrl + transh_search_url;
+	transh_delete_url = baseUrl + transh_delete_url;
+	
+	user_yundantijiao_url = baseUrl + user_yundantijiao_url;
+	transh_get_by_id_url = baseUrl + transh_get_by_id_url;
+	order_submit_url = baseUrl + order_submit_url;
+	transh_add_url = baseUrl + transh_add_url;
+	
+	user_xiugaidizi_url = baseUrl + user_xiugaidizi_url;
+	consignee_modify_no_pic_url = baseUrl + consignee_modify_no_pic_url;
+	consignee_modify_url = baseUrl + consignee_modify_url;
+	
+	user_shangmenqujian_url = baseUrl + user_shangmenqujian_url;
+	user_lipeiguanli_url = baseUrl + user_lipeiguanli_url;
+	user_tousuguanli_url = baseUrl + user_tousuguanli_url;
+	user_tuikuanshenqing_url = baseUrl + user_tuikuanshenqing_url;
+	user_tuihuoguanli_url = baseUrl + user_tuihuoguanli_url;
+	user_baoguorenling_url = baseUrl + user_baoguorenling_url;
+	call_order_add_url = baseUrl + call_order_add_url;
+	user_index_url = baseUrl + user_index_url;
+	user_modify_code_url= baseUrl + user_modify_code_url;
+	
+	user_globalargs_getcontents_url= baseUrl + user_globalargs_getcontents_url;
+	user_Endicia_label_url= baseUrl + user_Endicia_label_url;
+	
+	user_tran_dingdanzhifu_url= baseUrl + user_tran_dingdanzhifu_url;
+	
+
+}
+
+function logout() {
+	$.get(user_logout_url, function(response) {
+		window.location.href = user_index_url;
+	});
+	return false;
+}
+

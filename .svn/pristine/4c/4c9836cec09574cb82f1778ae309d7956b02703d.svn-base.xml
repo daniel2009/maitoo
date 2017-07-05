@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weiye.dao.CommonDao">
+	<insert id="insertToken">
+		insert into user_token(email,token,status,date)
+		values(#{email},#{token},'0',#{date})
+	</insert>
+	
+	<select id="retrieveToken" resultType="java.lang.String">
+		select token from user_token
+		where status='0' and email=#{email} and date>#{date}
+		order by date
+		limit 1
+	</select>
+	
+	<update id="updateStatus" parameterType="java.lang.String">
+		update user_token
+		set status='1'
+		where email=#{email}
+	</update>
+
+</mapper>

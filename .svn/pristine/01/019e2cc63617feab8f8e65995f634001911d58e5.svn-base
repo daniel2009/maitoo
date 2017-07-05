@@ -1,0 +1,86 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="shortcut icon" href="../img/favicon.ico" />
+</head>
+
+<body>
+	<input type="hidden" name="globalargsid" value="${param.id }" />
+	<input type="hidden" name="globalargsflag" value="" />
+	<input type="hidden" name="globalargstype" value="" />
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">
+			修改全局变量 <a href="#" id="a_back_globalargs_list_link">返回列表</a>
+
+		</p>
+
+		<div class="box_content">
+			<div class="content_title">修改全局变量信息</div>
+			<div class="content_text">
+
+
+				<div class="tab-content" id="tab2">
+					<form action="" id="modify_g_pic_form" method="post"
+						enctype="multipart/form-data" onSubmit="return false">
+
+						<input type="hidden" name="gid" value="" />
+						<input type="hidden" name="gflag" value="" />
+						<fieldset>
+							<p>
+								<label style="display: inline;">变量标志：</label> <input
+									class="text-input small-input" type="text" name="argsflag"
+									readonly="true" /> <span class="gl_message">*</span>
+							</p>
+							<p id="showtextcontent">
+								<label style="display: inline;">变量内容：</label>
+								<textarea rows="10" cols="16" name="argcontent"></textarea>
+								<span class="gl_message">*</span>
+							</p>
+							<p id="showpiccontent">
+								<input type="text" name="globalpic"
+									style="width:120px;display:none;" /> <span> <label
+									style="display: inline;">图片预览：</label><a href=""
+									target="_blank" id="imgurllink"><img width="150px"
+										height="150px" src=""></a>
+
+								</span><br /> <label style="display: inline;"> 上传新图片： </label> <input
+									id="globalfile" name="file" type="file" />
+							</p>
+
+							<p id="showtextcontent">
+								<label style="display: inline;">变量备注：</label>
+								<textarea rows="10" cols="16" name="argremark"></textarea>
+
+								<span class="gl_message">*</span>
+							</p>
+
+							<!-- <p>
+			            	<label style="display: inline;">&nbsp;&nbsp;&nbsp;照&nbsp;&nbsp;&nbsp;片：</label>
+			            	<input class="text-input small-input" type="file" name="pic"/>
+			            </p> -->
+							<p style="margin-left: 50px;">
+								<input id="bt_modify_globalargs" class="button" type="submit"
+									value="修改" />
+								<!-- <input id="bt_add_news_reset" class="button" type="reset" value="重置"/> -->
+							</p>
+						</fieldset>
+						<div class="clear"></div>
+						<!-- End .clear -->
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="tmpmsgdiv1" style="display:none;'">
+	
+	</div>
+</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+
+		loadNav942Data();
+	});
+</script>
+</html>

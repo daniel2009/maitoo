@@ -1,0 +1,788 @@
+
+function removenull(str)
+{
+	if((str=="")||(str==null)||(str=="null")||(str=="undefined"))
+	{
+		return "";
+	}
+	else
+	{
+		return str;
+	}
+}
+function loadNav44Data() {
+	// 开始运单数据
+	var forwardState = window.sessionStorage.getItem("searchState");
+	var searchAfter = window.sessionStorage.getItem("searchAfter");
+	
+	if(forwardState != null){
+		$("#stateSelect").val(forwardState);
+		if(searchAfter){
+			$("#searchUrl").val("../user/order/searchAfterOrderState");
+		}
+	}
+	
+	window.sessionStorage.clear();
+	getNeedFocusCount();
+	loaddhybinfo("","1");
+	
+	$("a[name='a_search_link']").click(function(){
+		var oid = $(":text[name='oid']").val();
+		var pn = "1";
+		$("#searchUrl").val("");
+		loaddhybinfo(oid,pn);
+		return false;
+	});
+	
+	// 设置点击跳转链接的事件
+	$("#datatable tfoot a[name='to_page']").click(function() {
+		// 跳页
+			var pn = $(this).attr("href");
+			var oid = $(":hidden[name='oid']").val();
+			loaddhybinfo(oid,pn);
+			return false;
+		});
+
+	$("#datatable tfoot input").keydown(function(event) {
+		if (event.which == 13) {
+			var pn = $(this).val();
+			if (/^\d*$/.test(pn)) {
+				var oid = $(":hidden[name='oid']").val();
+				loaddhybinfo(oid,pn);
+			} else {
+				alert("只能输入数字");
+			}
+			$(this).blur();
+		}
+	});
+	// 设置支付事件
+	$("a[name='a_pay_link']").click(function(){
+		var chk_value ="" ;
+		$(':checkbox[name="cb_submit"]:checked').each(function() {
+			chk_value += $(this).val()+",";
+		});
+		if (chk_value == null||chk_value=="") {
+			alert("您还没有选择要支付的运单或运单已经支付！");
+		} else {
+			chk_value=chk_value.substring(0,chk_value.length-1);
+			//window.location.href = "dingdanzhifu.jsp?oid="+chk_value;
+			nav442Click(chk_value);
+		}
+		return false;
+	});
+}
+
+
+function loaddhybinfo(oid,pn) {
+	var url = order_search_url;
+	if($("#searchUrl").val() != ""){
+		url = $("#searchUrl").val();
+	}
+	var queryLike = $("#queryLike").val();
+	
+	$(":hidden[name='oid']").val(oid);
+	$.ajax({
+		type:"post",
+		url: url,
+		dataType : "json",
+		contentType: "application/x-www-form-urlencoded; charset=utf-8",  
+		data : {
+			"oid":oid,
+			state : $("#stateSelect").val(),
+			"queryLike" : queryLike,
+			"pageIndex":pn
+		},
+		success:function(response) {
+			var code = response.code;
+			if (code == "200") {
+				if (response.data != null) {
+					showdhyblist(response.data.datas);
+					showpagesplit(response.data);
+				} else {
+					showdhyblist(null);
+					showpagesplit(null);
+				}
+				afterShow();
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				// 失败
+				alert("获取运单记录信息失败，原因是:" + response.message);
+			}
+		}
+	});
+}
+
+function showdhyblist(list) {
+	$("#datatable tbody").html("");
+	if (list != null && list.length > 0) {
+		$.each(list,function(){
+			var str = "<tr id='" + this.orderId + "'>";
+			str += "<td><a href='#' name='a_order_datail_link'>" + this.orderId.replace("DCS","ZY") + "</a></td>";
+			var pm = "";
+			var brands="";
+			//alert(this.type);
+			if((this.type!=null)&&(this.type=="7"))
+			{
+				//alert(pm);
+				pm=this.commodityThirdList;
+				brands=this.thirdBrands;
+			}
+			else{
+				$.each(this.details,function(){
+					pm += this.ctype + ":" + this.quantity + ";"; 
+					brands+=this.brands+";";
+				});
+			}
+			str += "<td>" + pm + "</td>";
+			str += "<td>" + brands + "</td>";
+			str += "<td>" + this.cName + "</td>";
+			str += "<td>" + this.createDate + "</td>";
+			if(this.totalMoney==null){
+				str += "<td>" + "&nbsp";+ "</td>";	
+			}else{
+			str += "<td>" + this.totalMoney + "</td>";	
+			}		
+			str += "<td>" + this.stateStr + "</td>";
+			
+			if (this.state == "1") {
+				str += "<td><input type='checkbox' name='cb_submit' value='" + this.orderId + "' /></td></tr>";
+			}else if(this.state=="-1"){
+				str += "<td><a href='#' name='a_del_link'>删除</a></td></tr>";
+			}else {
+				str += "<td><input type='checkbox' name='xiangqing_submit' value='" + this.orderId + "' /></td></tr>";
+			}
+			$("#datatable tbody").append(str);
+		});
+	}
+}
+
+function showpagesplit(pageSplit) {
+	var rowCount = 0;
+	var pageSize = 0;
+	var pageNow = 0;
+	var pageCount = 0;
+	if (pageSplit != null) {
+		rowCount = pageSplit.rowCount;
+		pageSize = pageSplit.pageSize;
+		pageNow = pageSplit.pageNow;
+		pageCount = pageSplit.pageCount;
+	}
+	$("#trsize").html(rowCount);
+	$("#tpsize").html(pageCount);
+	$("#first_page").attr("href","1");
+	$("#pre_page").attr("href", pageNow - 1);
+	$("#next_page").attr("href",pageNow + 1);
+	$("#last_page").attr("href", pageCount);
+}
+
+function afterShow() {
+	$("a[name='a_order_datail_link']").click(function(){
+		var id = $(this).parent().parent().attr("id");
+		nav441Click(id);
+		//window.location.href = "yundanliebiaoxiangqing.jsp?oid="+id;
+		return false;
+	});
+	
+	$("a[name='a_del_link']").click(function(){
+		
+		var oid = $(this).parent().parent().attr("id");
+		
+		if (confirm("您是否确认要删除此运单记录?")) {
+			$.ajax({
+				type:"post",
+				url:order_delete_url,
+				data : $.param({
+					"oid" : oid,
+				}, true),
+				success:function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("删除成功");
+						nav44Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else {
+						// 失败
+						alert("删除信息失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	});
+	return false;
+}
+function xiangqing() {
+	var chk_value = [];
+	$(':checkbox[name="xiangqing_submit"]:checked').each(function() {
+		chk_value.push($(this).val());
+	});
+	if (chk_value.length == 0) {
+		alert("您还没有选择要操作的运单 ！");
+	} 
+	else if (chk_value.length>1){
+		alert("一次只能选择一个订单！");
+	}
+	else{
+		nav441Click(chk_value.pop());
+		//window.location.href = "yundanliebiaoxiangqing.jsp?oid=" + chk_value;
+	}
+	return false;
+}
+
+
+///////////////////////////////////////////////////////////////
+function loadNav441Data() {
+	var id = $(":hidden[name='oid']").val();
+	$.ajax({
+		type:"get",
+		url:order_get_url,
+		data:{
+			"oid":id
+		},
+		success:function(response){
+			var code = response.code;
+			if (code=="200" && response.data != null) {
+				$.each(response.data, function(){
+					
+					var str = "<tr>";
+					str += "<td>" + this.orderId.replace("DCS","ZY") + "</td>";
+					var pm = "";
+					var brands="";
+					//alert(this.type);
+					if((this.type!=null)&&(this.type=="7"))
+					{
+						//alert(pm);
+						pm=this.commodityThirdList;
+						brands=this.thirdBrands;
+					}
+					else{
+						$.each(this.details,function(){
+							pm += this.ctype + ":" + this.quantity + ";"; 
+							brands+=this.brands+";";
+						});
+					}
+					if((pm==null)||(pm=="null"))
+					{pm="";}
+					str += "<td>" + pm + "</td>";
+					if((brands==null)||(brands=="null"))
+					{brands="";}
+					str += "<td>" + brands + "</td>";
+					
+					
+					if((this.weight==null)||(this.weight=="null"))
+					{this.weight="";}
+					if((this.cName==null)||(this.cName=="null"))
+					{this.cName="";}
+					if((this.totalMoney==null)||(this.totalMoney=="null"))
+					{this.totalMoney="";}
+					if((this.createDate==null)||(this.createDate=="null"))
+					{this.createDate="";}
+					if((this.address==null)||(this.address=="null"))
+					{this.address="";}
+					if((this.stateStr==null)||(this.stateStr=="null"))
+					{this.stateStr="";}
+				
+					
+																		
+					str += "<td>" + this.weight + "</td>";															
+					str += "<td>" + this.cName + "</td>";
+					str += "<td>" + this.totalMoney + "</td>";
+					str += "<td>" + this.createDate + "</td>";
+					str += "<td>" + this.address + "</td>";
+					str += "<td>" + this.stateStr + "</td>";
+					str += "</tr>";
+					$("#datatable tbody").append(str);
+					
+					
+					 if(this.thirdNo==null||this.thirdNo==""||this.thirdPNS==""||this.thirdPNS==null){
+						 getRoute(this.orderId);
+					 }
+					else{
+						
+						if((this.state!=null)&&(this.state!="")&&(this.state!="null")&&(this.state!="undefined")&&(this.state>6))
+						{
+							
+							getRoute1(this.orderId,this.thirdNo,this.thirdPNS);
+							
+						}
+						else
+						{
+							getRoute(this.orderId);
+						}
+					}
+					//kuaidiDcs(this.orderId);
+					//kuaidi100(this.orderId);
+				});
+			} else if ("607"==code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取运单详细信息失败，原因是:" + response.message);
+			}
+		}
+	});
+
+
+
+
+function getRoute(id) {
+	$.ajax({
+		type:"get",
+		url:route_search_url,
+		data:{
+			"oid":id
+		},
+		success:function(response){
+			
+			var code = response.code;
+			if (code=="200" && response.data != null) {
+				str = "";
+				for (var key in response.data) {
+					var value = response.data[key];
+					$.each(value, function(){
+						str+="<tr>";
+						
+						
+						if(this.state=="")
+						{
+							
+							str+="<tr style='color:blue;'>";
+						
+								
+						}
+						else
+						{
+							str+="<tr>";
+						}
+						
+						
+						
+						if((this.date==null)||(this.date=="null"))
+						{this.date="";}
+						if((this.state==null)||(this.state=="null"))
+						{this.state="";}
+						if((this.stateRemark==null)||(this.stateRemark=="null"))
+						{this.stateRemark="";}
+						if((this.remark==null)||(this.remark=="null"))
+						{this.remark="";}
+						
+						str+="<td>" + this.date + "</td>";
+						str+="<td>" + this.state + "</td>";
+						str+="<td>" + this.stateRemark + "</td>";
+						str+="<td align='left'>" + this.remark + "</td>";
+						str+="</tr>";
+						
+						
+						
+						
+					});
+				}
+				
+				$("#routetable tbody").html(str);
+			} else {
+				//ignore
+				
+			}
+		}
+	});
+}
+
+function getRoute1(id,third_no,third_pns) {
+	$.ajax({
+		type:"get",
+		url:route_search_url,
+		data:{
+			"oid":id
+		},
+		success:function(response){
+			
+			var code = response.code;
+			if (code=="200" && response.data != null) {
+				str = "";
+				for (var key in response.data) {
+					var value = response.data[key];
+					$.each(value, function(){
+						
+						
+						if((this.date==null)||(this.date=="null"))
+						{this.date="";}
+						if((this.state==null)||(this.state=="null"))
+						{this.state="";}
+						if((this.stateRemark==null)||(this.stateRemark=="null"))
+						{this.stateRemark="";}
+						if((this.remark==null)||(this.remark=="null"))
+						{this.remark="";}
+						
+						str+="<tr>";
+						str+="<td>" + this.date + "</td>";
+						str+="<td>" + this.state + "</td>";
+						str+="<td>" + this.stateRemark + "</td>";
+						str+="<td align='left'>" + this.remark + "</td>";
+						str+="</tr>";
+					});
+				}
+				
+				kuaidi100_1(str,third_no,third_pns);
+				
+				//return str;
+				//$("#routetable tbody").html(str);
+			} else {
+				// ignore
+				//return "";
+			}
+		}
+	});
+}
+
+function kuaidiDcs(orderId) {
+	$.ajax({
+		type:"get",
+		url:route_kuaidi_url,
+		data : $.param({
+			"oids" : orderId,
+			"kuaidi_type" : "2"
+		}, true),
+		success : function(response) {
+			var code = response.code;
+			
+			if (code=="200" && response.data != null) {
+				var str = "";
+				var i = 0;
+				$.each(response.data, function(){
+					str+="<tr>";
+					str+="<td>" + this.date + "</td>";
+					if(i==0){
+						str+="<td>" + this.state + "</td>";
+					}else{
+						str+="<td></td>";
+					}
+					str+="<td>" + this.stateRemark + "</td>";
+					str+="<td style='text-align:left'>" + this.remark + "</td>";
+					str+="</tr>";
+					i=i+1;
+				});
+				$("#routetable tbody").html(str);
+			} else {
+				
+			}
+			return false;
+		}
+	});
+}
+
+function kuaidi100(orderId) {
+
+	$.ajax({
+		type:"get",
+		url:route_kuaidi100_url,
+		data:{	
+			"oids":orderId,
+			"kuaidi_type":"0"
+		},
+		
+		success:function(response){
+			var code = response.code;
+			if (code=="200" && response.data != null) {
+				str = "";
+				var i = 0;
+				$.each(response.data, function(){
+					
+					
+					if((this.date==null)||(this.date=="null"))
+					{this.date="";}
+					if((this.state==null)||(this.state=="null"))
+					{this.state="";}
+					if((this.stateRemark==null)||(this.stateRemark=="null"))
+					{this.stateRemark="";}
+					if((this.remark==null)||(this.remark=="null"))
+					{this.remark="";}
+					
+					str+="<tr>";
+					str+="<td>" + this.date + "</td>";
+					if(i==0){
+						str+="<td>" + this.state + "</td>";
+					}else{
+						str+="<td></td>";
+					}
+					str+="<td>" + this.stateRemark + "</td>";
+					str+="<td style='text-align:left'>" + this.remark + "</td>";
+					str+="</tr>";
+					i=i+1;
+				});
+				$("#routetable tbody").html(str);
+			} else {
+				// ignore
+			}
+		}
+	});
+}
+
+function kuaidi100_1(rout_str,third_no,third_pns) {
+
+	$.ajax({
+		type:"get",
+		url:route_kuaidi100_url,
+		data:{	
+			"third_no":third_no,
+			"third_pns":third_pns
+		},
+		
+		success:function(response){
+			//alert(response);
+			var code = response.code;
+			if (code=="200" && response.data != null) {
+				str = "";
+				var i = 0;
+				$.each(response.data, function(){
+					
+					
+					if((this.date==null)||(this.date=="null"))
+					{this.date="";}
+					if((this.state==null)||(this.state=="null"))
+					{this.state="";}
+					if((this.stateRemark==null)||(this.stateRemark=="null"))
+					{this.stateRemark="";}
+					if((this.remark==null)||(this.remark=="null"))
+					{this.remark="";}
+					
+					str+="<tr style='color:blue;'>";
+					str+="<td>" + this.date + "</td>";
+					if(i==0){
+						str+="<td>" + this.state + "</td>";
+					}else{
+						str+="<td></td>";
+					}
+					str+="<td>" + this.stateRemark + "</td>";
+					str+="<td style='text-align:left'>" + this.remark + "</td>";
+					str+="</tr>";
+					i=i+1;
+					if(this.state=="")
+					{
+						
+						//str="<tr style='color:blue;'>";
+						if((this.returnurl=="")||(this.returnurl=="null")||(this.returnurl==null)||(this.returnurl=="undefined"))
+						{}
+						else
+						{
+							//alert(this.returnurl);
+							$("#show_return_title").show();
+							$("#returnurl").attr("style","width: 600px;height: 500px;margin-left: 10px;word-break:break-all; word-wrap:break-all;");
+							$("#returnurl").attr("src",this.returnurl);
+							$("#show_return_title").show();
+							
+							if((removenull(this.thrid_pns)!=""))
+							{
+								//alert(this.thrid_pns);
+								for(var i=0;i<_kuaidi_map.length;i++)
+								{
+									if(this.thrid_pns==_kuaidi_map[i][0])
+									{
+										this.thrid_pns=_kuaidi_map[i][1];
+										break;
+									}
+								}
+								
+							}
+							$("#expresscompanyname").html(this.thrid_pns);
+							$("#expresscompanycodes").html(this.thrid_no);
+							
+							
+						}
+							
+					}
+					else
+					{
+						//str="<tr>";
+					}
+					
+				});
+				//alert(rout_str+str);
+				$("#routetable tbody").html(rout_str+str);
+				
+				
+				
+			} else {
+				$("#routetable tbody").html(rout_str);
+			}
+		}
+	});
+}
+
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+
+function loadNav442Data(){
+	
+	// 开始获取数据
+	//var regx=/[a-zA-Z]*\d+/g;  
+	//update by chenkanghua  订单号为 WY+8位+US
+	
+	//var regx=/[A-Z]{2}[\d]{8}[A-Z]{2}|[a-zA-Z]*\d+/g
+	var value = $(":hidden[name='oid']").val();
+	//var arrs = value.match(regx);
+	var arrs = value;
+	if (arrs!=null) {
+		search(arrs);
+	}
+	
+	$("a[name='a_order_pay_link']").click(function(){
+		var value = $(":hidden[name='oid']").val();
+		var arrs = value.match(regx);
+		if (arrs!=null) {
+			$.ajax({
+				type:"post",
+				url:order_pay_url,
+				data : $.param({
+					"oid" : arrs,
+				}, true),
+				success:function(response) {
+					var code = response.code;
+					if (code == "200") {
+						alert("支付成功");
+						nav44Click();
+					} else if ("607" == code) {
+						alert("您尚未登录或登录已失效！");
+						logout();
+					} else if ("18005" == code) {
+						alert("账户余额不足，请去充值！");
+						nav61Click();
+					} else {
+						// 失败
+						alert("支付运单失败，原因是:" + response.message);
+					}
+				}
+			});
+		}
+		return false;
+	});
+
+
+function search(arrs) {
+	$.ajax({
+		type:"get",
+		url:order_get_url,
+		data : $.param({
+			"oid" : arrs,
+		}, true),
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				showOrders(response.data);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取运单详情失败，原因是:" + response.message);
+			}
+			return false;
+		}
+	});
+}
+
+function showOrders(list) {
+	$("#order_pay_info").html("");
+	if (list != null) {
+		var rmb = 0.0;
+		var usd = 0.0;
+		var totalMoney = 0.0;
+		$.each(list, function(){
+			var str = '<div>';
+			str += '<label>运单号：</label>' + this.orderId + '<br/>';
+			str += '<label>收货信息：</label>' + this.cName + '&nbsp;' + this.cPhone + '&nbsp;' + this.address + '<br/>';
+			var pm = '';
+			$.each(this.details,function(){
+				pm += this.xiangqing + ":" + this.quantity + ";";
+			});
+			str += '<label>运单信息：</label>' + pm + '<br/>';
+			str += '<label>运费($)：</label>' + this.totalMoney + '<br/>';
+			str += '</div><hr/><br/>';
+			totalMoney += parseFloat(this.totalMoney);
+			rmb = this.user.rmbBalance;
+			usd = this.user.usdBalance;
+			$("#order_pay_info").append(str);
+		});
+		$("#order_pay_info").append("账户余额:￥" + rmb +"&nbsp;/&nbsp;$" + usd + "<br/>");
+		$("#order_pay_info").append("总运费($):" + totalMoney + "<hr/><br/>");
+	}
+}
+
+};
+
+///////////////////////////////////////////////////////////////////////////////////
+//kai 20151003 支付完成后显示的信息
+function loadNav443Data(){
+	
+	// 开始获取数据
+	//var regx=/[a-zA-Z]*\d+/g;  
+	//update by chenkanghua  订单号为 WY+8位+US
+	var regx=/[A-Z]{2}[\d]{8}[A-Z]{2}|[a-zA-Z]*\d+/g
+	var value = $(":hidden[name='oid']").val();
+	var arrs = value.match(regx);
+	if (arrs!=null) {
+		searchinfo(arrs);
+	}
+	
+	$("a[name='a_return_tran_link']").click(function(){
+		
+		nav13Click();//返回预报记录
+		
+	});
+
+
+function searchinfo(arrs) {
+	$.ajax({
+		type:"get",
+		url:order_get_url,
+		data : $.param({
+			"oid" : arrs,
+		}, true),
+		success : function(response) {
+			var code = response.code;
+			if ("200" == code) {
+				showOrdersinfo(response.data);
+			} else if ("607" == code) {
+				alert("您尚未登录或登录已失效！");
+				logout();
+			} else {
+				alert("获取运单详情失败，原因是:" + response.message);
+			}
+			return false;
+		}
+	});
+}
+
+function showOrdersinfo(list) {
+	$("#order_pay_info").html("");
+	if (list != null) {
+		var rmb = 0.0;
+		var usd = 0.0;
+		var totalMoney = 0.0;
+		$.each(list, function(){
+			var str = '<div>';
+			str += '<label>运单号：</label>' + this.orderId + '<br/>';
+			str += '<label>收货信息：</label>' + this.cName + '&nbsp;' + this.cPhone + '&nbsp;' + this.address + '<br/>';
+			var pm = '';
+			$.each(this.details,function(){
+				pm += "商品详情:"+this.xiangqing + ",数量:" + this.quantity + ";";
+			});
+			str += '<label>运单信息：</label>' + pm + '<br/>';
+			str += '<label>运费(￥)：</label>' + this.totalMoney + '<br/>';
+			str += '</div><hr/><br/>';
+			totalMoney += parseFloat(this.totalMoney);
+			rmb = this.user.rmbBalance;
+			usd = this.user.usdBalance;
+			$("#order_pay_info").append(str);
+		});
+		$("#order_pay_info").append("账户余额:￥" + rmb +"&nbsp;/&nbsp;$" + usd + "<br/>");
+		$("#order_pay_info").append("已扣运费(￥):" + totalMoney + "<hr/><br/>");
+	}
+}
+
+};

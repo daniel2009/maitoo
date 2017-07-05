@@ -1,0 +1,81 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+	<link rel="shortcut icon" href="../img/favicon.ico" /> 
+	</head>
+
+	<body>
+	<div class="block">
+		<p class="block-heading" data-toggle="collapse"
+			data-target="#chart-container" style="font-size:20px">添加认领包裹
+			<a href="#" id="a_back_renling_list_link" class="button">返回列表</a>
+			</p>
+
+		<div class="box_content">
+			<div class="content_title">添加认领包裹</div>
+			<div class="content_text">
+		
+				<div class="tab-content" id="tab2">
+		          
+		          <form action="" id="add_form_renling" method="post" enctype="multipart/form-data">
+		            <fieldset>
+			            <p>
+			              <label class="cllabel">包裹单号：</label>
+			              <input class="text-input small-input" type="text" name="baoguoId" maxlength="16"/><span class="gl_message">*</span>
+			            </p>
+			            <p>
+			              <label class="cllabel">快递公司：</label>
+			              <input class="text-input small-input" type="text" name="company" maxlength="36"/>
+			            </p>
+			           <p>
+			              <label class="cllabel">接收人姓名：</label>
+			              <input class="text-input small-input" type="text" name="revName" maxlength="36"/>
+			            </p>
+			         
+			          
+			           
+			           
+			            <p>
+			              <label class="cllabel">接收人电话：</label>
+			              <input class="text-input small-input" type="text" name="baoguoPhone"maxlength="16" />
+			            </p>
+			            <p>
+			             <label class="cllabel">认领标题：</label>
+			              <input class="text-input medium-input" type="text" name="title" maxlength="46"/><span class="gl_message">*</span>
+			            </p>         			            
+			            <p>
+			              <label class="cllabel">认领内容描述：</label>
+			              <textarea rows="4" cols="10" class="text-input textarea wysiwyg" name="content"></textarea>
+			              <span class="gl_message">*</span>
+			            </p>
+			            
+			             <p>
+			              <label class="cllabel">认领样例图：</label>
+			              <input id="file1" name="file1" type="file" />
+			              <input id="file2" name="file2" type="file" />
+			              <input id="file3" name="file3" type="file" /> <span class="gl_message">*</span><small>(注意：支持JPG，PNG，BMP等图片格式的身体证图片，最大不超过4MB,并且至少提交1张图片)</small>
+			            </p>	
+			            
+			            
+			            <p style="margin-left: 50px;">
+			              <input id="bt_add_renlingbaoguo" class="button" type="submit" value="提交" />
+			              <input class="button" type="reset" value="重置">
+			            </p>
+		            </fieldset>
+		            <div class="clear"></div>
+		            <!-- End .clear -->
+		          </form>
+		        </div>
+			</div>
+		</div>
+		</div>
+		
+		<div id="tmpmsgdiv1" style="display:none;"></div>
+	</body>
+<script type="text/javascript">
+	$("#main-content").ready(function() {
+		loadNavRL01Data();
+	});
+</script>
+</html>
